@@ -8,4 +8,5 @@
 @section('content')
     <p>You are logged in!</p>
     <h1>{{$user = Auth::user()->name}}</h1>
+    <h2>{{$user = Auth::user()->privileges}}</h2>
 @stop
