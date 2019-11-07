@@ -11,11 +11,11 @@ class Unidade extends Model
 
 	public function empresa()
 	{
-		return $this->belongsTo(Models\Empresa::class);
+		return $this->belongsTo('App\Models\Empresa');
 	}	
 
 	public function user()
 		{
-			return $this->belongsTo(User::class);
+			return $this->belongsTo('App\User');
 		}
 }

@@ -22,7 +22,7 @@ $factory->define(Empresa::class, function (Faker $faker) {
         'telefone' => '41-13123132131',
         'responsavel'	=>	$faker->name,
         'email' =>	$faker->email,
-        'user_id' => factory(App\User::class),
+        
         
     ];
 });

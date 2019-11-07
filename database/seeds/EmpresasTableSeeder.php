@@ -19,12 +19,8 @@ class EmpresasTableSeeder extends Seeder
 
     public function run()
     {
-        // factory(App\Models\Empresa::class, 5)->create()->each(function ($unidade) {
-        //         $unidade->empresa()->save(factory(App\Models\Empresa::class)->make());
-
-
-        $empresa = factory(App\Models\Empresa::class,4)
-                    ->create();
+       $empresa = factory(App\Models\Empresa::class,4)
+                ->create();
         
     }
 }

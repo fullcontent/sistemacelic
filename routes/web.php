@@ -23,3 +23,4 @@ Route::get('/home', function() {
 
 
 Route::get('/empresas', 'EmpresaController@index');
+Route::get('/test', 'EmpresaController@test');

@@ -34,10 +34,7 @@ class CreateUnidadesTable extends Migration
             $table->string('responsavel');
             $table->string('email');
 
-            $table->unsignedInteger('user_id')->unsigned();
-            $table->foreign('user_id')->references('id')->on('users');
-
-
+            
             $table->timestamps();
         });
     }

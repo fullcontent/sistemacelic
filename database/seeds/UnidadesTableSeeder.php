@@ -12,6 +12,8 @@ class UnidadesTableSeeder extends Seeder
    public function run()
     {
        
+       $unidades = factory(App\Models\Unidade::class,10)
+                ->create();
 
     }
 }

@@ -10,14 +10,13 @@ class Empresa extends Model
 
 		public function unidades()
 		{
-			
 			return $this->hasMany('App\Models\Unidade');
 		}
 
 
-		public function user()
+		public function users()
 		{
-			return $this->belongsTo('App\User');
+			return $this->hasManyThrough('App\User','App\UserAccess','empresa_id','id');
 		}
 
 }
