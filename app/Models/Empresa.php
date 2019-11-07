@@ -11,13 +11,13 @@ class Empresa extends Model
 		public function unidades()
 		{
 			
-			return $this->hasMany(Unidade::class);
+			return $this->hasMany('App\Models\Unidade');
 		}
 
 
 		public function user()
 		{
-			return $this->belongsTo(User::class);
+			return $this->belongsTo('App\User');
 		}
 
 }

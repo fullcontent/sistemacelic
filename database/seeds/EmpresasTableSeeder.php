@@ -23,10 +23,8 @@ class EmpresasTableSeeder extends Seeder
         //         $unidade->empresa()->save(factory(App\Models\Empresa::class)->make());
 
 
-        $empresa = factory(App\Models\Empresa::class)
-                    ->create()
-                    ->each(function($unidade){
-                        $unidade->unidades()->createMany(factory(App\Models\Unidade::class,10)->make()->toArray());
-                    });
+        $empresa = factory(App\Models\Empresa::class,4)
+                    ->create();
+        
     }
 }

@@ -131,6 +131,16 @@ return [
             'search' => true,
         ],
         ['header' => 'main_navigation'],
+
+         [
+        'text' => 'Empresas',
+        'url' => 'empresas',
+        'icon' => 'glyphicon glyphicon-briefcase'],
+
+        [
+         'text' => 'Unidades',
+         'icon' => 'glyphicon glyphicon-align-justify'   
+        ]
         
     ],
 
