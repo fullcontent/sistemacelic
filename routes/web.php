@@ -22,5 +22,11 @@ Route::get('/home', function() {
 })->name('home');
 
 
-Route::get('/empresas', 'EmpresaController@index');
-Route::get('/test', 'EmpresaController@test');
+//Admin Routes
+
+Route::resource('/empresas','EmpresasController');
+Route::resource('/unidades','UnidadesController');
+Route::resource('/servicos','ServicosController');
+
+
+Route::get('/empresa/{empresa}/unidades','EmpresasController@unidades')->name('empresa.unidades');

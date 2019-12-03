@@ -139,8 +139,15 @@ return [
 
         [
          'text' => 'Unidades',
+         'url'  =>  'unidades',
          'icon' => 'glyphicon glyphicon-align-justify'   
-        ]
+        ],
+
+        [
+         'text' => 'Serviços',
+         'url'  =>  'servicos',
+         'icon' => 'glyphicon glyphicon-toolbox'   
+        ],
         
     ],
 
