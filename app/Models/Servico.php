@@ -14,8 +14,16 @@ class Servico extends Model
 
     public function empresa()
     {
-    	return $this->belongsTo('App\Models\Empresa');
+    	return $this->belongsTo('App\Models\Empresa','empresa_id');
     }
     
+    public function historico()
+    {
+    	return $this->hasMany('App\Models\Historico');
+    }
 
+    public function taxas()
+    {
+        return $this->hasMany('App\Models\Taxa');
+    }
 }

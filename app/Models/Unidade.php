@@ -18,4 +18,14 @@ class Unidade extends Model
 		{
 			return $this->belongsTo('App\User');
 		}
+
+	public function servicos()
+		{
+			return $this->hasMany('App\Models\Servico');
+		}
+
+		public function taxas()
+		{
+			return $this->hasManyThrough('App\Models\Taxa','App\Models\Servico','empresa_id','servico_id','id');
+		}
 }

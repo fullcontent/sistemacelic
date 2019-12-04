@@ -5,21 +5,23 @@
 use App\Models\Empresa;
 use Faker\Generator as Faker;
 
+
+
 $factory->define(Empresa::class, function (Faker $faker) {
     return [
         //
         
         'nomeFantasia' => $faker->name,
         'razaoSocial' => $faker->name,
-        'cnpj' => Str::random(14),
-        'inscricaoEst' => Str::random(5),
-        'inscricaoMun' => Str::random(5),
+        'cnpj' => '06643154000189',
+        'inscricaoEst' => '12345690',
+        'inscricaoMun' => '38989823',
         'cidade'	=>	$faker->city,
-        'uf'	=>	'UF',
-        'endereco' 	=>	$faker->address,
-        'cep'	=>	'81925080',
+        'uf'	=>	$faker->stateAbbr,
+        'endereco' 	=>	$faker->streetAddress,
+        'cep'	=>	$faker->postcode,
         'bairro'	=> 'Bairro nOvo',
-        'telefone' => '41-13123132131',
+        'telefone' => $faker->phone,
         'responsavel'	=>	$faker->name,
         'email' =>	$faker->email,
         

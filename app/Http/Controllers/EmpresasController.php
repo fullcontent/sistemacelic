@@ -18,7 +18,10 @@ class EmpresasController extends Controller
         //
         $empresas = Empresa::all();
 
-        return view ('admin.lista-empresas')->with('empresas',$empresas);
+        return view ('admin.lista-empresas')
+            ->with([
+                'empresas'=>$empresas,
+            ]);
     }
 
     /**
@@ -51,6 +54,11 @@ class EmpresasController extends Controller
     public function show($id)
     {
         //
+         //
+        
+        $empresa = Empresa::find($id);
+      
+        return view('admin.detalhe-empresa')->with('empresa',$empresa);
     }
 
     /**
@@ -61,7 +69,7 @@ class EmpresasController extends Controller
      */
     public function edit($id)
     {
-        //
+
     }
 
     /**

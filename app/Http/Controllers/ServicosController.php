@@ -13,8 +13,10 @@ class ServicosController extends Controller
      */
     public function index()
     {
-        //
-        return view('admin.lista-servicos');
+        
+        
+
+        // return view('admin.lista-servicos');
     }
 
     /**

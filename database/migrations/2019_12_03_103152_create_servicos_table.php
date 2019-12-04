@@ -17,15 +17,20 @@ class CreateServicosTable extends Migration
             $table->increments('id');
             $table->timestamps();
 
-            $table->string('tipo');
+            $table->string('tipo');//Primario, Secundario;            
             $table->string('nome');
-            $table->date('emissao');
-            $table->date('validade');
-            $table->string('protocolo');
-            $table->string('situacao');
+            $table->string('os');
+
+            $table->string('protocolo_anexo')->nullable();
+            $table->date('protocolo_emissao')->nullable();
+            $table->date('protocolo_validade')->nullable();
+            
+        
+            $table->string('situacao');//Finalizado, Andamento, Vencimento
+
             $table->text('observacoes');
-            $table->date('meta');
-            $table->integer('historico');
+            
+        
             $table->string('pendencia');
             $table->string('acao');
 

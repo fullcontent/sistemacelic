@@ -19,4 +19,16 @@ class Empresa extends Model
 			return $this->hasManyThrough('App\User','App\UserAccess','empresa_id','id');
 		}
 
+		public function servicos()
+		{
+			return $this->hasMany('App\Models\Servico');
+		}
+
+		public function taxas()
+		{
+			return $this->hasManyThrough('App\Models\Taxa','App\Models\Servico','empresa_id','servico_id','id');
+		}
+
+
+
 }

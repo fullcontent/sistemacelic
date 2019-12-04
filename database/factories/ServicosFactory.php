@@ -2,26 +2,28 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Model\Servico;
+use App\Models\Servico;
 use Faker\Generator as Faker;
+use Carbon\Carbon;
 
 $factory->define(Servico::class, function (Faker $faker) {
     return [
         //
          //
-        'tipo'    => Str::random(5),
-        'nome' => $faker->name,
-        'emissao'	=> '21/10/2019',
-        'validade'	=> 	'12/12/2020',
-        'protocolo' => Str::random(4),
+        'tipo'    => 'Primario',
+        'nome' => 'Alvara de '.$faker->word.'',
+        'os'    => Str::random(5),
+        'protocolo_emissao'	=> Carbon::instance($faker->dateTimeThisMonth())->toDateTimeString(),
+        'protocolo_validade'	=> 	Carbon::instance($faker->dateTimeThisMonth())->toDateTimeString(),
+        'protocolo_anexo' => Str::random(10),
         'situacao'	=> 'situacao',
         'observacoes'	=> 'Observacoes',
-        'meta'	=> '12/12/2010',
-        'historico' => 1,
-        'pendencia'	=>	'pendencia',
+        
+        
+        'pendencia'	=>	$faker->sentence,
         'acao'	=>	'acao',
 
-        'empresa_id' => 4,
-        'unidade_id' => null
+        // 'empresa_id' => 4,
+        // 'unidade_id' => null
     ];
 });

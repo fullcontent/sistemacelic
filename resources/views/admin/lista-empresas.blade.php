@@ -1,14 +1,14 @@
 @extends('adminlte::page')
 
 
-@section('content_header')
-    <h1>Empresas</h1>
-@stop
-
 @section('content')
-	
-	 
-              <table id="lista-empresas" class="table table-bordered table-hover">
+			
+
+			<div class="box">
+				<div class="box-header">
+					<h2>Listagem</h2>
+				</div>
+				<table id="lista-empresas" class="table table-bordered table-hover">
                 <thead>
                 <tr>
                   <th>ID</th>
@@ -18,6 +18,8 @@
                   <th>Telefone</th>
                   <th>Unidades</th>
                   <th>Serviços</th>
+                  <th>Taxas</th>
+                  <th></th>
                 </thead>
                 <tbody>
 				@foreach($empresas as $empresa)
@@ -28,11 +30,15 @@
 	              	<td>{{$empresa->cidade}}/{{$empresa->uf}}</td>
 	              	<td>{{$empresa->telefone}}</td>
 					<td><a href="{{route('empresa.unidades', $empresa->id)}}">{{count($empresa->unidades)}}</a></td>
-					<td></td>
+					<td><a href="{{route('empresa.unidades', $empresa->id)}}">{{count($empresa->servicos)}}</a></td>
+					<td><a href="{{route('empresa.unidades', $empresa->id)}}">{{count($empresa->taxas)}}</a></td>
+					<td><a href="{{route('empresas.show', $empresa->id)}}">Detalhes</a></td>
 	                </tr>
 	            @endforeach
                 </tbody>
               </table>   
+			</div>
+	 		
 @stop
 
 @section('js')
