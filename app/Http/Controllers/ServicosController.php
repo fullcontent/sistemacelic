@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Servico;
+
 
 class ServicosController extends Controller
 {
@@ -14,9 +16,9 @@ class ServicosController extends Controller
     public function index()
     {
         
-        
-
-        // return view('admin.lista-servicos');
+        $servicos = Servico::all();
+        return view('admin.lista-servicos')
+                    ->with('servicos',$servicos);
     }
 
     /**
@@ -49,6 +51,24 @@ class ServicosController extends Controller
     public function show($id)
     {
         //
+        $servico = Servico::find($id);
+
+        //Check if is empresa or unidade
+
+        if($servico->unidade_id){
+
+            $dados = $servico->unidade;
+        }
+        else{
+            $dados = $servico->empresa;
+        }
+
+
+        return view('admin.detalhe-servico')
+                    ->with([
+                        'servico'=>$servico,
+                        'dados'=>$dados,
+                ]);
     }
 
     /**

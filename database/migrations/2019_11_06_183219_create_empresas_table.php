@@ -21,6 +21,13 @@ class CreateEmpresasTable extends Migration
             $table->string('cnpj');
             $table->string('inscricaoEst');
             $table->string('inscricaoMun');
+            $table->string('inscricaoImo');
+           
+            $table->string('matriculaRI');
+            $table->string('tipoImovel');
+            $table->string('codigo');
+            $table->string('area');
+            
             $table->string('cidade');
             $table->string('uf',2);
             $table->string('endereco');

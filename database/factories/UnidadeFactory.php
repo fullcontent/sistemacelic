@@ -15,6 +15,11 @@ $factory->define(Unidade::class, function (Faker $faker) {
         'cnpj' => '06643154000189',
         'inscricaoEst' => '213489321',
         'inscricaoMun' => '3291837129',
+        'inscricaoImo'  => '9372198372198',
+        'matriculaRI'   => Str::random(8),
+        'tipoImovel'    => 'Shopping',
+        
+        'area'      => Str::random(4),
         'cidade'	=>	$faker->city,
         'uf'	=>	$faker->stateAbbr,
         'endereco' 	=>	$faker->streetAddress,

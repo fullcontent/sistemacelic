@@ -146,7 +146,7 @@ return [
         [
          'text' => 'Serviços',
          'url'  =>  'servicos',
-         'icon' => 'glyphicon glyphicon-toolbox'   
+         'icon' => 'glyphicon glyphicon-wrench'   
         ],
         
     ],

@@ -50,7 +50,9 @@ class UnidadesController extends Controller
     public function show($id)
     {
         //
-        return $id;
+        $unidade = Unidade::find($id);
+        return view('admin.detalhe-unidade')
+                    ->with('unidade',$unidade);
     }
 
     /**

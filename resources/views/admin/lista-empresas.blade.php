@@ -6,7 +6,7 @@
 
 			<div class="box">
 				<div class="box-header">
-					<h2>Listagem</h2>
+					<h2>Listando todas as empresas</h2>
 				</div>
 				<table id="lista-empresas" class="table table-bordered table-hover">
                 <thead>
