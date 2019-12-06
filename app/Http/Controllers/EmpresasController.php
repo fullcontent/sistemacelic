@@ -43,6 +43,8 @@ class EmpresasController extends Controller
     public function store(Request $request)
     {
         //
+
+        return $request;
     }
 
     /**
@@ -57,8 +59,15 @@ class EmpresasController extends Controller
          //
         
         $empresa = Empresa::find($id);
-      
-        return view('admin.detalhe-empresa')->with('empresa',$empresa);
+
+             
+        return view('admin.detalhe-empresa')
+                    ->with([
+                        'dados'=>$empresa,
+                        'servicos'=>$empresa->servicos,
+                        'taxas' => $empresa->taxas,
+                        'route' => 'empresas.edit',
+                    ]);
     }
 
     /**
@@ -68,8 +77,9 @@ class EmpresasController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
-    {
-
+    {   
+        $empresa = Empresa::find($id);
+        return view('admin.editar-empresa')->with('empresa',$empresa);
     }
 
     /**

@@ -35,6 +35,9 @@ class CreateUnidadesTable extends Migration
             $table->string('cidade');
             $table->string('uf',2);
             $table->string('endereco');
+            $table->string('numero');
+            $table->string('complemento');
+
             $table->string('cep');
             $table->string('bairro');
             $table->string('telefone');

@@ -26,6 +26,8 @@ $factory->define(Empresa::class, function (Faker $faker) {
         'cidade'	=>	$faker->city,
         'uf'	=>	$faker->stateAbbr,
         'endereco' 	=>	$faker->streetAddress,
+        'numero'    => Str::random(4),
+        'complemento' => Str::random(6),
         'cep'	=>	$faker->postcode,
         'bairro'	=> 'Bairro nOvo',
         'telefone' => $faker->phone,

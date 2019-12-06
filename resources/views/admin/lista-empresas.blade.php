@@ -35,8 +35,8 @@
 	              	<td>{{$empresa->cidade}}/{{$empresa->uf}}</td>
 	              	<td>{{$empresa->telefone}}</td>
 					<td><a href="{{route('empresa.unidades', $empresa->id)}}">{{count($empresa->unidades)}}</a></td>
-					<td><a href="{{route('empresa.unidades', $empresa->id)}}">{{count($empresa->servicos)}}</a></td>
-					<td><a href="{{route('empresa.unidades', $empresa->id)}}">{{count($empresa->taxas)}}</a></td>
+					<td><a href="#">{{count($empresa->servicos)}}</a></td>
+					<td><a href="#">{{count($empresa->taxas)}}</a></td>
 					<td><a href="{{route('empresas.show', $empresa->id)}}">Detalhes</a></td>
 	                </tr>
 	            @endforeach

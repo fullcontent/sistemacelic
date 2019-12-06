@@ -30,3 +30,15 @@ Route::resource('/servicos','ServicosController');
 
 
 Route::get('/empresa/{empresa}/unidades','EmpresasController@unidades')->name('empresa.unidades');
+
+
+
+//Test Routes
+
+Route::get('/empresa/cadastro', function ()
+{	
+	
+	return view ('admin.cadastro-empresa');
+});
+
+Route::post('/unidade/{id}', 'UnidadesController@editar')->name('unidade.editar');

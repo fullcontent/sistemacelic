@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Empresa extends Model
 {
-    
 
-		public function unidades()
+
+    	public function unidades()
 		{
 			return $this->hasMany('App\Models\Unidade');
 		}

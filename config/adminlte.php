@@ -243,6 +243,17 @@ return [
             ],
         ],
         [
+            'name' => 'InputMask',
+            'active' => true,
+            'files' => [
+                [
+                    'type' => 'js',
+                    'asset' => false,
+                    'location' => '//cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.js',
+                ],
+            ],
+        ],
+        [
             'name' => 'Pace',
             'active' => true,
             'files' => [
@@ -258,5 +269,6 @@ return [
                 ],
             ],
         ],
+        
     ],
 ];

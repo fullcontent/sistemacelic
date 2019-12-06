@@ -11,5 +11,6 @@ $factory->define(Historico::class, function (Faker $faker) {
         // 'servico_id' => 1,
         'anexo'	=>	Str::random(10),
         'observacoes' => $faker->sentence,
+        'by' => 'Robot',
     ];
 });
