@@ -69,7 +69,7 @@
                   <p><b>Nome: </b>{{$servico->nome}}</p>
                   
                   <p><b>Emissão: </b>{{\Carbon\Carbon::parse($servico->protocoloEmissao)->format('d/m/Y')}}</p>
-                  <p><b>Número Protocolo: </b>{{$servico->anexo}} <button type="button" class="btn btn-info btn-xs">Ver</button></p>
+                  <p><b>Número Protocolo: </b>{{$servico->anexo}} <button type="button" class="btn btn-primary btn-xs">Ver</button></p>
                   <p><b>Data Protocolo: </b>{{\Carbon\Carbon::parse($servico->protocoloEmissao)->format('d/m/Y')}}</p>
 
                 </div>
@@ -92,7 +92,7 @@
 
 <div class="row">
     <div class="col-sm-12">
-      <div class="box box-info">
+      <div class="box box-black">
             <div class="box-header with-border">
               <h3 class="box-title">Interações</h3>
 

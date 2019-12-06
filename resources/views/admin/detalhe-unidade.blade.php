@@ -49,7 +49,7 @@
     
     <div class="box box-info">
             <div class="box-header with-border">
-              <h3 class="box-title">Demandas</h3>
+              <h3 class="box-title">Serviços</h3>
 
               <div class="box-tools pull-right">
                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -88,8 +88,8 @@
             </div>
             <!-- /.box-body -->
             <div class="box-footer clearfix">
-              <a href="javascript:void(0)" class="btn btn-sm btn-info btn-flat pull-left">Nova Demanda</a>
-              <a href="javascript:void(0)" class="btn btn-sm btn-default btn-flat pull-right">Todas as Demandas</a>
+              <a href="javascript:void(0)" class="btn btn-sm btn-info btn-flat pull-left">Novo Serviço</a>
+              <a href="javascript:void(0)" class="btn btn-sm btn-default btn-flat pull-right">Todas os Serviços</a>
             </div>
             <!-- /.box-footer -->
           </div>

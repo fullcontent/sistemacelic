@@ -7,9 +7,13 @@
 			<div class="box">
 				<div class="box-header">
 					<h2>Listando todas as empresas</h2>
+
 				</div>
+				
 				<table id="lista-empresas" class="table table-bordered table-hover">
+
                 <thead>
+
                 <tr>
                   <th>ID</th>
                   <th>Nome Fantasia</th>
@@ -21,6 +25,7 @@
                   <th>Taxas</th>
                   <th></th>
                 </thead>
+
                 <tbody>
 				@foreach($empresas as $empresa)
                 	<tr>
