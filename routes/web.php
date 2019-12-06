@@ -42,3 +42,4 @@ Route::get('/empresa/cadastro', function ()
 });
 
 Route::post('/unidade/{id}', 'UnidadesController@editar')->name('unidade.editar');
+Route::post('/empresa/{id}', 'EmpresasController@editar')->name('empresa.editar');

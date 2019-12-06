@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Empresa;
 use App\Models\Unidade;
 
+use Illuminate\Support\Facades\Validator;
+
 class EmpresasController extends Controller
 {
     /**
@@ -109,5 +111,48 @@ class EmpresasController extends Controller
     {
         $unidades = Unidade::with('empresa')->where('empresa_id','=',$id)->get();
         return view('admin.lista-unidades')->with('unidades',$unidades);
+    }
+
+    public function editar(Request $request, $id)
+    {
+        
+
+        $validator = Validator::make($request->all(), [
+
+                'responsavel'=>'required',
+                'nomeFantasia' => 'required',
+                'email' => 'required|email',
+
+        ])->validate();
+
+        
+
+        $empresa = Empresa::find($id);
+
+            $empresa->cnpj          = $request->cnpj;
+            $empresa->nomeFantasia  = $request->nomeFantasia;
+            $empresa->razaoSocial   = $request->razaoSocial;
+            $empresa->inscricaoEst  = $request->inscricaoEst;
+            $empresa->inscricaoMun  = $request->inscricaoMun;
+            $empresa->inscricaoImo  = $request->inscricaoImo;
+            $empresa->endereco      = $request->endereco;
+            $empresa->numero        = $request->numero;
+            $empresa->cep           = $request->cep;
+            $empresa->complemento   = $request->complemento;
+            $empresa->bairro        = $request->bairro;
+            $empresa->telefone      = $request->telefone;
+            $empresa->responsavel   = $request->responsavel;
+            $empresa->email         = $request->email;
+            $empresa->matriculaRI   = $request->matriculaRI;
+            $empresa->area          = $request->area;
+            $empresa->tipoImovel    = $request->tipoImovel;
+
+            $empresa->save();
+            
+
+        return redirect()->route('empresas.show',$id)
+                        ->with('success', 'A empresa '.$empresa->nomeFantasia.' foi editado com sucesso!');
+
+
     }
 }

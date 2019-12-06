@@ -12,7 +12,7 @@
 
 	
 	
-	{!! Form::model($empresa,['route'=>['empresas.update', $empresa->id]]) !!}
+	{!! Form::model($empresa,['route'=>['empresa.editar', $empresa->id]]) !!}
 
 	@include('admin.partials.form-empresa')
 
