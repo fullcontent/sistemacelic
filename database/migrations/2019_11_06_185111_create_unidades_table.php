@@ -15,7 +15,7 @@ class CreateUnidadesTable extends Migration
     {
         Schema::create('unidades', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('codigo');  
+           
 
             $table->unsignedInteger('empresa_id')->unsigned();
             $table->foreign('empresa_id')->references('id')->on('empresas');
@@ -26,22 +26,22 @@ class CreateUnidadesTable extends Migration
             $table->string('inscricaoEst');
             $table->string('inscricaoMun');
             $table->string('inscricaoImo');
-
-            $table->string('matriculaRI');
+           
+            $table->string('matriculaRI')->nullable();
             $table->string('tipoImovel');
+            $table->string('codigo');
+            $table->string('area')->nullable();
             
-            $table->string('area');
-
             $table->string('cidade');
             $table->string('uf',2);
             $table->string('endereco');
             $table->string('numero');
             $table->string('complemento');
-
             $table->string('cep');
             $table->string('bairro');
-            $table->string('telefone');
-            $table->string('responsavel');
+            
+            $table->string('telefone')->nullable();
+            $table->string('responsavel')->nullable();
             $table->string('email');
 
             

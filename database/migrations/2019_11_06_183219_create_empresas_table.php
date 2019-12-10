@@ -23,10 +23,10 @@ class CreateEmpresasTable extends Migration
             $table->string('inscricaoMun');
             $table->string('inscricaoImo');
            
-            $table->string('matriculaRI');
+            $table->string('matriculaRI')->nullable();
             $table->string('tipoImovel');
             $table->string('codigo');
-            $table->string('area');
+            $table->string('area')->nullable();
             
             $table->string('cidade');
             $table->string('uf',2);
@@ -36,8 +36,8 @@ class CreateEmpresasTable extends Migration
             $table->string('cep');
             $table->string('bairro');
             
-            $table->string('telefone');
-            $table->string('responsavel');
+            $table->string('telefone')->nullable();
+            $table->string('responsavel')->nullable();
             $table->string('email');
 
             
