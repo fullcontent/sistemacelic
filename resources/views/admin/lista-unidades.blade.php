@@ -6,19 +6,20 @@
 
 			<div class="box">
 				<div class="box-header">
-					<h2>Listando todas as unidades</h2>
+					<a class="btn btn-app" href="{{route('unidade.cadastro')}}">
+	                		<i class="fa fa-plus"></i> Cadastrar
+	         			</a>
 				</div>
 				<table id="lista-unidades" class="table table-bordered table-hover">
                 <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>Empresa</th>
+                 
+                  
                   <th>Nome Fantasia</th>
                   <th>CNPJ</th>
                   <th>Cidade/UF</th>
                   <th>Telefone</th>
-                  <th>Servicos</th>
-                  <th>Taxas</th>
+                  
                   
                   <th></th>
                 </thead>
@@ -26,15 +27,30 @@
 				@foreach($unidades as $unidade)
                 	<tr>
 
-	              	<td>{{$unidade->id}}</td>
-	              	<td>{{$unidade->empresa->nomeFantasia}}</td>
-	              	<td>{{$unidade->nomeFantasia}}</td>
+	              	
+	              	
+	              	<td><a href="{{route('unidades.show', $unidade->id)}}">{{$unidade->nomeFantasia}}</a></td>
 	              	<td>{{$unidade->cnpj}}</td>
 	              	<td>{{$unidade->cidade}}/{{$unidade->uf}}</td>
 	              	<td>{{$unidade->telefone}}</td>
-	              	<td><a href="#">{{count($unidade->servicos)}}</a></td>
-	              	<td><a href="#">{{count($unidade->taxas)}}</a></td>
-					<td><a href="{{route('unidades.show', $unidade->id)}}">Detalhes</a></td>
+	              	
+					<td>
+						<div class="btn-group">
+                  <button type="button" class="btn btn-default btn-flat">Ações</button>
+                  <button type="button" class="btn btn-default btn-flat dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <span class="caret"></span>
+                    <span class="sr-only">Toggle Dropdown</span>
+                  </button>
+                  <ul class="dropdown-menu" role="menu">
+
+                  	<li><a href="#">Taxas</a></li>
+                  	<li class="divider"></li>
+                    <li><a href="{{route('unidades.show', $unidade->id)}}">Detalhes</a></li>
+                    <li><a href="{{route('unidades.edit', $unidade->id)}}">Editar</a></li>
+                                    
+                  </ul>
+                </div>
+</td>
 	                </tr>
 	            @endforeach
                 </tbody>

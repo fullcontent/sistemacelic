@@ -15,6 +15,7 @@
 			<p><b>Nome: </b>{{$dados->nomeFantasia}}</p>
 			<p><b>Razão Social:</b> {{$dados->razaoSocial}}</p>
 			<p><b>CNPJ:</b> {{$dados->cnpj}}</p>
+			<p><b>Status: </b>{{$dados->status}}</p>
 			<p><b>Ins. Estadual:</b> {{$dados->inscricaoEst}}</p>
 			<p><b>Insc. Municipal:</b> {{$dados->inscricaoMun}}</p>
 		</div>

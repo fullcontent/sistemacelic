@@ -12,6 +12,7 @@ $factory->define(Empresa::class, function (Faker $faker) {
         //
         
         'nomeFantasia' => 'Empresa '.$faker->name,
+        'status'        => 'Ativa',
         'razaoSocial' => $faker->name,
         'cnpj' => '06643154000189',
         'inscricaoEst' => '12345690',

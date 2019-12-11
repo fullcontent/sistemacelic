@@ -1,210 +1,264 @@
 <div class="box-body">
-	
+  
 
-		  <div class="col-md-12">
+      
+
+      <div class="col-md-12">
         
-        <p><b>Empresa: </b>{{$unidade->empresa->nomeFantasia}}</p>
+        <div class="form-group">
+          
+          {!! Form::label('empresa_id', 'Empresa', array('class'=>'control-label')) !!}
+          
+          {!! Form::select('empresa_id', $empresas, null, ['class'=>'form-control']) !!}
+
+        </div>
 
       </div>
 
-			<div class="col-md-6">
-				
-				<div class="input-group input-group-sm">
+      <div class="col-md-6">
+        
+        <div class="input-group input-group-sm">
                   
                   {!! Form::label('cnpj', 'CNPJ', array('class'=>'control-label')) !!}
                   {!! Form::text('cnpj', null, ['class'=>'form-control','id'=>'cnpj']) !!}
                   <span class="input-group-btn" style="vertical-align: bottom;">
-				 <button type="button" class="btn btn-warning btn-flat" id="pesquisar">Pesquisar</button>
-				</span>
-            	</div>
+         <button type="button" class="btn btn-warning btn-flat" id="pesquisar">Pesquisar</button>
+        </span>
+              </div>
 
-			</div>
+      </div>
 
-			
-			
-			<div class="col-md-6">
-				<div class="form-group">
+
+      
+      <div class="col-md-6">
+        <div class="form-group">
                   
                   {!! Form::label('nomeFantasia', 'Nome Fantasia', array('class'=>'control-label')) !!}
                   {!! Form::text('nomeFantasia', null, ['class'=>'form-control','id'=>'nomeFantasia']) !!}
-				
-            	</div>
+        
+              </div>
 
-			</div>
+      </div>
             
-            <div class="col-md-12">
-            	
-				<div class="form-group">
+        <div class="col-md-10">
+              
+        <div class="form-group">
                   
                   {!! Form::label('razaoSocial', 'Razão Social', array('class'=>'control-label')) !!}
                   {!! Form::text('razaoSocial', null, ['class'=>'form-control','id'=>'razaoSocial']) !!}
-				
-            	</div>
+        
+              </div>
+
+        </div>
+
+        <div class="col-md-2">
+          
+          <div class="form-group">
+                  
+                  {!! Form::label('status', 'Status', array('class'=>'control-label')) !!}
+                  {!! Form::select('status', array('ativa' => 'Ativa', 'inativa' => 'Inativa'), null, ['class'=>'form-control'])!!}
+        
+              </div>
+
+        </div>
+
+            
+            <div class="col-md-3">
+              
+              <div class="form-group">
+                  
+                  {!! Form::label('codigo', 'Código', array('class'=>'control-label')) !!}
+                  {!! Form::text('codigo', null, ['class'=>'form-control','id'=>'codigo']) !!}
+        
+              </div>
 
             </div>
 
-            
-            <div class="col-md-4">
-            	
-            	<div class="form-group">
+            <div class="col-md-3">
+              
+              <div class="form-group">
                   
                   {!! Form::label('inscricaoEst', 'Inscriçao Estadual', array('class'=>'control-label')) !!}
                   {!! Form::text('inscricaoEst', null, ['class'=>'form-control','id'=>'inscricaoEst']) !!}
-				
-            	</div>
+        
+              </div>
 
             </div>
 
+
+
             
-            <div class="col-md-4">
-            	
-            	<div class="form-group">
+            <div class="col-md-3">
+              
+              <div class="form-group">
                   
                   {!! Form::label('inscricaoMun', 'Inscrição Municipal', array('class'=>'control-label')) !!}
                   {!! Form::text('inscricaoMun', null, ['class'=>'form-control','id'=>'inscricaoMun']) !!}
-				
-            	</div>
+        
+              </div>
+            </div>
+
+            <div class="col-md-3">
+                
+                <div class="form-group">
+                    
+                    {!! Form::label('inscricaoImo', 'Inscrção Imobiliária', array('class'=>'control-label')) !!}
+                    {!! Form::text('inscricaoImo', null, ['class'=>'form-control','id'=>'inscricaoImo']) !!}
+          
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6">
+              
+                <div class="form-group">
+                    
+                    {!! Form::label('endereco', 'Endereço', array('class'=>'control-label')) !!}
+                    {!! Form::text('endereco', null, ['class'=>'form-control','id'=>'endereco']) !!}
+          
+                </div>
+
+            </div>
+
+            <div class="col-md-2">
+                
+                <div class="form-group">
+                    
+                    {!! Form::label('numero', 'Número', array('class'=>'control-label')) !!}
+                    {!! Form::text('numero', null, ['class'=>'form-control','id'=>'numero']) !!}
+          
+                </div>
+
+            </div>
+
+            <div class="col-md-3">
+                
+                <div class="form-group">
+                    
+                    {!! Form::label('cidade', 'Cidade', array('class'=>'control-label')) !!}
+                    {!! Form::text('cidade', null, ['class'=>'form-control','id'=>'cidade']) !!}
+          
+                </div>
+
+            </div>
+
+            <div class="col-md-1">
+                
+                <div class="form-group">
+                    
+                    {!! Form::label('uf', 'UF', array('class'=>'control-label')) !!}
+                    {!! Form::text('uf', null, ['class'=>'form-control','id'=>'uf']) !!}
+          
+                </div>
+
             </div>
 
             <div class="col-md-4">
-	            	
-	            	<div class="form-group">
-	                  
-	                  {!! Form::label('inscricaoImo', 'Inscrção Imobiliária', array('class'=>'control-label')) !!}
-	                  {!! Form::text('inscricaoImo', null, ['class'=>'form-control','id'=>'inscricaoImo']) !!}
-					
-	            	</div>
-
-            </div>
-
-
-            <div class="col-md-8">
-            	
-            		<div class="form-group">
-	                  
-	                  {!! Form::label('endereco', 'Endereço', array('class'=>'control-label')) !!}
-	                  {!! Form::text('endereco', null, ['class'=>'form-control','id'=>'endereco']) !!}
-					
-	            	</div>
-
-            </div>
-
-            <div class="col-md-4">
-            		
-            		<div class="form-group">
-	                  
-	                  {!! Form::label('numero', 'Número', array('class'=>'control-label')) !!}
-	                  {!! Form::text('numero', null, ['class'=>'form-control','id'=>'numero']) !!}
-					
-	            	</div>
-
-            </div>
-
-            <div class="col-md-4">
-            		
-            		<div class="form-group">
-	                  
-	                  {!! Form::label('cep', 'CEP', array('class'=>'control-label')) !!}
-	                  {!! Form::text('cep', null, ['class'=>'form-control','id'=>'cep']) !!}
-					
-	            	</div>
-
-
-            </div>
-
-            <div class="col-md-4">
-            		
-            		<div class="form-group">
-	                  
-	                  {!! Form::label('complemento', 'Complemento', array('class'=>'control-label')) !!}
-	                  {!! Form::text('complemento', null, ['class'=>'form-control','id'=>'complemento']) !!}
-					
-	            	</div>
-
-
-            </div>
-
-            <div class="col-md-4">
-            		
-            		<div class="form-group">
-	                  
-	                  {!! Form::label('bairro', 'Bairro', array('class'=>'control-label')) !!}
-	                  {!! Form::text('bairro', null, ['class'=>'form-control','id'=>'bairro']) !!}
-					
-	            	</div>
+                
+                <div class="form-group">
+                    
+                    {!! Form::label('cep', 'CEP', array('class'=>'control-label')) !!}
+                    {!! Form::text('cep', null, ['class'=>'form-control','id'=>'cep']) !!}
+          
+                </div>
 
 
             </div>
 
             <div class="col-md-4">
-            		
-            		<div class="form-group">
-	                  
-	                  {!! Form::label('telefone', 'Telefone', array('class'=>'control-label')) !!}
-	                  {!! Form::text('telefone', null, ['class'=>'form-control','id'=>'telefone', 'data-inputmask=','"mask": "(999) 999-9999""']) !!}
-					
-	            	</div>
+                
+                <div class="form-group">
+                    
+                    {!! Form::label('complemento', 'Complemento', array('class'=>'control-label')) !!}
+                    {!! Form::text('complemento', null, ['class'=>'form-control','id'=>'complemento']) !!}
+          
+                </div>
 
 
             </div>
 
             <div class="col-md-4">
-            		
-            		<div class="form-group">
-	                  
-	                  {!! Form::label('responsavel', 'Responsável', array('class'=>'control-label')) !!}
-	                  {!! Form::text('responsavel', null, ['class'=>'form-control','id'=>'responsavel']) !!}
-					
-	            	</div>
+                
+                <div class="form-group">
+                    
+                    {!! Form::label('bairro', 'Bairro', array('class'=>'control-label')) !!}
+                    {!! Form::text('bairro', null, ['class'=>'form-control','id'=>'bairro']) !!}
+          
+                </div>
 
 
             </div>
 
             <div class="col-md-4">
-            		
-            		<div class="form-group">
-	                  
-	                  {!! Form::label('email', 'E-mail', array('class'=>'control-label')) !!}
-	                  {!! Form::text('email', null, ['class'=>'form-control','id'=>'email']) !!}
-					
-	            	</div>
+                
+                <div class="form-group">
+                    
+                    {!! Form::label('telefone', 'Telefone', array('class'=>'control-label')) !!}
+                    {!! Form::text('telefone', null, ['class'=>'form-control','id'=>'telefone']) !!}
+          
+                </div>
 
 
             </div>
-			
 
-			<div class="col-md-3">
-            		
-            		<div class="form-group">
-	                  
-	                  {!! Form::label('matriculaRI', 'Matricula RI', array('class'=>'control-label')) !!}
-	                  {!! Form::text('matriculaRI', null, ['class'=>'form-control','id'=>'matriculaRI']) !!}
-					
-	            	</div>
+            <div class="col-md-4">
+                
+                <div class="form-group">
+                    
+                    {!! Form::label('responsavel', 'Responsável', array('class'=>'control-label')) !!}
+                    {!! Form::text('responsavel', null, ['class'=>'form-control','id'=>'responsavel']) !!}
+          
+                </div>
+
+
+            </div>
+
+            <div class="col-md-4">
+                
+                <div class="form-group">
+                    
+                    {!! Form::label('email', 'E-mail', array('class'=>'control-label')) !!}
+                    {!! Form::text('email', null, ['class'=>'form-control','id'=>'email']) !!}
+          
+                </div>
+
+
+            </div>
+      
+
+      <div class="col-md-3">
+                
+                <div class="form-group">
+                    
+                    {!! Form::label('matriculaRI', 'Matricula RI', array('class'=>'control-label')) !!}
+                    {!! Form::text('matriculaRI', null, ['class'=>'form-control','id'=>'matriculaRI']) !!}
+          
+                </div>
 
 
             </div>
 
             <div class="col-md-3">
-            		
-            		<div class="form-group">
-	                  
-	                  {!! Form::label('tipoImovel', 'Tipo do Imóvel', array('class'=>'control-label')) !!}
-	                  {!! Form::text('tipoImovel', null, ['class'=>'form-control','id'=>'tipoImovel']) !!}
-					
-	            	</div>
+                
+                <div class="form-group">
+                    
+                    {!! Form::label('tipoImovel', 'Tipo do Imóvel', array('class'=>'control-label')) !!}
+                    {!! Form::text('tipoImovel', null, ['class'=>'form-control','id'=>'tipoImovel']) !!}
+          
+                </div>
 
 
             </div>
 
             <div class="col-md-3">
-            		
-            		<div class="form-group">
-	                  
-	                  {!! Form::label('area', 'Área', array('class'=>'control-label')) !!}
-	                  {!! Form::text('area', null, ['class'=>'form-control','id'=>'area']) !!}
-					
-	            	</div>
+                
+                <div class="form-group">
+                    
+                    {!! Form::label('area', 'Área', array('class'=>'control-label')) !!}
+                    {!! Form::text('area', null, ['class'=>'form-control','id'=>'area']) !!}
+                   
+                </div>
 
 
             </div>

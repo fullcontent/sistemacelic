@@ -22,6 +22,8 @@ class CreateEmpresasTable extends Migration
             $table->string('inscricaoEst');
             $table->string('inscricaoMun');
             $table->string('inscricaoImo');
+
+            $table->string('status');
            
             $table->string('matriculaRI')->nullable();
             $table->string('tipoImovel');

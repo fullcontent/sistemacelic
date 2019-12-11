@@ -16,7 +16,7 @@
 
 			</div>
 
-			
+
 			
 			<div class="col-md-6">
 				<div class="form-group">
@@ -28,7 +28,7 @@
 
 			</div>
             
-            <div class="col-md-12">
+        <div class="col-md-10">
             	
 				<div class="form-group">
                   
@@ -37,22 +37,46 @@
 				
             	</div>
 
-            </div>
+        </div>
+
+        <div class="col-md-2">
+          
+          <div class="form-group">
+                  
+                  {!! Form::label('status', 'Status', array('class'=>'control-label')) !!}
+                  {!! Form::select('status', array('ativa' => 'Ativa', 'inativa' => 'Inativa'), null, ['class'=>'form-control'])!!}
+        
+              </div>
+
+        </div>
 
             
-            <div class="col-md-4">
+            <div class="col-md-3">
             	
             	<div class="form-group">
                   
-                  {!! Form::label('inscricaoEst', 'Inscriçao Estadual', array('class'=>'control-label')) !!}
-                  {!! Form::text('inscricaoEst', null, ['class'=>'form-control','id'=>'inscricaoEst']) !!}
+                  {!! Form::label('codigo', 'Código', array('class'=>'control-label')) !!}
+                  {!! Form::text('codigo', null, ['class'=>'form-control','id'=>'codigo']) !!}
 				
             	</div>
 
             </div>
 
+            <div class="col-md-3">
+              
+              <div class="form-group">
+                  
+                  {!! Form::label('inscricaoEst', 'Inscriçao Estadual', array('class'=>'control-label')) !!}
+                  {!! Form::text('inscricaoEst', null, ['class'=>'form-control','id'=>'inscricaoEst']) !!}
+        
+              </div>
+
+            </div>
+
+
+
             
-            <div class="col-md-4">
+            <div class="col-md-3">
             	
             	<div class="form-group">
                   
@@ -62,7 +86,7 @@
             	</div>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-3">
 	            	
 	            	<div class="form-group">
 	                  
@@ -74,7 +98,7 @@
             </div>
 
 
-            <div class="col-md-8">
+            <div class="col-md-6">
             	
             		<div class="form-group">
 	                  
@@ -85,7 +109,7 @@
 
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-2">
             		
             		<div class="form-group">
 	                  
@@ -93,6 +117,28 @@
 	                  {!! Form::text('numero', null, ['class'=>'form-control','id'=>'numero']) !!}
 					
 	            	</div>
+
+            </div>
+
+            <div class="col-md-3">
+                
+                <div class="form-group">
+                    
+                    {!! Form::label('cidade', 'Cidade', array('class'=>'control-label')) !!}
+                    {!! Form::text('cidade', null, ['class'=>'form-control','id'=>'cidade']) !!}
+          
+                </div>
+
+            </div>
+
+            <div class="col-md-1">
+                
+                <div class="form-group">
+                    
+                    {!! Form::label('uf', 'UF', array('class'=>'control-label')) !!}
+                    {!! Form::text('uf', null, ['class'=>'form-control','id'=>'uf']) !!}
+          
+                </div>
 
             </div>
 
@@ -199,7 +245,7 @@
 	                  
 	                  {!! Form::label('area', 'Área', array('class'=>'control-label')) !!}
 	                  {!! Form::text('area', null, ['class'=>'form-control','id'=>'area']) !!}
-					
+					         
 	            	</div>
 
 

@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 @section('content_header')
-<h1>{{$dados->nomeFantasia}}</h1>
+<h1>Detalhes da empresa</h1>
 @stop
 @section('content')
 @if (session()->has('success'))

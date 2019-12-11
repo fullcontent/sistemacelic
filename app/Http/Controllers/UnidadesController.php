@@ -45,6 +45,47 @@ class UnidadesController extends Controller
     public function store(Request $request)
     {
         //
+        $validator = Validator::make($request->all(), [
+
+                'responsavel'=>'required',
+                'nomeFantasia' => 'required',
+                'email' => 'required|email',
+
+            ])->validate();
+
+            $empresa = new Unidade;
+
+
+
+            
+            $empresa->empresa_id    = $request->empresa_id;
+            $empresa->cnpj          = $request->cnpj;
+            $empresa->nomeFantasia  = $request->nomeFantasia;
+            $empresa->razaoSocial   = $request->razaoSocial;
+            $empresa->status        = $request->status;
+            $empresa->inscricaoEst  = $request->inscricaoEst;
+            $empresa->inscricaoMun  = $request->inscricaoMun;
+            $empresa->inscricaoImo  = $request->inscricaoImo;
+            $empresa->codigo        = $request->codigo;
+            $empresa->endereco      = $request->endereco;
+            $empresa->numero        = $request->numero;
+            $empresa->cep           = $request->cep;
+            $empresa->complemento   = $request->complemento;
+            $empresa->bairro        = $request->bairro;
+            $empresa->cidade        = $request->cidade;
+            $empresa->uf            = $request->uf;
+            $empresa->telefone      = $request->telefone;
+            $empresa->responsavel   = $request->responsavel;
+            $empresa->email         = $request->email;
+            $empresa->matriculaRI   = $request->matriculaRI;
+            $empresa->area          = $request->area;
+            $empresa->tipoImovel    = $request->tipoImovel;
+
+            $empresa->save();
+
+            return redirect()->route('unidades.show',$empresa->id)
+                        ->with('success', 'A unidade '.$empresa->nomeFantasia.' foi criada com sucesso!');
+
     }
 
     /**
@@ -76,7 +117,7 @@ class UnidadesController extends Controller
     public function edit($id)
     {
         //
-        $empresas = Empresa::select('id','nomeFantasia')->get();
+        $empresas = Empresa::pluck('nomeFantasia','id')->toArray();
         $unidade = Unidade::find($id);
         return view('admin.editar-unidade')
                     ->with([
@@ -94,44 +135,8 @@ class UnidadesController extends Controller
      */
     public function update(Request $request, $id)
     {
-        
-
-        
-
-
-       $empresa = Empresa::find($id);
-
-
-
-
-
-            $empresa->cnpj          = $request->cnpj;
-            $empresa->nomeFantasia  = $request->nomeFantasia;
-            $empresa->razaoSocial   = $request->razaoSocial;
-            $empresa->inscricaoEst  = $request->inscricaoEst;
-            $empresa->inscricaoMun  = $request->inscricaoMun;
-            $empresa->inscricaoImo  = $request->inscricaoImo;
-            $empresa->endereco      = $request->endereco;
-            $empresa->numero        = $request->numero;
-            $empresa->cep           = $request->cep;
-            $empresa->complemento   = $request->complemento;
-            $empresa->bairro        = $request->bairro;
-            $empresa->telefone      = $request->telefone;
-            $empresa->responsavel   = $request->responsavel;
-            $empresa->email         = $request->email;
-            $empresa->matriculaRI   = $request->matriculaRI;
-            $empresa->area          = $request->area;
-            $empresa->tipoImovel    = $request->tipoImovel;
-
-
-
-
-
-
-            $empresa->save();
-
-        return redirect()->route('unidades.index')->with('message','Editado com sucesso!');
-
+       
+       //
 
     }
 
@@ -165,17 +170,22 @@ class UnidadesController extends Controller
 
         $empresa = Unidade::find($id);
 
+            $empresa->empresa_id    = $request->empresa_id;
             $empresa->cnpj          = $request->cnpj;
             $empresa->nomeFantasia  = $request->nomeFantasia;
             $empresa->razaoSocial   = $request->razaoSocial;
+            $empresa->status        = $request->status;
             $empresa->inscricaoEst  = $request->inscricaoEst;
             $empresa->inscricaoMun  = $request->inscricaoMun;
             $empresa->inscricaoImo  = $request->inscricaoImo;
+            $empresa->codigo        = $request->codigo;
             $empresa->endereco      = $request->endereco;
             $empresa->numero        = $request->numero;
             $empresa->cep           = $request->cep;
             $empresa->complemento   = $request->complemento;
             $empresa->bairro        = $request->bairro;
+            $empresa->cidade        = $request->cidade;
+            $empresa->uf            = $request->uf;
             $empresa->telefone      = $request->telefone;
             $empresa->responsavel   = $request->responsavel;
             $empresa->email         = $request->email;
@@ -190,5 +200,12 @@ class UnidadesController extends Controller
                         ->with('success', 'A unidade '.$empresa->nomeFantasia.' foi editado com sucesso!');
 
 
+    }
+
+    public function cadastro()
+    {   
+        $empresas = Empresa::pluck('nomeFantasia','id')->toArray();
+
+        return view('admin.cadastro-unidade')->with('empresas',$empresas);
     }
 }

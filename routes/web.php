@@ -35,11 +35,11 @@ Route::get('/empresa/{empresa}/unidades','EmpresasController@unidades')->name('e
 
 //Test Routes
 
-Route::get('/empresa/cadastro', function ()
-{	
-	
-	return view ('admin.cadastro-empresa');
-});
+Route::get('/empresa/cadastro', 'EmpresasController@cadastro')->name('empresa.cadastro');
+
+
+Route::get('/unidade/cadastro', 'UnidadesController@cadastro')->name('unidade.cadastro');
+
 
 Route::post('/unidade/{id}', 'UnidadesController@editar')->name('unidade.editar');
 Route::post('/empresa/{id}', 'EmpresasController@editar')->name('empresa.editar');

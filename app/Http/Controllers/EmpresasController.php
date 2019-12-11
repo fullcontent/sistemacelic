@@ -44,9 +44,46 @@ class EmpresasController extends Controller
      */
     public function store(Request $request)
     {
-        //
+          
+            $validator = Validator::make($request->all(), [
 
-        return $request;
+                'responsavel'=>'required',
+                'nomeFantasia' => 'required',
+                'email' => 'required|email',
+
+            ])->validate();
+
+            $empresa = new Empresa;
+
+            $empresa->cnpj          = $request->cnpj;
+            $empresa->nomeFantasia  = $request->nomeFantasia;
+            $empresa->razaoSocial   = $request->razaoSocial;
+            $empresa->status        = $request->status;
+            $empresa->inscricaoEst  = $request->inscricaoEst;
+            $empresa->inscricaoMun  = $request->inscricaoMun;
+            $empresa->inscricaoImo  = $request->inscricaoImo;
+            $empresa->codigo        = $request->codigo;
+            $empresa->endereco      = $request->endereco;
+            $empresa->numero        = $request->numero;
+            $empresa->cep           = $request->cep;
+            $empresa->complemento   = $request->complemento;
+            $empresa->bairro        = $request->bairro;
+            $empresa->cidade        = $request->cidade;
+            $empresa->uf            = $request->uf;
+            $empresa->telefone      = $request->telefone;
+            $empresa->responsavel   = $request->responsavel;
+            $empresa->email         = $request->email;
+            $empresa->matriculaRI   = $request->matriculaRI;
+            $empresa->area          = $request->area;
+            $empresa->tipoImovel    = $request->tipoImovel;
+
+            $empresa->save();
+
+            return redirect()->route('empresas.show',$empresa->id)
+                        ->with('success', 'A empresa '.$empresa->nomeFantasia.' foi criada com sucesso!');
+
+
+
     }
 
     /**
@@ -105,6 +142,8 @@ class EmpresasController extends Controller
     public function destroy($id)
     {
         //
+
+        return "delete";
     }
 
     public function unidades($id)
@@ -132,14 +171,18 @@ class EmpresasController extends Controller
             $empresa->cnpj          = $request->cnpj;
             $empresa->nomeFantasia  = $request->nomeFantasia;
             $empresa->razaoSocial   = $request->razaoSocial;
+            $empresa->status        = $request->status;
             $empresa->inscricaoEst  = $request->inscricaoEst;
             $empresa->inscricaoMun  = $request->inscricaoMun;
             $empresa->inscricaoImo  = $request->inscricaoImo;
+            $empresa->codigo        = $request->codigo;
             $empresa->endereco      = $request->endereco;
             $empresa->numero        = $request->numero;
             $empresa->cep           = $request->cep;
             $empresa->complemento   = $request->complemento;
             $empresa->bairro        = $request->bairro;
+            $empresa->cidade        = $request->cidade;
+            $empresa->uf            = $request->uf;
             $empresa->telefone      = $request->telefone;
             $empresa->responsavel   = $request->responsavel;
             $empresa->email         = $request->email;
@@ -150,9 +193,14 @@ class EmpresasController extends Controller
             $empresa->save();
             
 
-        return redirect()->route('empresas.show',$id)
+            return redirect()->route('empresas.show',$empresa->id)
                         ->with('success', 'A empresa '.$empresa->nomeFantasia.' foi editado com sucesso!');
 
 
+    }
+
+    public function cadastro()
+    {
+        return view('admin.cadastro-empresa');
     }
 }

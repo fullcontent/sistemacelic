@@ -14,6 +14,7 @@ $factory->define(Unidade::class, function (Faker $faker) {
         'inscricaoEst' => '12345690',
         'inscricaoMun' => '38989823',
         'inscricaoImo'  => '739821739173',
+        'status'        => 'Ativa',
         
         'matriculaRI'   => Str::random(8),
         'tipoImovel'    => 'Shopping',

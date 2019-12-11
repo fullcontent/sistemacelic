@@ -7,20 +7,19 @@
 	<div class="box box-primary">
 	
 	<div class="box-header with-border">
-		<h3 class="box-title">Cadastrar empresa</h3>
+		<h3 class="box-title">Cadastrar unidade</h3>
 	</div>
 
 	
 
-	{!! Form::open(['route'=>'empresas.store']) !!}
+	{!! Form::open(['route'=>'unidades.store']) !!}
 
-	@include('admin.partials.form-empresa')
+	@include('admin.partials.form-unidade')
 	
 	
 
       			<div class="box-footer">
-      			<a href="{{route('empresas.index')}}" class="btn btn-default">Voltar</a>
-                
+                <a href="{{route('unidades.index')}}" class="btn btn-default">Voltar</a>
                 <button type="submit" class="btn btn-info">Cadastrar</button>
               	</div>
     	

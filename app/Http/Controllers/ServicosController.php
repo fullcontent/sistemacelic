@@ -58,9 +58,11 @@ class ServicosController extends Controller
         if($servico->unidade_id){
 
             $dados = $servico->unidade;
+            $route = 'unidades.edit';
         }
         else{
             $dados = $servico->empresa;
+            $route = 'empresas.edit';
         }
 
 
@@ -68,6 +70,7 @@ class ServicosController extends Controller
                     ->with([
                         'servico'=>$servico,
                         'dados'=>$dados,
+                        'route'=>$route,
                 ]);
     }
 
