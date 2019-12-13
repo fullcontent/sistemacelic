@@ -8,7 +8,7 @@ use Faker\Generator as Faker;
 $factory->define(Unidade::class, function (Faker $faker) {
     return [
         //
-        'nomeFantasia' => 'Empresa '.$faker->name,
+        'nomeFantasia' => 'Unidade '.$faker->name,
         'razaoSocial' => $faker->name,
         'cnpj' => '06643154000189',
         'inscricaoEst' => '12345690',

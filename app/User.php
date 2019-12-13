@@ -48,6 +48,17 @@ class User extends Authenticatable
             'user_id',
             'id');
         }
+
+    public function unidades()
+        {
+            return $this->hasManyThrough(
+            'App\Models\Unidade',
+            'App\UserAccess',
+            'user_id',
+            'id');
+        }
+
+    
     
     
 }

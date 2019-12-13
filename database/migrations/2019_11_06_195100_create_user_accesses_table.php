@@ -21,10 +21,12 @@ class CreateUserAccessesTable extends Migration
             $table->unsignedInteger('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users');
             
-            $table->unsignedInteger('empresa_id')->unsigned();
+            $table->unsignedInteger('empresa_id')->unsigned()->nullable();
             $table->foreign('empresa_id')->references('id')->on('empresas');
 
-            
+
+            $table->unsignedInteger('unidade_id')->unsigned()->nullable();
+            $table->foreign('unidade_id')->references('id')->on('unidades');           
 
             
             $table->timestamps();

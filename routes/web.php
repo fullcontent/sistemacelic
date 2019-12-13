@@ -36,10 +36,19 @@ Route::get('/empresa/{empresa}/unidades','EmpresasController@unidades')->name('e
 //Test Routes
 
 Route::get('/empresa/cadastro', 'EmpresasController@cadastro')->name('empresa.cadastro');
-
-
 Route::get('/unidade/cadastro', 'UnidadesController@cadastro')->name('unidade.cadastro');
 
 
 Route::post('/unidade/{id}', 'UnidadesController@editar')->name('unidade.editar');
 Route::post('/empresa/{id}', 'EmpresasController@editar')->name('empresa.editar');
+
+
+
+
+Route::get('/usuarios', 'UsersController@index')->name('usuarios.index');
+Route::get('/usuario/cadastro', 'UsersController@cadastro')->name('usuario.cadastro');
+
+Route::get('/usuario/editar/{id}', 'UsersController@editar')->name('usuario.editar');
+Route::post('/usuario/editar/{id}', 'UsersController@update')->name('usuario.update');
+
+Route::post('/usuario','UsersController@store')->name('usuario.store');
