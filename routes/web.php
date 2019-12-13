@@ -42,9 +42,6 @@ Route::get('/unidade/cadastro', 'UnidadesController@cadastro')->name('unidade.ca
 Route::post('/unidade/{id}', 'UnidadesController@editar')->name('unidade.editar');
 Route::post('/empresa/{id}', 'EmpresasController@editar')->name('empresa.editar');
 
-
-
-
 Route::get('/usuarios', 'UsersController@index')->name('usuarios.index');
 Route::get('/usuario/cadastro', 'UsersController@cadastro')->name('usuario.cadastro');
 
@@ -52,3 +49,7 @@ Route::get('/usuario/editar/{id}', 'UsersController@editar')->name('usuario.edit
 Route::post('/usuario/editar/{id}', 'UsersController@update')->name('usuario.update');
 
 Route::post('/usuario','UsersController@store')->name('usuario.store');
+
+
+
+

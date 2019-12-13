@@ -22,17 +22,18 @@ class CreateServicosTable extends Migration
             $table->string('os');
 
             $table->string('protocolo_anexo')->nullable();
+            $table->string('protocolo_numero')->nullable();
             $table->date('protocolo_emissao')->nullable();
             $table->date('protocolo_validade')->nullable();
             
         
             $table->string('situacao');//Finalizado, Andamento, Vencimento
 
-            $table->text('observacoes');
+            $table->text('observacoes')->nullable();
             
         
-            $table->string('pendencia');
-            $table->string('acao');
+            $table->string('pendencia')->nullable();
+            $table->string('acao')->nullable();
 
             $table->unsignedInteger('empresa_id')->unsigned()->nullable();
             $table->foreign('empresa_id')->references('id')->on('empresas');
