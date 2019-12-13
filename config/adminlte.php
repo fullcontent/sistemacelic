@@ -148,6 +148,11 @@ return [
          'url'  =>  'servicos',
          'icon' => 'glyphicon glyphicon-wrench'   
         ],
+        [
+         'text' => 'Usuários',
+         'url'  =>  'usuarios',
+         'icon' => 'glyphicon glyphicon-user'   
+        ],
         
     ],
 

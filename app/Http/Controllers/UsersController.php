@@ -9,6 +9,8 @@ use App\UserAccess;
 use App\Models\Empresa;
 use App\Models\Unidade;
 
+use Illuminate\Support\Facades\Validator;
+
 class UsersController extends Controller
 {
     //
@@ -26,6 +28,9 @@ class UsersController extends Controller
     {	
     	$empresas = Empresa::pluck('nomeFantasia','id');
     	$unidades = Unidade::pluck('nomeFantasia','id');
+
+
+
     	return view('admin.cadastro-usuario')->with(['empresas'=>$empresas,'unidades'=>$unidades]);
     }
 
@@ -116,7 +121,17 @@ class UsersController extends Controller
 
     public function store(Request $request)
     {	
-    	   
+    	   	
+    	   	$validator = Validator::make($request->all(), [
+
+                'name'=>'required',
+                
+                'email' => 'required|email',
+                'password'=>'required',
+                
+
+            ])->validate();
+
 			$usuario = new User;
 
 			if($request->password!=null)
