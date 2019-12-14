@@ -69,51 +69,15 @@ class UsersController extends Controller
     	$usuario->name 		=	$request->name;
     	$usuario->email 	=	$request->email;
       	$usuario->privileges=	$request->privileges;
-    	$usuario->save();
-
-
-    	$empresas_user_access	= $request->empresas_user_access;
-    	$unidades_user_access	= $request->unidades_user_access;
 
     	
-		
-    	//Check if access is equal to DB
+	    $usuario->acesso_empresa()->sync($request->empresas_user_access);
+	    $usuario->acesso_unidade	()->sync($request->unidades_user_access);
 
-    	$empresas = UserAccess::whereIn('empresa_id',$unidades_user_access)->count();
+	    $usuario->save();
 
 
-    	//
-		if($empresas_user_access<=$empresas){
-				foreach ($empresas_user_access as $e)
-				{
-					if(!UserAccess::where('empresa_id','=',$e)->first())
-					{
-						$empresas_access = new UserAccess;
-						$empresas_access->user_id = $request->id;
-						$empresas_access->empresa_id = $e;
-						$empresas_access->save();
-					}
-				}
-			}
-    	
-
-			if($unidades_user_access)
-			{
-				foreach ($unidades_user_access as $u)
-				{
-
-				//Check if not exists
-				if(!UserAccess::where('unidade_id','=',$u)->first())
-					{
-						$unidade_access = new UserAccess;
-						$unidade_access->user_id = $request->id;
-						$unidade_access->unidade_id = $u;
-						$unidade_access->save();
-					}
-				}
-			}
-    	
-
+	    
     	return redirect()->route('usuarios.index');
                     
     }

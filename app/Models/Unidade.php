@@ -14,11 +14,7 @@ class Unidade extends Model
 		return $this->belongsTo('App\Models\Empresa');
 	}	
 
-	public function user()
-		{
-			return $this->belongsTo('App\User');
-		}
-
+	
 	public function servicos()
 		{
 			return $this->hasMany('App\Models\Servico');

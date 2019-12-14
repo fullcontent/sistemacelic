@@ -40,23 +40,40 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-   public function empresas()
-        {
-            return $this->hasManyThrough(
+   
+    public function empresas()
+    {
+      return $this->hasManyThrough(
             'App\Models\Empresa',
             'App\UserAccess',
-            'user_id',
-            'id');
-        }
-
+            'user_id', // Foreign key on users table...
+            'id', // Foreign key on history table...
+            'id', // Local key on suppliers table...
+            'empresa_id' // Local key on users table...
+        );
+                 
+    }
     public function unidades()
-        {
-            return $this->hasManyThrough(
+    {
+      return $this->hasManyThrough(
             'App\Models\Unidade',
             'App\UserAccess',
-            'user_id',
-            'id');
-        }
+            'user_id', // Foreign key on users table...
+            'id', // Foreign key on history table...
+            'id', // Local key on suppliers table...
+            'unidade_id' // Local key on users table...
+        );
+                 
+    }
+
+    public function acesso_empresa()
+    {
+        return $this->belongsToMany('App\UserAccess','user_accesses','user_id','empresa_id');
+    }
+    public function acesso_unidade()
+    {
+        return $this->belongsToMany('App\UserAccess','user_accesses','user_id','unidade_id');
+    }
 
     
     

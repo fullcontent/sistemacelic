@@ -52,4 +52,7 @@ Route::post('/usuario','UsersController@store')->name('usuario.store');
 
 
 
-
+Route::get('/test', function() {
+    //
+    
+});
