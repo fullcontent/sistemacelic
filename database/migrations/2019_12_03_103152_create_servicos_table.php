@@ -24,7 +24,14 @@ class CreateServicosTable extends Migration
             $table->string('protocolo_anexo')->nullable();
             $table->string('protocolo_numero')->nullable();
             $table->date('protocolo_emissao')->nullable();
-            $table->date('protocolo_validade')->nullable();
+            
+
+            $table->string('licenca_anexo')->nullable();
+            $table->date('licenca_emissao')->nullable();
+            $table->date('licenca_validade')->nullable();
+
+            $table->unsignedInteger('responsavel_id')->unsigned()->nullable();
+            $table->foreign('responsavel_id')->references('id')->on('users');
             
         
             $table->string('situacao');//Finalizado, Andamento, Vencimento
@@ -32,8 +39,7 @@ class CreateServicosTable extends Migration
             $table->text('observacoes')->nullable();
             
         
-            $table->string('pendencia')->nullable();
-            $table->string('acao')->nullable();
+            
 
             $table->unsignedInteger('empresa_id')->unsigned()->nullable();
             $table->foreign('empresa_id')->references('id')->on('empresas');

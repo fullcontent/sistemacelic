@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Servico;
 use App\Models\Historico;
+use App\User;
+
+use Illuminate\Support\Facades\Auth;
 
 
 class ServicosController extends Controller
@@ -33,11 +36,14 @@ class ServicosController extends Controller
 
         $tipo = $request->tipo;
         $id = $request->id;
+        $users = User::where('privileges','=','admin')->pluck('name','id')->toArray();
 
-
-
-
-        return view('admin.cadastro-servico')->with(['tipo'=>$tipo,'id'=>$id]);
+        return view('admin.cadastro-servico')
+                ->with([
+                    'tipo'=>$tipo,
+                    'id'=>$id,
+                    'users'=>$users,
+                ]);
     }
 
     /**
@@ -54,16 +60,19 @@ class ServicosController extends Controller
         $servico->os    =   $request->os;
         $servico->nome  =   $request->nome;
         $servico->situacao  =  $request->situacao;
-        $servico->protocolo_numero  =   $request->protocolo_numero;
+        $servico->responsavel_id = $request->responsavel_id;
+
         
+        $servico->protocolo_numero  =   $request->protocolo_numero;
         $servico->protocolo_emissao =   date('Y-m-d',strtotime($request->protocolo_emissao));
-        $servico->protocolo_validade =  date('Y-m-d',strtotime($request->protocolo_validade));
-
         $servico->protocolo_anexo   = $request->protocolo_anexo;
-        $servico->acao  =   $request->acao;
-        $servico->pendencia = $request->pendencia;
-        $servico->observacoes   = $request->observacoes;
 
+        $servico->licenca_emissao = $request->licenca_emissao;
+        $servico->licenca_validade = $request->licenca_validade;
+        $servico->licenca_anexo = $request->licenca_anexo;
+        
+
+        $servico->observacoes   = $request->observacoes;
 
         $servico->empresa_id = $request->empresa_id;
         $servico->unidade_id = $request->unidade_id;
@@ -75,8 +84,8 @@ class ServicosController extends Controller
 
         $history = new Historico();
         $history->servico_id = $servico->id;
-        $history->by = 'USER NAME';
-        $history->observacoes = "Serviço cadastrado";
+        $history->user_id = Auth::id();
+        $history->observacoes = "Serviço ".$servico->id." cadastrado.";
         $history->save();
 
         
@@ -132,6 +141,8 @@ class ServicosController extends Controller
 
         $servico = Servico::find($id);
 
+        $users = User::where('privileges','=','admin')->pluck('name','id')->toArray();
+
         //Check if is empresa or unidade
 
         if($servico->unidade_id){
@@ -150,6 +161,7 @@ class ServicosController extends Controller
                         'servico'=>$servico,
                         'dados'=>$dados,
                         'route'=>$route,
+                        'users'=>$users,
                     ]);
     }
 
@@ -168,29 +180,43 @@ class ServicosController extends Controller
         $servico->os    =   $request->os;
         $servico->nome  =   $request->nome;
         $servico->situacao  =  $request->situacao;
-        $servico->protocolo_numero  =   $request->protocolo_numero;
-        
-        $servico->protocolo_emissao =   date('Y-m-d',strtotime($request->protocolo_emissao));
-        $servico->protocolo_validade =  date('Y-m-d',strtotime($request->protocolo_validade));
+        $servico->responsavel_id = $request->responsavel_id;
 
+        
+        $servico->protocolo_numero  =   $request->protocolo_numero;
+        $servico->protocolo_emissao =   date('Y-m-d',strtotime($request->protocolo_emissao));
         $servico->protocolo_anexo   = $request->protocolo_anexo;
-        $servico->acao  =   $request->acao;
-        $servico->pendencia = $request->pendencia;
+
+
+        $servico->licenca_emissao = $request->licenca_emissao;
+        $servico->licenca_validade = $request->licenca_validade;
+        $servico->licenca_anexo = $request->licenca_anexo;
+
+
+        $servico->observacoes   = $request->observacoes;
         $servico->observacoes   = $request->observacoes;
 
 
         $servico->save();
 
-
-        //Insert history
-
-        $history = new Historico();
-        $history->servico_id = $servico->id;
-        $history->by = 'USER NAME';
-        $history->observacoes = "Serviço editado";
-        $history->save();
-
         
+        if (!$servico->wasRecentlyCreated) {
+            
+            $changes = $servico->getChanges();
+            unset($changes['updated_at']);
+
+
+             foreach ($changes as $value => $key) {
+                 
+                    $history = new Historico();
+                    $history->servico_id = $servico->id;
+                    $history->user_id = Auth::id();
+                    $history->observacoes = 'Alterou '.$value.' para "'.$key.'"';
+                    $history->save();
+             }
+            }
+
+      
 
         return redirect()->route('servicos.index');
 

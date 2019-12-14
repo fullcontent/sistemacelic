@@ -14,14 +14,14 @@ $factory->define(Servico::class, function (Faker $faker) {
         'nome' => 'Alvara de '.$faker->word.'',
         'os'    => Str::random(5),
         'protocolo_emissao'	=> Carbon::instance($faker->dateTimeThisMonth())->toDateTimeString(),
-        'protocolo_validade'	=> 	Carbon::instance($faker->dateTimeThisMonth())->toDateTimeString(),
+        'protocolo_numero' => Str::random(10),
         'protocolo_anexo' => Str::random(10),
+        'responsavel_id' => 1,
         'situacao'	=> 'situacao',
         'observacoes'	=> 'Observacoes',
         
         
-        'pendencia'	=>	$faker->sentence,
-        'acao'	=>	'acao',
+        
 
         // 'empresa_id' => 4,
         // 'unidade_id' => null

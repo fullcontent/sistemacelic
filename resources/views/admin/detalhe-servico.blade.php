@@ -35,19 +35,22 @@
             <div class="box-body">
                 
                 <div class="col-sm-6">
+                  <p><b>Ordem de serviço: </b>{{$servico->os}}</p>
                   <p><b>Nome: </b>{{$servico->nome}}</p>
-                  
-                  <p><b>Emissão: </b>{{\Carbon\Carbon::parse($servico->protocolo_emissao)->format('d/m/Y')}}</p>
+                  <p><b>Responsável: </b>{{$servico->responsavel->name}}</p>
+                  <p><b>Início do processo: </b>{{\Carbon\Carbon::parse($servico->created_at)->format('d/m/Y')}}</p>
+                  <p><b>Emissão Protocolo: </b>{{\Carbon\Carbon::parse($servico->protocolo_emissao)->format('d/m/Y')}}</p>
                   <p><b>Número Protocolo: </b>{{$servico->protocolo_numero}} <button type="button" class="btn btn-primary btn-xs">Ver</button></p>
-                  <p><b>Validade: </b>{{\Carbon\Carbon::parse($servico->protocolo_validade)->format('d/m/Y')}}</p>
+                  
 
                 </div>
                 
                 <div class="col-sm-6">
                     
-                  <p><b>Início do processo: </b>{{\Carbon\Carbon::parse($servico->created_at)->format('d/m/Y')}}</p>
-                  <p><b>Última cobrança: </b></p>
-                  <p><b>Próxima cobrança: </b></p>
+                  <p><b>Emissão Licença: </b>{{$servico->licenca_emissao}}</p>
+                  <p><b>Emissão Validade: </b>{{$servico->licenca_emissao}}</p>
+                  <p><b>Emissão Documento: </b><button type="button" class="btn btn-primary btn-xs">Ver</button></p>
+
                 </div>
 
               <a href="{{route('servicos.edit', $servico->id)}}" class="btn btn-info pull-right"><span class="glyphicon glyphicon-pencil"></span> Editar</a>
@@ -72,6 +75,7 @@
               </div>
             </div>
             <!-- /.box-header -->
+            
             <div class="box-body">
                         
                 <ul class="timeline timeline-inverse">
@@ -79,15 +83,15 @@
                   
                 @foreach($servico->historico as $historico)
                   <!-- timeline item -->
-                    <li>
+                  <li>
+                    
                     <i class="fa fa-user bg-aqua"></i>
-
+                    
                     <div class="timeline-item">
-                      <span class="time"><i class="fa fa-clock-o"></i> {{\Carbon\Carbon::parse($historico->created_at)->diffForHumans()}}</span>
+                      <span class="time"><i class="fa fa-clock"></i> {{\Carbon\Carbon::parse($historico->created_at)->diffForHumans()}}</span>
+                      <h3 class="timeline-header"><a href="#">{{$servico->responsavel->name}}</a> {{$historico->observacoes}}</h3>
 
-                      <h3 class="timeline-header no-border">
-                        {{$historico->observacoes}}
-                      </h3>
+                      
                     </div>
                   </li>
                   <!-- END timeline item -->
@@ -95,11 +99,13 @@
                   
                   
                   <li>
-                    <i class="fa fa-clock-o bg-gray"></i>
+                    <i class="fa fa-clock bg-gray"></i>
                   </li>
                 </ul>
 
             </div>
+
+                 
   </div>
 
 

@@ -36,12 +36,15 @@
 	$(document).ready(function() {
 
   	$("#protocolo_emissao").datepicker();
-  	$("#protocolo_validade").datepicker();
+  	$("#licenca_emissao").datepicker();
+  	$("#licenca_vencimento").datepicker();
   	
-
+  	
 	  	
  
 });
+
+
 </script>
 
 @stop

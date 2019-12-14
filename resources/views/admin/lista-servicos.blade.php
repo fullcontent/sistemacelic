@@ -16,7 +16,7 @@
                   <th>Nome</th>
                   <th>Empresa/Unidade</th>
                   <th>Situação</th>
-                  <th>Pendência</th>
+                  <th>Responsável</th>
                   <th></th>
                 </thead>
                 <tbody>
@@ -36,7 +36,7 @@
 	              	@endphp
 	              	<td>{{$empresa}}</td>
 	              	<td>{{$servico->situacao}}</td>
-	              	<td>{{$servico->pendencia}}</td>
+	              	<td>{{$servico->responsavel->name}}</td>
 
 					<td><a href="{{route('servicos.show', $servico->id)}}">Detalhes</a></td>
 	                </tr>

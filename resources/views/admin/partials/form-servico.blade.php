@@ -1,6 +1,6 @@
 <div class="box-body">
 
-<div class="col-md-4">
+<div class="col-md-3">
 	
 	<div class="form-group">
 		
@@ -10,7 +10,7 @@
 	</div>
 </div>
 
-<div class="col-md-4">
+<div class="col-md-3">
 	
 	<div class="form-group">
 		
@@ -20,7 +20,7 @@
 	</div>
 </div>
 
-<div class="col-md-4">
+<div class="col-md-3">
 	
 	<div class="form-group">
 		
@@ -29,6 +29,23 @@
 		
 	</div>
 </div>
+
+<div class="col-md-3">
+	
+	<div class="form-group">
+		
+		 <div class="form-group">
+          
+          {!! Form::label('responsavel_id', 'Responsável', array('class'=>'control-label')) !!}
+          
+          {!! Form::select('responsavel_id', $users, null, ['class'=>'form-control']) !!}
+
+        </div>
+		
+	</div>
+</div>
+
+
 
 <div class="col-md-12">
 	
@@ -55,51 +72,36 @@
 	
 	<div class="form-group">
 		
-		{!! Form::label('protocolo_emissao', 'Emissão Prot.', array('class'=>'control-label')) !!}
+		{!! Form::label('protocolo_emissao', 'Emissão Protocolo', array('class'=>'control-label')) !!}
 		{!! Form::text('protocolo_emissao', null, ['class'=>'form-control','id'=>'protocolo_emissao']) !!}
 		
 	</div>
 </div>
 
+
+	
+
 <div class="col-md-4">
 	
 	<div class="form-group">
 		
-		{!! Form::label('protocolo_validade', 'Validade Prot.', array('class'=>'control-label')) !!}
-		{!! Form::text('protocolo_validade', null, ['class'=>'form-control','id'=>'protocolo_validade']) !!}
-		
-	</div>
-</div>
-
-<div class="col-md-12">
-	
-	<div class="form-group">
-		
-		{!! Form::label('protocolo_anexo', 'Anexo Prot.', array('class'=>'control-label')) !!}
+		{!! Form::label('protocolo_anexo', 'Anexo Protocolo.', array('class'=>'control-label')) !!}
 		{!! Form::file('protocolo_anexo', null, ['class'=>'form-control','id'=>'protocolo_anexo']) !!}
 		
 	</div>
 </div>
 
-<div class="col-md-6">
-	
-	<div class="form-group">
-		
-		{!! Form::label('pendencia', 'Pendência', array('class'=>'control-label')) !!}
-		{!! Form::text('pendencia', null, ['class'=>'form-control','id'=>'pendencia']) !!}
-		
-	</div>
-</div>
 
-<div class="col-md-6">
-	
-	<div class="form-group">
-		
-		{!! Form::label('acao', 'Ação', array('class'=>'control-label')) !!}
-		{!! Form::text('acao', null, ['class'=>'form-control','id'=>'acao']) !!}
-		
-	</div>
-</div>
+
+
+
+
+
+
+
+
+
+
 
 
 <div class="col-md-12">
@@ -108,6 +110,40 @@
 		
 		{!! Form::label('observacoes', 'Observações', array('class'=>'control-label')) !!}
 		{!! Form::textarea('observacoes', null, ['class'=>'form-control','id'=>'observacoes']) !!}
+		
+	</div>
+</div>
+
+
+
+
+
+<div class="col-md-3">
+	
+	<div class="form-group">
+		
+		{!! Form::label('licenca_emissao', 'Emissão Licença', array('class'=>'control-label')) !!}
+		{!! Form::text('licenca_emissao', null, ['class'=>'form-control','id'=>'licenca_emissao']) !!}
+		
+	</div>
+</div>
+
+<div class="col-md-3">
+	
+	<div class="form-group">
+		
+		{!! Form::label('licenca_vencimento', 'Vencimento Licença', array('class'=>'control-label')) !!}
+		{!! Form::text('licenca_vencimento', null, ['class'=>'form-control','id'=>'licenca_vencimento']) !!}
+		
+	</div>
+</div>
+
+<div class="col-md-6">
+	
+	<div class="form-group">
+		
+		{!! Form::label('licenca_anexo', 'Documento Licença', array('class'=>'control-label')) !!}
+		{!! Form::file('licenca_anexo', null, ['class'=>'form-control','id'=>'licenca_anexo']) !!}
 		
 	</div>
 </div>

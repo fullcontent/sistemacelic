@@ -19,7 +19,10 @@ class CreateHistoricosTable extends Migration
             $table->integer('servico_id');
             $table->string('anexo')->nullable();
             $table->text('observacoes');
-            $table->string('by'); //Robot, Castro, Cliente
+
+            $table->unsignedInteger('user_id')->unsigned()->nullable();
+            $table->foreign('user_id')->references('id')->on('users');
+           
         });
     }
 
