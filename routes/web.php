@@ -15,7 +15,7 @@ Route::get('/', function () {
     return view('auth.login');
 });
 
-Auth::routes();
+
 
 Route::get('/home', function() {
     return view('home');
@@ -51,6 +51,12 @@ Route::post('/usuario/editar/{id}', 'UsersController@update')->name('usuario.upd
 Route::post('/usuario','UsersController@store')->name('usuario.store');
 
 
+
+
+Route::post('salvarInteracao', 'ServicosController@salvarInteracao')->name('interacao.store');
+
+
+Auth::routes();
 
 Route::get('/test', function() {
     //

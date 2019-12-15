@@ -76,9 +76,7 @@
             </div>
             <!-- /.box-header -->
             
-            <div class="box-body">
-                        
-                <ul class="timeline timeline-inverse">
+             <ul class="timeline timeline-inverse">
                                  
                   
                 @foreach($servico->historico as $historico)
@@ -103,7 +101,25 @@
                   </li>
                 </ul>
 
+                <div class="box-footer">
+                
+                <div class="box-header">
+                  
+                  {!! Form::open(['route'=>'interacao.store']) !!}
+                  <div class="input-group">
+                  {!! Form::text('observacoes', null, ['class'=>'form-control','id'=>'observacoes','placeholder'=>'Digite a mensagem']) !!}
+                  {!! Form::hidden('servico_id',$servico->id) !!}
+                  
+                      <span class="input-group-btn">
+                        <button type="submit" class="btn btn-info btn-flat">Enviar</button>
+                      </span>
+                </div>
+                {!! Form::close() !!}   
+
+                </div>
+
             </div>
+
 
                  
   </div>

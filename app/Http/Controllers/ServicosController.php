@@ -233,4 +233,19 @@ class ServicosController extends Controller
     {
         //
     }
+
+
+
+    public function salvarInteracao(Request $request)
+    {   
+        $interacao = new Historico;
+
+        $interacao->servico_id = $request->servico_id;
+        $interacao->observacoes = $request->observacoes;
+        $interacao->user_id = Auth::id();
+
+        $interacao->save();
+
+        return redirect()->route('servicos.show', $request->servico_id);
+    }
 }
