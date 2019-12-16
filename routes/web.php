@@ -44,13 +44,25 @@ Route::get('/', function () {
 
 	Route::prefix('cliente')->group(function () {
 
-			Route::get('/home', function() {
-    			return view('user.dashboard');
-			});
+			Route::get('/home', 'ClienteController@index');
 
 			Route::get('/empresas', 'ClienteController@empresas')->name('empresas');
+			Route::get('/empresa/{id}', 'ClienteController@empresaShow')->name('empresa.show');
+			Route::get('/empresa/{id}/unidades', 'ClienteController@empresaUnidades')->name('empresa.unidades');
+
+
+
+
 			Route::get('/unidades', 'ClienteController@unidades')->name('unidades');
+			Route::get('/unidade/{id}', 'ClienteController@unidadeShow')->name('unidade.show');
+
+
 			Route::get('/servicos', 'ClienteController@servicos')->name('servicos');
+			Route::get('/servico/{id}', 'ClienteController@servicoShow')->name('servico.show');
+			Route::post('salvarInteracao', 'ClienteController@salvarInteracao')->name('interacao.salvar');
+
+
+
 			Route::get('/usuarios', 'ClienteController@usuarios')->name('usuarios');
 
 	});

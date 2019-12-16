@@ -43,6 +43,13 @@ class AppServiceProvider extends ServiceProvider
 
                         $event->menu->add(
                         ['header' => 'main_navigation'],
+
+                        [
+                        'text' => 'Dashboard',
+                        'url' =>  ''.Auth::user()->privileges.'/home',
+                        'icon' => 'glyphicon glyphicon-home'
+
+                        ],
                         [
                         'text' => 'Empresas',
                         'url' =>  ''.Auth::user()->privileges.'/empresas',
@@ -59,11 +66,27 @@ class AppServiceProvider extends ServiceProvider
                         'icon' => 'glyphicon glyphicon-wrench'
                         ],
                         [
-                        'text' => 'Usuários',
-                        'url'  =>  ''.Auth::user()->privileges.'/usuarios',
+                        'text' => 'Perfil',
+                        'url'  =>  ''.Auth::user()->privileges.'/profile',
                         'icon' => 'glyphicon glyphicon-user'
                         ],
+                        
                     );
+
+                        if(Auth::user()->privileges == 'admin')
+
+                        {
+                            $event->menu->add(
+                                ['header'=> 'Administração'],
+                                [
+                                'text' => 'Usuários',
+                                'url'  =>  ''.Auth::user()->privileges.'/usuarios',
+                                'icon' => 'fa fa-users'
+                                ],
+
+
+                            );
+                        }
                 
         });
     }

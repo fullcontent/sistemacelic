@@ -6,9 +6,7 @@
 				<div class="box">
 					<div class="box-header">
 					
-						<a class="btn btn-app" href="{{route('empresa.cadastro')}}">
-	                		<i class="fa fa-plus"></i> Cadastrar
-	         			</a>
+						
 
 					</div>
 				
@@ -27,36 +25,16 @@
                 </thead>
 
                 <tbody>
-
-                	
 				@foreach($empresas as $empresa)
-
                 	<tr>
 	              	
-	              	<td><a href="{{route('empresas.show', $empresa->id)}}">{{$empresa->nomeFantasia}}</a></td>
+	              	<td><a href="{{route('empresa.show', $empresa->id)}}">{{$empresa->nomeFantasia}}</a></td>
 	              	<td>{{$empresa->cnpj}}</td>
 	              	<td>{{$empresa->cidade}}/{{$empresa->uf}}</td>
 	              	<td>{{$empresa->telefone}}</td>
 					
-					<td>
-						<div class="btn-group">
-                  <button type="button" class="btn btn-default btn-flat">Ações</button>
-                  <button type="button" class="btn btn-default btn-flat dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <span class="caret"></span>
-                    <span class="sr-only">Toggle Dropdown</span>
-                  </button>
-                  <ul class="dropdown-menu" role="menu">
-
-                  	<li><a href="{{route('empresa.unidades',$empresa->id)}}">Ver Unidades</a></li>
-                  	<li><a href="#">Taxas</a></li>
-                  	<li class="divider"></li>
-                    <li><a href="{{route('empresas.show', $empresa->id)}}">Detalhes</a></li>
-                    <li><a href="{{route('empresas.edit', $empresa->id)}}">Editar</a></li>
-                                    
-                  </ul>
-                </div>
-
-
+					<td><a href="{{route('empresa.unidades',$empresa->id)}}" class="btn btn-flat btn-info">Unidades</a>
+						<a href="{{route('empresa.show',$empresa->id)}}" class="btn btn-flat btn-warning">Detalhes</a>
 						</td>
 	                </tr>
 	            @endforeach
