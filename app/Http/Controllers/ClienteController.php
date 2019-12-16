@@ -34,7 +34,7 @@ class ClienteController extends Controller
     	return view ('cliente.dashboard')
                         ->with([
                             'servicos'=>$this->getServicosCliente(),
-                            
+
                         ]);
     }
 
@@ -88,15 +88,7 @@ class ClienteController extends Controller
         return view('cliente.lista-unidades')->with('unidades',$unidades);
     }
 
-    public function getServicosCliente()
-    {
-        $user = User::find(Auth::id());
-
-        $servicos = Servico::whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))->get();
-
-        return $servicos;
-    }
-
+    
     public function servicos()
     {   
         $user = User::find(Auth::id());
@@ -150,4 +142,16 @@ class ClienteController extends Controller
 
         return redirect()->route('servico.show', $request->servico_id);
     }
+
+
+    public function getServicosCliente()
+    {
+        $user = User::find(Auth::id());
+
+        $servicos = Servico::whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))->get();
+
+        return $servicos;
+    }
+
+    
 }

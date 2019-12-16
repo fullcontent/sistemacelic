@@ -16,7 +16,7 @@ class UsersSeeder extends Seeder
             'email' => 'bgc1988@gmail.com',
             'password' => bcrypt('juc4b4l4'),
             'privileges' => 'admin',
-        ]);
+            ]);
 
         $users = factory(App\User::class,10)
                 ->create();
