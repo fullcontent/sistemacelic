@@ -13,4 +13,10 @@ class Historico extends Model
    	
    		return $this->belongsTo('App\Models\Servico');
    }
+
+
+   public function user()
+   {
+   		return $this->belongsTo('App\User');
+   }
 }

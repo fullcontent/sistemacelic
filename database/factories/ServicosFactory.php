@@ -17,7 +17,7 @@ $factory->define(Servico::class, function (Faker $faker) {
         'protocolo_numero' => Str::random(10),
         'protocolo_anexo' => Str::random(10),
         'responsavel_id' => 1,
-        'situacao'	=> 'situacao',
+        'situacao'	=> 'Em Andamento',
         'observacoes'	=> 'Observacoes',
         
         

@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Empresa;
 use App\Models\Unidade;
 
+use Auth;
+
 use Illuminate\Support\Facades\Validator;
 
 class EmpresasController extends Controller
@@ -15,15 +17,26 @@ class EmpresasController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    public function __construct()
+    {
+        
+        $this->middleware('admin');       
+
+    }
+
     public function index()
     {
         //
+        
         $empresas = Empresa::all();
-
         return view ('admin.lista-empresas')
             ->with([
                 'empresas'=>$empresas,
             ]);
+        
+
+        
     }
 
     /**

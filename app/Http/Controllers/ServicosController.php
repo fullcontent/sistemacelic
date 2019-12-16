@@ -7,7 +7,8 @@ use App\Models\Servico;
 use App\Models\Historico;
 use App\User;
 
-use Illuminate\Support\Facades\Auth;
+use Auth;
+use Illuminate\Support\Facades\Validator;
 
 
 class ServicosController extends Controller
@@ -17,6 +18,15 @@ class ServicosController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    public function __construct()
+    {
+        
+        $this->middleware('auth');
+
+    }
+
+    
     public function index()
     {
         
@@ -238,6 +248,13 @@ class ServicosController extends Controller
 
     public function salvarInteracao(Request $request)
     {   
+
+        $validator = Validator::make($request->all(), [
+
+                'observacoes'=>'required',
+                
+            ])->validate();
+
         $interacao = new Historico;
 
         $interacao->servico_id = $request->servico_id;

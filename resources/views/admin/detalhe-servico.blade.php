@@ -66,7 +66,7 @@
     <div class="col-sm-12">
       <div class="box box-black">
             <div class="box-header with-border">
-              <h3 class="box-title">Interações</h3>
+              <h3 class="box-title">Últimas Interações</h3>
 
               <div class="box-tools pull-right">
                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -87,7 +87,7 @@
                     
                     <div class="timeline-item">
                       <span class="time"><i class="fa fa-clock"></i> {{\Carbon\Carbon::parse($historico->created_at)->diffForHumans()}}</span>
-                      <h3 class="timeline-header"><a href="#">{{$servico->responsavel->name}}</a> {{$historico->observacoes}}</h3>
+                      <h3 class="timeline-header"><a href="#">{{$historico->user->name}}</a> {{$historico->observacoes}}</h3>
 
                       
                     </div>

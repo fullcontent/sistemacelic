@@ -124,37 +124,9 @@ return [
     | Awesome. A string instead of an array represents a header in sidebar
     | layout. The 'can' is a filter on Laravel's built in Gate functionality.
     */
-
-    'menu' => [
-        [
-            'text' => 'search',
-            'search' => true,
-        ],
-        ['header' => 'main_navigation'],
-
-         [
-        'text' => 'Empresas',
-        'url' => 'empresas',
-        'icon' => 'glyphicon glyphicon-briefcase'],
-
-        [
-         'text' => 'Unidades',
-         'url'  =>  'unidades',
-         'icon' => 'glyphicon glyphicon-align-justify'   
-        ],
-
-        [
-         'text' => 'Serviços',
-         'url'  =>  'servicos',
-         'icon' => 'glyphicon glyphicon-wrench'   
-        ],
-        [
-         'text' => 'Usuários',
-         'url'  =>  'usuarios',
-         'icon' => 'glyphicon glyphicon-user'   
-        ],
-        
-    ],
+    
+    
+    'menu' => [],
 
     /*
     |--------------------------------------------------------------------------
@@ -176,6 +148,7 @@ return [
         JeroenNoten\LaravelAdminLte\Menu\Filters\ClassesFilter::class,
         JeroenNoten\LaravelAdminLte\Menu\Filters\GateFilter::class,
         JeroenNoten\LaravelAdminLte\Menu\Filters\LangFilter::class,
+        
     ],
 
     /*
