@@ -22,6 +22,6 @@ class Unidade extends Model
 
 		public function taxas()
 		{
-			return $this->hasManyThrough('App\Models\Taxa','App\Models\Servico','empresa_id','servico_id','id');
+			return $this->hasManyThrough('App\Models\Taxa','App\Models\Servico','unidade_id','servico_id','id');
 		}
 }

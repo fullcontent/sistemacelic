@@ -1,8 +1,6 @@
 <div class="box-body">
 	
 
-		
-
 			<div class="col-md-6">
 				
 				<div class="input-group input-group-sm">

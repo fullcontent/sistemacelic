@@ -25,9 +25,12 @@ Route::get('/', function () {
 		return view('admin.dashboard');
 		})->name('home');
 
+
+
 		Route::resource('/empresas','EmpresasController');
 		Route::resource('/unidades','UnidadesController');
 		Route::resource('/servicos','ServicosController');
+		Route::resource('/taxas','TaxasController');
 		Route::get('/empresa/{empresa}/unidades','EmpresasController@unidades')->name('empresa.unidades');
 		Route::get('/empresa/cadastro', 'EmpresasController@cadastro')->name('empresa.cadastro');
 		Route::get('/unidade/cadastro', 'UnidadesController@cadastro')->name('unidade.cadastro');

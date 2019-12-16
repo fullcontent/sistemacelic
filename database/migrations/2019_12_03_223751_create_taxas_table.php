@@ -27,6 +27,7 @@ class CreateTaxasTable extends Migration
             $table->text('observacoes');
             $table->date('emissao');
             $table->date('vencimento');
+            
             $table->string('situacao');
 
         });

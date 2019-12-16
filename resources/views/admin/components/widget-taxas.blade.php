@@ -1,6 +1,6 @@
 <div class="box box-info">
             <div class="box-header with-border">
-              <h3 class="box-title">Taxas</h3>
+              <h3 class="box-title">Taxas em aberto</h3>
 
               <div class="box-tools pull-right">
                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -18,6 +18,7 @@
                     <th>Valor</th>
                     <th>Vencimento</th>
                     <th>Situacao</th>
+                    <th>O.S.</th>
                   </tr>
                   </thead>
                   <tbody>
@@ -28,6 +29,8 @@
                     <td><span class="label label-success">{{ \Carbon\Carbon::parse($taxa->vencimento)->format('d/m/Y')}}
 </span></td>
                     <td>{{$taxa->situacao}}</td>
+                    <td>{{$taxa->servico->os}}</td>
+
                   </tr>
                   @endforeach
                   
@@ -38,6 +41,7 @@
             </div>
             <!-- /.box-body -->
             <div class="box-footer clearfix">
+              <a href="{{route('taxas.create')}}" class="btn btn-sm btn-info btn-flat pull-left"><span class="glyphicon glyphicon-plus-sign"></span> Nova Taxa</a>
               <a href="javascript:void(0)" class="btn btn-sm btn-default btn-flat pull-right">Todas as Taxas</a>
             </div>
             <!-- /.box-footer -->

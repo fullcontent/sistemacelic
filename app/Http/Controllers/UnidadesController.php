@@ -108,6 +108,9 @@ class UnidadesController extends Controller
         //
         $unidade = Unidade::find($id);
 
+
+        
+
         return view('admin.detalhe-unidade')
                     ->with([
                         'dados'=>$unidade,

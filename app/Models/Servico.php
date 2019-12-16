@@ -26,6 +26,7 @@ class Servico extends Model
     {
         return $this->hasMany('App\Models\Taxa');
     }
+    
     public function responsavel()
     {
         return $this->belongsTo('App\User','responsavel_id','id');
