@@ -69,7 +69,7 @@ class AppServiceProvider extends ServiceProvider
                         'text' => 'Perfil',
                         'url'  =>  ''.Auth::user()->privileges.'/profile',
                         'icon' => 'glyphicon glyphicon-user'
-                        ],
+                        ]
                         
                     );
 
@@ -82,7 +82,7 @@ class AppServiceProvider extends ServiceProvider
                                 'text' => 'Usuários',
                                 'url'  =>  ''.Auth::user()->privileges.'/usuarios',
                                 'icon' => 'fa fa-users'
-                                ],
+                                ]
 
 
                             );
