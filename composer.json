@@ -15,6 +15,8 @@
         "laravel/framework": "^6.2",
         "laravel/tinker": "^1.0",
         "laravelcollective/html": "^6.0",
+        "symfony/mime": "4.3.8",
+        "symfony/http-foundation": "4.3.8",
         "lucascudo/laravel-pt-br-localization": "^1.0"
     },
     "require-dev": {

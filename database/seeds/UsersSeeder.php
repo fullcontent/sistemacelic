@@ -18,6 +18,13 @@ class UsersSeeder extends Seeder
             'privileges' => 'admin',
             ]);
 
+        DB::table('users')->insert([
+            'name' => 'Diego Castro',
+            'email' => 'diego@celic.com',
+            'password' => bcrypt('123456'),
+            'privileges' => 'admin',
+            ]);
+
         $users = factory(App\User::class,10)
                 ->create();
     }
