@@ -30,7 +30,13 @@ class UnidadesTableSeeder extends Seeder
                         {
                             $historico = factory(App\Models\Historico::class,10)->create(['servico_id'=>$h->id]);
                             $h->historico()->saveMany($historico);
-                        });
+                        })
+                        ->each(function ($p)
+                        {
+                            $pendencia = factory(App\Models\Pendencia::class,10)->create(['servico_id'=>$p->id]);
+                            $p->historico()->saveMany($pendencia);
+                        })
+                        ;
 
                     $unidade->servicos()->saveMany($servico);
 

@@ -766,6 +766,7 @@ throw new Error('AdminLTE requires jQuery')
 
   TodoList.prototype.check = function (item) {
     this.options.onCheck.call(item);
+
   };
 
   TodoList.prototype.unCheck = function (item) {

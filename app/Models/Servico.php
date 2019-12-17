@@ -26,9 +26,16 @@ class Servico extends Model
     {
         return $this->hasMany('App\Models\Taxa');
     }
+
+    public function pendencias()
+    {
+        return $this->hasMany('App\Models\Pendencia');
+    }
     
     public function responsavel()
     {
         return $this->belongsTo('App\User','responsavel_id','id');
     }
+
+
 }

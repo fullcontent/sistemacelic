@@ -31,6 +31,10 @@ Route::get('/', function () {
 		Route::resource('/unidades','UnidadesController');
 		Route::resource('/servicos','ServicosController');
 		Route::resource('/taxas','TaxasController');
+		Route::resource('/pendencia','PendenciasController');
+		
+
+
 		Route::get('/empresa/{empresa}/unidades','EmpresasController@unidades')->name('empresa.unidades');
 		Route::get('/empresa/cadastro', 'EmpresasController@cadastro')->name('empresa.cadastro');
 		Route::get('/unidade/cadastro', 'UnidadesController@cadastro')->name('unidade.cadastro');
@@ -42,6 +46,12 @@ Route::get('/', function () {
 		Route::post('/usuario/editar/{id}', 'UsersController@update')->name('usuario.update');
 		Route::post('/usuario','UsersController@store')->name('usuario.store');
 		Route::post('salvarInteracao', 'ServicosController@salvarInteracao')->name('interacao.store');
+
+		Route::get('/pendencia/done/{id}', 'PendenciasController@done')->name('pendencia.done');
+		Route::get('/pendencia/undone/{id}', 'PendenciasController@undone')->name('pendencia.undone');
+		Route::get('/pendencia/create/{servico_id}', 'PendenciasController@create')->name('pendencia.create');
+		
+		
 
 	});
 

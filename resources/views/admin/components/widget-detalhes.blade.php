@@ -1,4 +1,4 @@
-<div class="box box-info">
+<div class="box box-info collapsed-box">
 	<div class="box-header with-border">
 		<h3 class="box-title">{{$dados->nomeFantasia}}</h3>
 		<div class="box-tools pull-right">
