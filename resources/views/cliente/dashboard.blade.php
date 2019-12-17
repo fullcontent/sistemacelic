@@ -14,7 +14,7 @@
           <!-- small box -->
           <div class="small-box bg-aqua">
             <div class="inner">
-              <h3>150</h3>
+              <h3></h3>
 
               <p>Total de O.S.s</p>
             </div>
@@ -132,7 +132,3 @@
      
 
 @endsection
-
-
-
-

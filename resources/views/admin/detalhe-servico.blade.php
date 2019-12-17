@@ -19,7 +19,7 @@
 
 
  
-<div class="col-md-8">
+<div class="col-md-6">
     
     <div class="box box-info">
             <div class="box-header with-border">
@@ -60,6 +60,10 @@
             <!-- /.box-body -->
            
           </div>
+</div>
+
+<div class="col-md-6">
+  @include('admin.components.widget-taxas')
 </div>
 
 <div class="row">

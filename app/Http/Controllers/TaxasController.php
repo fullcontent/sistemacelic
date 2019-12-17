@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Models\Servico;
+use App\Models\Taxa;
 
 class TaxasController extends Controller
 {
@@ -40,6 +41,24 @@ class TaxasController extends Controller
     public function store(Request $request)
     {
         //
+
+        $taxa = new Taxa;
+
+        $taxa->nome  = $request->nome;
+        $taxa->emissao = date('Y-m-d',strtotime($request->emissao));
+        $taxa->servico_id = $request->servico_id;
+        $taxa->vencimento = date('Y-m-d',strtotime($request->vencimento));
+        $taxa->valor =  str_replace (',', '.', str_replace ('.', '', $request->valor));
+        $taxa->observacoes = $request->observacoes;
+        $taxa->boleto   =   $request->boleto;
+        $taxa->comprovante = $request->comprovante;
+        $taxa->situacao = $request->situacao;
+
+        $taxa->save();
+
+        
+        
+        return redirect()->route('servicos.show',$request->servico_id);
     }
 
     /**

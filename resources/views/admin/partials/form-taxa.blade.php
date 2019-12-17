@@ -1,18 +1,28 @@
 <div class="box-body">
   
-      <div class="col-md-4">
+      <div class="col-md-3">
         <div class="form-group">
           
           {!! Form::label('servico_id', 'Ordem de serviço', array('class'=>'control-label')) !!}
+
+          
           {!! Form::select('servico_id', $servicos, null, ['class'=>'form-control','id'=>'servico_id']) !!}
           
         </div>
       </div>
 
-      <div class="col-md-8">
+      <div class="col-md-6">
         <div class="form-group">
         {!! Form::label('nome', 'Descrição', array('class'=>'control-label')) !!}
         {!! Form::text('nome', null, ['class'=>'form-control','id'=>'nome']) !!}
+        </div>
+        
+      </div>
+
+      <div class="col-md-3">
+        <div class="form-group">
+        {!! Form::label('situacao', 'Situação', array('class'=>'control-label')) !!}
+        {!! Form::select('situacao', array('aberto' => 'Em aberto', 'vencimento' => 'Vencimento','vencida'=>'Vencida'), 'aberto', ['class'=>'form-control','id'=>'situacao']) !!}
         </div>
         
       </div>

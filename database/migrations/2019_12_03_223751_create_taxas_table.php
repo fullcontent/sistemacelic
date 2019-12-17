@@ -24,7 +24,7 @@ class CreateTaxasTable extends Migration
             $table->float('valor',10,2);
             $table->string('boleto')->nullable();
             $table->string('comprovante')->nullable();
-            $table->text('observacoes');
+            $table->text('observacoes')->nullable();
             $table->date('emissao');
             $table->date('vencimento');
             

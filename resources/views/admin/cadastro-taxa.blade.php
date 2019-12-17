@@ -29,3 +29,22 @@
 	{!! Form::close() !!}
 
 @endsection
+
+@section('js')
+
+<script>
+	
+	$(document).ready(function() {
+
+  	$("#emissao").datepicker();
+  	$("#vencimento").datepicker();
+  	 	
+  	$("#valor").mask('000.000.000.000.000,00', {reverse: true});
+	  	
+ 
+});
+
+
+</script>
+
+@stop

@@ -64,12 +64,8 @@ class AppServiceProvider extends ServiceProvider
                         'text' => 'Serviços',
                         'url'  =>  ''.Auth::user()->privileges.'/servicos',
                         'icon' => 'glyphicon glyphicon-wrench'
-                        ],
-                        [
-                        'text' => 'Perfil',
-                        'url'  =>  ''.Auth::user()->privileges.'/profile',
-                        'icon' => 'glyphicon glyphicon-user'
                         ]
+                        
                         
                     );
 
