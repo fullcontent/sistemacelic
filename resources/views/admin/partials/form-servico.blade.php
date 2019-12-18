@@ -87,6 +87,11 @@
 		
 		{!! Form::label('protocolo_anexo', 'Anexo Protocolo.', array('class'=>'control-label')) !!}
 		{!! Form::file('protocolo_anexo', null, ['class'=>'form-control','id'=>'protocolo_anexo']) !!}
+
+		@unless ( empty($servico->protocolo_anexo) )
+    		
+    		<a href="{{ url("storage/$servico->protocolo_anexo") }}" class="btn btn-xs btn-warning" target="_blank">Ver Protocolo</a>
+		@endunless
 		
 	</div>
 </div>
@@ -144,7 +149,10 @@
 		
 		{!! Form::label('licenca_anexo', 'Documento Licença', array('class'=>'control-label')) !!}
 		{!! Form::file('licenca_anexo', null, ['class'=>'form-control','id'=>'licenca_anexo']) !!}
-		
+		@unless ( empty($servico->licenca_anexo) )
+    		
+    		<a href="{{ url("storage/$servico->licenca_anexo") }}" class="btn btn-xs btn-warning" target="_blank">Ver Licença</a>
+		@endunless
 	</div>
 </div>
 

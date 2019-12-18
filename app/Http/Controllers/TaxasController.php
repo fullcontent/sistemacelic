@@ -50,9 +50,38 @@ class TaxasController extends Controller
         $taxa->vencimento = date('Y-m-d',strtotime($request->vencimento));
         $taxa->valor =  str_replace (',', '.', str_replace ('.', '', $request->valor));
         $taxa->observacoes = $request->observacoes;
-        $taxa->boleto   =   $request->boleto;
-        $taxa->comprovante = $request->comprovante;
+        // $taxa->boleto   =   $request->boleto;
+        // $taxa->comprovante = $request->comprovante;
         $taxa->situacao = $request->situacao;
+
+         // Se informou o arquivo, retorna um boolean
+        if ($request->hasFile('boleto') && $request->file('boleto')->isValid()) {
+                $nameFile = null;
+                $name = uniqid(date('HisYmd'));
+                $extension = $request->boleto->extension();
+                $nameFile = "{$name}.{$extension}";
+                // Faz o upload:
+                $upload = $request->boleto->storeAs('boletos', $nameFile);
+                // Se tiver funcionado o arquivo foi armazenado em storage/app/public/categories/nomedinamicoarquivo.extensao
+
+                $taxa->boleto = $upload;
+
+            }
+
+         // Se informou o arquivo, retorna um boolean
+        if ($request->hasFile('comprovante') && $request->file('comprovante')->isValid()) {
+                $nameFile = null;
+                $name = uniqid(date('HisYmd'));
+                $extension = $request->comprovante->extension();
+                $nameFile = "{$name}.{$extension}";
+                // Faz o upload:
+                $upload = $request->comprovante->storeAs('comprovantes', $nameFile);
+                // Se tiver funcionado o arquivo foi armazenado em storage/app/public/categories/nomedinamicoarquivo.extensao
+
+                $taxa->comprovante = $upload;
+
+
+            }
 
         $taxa->save();
 
@@ -81,6 +110,10 @@ class TaxasController extends Controller
     public function edit($id)
     {
         //
+        $taxa = Taxa::find($id);
+        $servicos = Servico::pluck('os','id')->toArray();
+
+        return view('admin.editar-taxa')->with(['taxa'=>$taxa,'servicos'=>$servicos]);
     }
 
     /**
@@ -92,7 +125,55 @@ class TaxasController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        
+        $taxa = Taxa::find($id);
+
+        $taxa->nome  = $request->nome;
+        $taxa->emissao = date('Y-m-d',strtotime($request->emissao));
+        $taxa->servico_id = $request->servico_id;
+        $taxa->vencimento = date('Y-m-d',strtotime($request->vencimento));
+        $taxa->valor =  str_replace (',', '.', str_replace ('.', '', $request->valor));
+        $taxa->observacoes = $request->observacoes;
+        // $taxa->boleto   =   $request->boleto;
+        // $taxa->comprovante = $request->comprovante;
+        $taxa->situacao = $request->situacao;
+
+         // Se informou o arquivo, retorna um boolean
+        if ($request->hasFile('boleto') && $request->file('boleto')->isValid()) {
+                $nameFile = null;
+                $name = uniqid(date('HisYmd'));
+                $extension = $request->boleto->extension();
+                $nameFile = "{$name}.{$extension}";
+                // Faz o upload:
+                $upload = $request->boleto->storeAs('boletos', $nameFile);
+                // Se tiver funcionado o arquivo foi armazenado em storage/app/public/categories/nomedinamicoarquivo.extensao
+
+                $taxa->boleto = $upload;
+
+            }
+
+         // Se informou o arquivo, retorna um boolean
+        if ($request->hasFile('comprovante') && $request->file('comprovante')->isValid()) {
+                $nameFile = null;
+                $name = uniqid(date('HisYmd'));
+                $extension = $request->comprovante->extension();
+                $nameFile = "{$name}.{$extension}";
+                // Faz o upload:
+                $upload = $request->comprovante->storeAs('comprovantes', $nameFile);
+                // Se tiver funcionado o arquivo foi armazenado em storage/app/public/categories/nomedinamicoarquivo.extensao
+
+                $taxa->comprovante = $upload;
+
+
+            }
+
+        $taxa->save();
+
+        
+        
+        return redirect()->route('servicos.show',$request->servico_id);
+
+
     }
 
     /**

@@ -12,7 +12,7 @@
 
 	
 
-	{!! Form::open(['route'=>'taxas.store','enctype'=>'multipart/form-data']) !!}
+{!! Form::model($taxa,['route'=>['taxas.update', $taxa->id],'method'=>'put','enctype'=>'multipart/form-data']) !!}
 
 	@include('admin.partials.form-taxa')
 	

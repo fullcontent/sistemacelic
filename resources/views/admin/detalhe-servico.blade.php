@@ -39,17 +39,24 @@
                   <p><b>Nome: </b>{{$servico->nome}}</p>
                   <p><b>Responsável: </b>{{$servico->responsavel->name}}</p>
                   <p><b>Início do processo: </b>{{\Carbon\Carbon::parse($servico->created_at)->format('d/m/Y')}}</p>
-                  <p><b>Emissão Protocolo: </b>{{\Carbon\Carbon::parse($servico->protocolo_emissao)->format('d/m/Y')}}</p>
-                  <p><b>Número Protocolo: </b>{{$servico->protocolo_numero}} <button type="button" class="btn btn-primary btn-xs">Ver</button></p>
+                  
+                  @unless ( empty($servico->protocolo_anexo) )
+                    
+                    <p><b>Emissão Protocolo: </b>{{\Carbon\Carbon::parse($servico->protocolo_emissao)->format('d/m/Y')}}</p>
+                  <p><b>Número Protocolo: </b>{{$servico->protocolo_numero}} 
+                    <a href="{{ url("storage/$servico->protocolo_anexo") }}" class="btn btn-xs btn-warning" target="_blank">Ver Protocolo</a>
+                  @endunless
                   
 
                 </div>
                 
                 <div class="col-sm-6">
-                    
+                  
+                  @unless ( empty($servico->licenca_anexo) )  
                   <p><b>Emissão Licença: </b>{{$servico->licenca_emissao}}</p>
                   <p><b>Emissão Validade: </b>{{$servico->licenca_emissao}}</p>
-                  <p><b>Emissão Documento: </b><button type="button" class="btn btn-primary btn-xs">Ver</button></p>
+                  <p><b>Emissão Documento: </b> <a href="{{ url("storage/$servico->licenca_anexo") }}" class="btn btn-xs btn-warning" target="_blank">Ver Licença</a></p>
+                  @endunless
 
                 </div>
 

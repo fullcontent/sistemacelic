@@ -14,7 +14,7 @@
 
 	
 
-	{!! Form::model($servico,['route'=>['servicos.update', $servico->id],'method'=>'put']) !!}
+	{!! Form::model($servico,['route'=>['servicos.update', $servico->id],'method'=>'put','enctype'=>'multipart/form-data']) !!}
 
 
 	@include('admin.partials.form-servico')

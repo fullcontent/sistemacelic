@@ -19,6 +19,7 @@
                     <th>Vencimento</th>
                     <th>Situacao</th>
                     <th>O.S.</th>
+                    <th></th>
                   </tr>
                   </thead>
                   <tbody>
@@ -30,6 +31,15 @@
 </span></td>
                     <td>{{$taxa->situacao}}</td>
                     <td>{{$taxa->servico->os}}</td>
+                    <td>
+        @unless ( empty($taxa->boleto))
+        
+        <a href="{{ url("storage/$taxa->boleto") }}" class="btn btn-xs btn-warning" target="_blank">Ver Boleto</a>
+        @endunless
+        @unless ( empty($taxa->comprovante) )
+        
+        <a href="{{ url("storage/$taxa->comprovante") }}" class="btn btn-xs btn-success" target="_blank">Ver Comprovante</a>
+        @endunless</td>
 
                   </tr>
                   @endforeach
@@ -42,7 +52,7 @@
             <!-- /.box-body -->
             <div class="box-footer clearfix">
               <a href="{{route('taxas.create')}}" class="btn btn-sm btn-info btn-flat pull-left"><span class="glyphicon glyphicon-plus-sign"></span> Nova Taxa</a>
-              <a href="javascript:void(0)" class="btn btn-sm btn-default btn-flat pull-right">Todas as Taxas</a>
+              
             </div>
             <!-- /.box-footer -->
           </div>

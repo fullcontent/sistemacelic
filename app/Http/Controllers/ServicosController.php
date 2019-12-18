@@ -75,12 +75,46 @@ class ServicosController extends Controller
         
         $servico->protocolo_numero  =   $request->protocolo_numero;
         $servico->protocolo_emissao =   date('Y-m-d',strtotime($request->protocolo_emissao));
-        $servico->protocolo_anexo   = $request->protocolo_anexo;
 
-        $servico->licenca_emissao = $request->licenca_emissao;
-        $servico->licenca_validade = $request->licenca_validade;
-        $servico->licenca_anexo = $request->licenca_anexo;
-        
+      
+
+        $servico->licenca_emissao = date('Y-m-d',strtotime($request->licenca_emissao));
+        $servico->licenca_validade = date('Y-m-d',strtotime($request->licenca_validade));
+
+        //Upload de anexos com md5
+
+         // Se informou o arquivo, retorna um boolean
+        if ($request->hasFile('licenca_anexo') && $request->file('licenca_anexo')->isValid()) {
+                $nameFile = null;
+                $name = uniqid(date('HisYmd'));
+                $extension = $request->licenca_anexo->extension();
+                $nameFile = "{$name}.{$extension}";
+                // Faz o upload:
+                $upload = $request->licenca_anexo->storeAs('licencas', $nameFile);
+                // Se tiver funcionado o arquivo foi armazenado em storage/app/public/categories/nomedinamicoarquivo.extensao
+
+                $servico->licenca_anexo = $upload;
+
+            }
+
+         // Se informou o arquivo, retorna um boolean
+        if ($request->hasFile('protocolo_anexo') && $request->file('protocolo_anexo')->isValid()) {
+                $nameFile = null;
+                $name = uniqid(date('HisYmd'));
+                $extension = $request->protocolo_anexo->extension();
+                $nameFile = "{$name}.{$extension}";
+                // Faz o upload:
+                $upload = $request->protocolo_anexo->storeAs('protocolos', $nameFile);
+                // Se tiver funcionado o arquivo foi armazenado em storage/app/public/categories/nomedinamicoarquivo.extensao
+
+                $servico->protocolo_anexo = $upload;
+
+
+            }
+
+
+        // $servico->licenca_anexo = $request->licenca_anexo;
+        // $servico->protocolo_anexo   = $request->protocolo_anexo;
 
         $servico->observacoes   = $request->observacoes;
 
@@ -197,12 +231,42 @@ class ServicosController extends Controller
         
         $servico->protocolo_numero  =   $request->protocolo_numero;
         $servico->protocolo_emissao =   date('Y-m-d',strtotime($request->protocolo_emissao));
-        $servico->protocolo_anexo   = $request->protocolo_anexo;
+        // $servico->protocolo_anexo   = $request->protocolo_anexo;
+
+
+        // Se informou o arquivo, retorna um boolean
+        if ($request->hasFile('licenca_anexo') && $request->file('licenca_anexo')->isValid()) {
+                $nameFile = null;
+                $name = uniqid(date('HisYmd'));
+                $extension = $request->licenca_anexo->extension();
+                $nameFile = "{$name}.{$extension}";
+                // Faz o upload:
+                $upload = $request->licenca_anexo->storeAs('licencas', $nameFile);
+                // Se tiver funcionado o arquivo foi armazenado em storage/app/public/categories/nomedinamicoarquivo.extensao
+
+                $servico->licenca_anexo = $upload;
+
+            }
+
+         // Se informou o arquivo, retorna um boolean
+        if ($request->hasFile('protocolo_anexo') && $request->file('protocolo_anexo')->isValid()) {
+                $nameFile = null;
+                $name = uniqid(date('HisYmd'));
+                $extension = $request->protocolo_anexo->extension();
+                $nameFile = "{$name}.{$extension}";
+                // Faz o upload:
+                $upload = $request->protocolo_anexo->storeAs('protocolos', $nameFile);
+                // Se tiver funcionado o arquivo foi armazenado em storage/app/public/categories/nomedinamicoarquivo.extensao
+
+                $servico->protocolo_anexo = $upload;
+
+
+            }
 
 
         $servico->licenca_emissao = $request->licenca_emissao;
         $servico->licenca_validade = $request->licenca_validade;
-        $servico->licenca_anexo = $request->licenca_anexo;
+        // $servico->licenca_anexo = $request->licenca_anexo;
 
 
         $servico->observacoes   = $request->observacoes;
