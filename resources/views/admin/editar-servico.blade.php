@@ -20,7 +20,7 @@
 	@include('admin.partials.form-servico')
 
 				<div class="box-footer">
-                <a href="{{route('servicos.index')}}" class="btn btn-default">Voltar</a>
+                <a href="{{route('servicos.show',$servico->id)}}" class="btn btn-default">Voltar</a>
                 <button type="submit" class="btn btn-info">EDITAR</button>
               	</div>
     
@@ -37,6 +37,10 @@
 
   	$("#protocolo_emissao").datepicker();
   	$("#protocolo_validade").datepicker();
+  	$("#licenca_emissao").datepicker();
+  	$("#licenca_validade").datepicker();
+
+
   	
 
 	  	

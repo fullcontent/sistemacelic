@@ -73,7 +73,7 @@
 	<div class="form-group">
 		
 		{!! Form::label('protocolo_emissao', 'Emissão Protocolo', array('class'=>'control-label')) !!}
-		{!! Form::text('protocolo_emissao', null, ['class'=>'form-control','id'=>'protocolo_emissao']) !!}
+		{!! Form::text('protocolo_emissao', null, ['class'=>'form-control','id'=>'protocolo_emissao','data-date-format'=>'dd/mm/yyyy']) !!}
 		
 	</div>
 </div>
@@ -128,7 +128,7 @@
 	<div class="form-group">
 		
 		{!! Form::label('licenca_emissao', 'Emissão Licença', array('class'=>'control-label')) !!}
-		{!! Form::text('licenca_emissao', null, ['class'=>'form-control','id'=>'licenca_emissao']) !!}
+		{!! Form::text('licenca_emissao', null, ['class'=>'form-control','id'=>'licenca_emissao','data-date-format'=>'dd/mm/yyyy']) !!}
 		
 	</div>
 </div>
@@ -137,8 +137,8 @@
 	
 	<div class="form-group">
 		
-		{!! Form::label('licenca_vencimento', 'Vencimento Licença', array('class'=>'control-label')) !!}
-		{!! Form::text('licenca_vencimento', null, ['class'=>'form-control','id'=>'licenca_vencimento']) !!}
+		{!! Form::label('licenca_validade', 'Vencimento Licença', array('class'=>'control-label')) !!}
+		{!! Form::text('licenca_validade', null, ['class'=>'form-control','id'=>'licenca_validade','data-date-format'=>'dd/mm/yyyy']) !!}
 		
 	</div>
 </div>

@@ -30,7 +30,15 @@ class ServicosController extends Controller
     public function index()
     {
         
-        $servicos = Servico::all();
+        $servicos = Servico::with('unidade','empresa','responsavel')->get();
+        // $servicos = Servico::select('os','nome','tipo','responsavel_id','servicos.unidade_id','servicos.empresa_id')
+        //             ->join('unidades', 'unidades.id', '=', 'unidade_id')
+        //             ->join('empresas', 'empresas.id', '=', 'empresa_id')
+                    
+        // ->get();
+
+        // return $servicos;
+
         return view('admin.lista-servicos')
                     ->with('servicos',$servicos);
     }
@@ -84,6 +92,7 @@ class ServicosController extends Controller
         //Upload de anexos com md5
 
          // Se informou o arquivo, retorna um boolean
+        
         if ($request->hasFile('licenca_anexo') && $request->file('licenca_anexo')->isValid()) {
                 $nameFile = null;
                 $name = uniqid(date('HisYmd'));
@@ -102,6 +111,7 @@ class ServicosController extends Controller
                 $nameFile = null;
                 $name = uniqid(date('HisYmd'));
                 $extension = $request->protocolo_anexo->extension();
+
                 $nameFile = "{$name}.{$extension}";
                 // Faz o upload:
                 $upload = $request->protocolo_anexo->storeAs('protocolos', $nameFile);
@@ -186,7 +196,6 @@ class ServicosController extends Controller
         
 
         $servico = Servico::find($id);
-
         $users = User::where('privileges','=','admin')->pluck('name','id')->toArray();
 
         //Check if is empresa or unidade
@@ -202,6 +211,12 @@ class ServicosController extends Controller
         }
 
 
+        //Change date format to dd/mm/YYYY
+
+        $servico->protocolo_emissao = date('d/m/Y',strtotime($servico->protocolo_emissao));
+        $servico->licenca_emissao = date('d/m/Y',strtotime($servico->licenca_emissao));
+        $servico->licenca_validade = date('d/m/Y',strtotime($servico->licenca_validade));
+        
         return view('admin.editar-servico')
                     ->with([
                         'servico'=>$servico,
@@ -264,14 +279,16 @@ class ServicosController extends Controller
             }
 
 
-        $servico->licenca_emissao = $request->licenca_emissao;
-        $servico->licenca_validade = $request->licenca_validade;
+        $servico->licenca_emissao = date('Y-m-d',strtotime($request->licenca_emissao));
+
+        $servico->licenca_validade = date('Y-m-d',strtotime($request->licenca_validade));
         // $servico->licenca_anexo = $request->licenca_anexo;
 
 
         $servico->observacoes   = $request->observacoes;
-        $servico->observacoes   = $request->observacoes;
+        
 
+        
 
         $servico->save();
 
@@ -294,7 +311,7 @@ class ServicosController extends Controller
 
       
 
-        return redirect()->route('servicos.index');
+        return redirect()->route('servicos.show',$servico->id);
 
 
     }

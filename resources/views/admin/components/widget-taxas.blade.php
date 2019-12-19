@@ -34,11 +34,11 @@
                     <td>
         @unless ( empty($taxa->boleto))
         
-        <a href="{{ url("storage/$taxa->boleto") }}" class="btn btn-xs btn-warning" target="_blank">Ver Boleto</a>
+        <a href="{{ url("uploads/$taxa->boleto") }}" class="btn btn-xs btn-warning" target="_blank">Ver Boleto</a>
         @endunless
         @unless ( empty($taxa->comprovante) )
         
-        <a href="{{ url("storage/$taxa->comprovante") }}" class="btn btn-xs btn-success" target="_blank">Ver Comprovante</a>
+        <a href="{{ url("uploads/$taxa->comprovante") }}" class="btn btn-xs btn-success" target="_blank">Ver Comprovante</a>
         @endunless</td>
 
                   </tr>
