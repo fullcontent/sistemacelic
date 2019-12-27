@@ -28,7 +28,7 @@
 				@foreach($empresas as $empresa)
                 	<tr>
 	              	
-	              	<td><a href="{{route('empresa.show', $empresa->id)}}">{{$empresa->nomeFantasia}}</a></td>
+	              	<td><a href="{{route('cliente.empresa.unidades', $empresa->id)}}">{{$empresa->nomeFantasia}}</a></td>
 	              	<td>{{$empresa->cnpj}}</td>
 	              	<td>{{$empresa->cidade}}/{{$empresa->uf}}</td>
 	              	<td>{{$empresa->telefone}}</td>

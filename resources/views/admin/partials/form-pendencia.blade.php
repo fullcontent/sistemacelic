@@ -22,7 +22,7 @@
       <div class="col-md-3">
         <div class="form-group">
         {!! Form::label('status', 'Status', array('class'=>'control-label')) !!}
-        {!! Form::select('status', array('pendente' => 'Pendente', 'vencimento' => 'Vencimento','vencida'=>'Vencida'), 'pendente', ['class'=>'form-control','id'=>'status']) !!}
+        {!! Form::select('status', array('pendente' => 'Pendente', 'concluido' => 'Concluido'), 'pendente', ['class'=>'form-control','id'=>'status']) !!}
         </div>
     </div>
 
@@ -44,7 +44,7 @@
       <div class="col-md-3">
         <div class="form-group">
         {!! Form::label('vencimento', 'Data limite', array('class'=>'control-label')) !!}
-        {!! Form::text('vencimento' ,null, ['class'=>'form-control','id'=>'vencimento']) !!}
+        {!! Form::text('vencimento' ,null, ['class'=>'form-control','id'=>'vencimento','data-date-format'=>'dd/mm/yyyy']) !!}
         </div>
       </div>
 

@@ -61,7 +61,7 @@ Route::get('/', function () {
 
 			Route::get('/empresas', 'ClienteController@empresas')->name('empresas');
 			Route::get('/empresa/{id}', 'ClienteController@empresaShow')->name('empresa.show');
-			Route::get('/empresa/{id}/unidades', 'ClienteController@empresaUnidades')->name('empresa.unidades');
+			Route::get('/empresa/{id}/unidades', 'ClienteController@empresaUnidades')->name('cliente.empresa.unidades');
 
 
 
@@ -81,3 +81,15 @@ Route::get('/', function () {
 	});
 
 
+Route::get('/teste', function() {
+
+	$servicos = App\Models\Servico::where('tipo','primario')->whereDate('licenca_validade','>=',date('Y-m-d'))->where('licenca_validade','!=','0000-00-00')->get();
+
+	foreach ($servicos as $s) {
+		
+		echo "Validade: ".$s->licenca_validade." - Data: ".date('Y-m-d')."<br>";
+	}
+
+	
+    //
+});

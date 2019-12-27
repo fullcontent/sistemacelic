@@ -36,6 +36,7 @@ class ClienteController extends Controller
                         ->with([
                             'servicos'=>$this->getServicosCliente(),
 
+
                         ]);
     }
 
@@ -94,7 +95,7 @@ class ClienteController extends Controller
     {   
         $user = User::find(Auth::id());
 
-    	$servicos = Servico::whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))->get();
+    	$servicos = Servico::whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))->with('unidade','empresa','responsavel')->get();
 
         return view('cliente.lista-servicos')
                     ->with('servicos', $servicos);
@@ -125,6 +126,7 @@ class ClienteController extends Controller
     }
 
     public function salvarInteracao(Request $request)
+    
     {   
 
         $validator = Validator::make($request->all(), [
@@ -153,6 +155,8 @@ class ClienteController extends Controller
 
         return $servicos;
     }
+
+    
 
     
 }

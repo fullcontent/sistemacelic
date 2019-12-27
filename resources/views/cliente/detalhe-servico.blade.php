@@ -47,9 +47,9 @@
                 
                 <div class="col-sm-6">
                     
-                  <p><b>Emissão Licença: </b>{{$servico->licenca_emissao}}</p>
-                  <p><b>Emissão Validade: </b>{{$servico->licenca_emissao}}</p>
-                  <p><b>Emissão Documento: </b><button type="button" class="btn btn-primary btn-xs">Ver</button></p>
+                  <p><b>Emissão Licença: </b>{{\Carbon\Carbon::parse($servico->licenca_emissao)->format('d/m/Y')}}</p>
+                  <p><b>Emissão Validade: </b>{{\Carbon\Carbon::parse($servico->licenca_validade)->format('d/m/Y')}}</p>
+                  <p><b>Visualizar Documento: </b><button type="button" class="btn btn-primary btn-xs">Ver</button></p>
 
                 </div>
 

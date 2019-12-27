@@ -34,9 +34,18 @@
 	              		else{
 	              			$empresa = $servico->empresa->nomeFantasia	;
 	              		}
+
+	              		if($servico->situacao == 'andamento')
+	              		{
+	              			$label = "label-warning";
+	              		}
+	              		else{
+
+	              			$label = "label-success";
+	              		}	              
 	              	@endphp
 	              	<td>{{$empresa}}</td>
-	              	<td><span class="label label-success">{{$servico->situacao}}</span></td>
+	              	<td><span class="label {{$label}}">{{$servico->situacao}}</span></td>
 	              	<td>{{$servico->responsavel->name}}</td>
 
 					<td><a href="{{route('servico.show', $servico->id)}}" class="btn btn-flat btn-warning">Detalhes</a></td>
