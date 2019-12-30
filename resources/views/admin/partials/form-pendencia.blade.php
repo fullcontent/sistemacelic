@@ -44,19 +44,14 @@
       <div class="col-md-3">
         <div class="form-group">
         {!! Form::label('vencimento', 'Data limite', array('class'=>'control-label')) !!}
-        {!! Form::text('vencimento' ,null, ['class'=>'form-control','id'=>'vencimento','data-date-format'=>'dd/mm/yyyy']) !!}
+        {!! Form::text('vencimento' , null, ['class'=>'form-control','id'=>'vencimento','data-date-format'=>'dd/mm/yyyy']) !!}
         </div>
       </div>
 
      
 
      
-      <div class="col-md-12">
-        <div class="form-group">
-        {!! Form::label('observacoes', 'Observações', array('class'=>'control-label')) !!}
-        {!! Form::textarea('observacoes', null, ['class'=>'form-control','id'=>'observacoes']) !!}
-        </div>
-      </div>
+      
 
           
 
@@ -69,7 +64,8 @@
 	$(document).ready(function() {
 
   	$("#vencimento").datepicker();
-  	
+
+   	
 	  	
  
 });

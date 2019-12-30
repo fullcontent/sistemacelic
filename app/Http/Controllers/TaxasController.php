@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Models\Servico;
 use App\Models\Taxa;
+use App\Models\Historico;
 
 class TaxasController extends Controller
 {
@@ -45,9 +46,9 @@ class TaxasController extends Controller
         $taxa = new Taxa;
 
         $taxa->nome  = $request->nome;
-        $taxa->emissao = date('Y-m-d',strtotime($request->emissao));
+        $taxa->emissao = Carbon::createFromFormat('d/m/Y', $request->emissao)->toDateString(); 
         $taxa->servico_id = $request->servico_id;
-        $taxa->vencimento = date('Y-m-d',strtotime($request->vencimento));
+        $taxa->vencimento = Carbon::createFromFormat('d/m/Y', $request->vencimento)->toDateString(); 
         $taxa->valor =  str_replace (',', '.', str_replace ('.', '', $request->valor));
         $taxa->observacoes = $request->observacoes;
         // $taxa->boleto   =   $request->boleto;
@@ -84,6 +85,15 @@ class TaxasController extends Controller
             }
 
         $taxa->save();
+
+
+        //insert history
+
+        $history = new Historico();
+        $history->servico_id = $request->servico_id;
+        $history->user_id = Auth::id();
+        $history->observacoes = "Taxa ".$taxa->nome." cadastrada.";
+        $history->save();
 
         
         
@@ -129,9 +139,9 @@ class TaxasController extends Controller
         $taxa = Taxa::find($id);
 
         $taxa->nome  = $request->nome;
-        $taxa->emissao = date('Y-m-d',strtotime($request->emissao));
+        $taxa->emissao = Carbon::createFromFormat('d/m/Y', $request->emissao)->toDateString(); 
         $taxa->servico_id = $request->servico_id;
-        $taxa->vencimento = date('Y-m-d',strtotime($request->vencimento));
+        $taxa->vencimento = Carbon::createFromFormat('d/m/Y', $request->vencimento)->toDateString(); 
         $taxa->valor =  str_replace (',', '.', str_replace ('.', '', $request->valor));
         $taxa->observacoes = $request->observacoes;
         // $taxa->boleto   =   $request->boleto;
@@ -185,5 +195,17 @@ class TaxasController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function salvarHistorico()
+    {
+         //Insert history
+
+        $history = new Historico();
+        $history->servico_id = $servico->id;
+        $history->user_id = Auth::id();
+        $history->observacoes = "Taxa ".$servico->id." cadastrado.";
+        $history->save();
+
     }
 }

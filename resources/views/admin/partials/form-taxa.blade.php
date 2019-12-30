@@ -30,13 +30,13 @@
       <div class="col-md-4">
         <div class="form-group">
         {!! Form::label('emissao', 'Emissão', array('class'=>'control-label')) !!}
-        {!! Form::text('emissao', null, ['class'=>'form-control','id'=>'emissao']) !!}
+        {!! Form::text('emissao', null, ['class'=>'form-control','id'=>'emissao','data-date-format'=>'dd/mm/yyyy']) !!}
         </div>
       </div>
       <div class="col-md-4">
         <div class="form-group">
         {!! Form::label('vencimento', 'Vencimento', array('class'=>'control-label')) !!}
-        {!! Form::text('vencimento', null, ['class'=>'form-control','id'=>'vencimento']) !!}
+        {!! Form::text('vencimento', null, ['class'=>'form-control','id'=>'vencimento','data-date-format'=>'dd/mm/yyyy']) !!}
         </div>
       </div>
       <div class="col-md-4">

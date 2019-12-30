@@ -15,6 +15,7 @@
              <ul class="timeline timeline-inverse">
                                  
                   
+                
                 @foreach($servico->historico as $historico)
                   <!-- timeline item -->
                   <li>
@@ -34,6 +35,11 @@
                   
                   <li>
                     <i class="fa fa-clock bg-gray"></i>
+                    <div class="timeline-item">
+                      <a href="{{route('interacoes.lista',$servico->id)}}" class="btn btn-flat">Visualizar todas as interações</a>
+
+                    </div>
+                    
                   </li>
                 </ul>
 

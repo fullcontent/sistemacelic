@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Servico;
 use App\Models\Historico;
 use App\User;
+use Carbon\Carbon;
+
 
 use Auth;
 use Illuminate\Support\Facades\Validator;
@@ -82,12 +84,22 @@ class ServicosController extends Controller
 
         
         $servico->protocolo_numero  =   $request->protocolo_numero;
-        $servico->protocolo_emissao =   date('Y-m-d',strtotime($request->protocolo_emissao));
 
-      
+        
+        if($request->protocolo_emissao)
+        {
+            $servico->protocolo_emissao = Carbon::createFromFormat('d/m/Y', $request->protocolo_emissao)->toDateString();
+        }
 
-        $servico->licenca_emissao = date('Y-m-d',strtotime($request->licenca_emissao));
-        $servico->licenca_validade = date('Y-m-d',strtotime($request->licenca_validade));
+        if($request->licenca_emissao)
+        {
+            $servico->licenca_emissao = Carbon::createFromFormat('d/m/Y', $request->licenca_emissao)->toDateString();
+        }
+        if($request->licenca_validade)
+        {
+            $servico->licenca_validade = Carbon::createFromFormat('d/m/Y', $request->licenca_validade)->toDateString();
+        }
+
 
         //Upload de anexos com md5
 
@@ -132,6 +144,8 @@ class ServicosController extends Controller
         $servico->unidade_id = $request->unidade_id;
 
         $servico->save();
+
+        
 
 
         //Insert history
@@ -245,8 +259,10 @@ class ServicosController extends Controller
 
         
         $servico->protocolo_numero  =   $request->protocolo_numero;
-        $servico->protocolo_emissao =   date('Y-m-d',strtotime($request->protocolo_emissao));
-        // $servico->protocolo_anexo   = $request->protocolo_anexo;
+
+
+       
+       
 
 
         // Se informou o arquivo, retorna um boolean
@@ -279,10 +295,19 @@ class ServicosController extends Controller
             }
 
 
-        $servico->licenca_emissao = date('Y-m-d',strtotime($request->licenca_emissao));
+       if($request->protocolo_emissao)
+        {
+            $servico->protocolo_emissao = Carbon::createFromFormat('d/m/Y', $request->protocolo_emissao)->toDateString();
+        }
 
-        $servico->licenca_validade = date('Y-m-d',strtotime($request->licenca_validade));
-        // $servico->licenca_anexo = $request->licenca_anexo;
+        if($request->licenca_emissao)
+        {
+            $servico->licenca_emissao = Carbon::createFromFormat('d/m/Y', $request->licenca_emissao)->toDateString();
+        }
+        if($request->licenca_validade)
+        {
+            $servico->licenca_validade = Carbon::createFromFormat('d/m/Y', $request->licenca_validade)->toDateString();
+        }
 
 
         $servico->observacoes   = $request->observacoes;
@@ -325,6 +350,8 @@ class ServicosController extends Controller
     public function destroy($id)
     {
         //
+        $servico = Servico::delete($id);
+        return $servico;
     }
 
 

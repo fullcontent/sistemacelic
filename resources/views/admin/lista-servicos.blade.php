@@ -30,8 +30,8 @@
 	              		if($servico->unidade_id){
 	              			$empresa = $servico->unidade->nomeFantasia;
 	              		}
-	              		else{
-	              			$empresa = $servico->empresa->nomeFantasia	;
+	              		elseif($servico->empresa_id){
+	              			$empresa = $servico->empresa->nomeFantasia;
 	              		}
 	              	@endphp
 	              	<td>{{$empresa}}</td>

@@ -146,6 +146,13 @@ class ClienteController extends Controller
         return redirect()->route('servico.show', $request->servico_id);
     }
 
+    public function interacoes($id)
+    {
+        $interacoes = Historico::where('servico_id',$id)->orderBy('created_at','desc')->get();
+
+        return view('cliente.lista-interacoes')->with('interacoes',$interacoes);
+    }
+
 
     public function getServicosCliente()
     {

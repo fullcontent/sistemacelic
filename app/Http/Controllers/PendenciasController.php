@@ -8,6 +8,7 @@ use App\Models\Historico;
 use App\Models\Servico;
 use App\User;
 use Auth;
+use Carbon\Carbon;
 
 class PendenciasController extends Controller
 {
@@ -21,7 +22,6 @@ class PendenciasController extends Controller
         //
         
         $pendencias = Pendencia::where('servico_id',$request->servico_id)->get();
-
         $servico = Servico::find($request->servico_id);
 
 
@@ -66,7 +66,7 @@ class PendenciasController extends Controller
         $pendencia->created_by = Auth::id();
         $pendencia->servico_id = $request->servico_id;
         $pendencia->pendencia  = $request->pendencia;
-        $pendencia->vencimento = date('Y-m-d',strtotime($request->vencimento));
+        $pendencia->vencimento = Carbon::createFromFormat('d/m/Y', $request->vencimento)->toDateString(); 
         $pendencia->responsavel_tipo = $request->responsavel_tipo;
         $pendencia->responsavel_id = $request->responsavel_id;
         $pendencia->status = $request->status;
@@ -97,7 +97,24 @@ class PendenciasController extends Controller
     public function edit($id)
     {
         //
-        return "editar pendencia $id";
+        
+
+        $pendencia = Pendencia::find($id);
+
+        $pendencia->vencimento = date('d/m/Y', strtotime($pendencia->vencimento));
+
+        $servico = Servico::where('id',$pendencia->servico_id)->pluck('os','id')->toArray();
+
+        $responsaveis = User::pluck('name','id')->toArray();
+
+
+        return view('admin.editar-pendencia')->with(
+            [
+                'pendencia'=>$pendencia,
+                'servico'=>$servico,
+                'responsaveis'=>$responsaveis,
+            ]
+        );
     }
 
     /**
@@ -110,6 +127,25 @@ class PendenciasController extends Controller
     public function update(Request $request, $id)
     {
         //
+
+       $pendencia = Pendencia::find($id);
+
+        $pendencia->created_by = Auth::id();
+        $pendencia->servico_id = $request->servico_id;
+        $pendencia->pendencia  = $request->pendencia;
+        $pendencia->vencimento = Carbon::createFromFormat('d/m/Y', $request->vencimento)->toDateString(); 
+        $pendencia->responsavel_tipo = $request->responsavel_tipo;
+        $pendencia->responsavel_id = $request->responsavel_id;
+        $pendencia->status = $request->status;
+
+
+        $pendencia->save();
+
+        // return $pendencia;
+
+        return redirect(route('pendencia.index',['servico_id'=>$pendencia->servico_id]));
+
+
     }
 
     /**

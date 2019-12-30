@@ -73,6 +73,7 @@ Route::get('/', function () {
 			Route::get('/servicos', 'ClienteController@servicos')->name('servicos');
 			Route::get('/servico/{id}', 'ClienteController@servicoShow')->name('servico.show');
 			Route::post('salvarInteracao', 'ClienteController@salvarInteracao')->name('interacao.salvar');
+			Route::get('/servico/{id}/interacoes', 'ClienteController@interacoes')->name('interacoes.lista');
 
 
 
