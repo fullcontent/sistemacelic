@@ -100,6 +100,8 @@ class ServicosController extends Controller
             $servico->licenca_validade = Carbon::createFromFormat('d/m/Y', $request->licenca_validade)->toDateString();
         }
 
+        // return $request;
+
 
         //Upload de anexos com md5
 
@@ -228,8 +230,17 @@ class ServicosController extends Controller
         //Change date format to dd/mm/YYYY
 
         $servico->protocolo_emissao = date('d/m/Y',strtotime($servico->protocolo_emissao));
-        $servico->licenca_emissao = date('d/m/Y',strtotime($servico->licenca_emissao));
+
+        if($servico->licenca_emissao)
+        {
+             $servico->licenca_emissao = date('d/m/Y',strtotime($servico->licenca_emissao));
+        }
+
+        if($servico->licenca_validade)
+       {
         $servico->licenca_validade = date('d/m/Y',strtotime($servico->licenca_validade));
+       }
+        
         
         return view('admin.editar-servico')
                     ->with([
