@@ -198,6 +198,7 @@ class ServicosController extends Controller
                         'route'=>$route,
                         'taxas'=>$servico->taxas,
                         'pendencias'=>$servico->pendencias,
+                        'arquivo'=>'servico',
                     ]);
     }
 

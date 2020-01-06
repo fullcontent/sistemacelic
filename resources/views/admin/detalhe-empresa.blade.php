@@ -28,5 +28,40 @@
     @include('admin.components.widget-taxas')
     
   </div>
+
+  <div class="col-md-6">
+        
+        @include('admin.components.widget-arquivos')
+        
+    </div>
 </div>
+
+@endsection
+
+@section('js')
+<script>
+
+  
+
+    $(function () {
+        
+        $('#servicos').DataTable({
+          "paging": true,
+          "lengthChange": false,
+          "searching": true,
+          "ordering": true,
+          "info": false,
+          "autoWidth": false,
+           "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
+            }
+
+
+        });
+
+        
+  });
+
+
+</script>
 @endsection

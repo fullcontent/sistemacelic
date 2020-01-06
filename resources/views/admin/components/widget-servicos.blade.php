@@ -11,13 +11,13 @@
             <!-- /.box-header -->
             <div class="box-body">
               <div class="table-responsive">
-                <table class="table no-margin">
+                <table class="table no-margin" id="servicos">
                   <thead>
                   <tr>
                     <th>OS</th>
                     <th>Serviço</th>
                     <th>Status</th>
-                    <th>Obs</th>
+                    
                     <th></th>
                   </tr>
                   </thead>
@@ -27,7 +27,7 @@
                     <td>{{$servico->os}}</td>
                     <td>{{$servico->nome}}</td>
                     <td><span class="label label-success">{{$servico->situacao}}</span></td>
-                    <td>{{$servico->observacoes}}</td>
+                    
                     <td><a href="{{route('servicos.show',$servico->id)}}">Detalhes</a></td>
                   </tr>
                   @endforeach

@@ -32,6 +32,7 @@ Route::get('/', function () {
 		Route::resource('/servicos','ServicosController');
 		Route::resource('/taxas','TaxasController');
 		Route::resource('/pendencia','PendenciasController');
+		Route::resource('/arquivo','ArquivosController');
 		
 
 

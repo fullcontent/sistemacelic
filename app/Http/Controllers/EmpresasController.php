@@ -119,6 +119,8 @@ class EmpresasController extends Controller
                         'servicos'=>$empresa->servicos,
                         'taxas' => $empresa->taxas,
                         'route' => 'empresas.edit',
+                        'arquivo'=>'empresa',
+                        
                     ]);
     }
 

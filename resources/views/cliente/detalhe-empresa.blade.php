@@ -28,5 +28,11 @@
     @include('cliente.components.widget-taxas')
     
   </div>
+  <div class="col-md-6">
+    
+    @include('cliente.components.widget-arquivos')
+    
+  </div>
 </div>
 @endsection
+

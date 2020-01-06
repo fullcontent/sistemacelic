@@ -111,12 +111,16 @@ class UnidadesController extends Controller
 
         
 
+        
+        
+
         return view('admin.detalhe-unidade')
                     ->with([
                         'dados'=>$unidade,
                         'servicos'=>$unidade->servicos,
                         'taxas'=>$unidade->taxas,
                         'route' => 'unidades.edit',
+                        'arquivo'=>'unidade',
                 ]);
     }
 

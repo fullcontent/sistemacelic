@@ -37,5 +37,9 @@ class Servico extends Model
         return $this->belongsTo('App\User','responsavel_id','id');
     }
 
+    public function arquivos()
+        {
+            return $this->hasMany('App\Models\Arquivo');
+        }
 
 }
