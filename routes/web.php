@@ -47,6 +47,7 @@ Route::get('/', function () {
 		Route::post('/usuario/editar/{id}', 'UsersController@update')->name('usuario.update');
 		Route::post('/usuario','UsersController@store')->name('usuario.store');
 		Route::post('salvarInteracao', 'ServicosController@salvarInteracao')->name('interacao.store');
+		Route::get('/servico/delete/{id}','ServicosController@delete')->name('servico.delete');
 
 		Route::get('/pendencia/done/{id}', 'PendenciasController@done')->name('pendencia.done');
 		Route::get('/pendencia/undone/{id}', 'PendenciasController@undone')->name('pendencia.undone');
@@ -85,12 +86,11 @@ Route::get('/', function () {
 
 Route::get('/teste', function() {
 
-	$servicos = App\Models\Servico::where('tipo','primario')->whereDate('licenca_validade','>=',date('Y-m-d'))->where('licenca_validade','!=','0000-00-00')->get();
+	$servicos = App\Models\Taxa::all();
 
-	foreach ($servicos as $s) {
-		
-		echo "Validade: ".$s->licenca_validade." - Data: ".date('Y-m-d')."<br>";
-	}
+	return $servicos;
+
+	
 
 	
     //

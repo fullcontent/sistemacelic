@@ -21,10 +21,11 @@
                 </thead>
                 <tbody>
 				@foreach($servicos as $servico)
+                	
                 	<tr>
 	              	<td>{{$servico->os}}</td>
 	              	<td>{{$servico->tipo}}</td>
-	              	<td>{{$servico->nome}}</td>
+	              	<td><a href="{{route('servicos.show', $servico->id)}}">{{$servico->nome}}</a></td>
 
 	              	@php
 	              		if($servico->unidade_id){
@@ -38,7 +39,10 @@
 	              	<td>{{$servico->situacao}}</td>
 	              	<td>{{$servico->responsavel->name}}</td>
 
-					<td><a href="{{route('servicos.show', $servico->id)}}">Detalhes</a></td>
+					<td><a href="{{route('servicos.show', $servico->id)}}"><i class="glyphicon glyphicon-list-alt
+"></i></a>
+						<a href="{{route('servico.delete', $servico->id)}}" class="confirmation danger"> <i class="glyphicon glyphicon-trash
+"></i></a></td>
 	                </tr>
 	            @endforeach
                 </tbody>
@@ -63,9 +67,13 @@
 		      "autoWidth": false,
 		       "language": {
                 "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
-            }
+            }           
+  });
+$('.confirmation').on('click', function () {
+        		return confirm('Você deseja excluir o serviço?');
+    			});
 		     
 		    });
-  });
+
     </script>
   @stop

@@ -54,13 +54,14 @@ class ServicosController extends Controller
     {
         //
 
-        $tipo = $request->tipo;
+        $tipo = $request->t;
         $id = $request->id;
         $users = User::where('privileges','=','admin')->pluck('name','id')->toArray();
 
+
         return view('admin.cadastro-servico')
                 ->with([
-                    'tipo'=>$tipo,
+                    't'=>$tipo,
                     'id'=>$id,
                     'users'=>$users,
                 ]);
@@ -74,6 +75,8 @@ class ServicosController extends Controller
      */
     public function store(Request $request)
     {
+        
+        
         
         $servico = new Servico;
         $servico->tipo  =   $request->tipo;
@@ -142,10 +145,21 @@ class ServicosController extends Controller
 
         $servico->observacoes   = $request->observacoes;
 
-        $servico->empresa_id = $request->empresa_id;
-        $servico->unidade_id = $request->unidade_id;
+
+        if($request->t == 'unidade')
+        {
+            $servico->unidade_id = $request->unidade_id;
+        }
+
+        if($request->t == 'empresa')
+        {
+            $servico->unidade_id = $request->empresa_id;
+        }
+        
+        
 
         $servico->save();
+     
 
         
 
@@ -178,6 +192,7 @@ class ServicosController extends Controller
         //
         $servico = Servico::find($id);
 
+       
         //Check if is empresa or unidade
 
         if($servico->unidade_id){
@@ -230,7 +245,12 @@ class ServicosController extends Controller
 
         //Change date format to dd/mm/YYYY
 
-        $servico->protocolo_emissao = date('d/m/Y',strtotime($servico->protocolo_emissao));
+        if($servico->protocolo_emissao)
+        {
+            $servico->protocolo_emissao = date('d/m/Y',strtotime($servico->protocolo_emissao));
+        }
+
+        
 
         if($servico->licenca_emissao)
         {
@@ -362,8 +382,16 @@ class ServicosController extends Controller
     public function destroy($id)
     {
         //
-        $servico = Servico::delete($id);
-        return $servico;
+        // $servico = Servico::delete($id);
+        // return redirect()->route('servicos.index');
+
+        return $id;
+    }
+
+    public function delete($id)
+    {
+        $servico = Servico::destroy($id);
+        return redirect()->route('servicos.index');
     }
 
 

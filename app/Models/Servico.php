@@ -9,7 +9,7 @@ class Servico extends Model
     //
     public function unidade()
     {
-    	return $this->belongsTo('App\Models\Unidade');
+    	return $this->belongsTo('App\Models\Unidade','unidade_id');
     }
 
     public function empresa()

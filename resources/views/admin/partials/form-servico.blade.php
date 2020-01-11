@@ -157,14 +157,21 @@
 </div>
 
 		
-		@if($tipo ?? '' == 'empresa')
-			
-			{!! Form::hidden('empresa_id', $id ?? '') !!}
-		@else
-			{!! Form::hidden('unidade_id', $id ?? '') !!}
-		@endif
+
+		@switch($t)
+
+			@case('empresa')
+					{!! Form::hidden('empresa_id', $id ?? '') !!}
+			@break
+
+			@case('unidade')
+					{!! Form::hidden('unidade_id', $id ?? '') !!}
+			@break
+
+		@endswitch
 
 
+			{!! Form::hidden('t',$t) !!}
 
 
 </div>
