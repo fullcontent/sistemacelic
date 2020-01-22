@@ -7,6 +7,8 @@ use App\Models\Servico;
 use App\Models\Historico;
 use App\User;
 use Carbon\Carbon;
+use App\Models\Empresa;
+use App\Models\Unidade;
 
 
 use Auth;
@@ -58,12 +60,55 @@ class ServicosController extends Controller
         $id = $request->id;
         $users = User::where('privileges','=','admin')->pluck('name','id')->toArray();
 
+        
+
+        switch ($tipo) {
+            case 'unidade':
+                // code...
+                    $u = Unidade::find($id);
+                    $a = $u->empresa->nomeFantasia;
+                    $a = explode(' ',$a);
+                    $os = substr($a[0], 0, 1);
+                    $os .= substr($a[1], 0, 1); 
+
+                    if(Servico::where('os','%like%',$os)->first())
+                    {
+                        return "achou";
+                    }
+
+
+                break;
+            case 'empresa':
+
+                    $u = Empresa::find($id);
+                    $a = $u->nomeFantasia;
+                    $a = explode(' ',$a);
+                    $os = substr($a[0], 0, 1);
+                    $os .= substr($a[1], 0, 1); 
+
+                    $lastOS = Servico::where('os','like','%'.$os.'0%')->orderBy('os','DESC')->pluck('os')->first();
+
+                    $number = substr($lastOS, 2,4);
+                    $number = $number + 1;
+
+                    $os .= $number;
+
+                break;
+            
+            
+        }
+
+       
+
+        
+
 
         return view('admin.cadastro-servico')
                 ->with([
                     't'=>$tipo,
                     'id'=>$id,
                     'users'=>$users,
+                    'os' => $os,
                 ]);
     }
 
@@ -414,5 +459,13 @@ class ServicosController extends Controller
         $interacao->save();
 
         return redirect()->route('servicos.show', $request->servico_id);
+    }
+
+
+    public function listarInteracoes($id)
+    {
+        
+        return $id;
+
     }
 }

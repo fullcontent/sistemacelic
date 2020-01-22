@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Servico;
 use App\Models\Taxa;
 use App\Models\Historico;
+use Carbon\Carbon;
+use Auth;
 
 class TaxasController extends Controller
 {
@@ -50,7 +52,16 @@ class TaxasController extends Controller
         $taxa->servico_id = $request->servico_id;
         $taxa->vencimento = Carbon::createFromFormat('d/m/Y', $request->vencimento)->toDateString(); 
         $taxa->valor =  str_replace (',', '.', str_replace ('.', '', $request->valor));
-        $taxa->observacoes = $request->observacoes;
+        
+        if($request->observacoes)
+        {
+            $taxa->observacoes = $request->observacoes;
+        }
+        else
+        {
+            $taxa->observacoes = " ";
+        }
+        
         // $taxa->boleto   =   $request->boleto;
         // $taxa->comprovante = $request->comprovante;
         $taxa->situacao = $request->situacao;
