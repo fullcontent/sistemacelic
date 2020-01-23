@@ -9,6 +9,7 @@ use App\Models\Taxa;
 use App\Models\Historico;
 use Carbon\Carbon;
 use Auth;
+use App\Notifications\VencimentoTaxa;
 
 class TaxasController extends Controller
 {
@@ -27,12 +28,14 @@ class TaxasController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $r)
     {
         //
         $servicos = Servico::pluck('os','id')->toArray();
 
-        return view('admin.cadastro-taxa')->with(['servicos'=>$servicos]);
+        $servico_id = $r->servico_id;
+
+        return view('admin.cadastro-taxa')->with(['servicos'=>$servicos,'servico_id'=>$servico_id]);
     }
 
     /**
@@ -120,6 +123,10 @@ class TaxasController extends Controller
     public function show($id)
     {
         //
+        $taxa = Taxa::find($id);
+        $servicos = Servico::pluck('os','id')->toArray();
+
+        return view('admin.editar-taxa')->with(['taxa'=>$taxa,'servicos'=>$servicos]);
     }
 
     /**
@@ -219,4 +226,18 @@ class TaxasController extends Controller
         $history->save();
 
     }
+
+
+    public function notifyUser()
+    {
+        $taxa = Taxa::find(722);
+        // $user = \App\User::find($taxa->servico->responsavel->id);
+        $user = \App\User::find(Auth::id());
+        $user->notify(new VencimentoTaxa($taxa));
+
+        return "notifyUser";
+
+    }
+
+
 }

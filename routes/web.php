@@ -95,3 +95,11 @@ Route::get('/teste', function() {
 	
     //
 });
+
+Route::get('/taxa/notify', 'TaxasController@notifyUser');
+
+
+Route::get('markAsRead', function() {
+    auth()->user()->unreadNotifications->markAsRead();
+    return redirect()->back();
+})->name('markAsRead');

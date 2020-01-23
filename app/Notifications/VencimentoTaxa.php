@@ -11,7 +11,7 @@ use Illuminate\Queue\SerializesModels;
 
 
 
-class NotifyTaxa extends Notification implements ShouldQueue
+class VencimentoTaxa extends Notification
 {
     use Queueable, SerializesModels;
     
@@ -62,7 +62,11 @@ class NotifyTaxa extends Notification implements ShouldQueue
     {
         return [
             //
+            'mensagem'=>''.$this->taxa->nome.' está para vencer!',
             'taxa'=>$this->taxa,
+            'action'=> route('taxas.show', $this->taxa->id),
+            
+
         ];
     }
 }

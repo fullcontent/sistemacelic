@@ -6,7 +6,7 @@
           {!! Form::label('servico_id', 'Ordem de serviço', array('class'=>'control-label')) !!}
 
           
-          {!! Form::select('servico_id', $servicos, null, ['class'=>'form-control','id'=>'servico_id']) !!}
+          {!! Form::select('servico_id', $servicos, $servicos, ['class'=>'form-control','id'=>'servico_id','disabled']) !!}
           
         </div>
       </div>

@@ -25,7 +25,7 @@
                   <tbody>
                     @foreach($taxas->take(5) as $taxa)
                   <tr>
-                    <td>{{$taxa->nome}}</td>
+                    <td><a href="{{route('taxas.show',$taxa->id)}}">{{$taxa->nome}}</a></td>
                     <td>R$ {{$taxa->valor}}</td>
                     <td><span class="label label-success">{{ \Carbon\Carbon::parse($taxa->vencimento)->format('d/m/Y')}}
 </span></td>
@@ -51,7 +51,7 @@
             </div>
             <!-- /.box-body -->
             <div class="box-footer clearfix">
-              <a href="{{route('taxas.create')}}" class="btn btn-sm btn-info btn-flat pull-left"><span class="glyphicon glyphicon-plus-sign"></span> Nova Taxa</a>
+              <a href="{{route('taxas.create', ['servico_id'=>$servico->id])}}" class="btn btn-sm btn-info btn-flat pull-left"><span class="glyphicon glyphicon-plus-sign"></span> Nova Taxa</a>
               
             </div>
             <!-- /.box-footer -->
