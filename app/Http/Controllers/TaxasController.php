@@ -49,6 +49,7 @@ class TaxasController extends Controller
     {
         //
 
+        
         $taxa = new Taxa;
 
         $taxa->nome  = $request->nome;

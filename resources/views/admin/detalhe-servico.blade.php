@@ -112,7 +112,7 @@
                   
                   
                   <li>
-                    <i class="fa fa-clock bg-gray"></i>
+                    <a href=""><i class="fa fa-clock bg-gray"></i></a>
                   </li>
                 </ul>
 

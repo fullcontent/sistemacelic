@@ -8,10 +8,10 @@ use App\Events\UserLoggedIn;
 use Auth;
 use App\Models\Taxa;
 use Carbon\Carbon;
-use App\Notifications\VencimentoTaxaToday;
+use App\Notifications\VencimentoLicenca60days;
 use App\User;
 
-class NotificacaoTaxaToday
+class NotificacaoLicenca60days
 {
     /**
      * Create the event listener.
@@ -37,12 +37,12 @@ class NotificacaoTaxaToday
         $groupTaxas = $taxas->pluck('id');
         $notifications = auth()->user()->notifications->whereIn('data.taxa.id',$groupTaxas)->pluck('data.taxa.id');
 
+        
         if(!$notifications->count()==$taxas->count())
         {
             foreach($taxas as $t)
-            {   
-                $user = User::find($t->servico->responsavel_id);
-                $user->notify(new VencimentoTaxaToday($t)); 
+            {
+                auth()->user()->notify(new VencimentoLicenca60days($t)); 
             }
         }
                 

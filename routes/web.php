@@ -102,4 +102,8 @@ Route::get('/teste', function() {
 Route::get('/taxa/notify', 'TaxasController@notifyUser');
 
 
-Route::get('markAsRead', 'TaxasController@markAsRead')->name('markAsRead');
+Route::get('clearNotifications', function(){
+
+	auth()->user()->notifications->markAsRead();
+	return redirect()->back();
+})->name('clearNotifications');

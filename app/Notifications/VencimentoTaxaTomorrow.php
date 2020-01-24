@@ -51,7 +51,7 @@ class VencimentoTaxaTomorrow extends Notification
     {
         return [
             //
-            'mensagem'=>''.$this->taxa->nome.' vence amanhã!',
+            'mensagem'=>''.$this->taxa->nome.' da O.S. '.$this->taxa->servico->os.' vence amanhã!',
             'taxa'=>$this->taxa,
             'action'=> route('taxas.show', $this->taxa->id),
             

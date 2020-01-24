@@ -51,7 +51,12 @@
             </div>
             <!-- /.box-body -->
             <div class="box-footer clearfix">
+              @if(Request::is('admin/servicos/*'))
               <a href="{{route('taxas.create', ['servico_id'=>$servico->id])}}" class="btn btn-sm btn-info btn-flat pull-left"><span class="glyphicon glyphicon-plus-sign"></span> Nova Taxa</a>
+              @endif
+
+              
+             
               
             </div>
             <!-- /.box-footer -->

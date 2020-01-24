@@ -5,12 +5,20 @@
           
           {!! Form::label('servico_id', 'Ordem de serviço', array('class'=>'control-label')) !!}
 
-          
-          {!! Form::select('servico_id', $servicos, $servicos, ['class'=>'form-control','id'=>'servico_id','disabled']) !!}
+                  
+
+          @isset($servico_id)
+          {!! Form::select('servico_id', $servicos, $servico_id, ['class'=>'form-control','id'=>'servico_id','disabled']) !!}
+          @endisset
+
+
+          @empty($servico_id)
+              {!! Form::select('servico_id', $servicos, null, ['class'=>'form-control','id'=>'servico_id','disabled']) !!}
+          @endempty
           
         </div>
       </div>
-
+        
       <div class="col-md-6">
         <div class="form-group">
         {!! Form::label('nome', 'Descrição', array('class'=>'control-label')) !!}
@@ -76,7 +84,7 @@
         </div>
       </div>
 
-
+     
             
 
 </div>

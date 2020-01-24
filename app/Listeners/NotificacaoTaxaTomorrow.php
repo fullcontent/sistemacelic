@@ -40,8 +40,10 @@ class NotificacaoTaxaTomorrow
         if(!$notifications->count()==$taxas->count())
         {
             foreach($taxas as $t)
-            {
-                auth()->user()->notify(new VencimentoTaxaTomorrow($t)); 
+            {   
+                dump($t->servico->responsavel_id);
+                $user = User::find($t->servico->responsavel_id);
+                $user->notify(new VencimentoTaxaToday($t)); 
             }
         }
                 
