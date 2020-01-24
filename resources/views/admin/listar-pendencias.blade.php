@@ -38,6 +38,7 @@
                   <!-- General tools such as edit or delete-->
                   <div class="tools">
                     <a href="{{route('pendencia.edit',$pendencia->id)}}"><i class="fa fa-edit"></i></a>
+                     <a href="{{route('pendencia.delete',$pendencia->id)}}" onclick="return confirm('Tem certeza que deseja excluir a pendência?');"><i class="fa fa-trash"></i></a>
                     
                   </div>
                 </li>

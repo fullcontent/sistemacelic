@@ -69,11 +69,11 @@
           </div>
 </div>
 
-<div class="col-md-6">
+<div class="col-md-7">
   @include('admin.components.widget-taxas')
 </div>
 
-<div class="col-md-6">
+<div class="col-md-5">
   @include('admin.components.widget-pendencias')
 </div>
 
@@ -112,7 +112,7 @@
                   
                   
                   <li>
-                    <a href=""><i class="fa fa-clock bg-gray"></i></a>
+                    <i class="fa fa-clock bg-gray"></i>
                   </li>
                 </ul>
 

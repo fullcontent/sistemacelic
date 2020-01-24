@@ -154,9 +154,11 @@ class PendenciasController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function delete($id)
     {
         //
+        $pendencia = Pendencia::destroy($id);
+        return redirect()->back();
     }
 
     public function done($id)

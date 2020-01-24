@@ -158,7 +158,7 @@
 
 		
 
-		@switch($t)
+		@switch($t ?? '')
 
 			@case('empresa')
 					{!! Form::hidden('empresa_id', $id ?? '') !!}
@@ -171,7 +171,7 @@
 		@endswitch
 
 
-			{!! Form::hidden('t',$t) !!}
+			{!! Form::hidden('t',$t ?? '' ?? '') !!}
 
 
 </div>
