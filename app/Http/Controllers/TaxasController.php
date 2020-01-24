@@ -9,7 +9,8 @@ use App\Models\Taxa;
 use App\Models\Historico;
 use Carbon\Carbon;
 use Auth;
-use App\Notifications\VencimentoTaxa;
+
+
 
 class TaxasController extends Controller
 {
@@ -126,6 +127,9 @@ class TaxasController extends Controller
         $taxa = Taxa::find($id);
         $servicos = Servico::pluck('os','id')->toArray();
 
+        $taxa->emissao = Carbon::parse($taxa->emissao)->format('d/m/Y');
+        $taxa->vencimento = Carbon::parse($taxa->vencimento)->format('d/m/Y');
+
         return view('admin.editar-taxa')->with(['taxa'=>$taxa,'servicos'=>$servicos]);
     }
 
@@ -139,9 +143,13 @@ class TaxasController extends Controller
     {
         //
         $taxa = Taxa::find($id);
-        $servicos = Servico::pluck('os','id')->toArray();
 
-        return view('admin.editar-taxa')->with(['taxa'=>$taxa,'servicos'=>$servicos]);
+        // $taxa->emissao = Carbon::createFromFormat('d/m/Y', $taxa->emissao);
+
+
+       
+
+        return view('admin.editar-taxa')->with(['taxa'=>$taxa]);
     }
 
     /**
@@ -154,17 +162,21 @@ class TaxasController extends Controller
     public function update(Request $request, $id)
     {
         
+
         $taxa = Taxa::find($id);
+
 
         $taxa->nome  = $request->nome;
         $taxa->emissao = Carbon::createFromFormat('d/m/Y', $request->emissao)->toDateString(); 
-        $taxa->servico_id = $request->servico_id;
+        
         $taxa->vencimento = Carbon::createFromFormat('d/m/Y', $request->vencimento)->toDateString(); 
         $taxa->valor =  str_replace (',', '.', str_replace ('.', '', $request->valor));
         $taxa->observacoes = $request->observacoes;
         // $taxa->boleto   =   $request->boleto;
         // $taxa->comprovante = $request->comprovante;
         $taxa->situacao = $request->situacao;
+
+
 
          // Se informou o arquivo, retorna um boolean
         if ($request->hasFile('boleto') && $request->file('boleto')->isValid()) {
@@ -195,11 +207,13 @@ class TaxasController extends Controller
 
             }
 
+      
+
         $taxa->save();
 
         
         
-        return redirect()->route('servicos.show',$request->servico_id);
+        return redirect()->route('servicos.show',$taxa->servico_id);
 
 
     }
@@ -230,13 +244,21 @@ class TaxasController extends Controller
 
     public function notifyUser()
     {
-        $taxa = Taxa::find(722);
+        $taxa = Taxa::find(35);
         // $user = \App\User::find($taxa->servico->responsavel->id);
         $user = \App\User::find(Auth::id());
-        $user->notify(new VencimentoTaxa($taxa));
+        $user->notify(new \App\Notifications\VencimentoTaxaTomorrow($taxa));
 
         return "notifyUser";
 
+    }
+
+    public function markAsRead(Request $request)
+    {   
+
+        
+        auth()->user()->notifications->where('id',$request->notif_id)->markAsRead();
+        return redirect()->back();
     }
 
 

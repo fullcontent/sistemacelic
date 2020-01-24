@@ -15,9 +15,12 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
-        Registered::class => [
-            SendEmailVerificationNotification::class,
-        ],
+        
+        'App\Events\UserLoggedIn' => [
+        'App\Listeners\NotificacaoTaxaTomorrow',
+        'App\Listeners\NotificacaoTaxaToday',
+    ],
+    
     ];
 
     /**

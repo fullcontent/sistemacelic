@@ -19,7 +19,7 @@
 	
 
       			<div class="box-footer">
-      			<a href="{{route('servicos.show',$taxa->servico_id)}}" class="btn btn-default">Voltar</a>
+      			<a href="{{route('servicos.show', $taxa->servico_id)}}" class="btn btn-default">Voltar</a>
                 
                 <button type="submit" class="btn btn-info">Editar</button>
               	</div>
@@ -37,11 +37,13 @@
 	$(document).ready(function() {
 
   	$("#emissao").datepicker();
+
+
   	$("#vencimento").datepicker();
   	 	
   	$("#valor").mask('000.000.000.000.000,00', {reverse: true});
 	  	
- 
+ 	
 });
 
 

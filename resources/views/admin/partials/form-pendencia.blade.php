@@ -22,7 +22,7 @@
       <div class="col-md-3">
         <div class="form-group">
         {!! Form::label('status', 'Status', array('class'=>'control-label')) !!}
-        {!! Form::select('status', array('pendente' => 'Pendente', 'concluido' => 'Concluido'), 'pendente', ['class'=>'form-control','id'=>'status']) !!}
+        {!! Form::select('status', array('pendente' => 'Pendente', 'concluido' => 'Concluido'), null, ['class'=>'form-control','id'=>'status']) !!}
         </div>
     </div>
 

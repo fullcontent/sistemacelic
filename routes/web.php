@@ -22,6 +22,9 @@ Route::get('/', function () {
 
 		
 		Route::get('/home', function() {
+
+		event(new \App\Events\UserLoggedIn(auth()->user()));
+		
 		return view('admin.dashboard');
 		})->name('home');
 
@@ -99,7 +102,4 @@ Route::get('/teste', function() {
 Route::get('/taxa/notify', 'TaxasController@notifyUser');
 
 
-Route::get('markAsRead', function() {
-    auth()->user()->unreadNotifications->markAsRead();
-    return redirect()->back();
-})->name('markAsRead');
+Route::get('markAsRead', 'TaxasController@markAsRead')->name('markAsRead');

@@ -11,7 +11,7 @@ use Illuminate\Queue\SerializesModels;
 
 
 
-class VencimentoTaxa extends Notification
+class VencimentoTaxaToday extends Notification
 {
     use Queueable, SerializesModels;
     
@@ -40,18 +40,7 @@ class VencimentoTaxa extends Notification
         return ['database'];
     }
 
-    /**
-     * Get the array representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return array
-     */
-    public function toArray($notifiable)
-    {
-        return [
-            //
-        ];
-    }
+    
     /**
      * Get the array representation of the notification.
      *
@@ -62,7 +51,7 @@ class VencimentoTaxa extends Notification
     {
         return [
             //
-            'mensagem'=>''.$this->taxa->nome.' está para vencer!',
+            'mensagem'=>''.$this->taxa->nome.' vence hoje!',
             'taxa'=>$this->taxa,
             'action'=> route('taxas.show', $this->taxa->id),
             

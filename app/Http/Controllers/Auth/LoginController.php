@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use App\User;
 use Auth;
+use App\Events\UserLoggedIn;
 
 
 class LoginController extends Controller
@@ -48,6 +49,8 @@ class LoginController extends Controller
     protected function authenticated($request,User $user)
         {
             if($user->privileges == 'admin') {
+
+                
                 return redirect()->intended('admin/home');
             }
             return redirect()->intended('cliente/home');
