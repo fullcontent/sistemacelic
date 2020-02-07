@@ -15,6 +15,13 @@
           @empty($servico_id)
               {!! Form::select('servico_id', $servicos, null, ['class'=>'form-control','id'=>'servico_id','disabled']) !!}
           @endempty
+
+          
+          @if($s ?? '')
+
+          {!! Form::hidden('servico_id', $s) !!}
+
+          @endif
           
         </div>
       </div>

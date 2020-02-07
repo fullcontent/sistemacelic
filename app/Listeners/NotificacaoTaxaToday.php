@@ -11,7 +11,7 @@ use Carbon\Carbon;
 use App\Notifications\VencimentoTaxaToday;
 use App\User;
 
-class NotificacaoTaxaToday
+class NotificacaoTaxaToday 
 {
     /**
      * Create the event listener.
@@ -32,7 +32,6 @@ class NotificacaoTaxaToday
     public function handle($event)
     {
         
-
         $taxas = Taxa::whereDate('vencimento','=',Carbon::now())->where('situacao','aberto')->get();
         $groupTaxas = $taxas->pluck('id');
         $notifications = auth()->user()->notifications->whereIn('data.taxa.id',$groupTaxas)->pluck('data.taxa.id');
@@ -45,7 +44,8 @@ class NotificacaoTaxaToday
                 $user->notify(new VencimentoTaxaToday($t)); 
             }
         }
-                
+
+
 
         
     }

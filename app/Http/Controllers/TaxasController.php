@@ -35,8 +35,9 @@ class TaxasController extends Controller
         $servicos = Servico::pluck('os','id')->toArray();
 
         $servico_id = $r->servico_id;
-
-        return view('admin.cadastro-taxa')->with(['servicos'=>$servicos,'servico_id'=>$servico_id]);
+       
+        
+        return view('admin.cadastro-taxa')->with(['servicos'=>$servicos,'servico_id'=>$servico_id,'s'=>$servico_id]);
     }
 
     /**

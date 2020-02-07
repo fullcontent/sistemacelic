@@ -57,6 +57,7 @@ class ServicosController extends Controller
         //
 
         $tipo = $request->t;
+    
         $id = $request->id;
         $users = User::where('privileges','=','admin')->pluck('name','id')->toArray();
 
