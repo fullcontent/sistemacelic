@@ -39,8 +39,7 @@
   	$("#licenca_emissao").datepicker();
   	$("#licenca_vencimento").datepicker();
 
-  	
-  	
+  	$("#os").val("{!! $os !!}");  	
 	  	
  
 });

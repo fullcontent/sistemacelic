@@ -65,7 +65,7 @@ class TaxasController extends Controller
         }
         else
         {
-            $taxa->observacoes = " ";
+            $taxa->observacoes = ".";
         }
         
         // $taxa->boleto   =   $request->boleto;

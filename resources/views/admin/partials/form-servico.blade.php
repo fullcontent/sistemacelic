@@ -11,6 +11,8 @@
 </div>
 
 <div class="col-md-3">
+
+
 	
 	<div class="form-group">
 		
@@ -51,7 +53,7 @@
 	
 	<div class="form-group">
 		
-		{!! Form::label('nome', 'Nome', array('class'=>'control-label')) !!}
+		{!! Form::label('nome', 'Serviço', array('class'=>'control-label')) !!}
 		{!! Form::text('nome', null, ['class'=>'form-control','id'=>'nome']) !!}
 		
 	</div>

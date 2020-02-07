@@ -14,6 +14,7 @@
         
         @include('admin.components.widget-detalhes')
         
+        
     </div>
 </div>
 
@@ -40,11 +41,16 @@
                   <p><b>Responsável: </b>{{$servico->responsavel->name}}</p>
                   <p><b>Início do processo: </b>{{\Carbon\Carbon::parse($servico->created_at)->format('d/m/Y')}}</p>
                   
-                  @unless ( empty($servico->protocolo_anexo) )
+                  @unless ( empty($servico->protocolo_numero) )
                     
                     <p><b>Emissão Protocolo: </b>{{\Carbon\Carbon::parse($servico->protocolo_emissao)->format('d/m/Y')}}</p>
-                  <p><b>Número Protocolo: </b>{{$servico->protocolo_numero}} 
+                  <p><b>Número Protocolo: </b>{{$servico->protocolo_numero}}
+
+                    @unless (empty($servico->protocolo_anexo))
                     <a href="{{ url("uploads/$servico->protocolo_anexo") }}" class="btn btn-xs btn-warning" target="_blank">Ver Protocolo</a>
+                    @endunless
+
+
                   @endunless
                   
 
@@ -101,7 +107,7 @@
                     <i class="fa fa-user bg-aqua"></i>
                     
                     <div class="timeline-item">
-                      <span class="time"><i class="fa fa-clock"></i> {{\Carbon\Carbon::parse($historico->created_at)->diffForHumans()}}</span>
+                      <span class="time"><i class="fa fa-clock"></i> {{\Carbon\Carbon::parse($historico->created_at)->format('d/m/Y H:m')}}</span>
                       <h3 class="timeline-header"><a href="#">{{$historico->user->name}}</a> {{$historico->observacoes}}</h3>
 
                       
@@ -112,7 +118,11 @@
                   
                   
                   <li>
-                    <i class="fa fa-clock bg-gray"></i>
+                   <i class="fa fa-clock bg-gray"></i>
+                   <div class="timeline-item">
+                      <a href="{{route('interacoes.lista',$servico->id)}}" class="btn btn-flat">Visualizar todas as interações</a>
+
+                    </div>
                   </li>
                 </ul>
 

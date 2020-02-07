@@ -6,14 +6,15 @@
 	
 	<div class="box">
 				<div class="box-header">
-					<h2>Listando todos os serviços</h2>
+					<h3>Listagem de serviços</h3>
 				</div>
 				<table id="lista-servicos" class="table table-bordered table-hover">
                 <thead>
                 <tr>
                   <th>OS</th>
                   <th>Tipo</th>
-                  <th>Nome</th>
+                  <th>Serviço</th>
+                  <th>Cod. Unid.</th>
                   <th>Empresa/Unidade</th>
                   <th>Situação</th>
                   <th>Responsável</th>
@@ -30,12 +31,15 @@
 	              	@php
 	              		if($servico->unidade_id){
 	              			$empresa = $servico->unidade->nomeFantasia;
+	              			$route = route('unidades.show',$servico->unidade->id);
 	              		}
 	              		elseif($servico->empresa_id){
 	              			$empresa = $servico->empresa->nomeFantasia;
+	              			$route = route('empresas.show',$servico->empresa->id);
 	              		}
 	              	@endphp
-	              	<td>{{$empresa}}</td>
+	              	<td>{{$servico->unidade->codigo ?? ''}}</td>
+	              	<td><a href="{{$route}}">{{$empresa}}</a></td>
 	              	<td>{{$servico->situacao}}</td>
 	              	<td>{{$servico->responsavel->name}}</td>
 

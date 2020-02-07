@@ -141,6 +141,24 @@ class PendenciasController extends Controller
 
         $pendencia->save();
 
+        //Save Interation
+
+        if (!$pendencia->wasRecentlyCreated) {
+            
+            $changes = $pendencia->getChanges();
+            unset($changes['updated_at']);
+
+
+             foreach ($changes as $value => $key) {
+                 
+                    $history = new Historico();
+                    $history->servico_id = $pendencia->servico_id;
+                    $history->user_id = Auth::id();
+                    $history->observacoes = 'Pendencia '.$pendencia->pendencia.' alterado '.$value.' para "'.$key.'"';
+                    $history->save();
+             }
+            }
+
         // return $pendencia;
 
         return redirect(route('pendencia.index',['servico_id'=>$pendencia->servico_id]));

@@ -67,30 +67,50 @@ class ServicosController extends Controller
             case 'unidade':
                 // code...
                     $u = Unidade::find($id);
-                    $a = $u->empresa->nomeFantasia;
-                    $a = explode(' ',$a);
-                    $os = substr($a[0], 0, 1);
-                    $os .= substr($a[1], 0, 1); 
-
-                    if(Servico::where('os','%like%',$os)->first())
-                    {
-                        return "achou";
-                    }
-
-
-                break;
-            case 'empresa':
-
-                    $u = Empresa::find($id);
-                    $a = $u->nomeFantasia;
+                    $a = $u->empresa->razaoSocial;
                     $a = explode(' ',$a);
                     $os = substr($a[0], 0, 1);
                     $os .= substr($a[1], 0, 1); 
 
                     $lastOS = Servico::where('os','like','%'.$os.'0%')->orderBy('os','DESC')->pluck('os')->first();
 
-                    $number = substr($lastOS, 2,4);
-                    $number = $number + 1;
+                    if(!$lastOS)
+                    {
+                        $number = "001";
+
+                    }
+                    else {
+                        $number = substr($lastOS, 2,4);
+                        $number = str_pad($number+1, 4, "000", STR_PAD_LEFT);
+                        
+                    }
+
+                    
+
+                    $os .= $number;
+
+
+                break;
+            case 'empresa':
+
+                    $u = Empresa::find($id);
+                    $a = $u->razaoSocial;
+                    $a = explode(' ',$a);
+                    $os = substr($a[0], 0, 1);
+                    $os .= substr($a[1], 0, 1); 
+
+                    $lastOS = Servico::where('os','like','%'.$os.'0%')->orderBy('os','DESC')->pluck('os')->first();
+
+                     if(!$lastOS)
+                    {
+                        $number = "001";
+
+                    }
+                    else {
+                        $number = substr($lastOS, 2,4);
+                        $number = str_pad($number+1, 4, "000", STR_PAD_LEFT);
+                        
+                    }
 
                     $os .= $number;
 
@@ -100,8 +120,7 @@ class ServicosController extends Controller
         }
 
        
-
-        
+         
 
 
         return view('admin.cadastro-servico')
@@ -220,7 +239,7 @@ class ServicosController extends Controller
 
         
 
-        return redirect()->route('servicos.index');
+        return redirect()->route('servicos.show',$servico->id);
 
 
 
