@@ -76,7 +76,7 @@ class ServicosController extends Controller
 
                     if(!$lastOS)
                     {
-                        $number = "001";
+                        $number = "0001";
 
                     }
                     else {
@@ -103,7 +103,7 @@ class ServicosController extends Controller
 
                      if(!$lastOS)
                     {
-                        $number = "001";
+                        $number = "0001";
 
                     }
                     else {
