@@ -22,7 +22,7 @@
                    @foreach($dados->arquivos as $a)
                    <tr>
                    	<td>{{$a->nome}}</td>
-                   	<td><a href="{{ url("uploads/$a->arquivo") }}" class="btn btn-xs btn-warning" target="_blank">Download</a></td>
+                   	<td><a href="{{ url("uploads/$a->arquivo") }}" class="btn btn-xs btn-default" target="_blank">Download</a></td>
                    </tr>
                   @endforeach
                   </tbody>

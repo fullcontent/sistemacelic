@@ -8,11 +8,11 @@
 
 @section('content')
   
-  <div class="col-4">
-    <a href="{{route('servicos.index')}}" class="btn btn-primary">Voltar</a>
-  </div>
+  
   
 <div class="row">
+
+  
     <div class="col-md-12">
         
         @include('admin.components.widget-detalhes')

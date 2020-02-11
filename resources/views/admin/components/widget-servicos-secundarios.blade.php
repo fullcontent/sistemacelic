@@ -1,6 +1,6 @@
 <div class="box box-info">
             <div class="box-header with-border">
-              <h3 class="box-title">Serviços primários</h3>
+              <h3 class="box-title">Serviços secundários</h3>
 
               <div class="box-tools pull-right">
                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -21,41 +21,22 @@
                   </tr>
                   </thead>
                   <tbody>
-                    @foreach($servicos->where('tipo','primario') as $servico)
+                    @foreach($servicos->where('tipo','secundario') as $servico)
                   <tr>
                     
                     <td><a href="{{route('servicos.show',$servico->id)}}">{{$servico->os}} | {{$servico->nome}}</a></td>
                     <td>
                       @switch($servico->situacao)
 
-                      @case('andamento')
-                          @if($servico->licenca_validade >= date('Y-m-d'))
-                  
-                           <a href="{{route('servicos.show',$servico->id)}}" class="btn btn-xs btn-success">Andamento</a>
-                          @elseif($servico->licenca_validade < date('Y-m-d'))
-                          <a href="{{route('servicos.show',$servico->id)}}" class="btn btn-xs btn-danger">Andamento</a>
-
-                        @endif
+                        @case('andamento')
+                            <span class="label label-warning">Andamento</span>
                         @break
 
-                      @case('finalizado')
-
-                        @if($servico->licenca_validade >= date('Y-m-d'))
-                  
-                           <a href="{{route('servicos.show',$servico->id)}}" class="btn btn-xs btn-success">Finalizado</a>
-                          @elseif($servico->licenca_validade < date('Y-m-d'))
-                          <a href="{{route('servicos.show',$servico->id)}}" class="btn btn-xs btn-danger">Finalizado</a>
-
-                        @endif
-
-                
+                        @case('finalizado')
+                            <span class="label label-success">Finalizado</span>
                         @break
 
-                      @case('arquivado')
-                <button type="button" class="btn btn-xs btn-default">Arquivado</button>
-                        @break
-
-                    @endswitch
+                      @endswitch
                     </td>
                     
                     

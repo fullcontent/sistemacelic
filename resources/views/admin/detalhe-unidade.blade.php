@@ -22,6 +22,7 @@
     <div class="col-md-5">
         
         @include('admin.components.widget-servicos')
+        @include('admin.components.widget-servicos-secundarios')
         
     </div>
     <div class="col-md-7">
