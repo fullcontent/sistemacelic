@@ -67,7 +67,40 @@ class AppServiceProvider extends ServiceProvider
                         [
                         'text' => 'Serviços',
                         'url'  =>  ''.Auth::user()->privileges.'/servicos',
-                        'icon' => 'glyphicon glyphicon-wrench'
+                        'icon' => 'glyphicon glyphicon-wrench',
+                        'submenu'=>[
+
+                                [
+                                    'text'=>'Todos os serviços',
+                                    'url'  =>  ''.Auth::user()->privileges.'/servicos',
+                                    'icon'=>'glyphicon glyphicon-wrench',
+
+
+                                ],
+                                [
+                                    'text' => 'Em andamento',
+                                    'url'  =>  route('servico.andamento'),
+                                    'icon'  =>  'glyphicon glyphicon-object-align-left text-yellow',
+                                ],
+                                [
+                                    'text' => 'Finalizados',
+                                    'url'  =>  route('servico.finalizado'),
+                                    'icon'  =>  'glyphicon glyphicon-ok-sign text-green',
+                                ],
+                                [
+                                    'text' => 'Vigentes',
+                                    'url'  =>  route('servico.vigente'),
+                                    'icon'  =>  'glyphicon glyphicon-tags text-aqua',
+                                ],
+                                [
+                                    'text' => 'Vencidos',
+                                    'url'  =>  route('servico.vencido'),
+                                    'icon'  =>  'glyphicon glyphicon-remove-sign text-red',
+                                ],
+
+
+
+                            ]
                         ]
                         
                         

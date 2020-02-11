@@ -47,6 +47,82 @@ class ServicosController extends Controller
                     ->with('servicos',$servicos);
     }
 
+    public function listaAndamento()
+    {
+        
+
+        
+        $servicos = Servico::with('unidade','empresa','responsavel')->where('situacao','andamento')->get();
+        // $servicos = Servico::select('os','nome','tipo','responsavel_id','servicos.unidade_id','servicos.empresa_id')
+        //             ->join('unidades', 'unidades.id', '=', 'unidade_id')
+        //             ->join('empresas', 'empresas.id', '=', 'empresa_id')
+                    
+        // ->get();
+
+        // return $servicos;
+
+        return view('admin.lista-servicos')
+                    ->with('servicos',$servicos);
+    }
+
+    public function listaFinalizados()
+    {
+        
+
+        
+        $servicos = Servico::with('unidade','empresa','responsavel')->where('situacao','finalizado')->get();
+        // $servicos = Servico::select('os','nome','tipo','responsavel_id','servicos.unidade_id','servicos.empresa_id')
+        //             ->join('unidades', 'unidades.id', '=', 'unidade_id')
+        //             ->join('empresas', 'empresas.id', '=', 'empresa_id')
+                    
+        // ->get();
+
+        // return $servicos;
+
+        return view('admin.lista-servicos')
+                    ->with('servicos',$servicos);
+    }
+
+    public function listaVigentes()
+    {
+        
+        $servicos = Servico::with('unidade','empresa','responsavel')
+                        ->where('licenca_validade','>',date('Y-m-d'))
+                        ->get();
+        // $servicos = Servico::select('os','nome','tipo','responsavel_id','servicos.unidade_id','servicos.empresa_id')
+        //             ->join('unidades', 'unidades.id', '=', 'unidade_id')
+        //             ->join('empresas', 'empresas.id', '=', 'empresa_id')
+                    
+        // ->get();
+
+        // return $servicos;
+
+        return view('admin.lista-servicos')
+                    ->with('servicos',$servicos);
+    }
+
+    public function listaVencidos()
+    {
+        
+        $servicos = Servico::with('unidade','empresa','responsavel')
+                            ->where('licenca_validade','<',date('Y-m-d'))
+                            ->get();
+        // $servicos = Servico::select('os','nome','tipo','responsavel_id','servicos.unidade_id','servicos.empresa_id')
+        //             ->join('unidades', 'unidades.id', '=', 'unidade_id')
+        //             ->join('empresas', 'empresas.id', '=', 'empresa_id')
+                    
+        // ->get();
+
+        // return $servicos;
+
+        return view('admin.lista-servicos')
+                    ->with('servicos',$servicos);
+    }
+
+
+
+
+
     /**
      * Show the form for creating a new resource.
      *

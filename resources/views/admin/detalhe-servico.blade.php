@@ -55,10 +55,10 @@
                     @unless (empty($servico->protocolo_anexo))
                     <a href="{{ url("uploads/$servico->protocolo_anexo") }}" class="btn btn-xs btn-warning" target="_blank">Ver Protocolo</a>
                     @endunless
-
+          
 
                   @endunless
-                  
+                  <p><b>Observações: </b>{{$servico->observacoes}}</p>
 
                 </div>
                 

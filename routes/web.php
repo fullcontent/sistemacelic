@@ -59,6 +59,12 @@ Route::get('/', function () {
 		Route::get('/pendencia/delete/{id}', 'PendenciasController@delete')->name('pendencia.delete');
 		Route::get('/taxa/delete/{id}', 'TaxasController@delete')->name('taxas.delete');
 
+
+		Route::get('/servico/andamento/', 'ServicosController@listaAndamento')->name('servico.andamento');
+		Route::get('/servico/finalizados/', 'ServicosController@listaFinalizados')->name('servico.finalizado');
+		Route::get('/servico/vigentes/', 'ServicosController@listaVigentes')->name('servico.vigente');
+		Route::get('/servico/vencidos/', 'ServicosController@listaVencidos')->name('servico.vencido');
+
 		
 		
 
