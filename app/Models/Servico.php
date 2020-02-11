@@ -42,4 +42,6 @@ class Servico extends Model
             return $this->hasMany('App\Models\Arquivo');
         }
 
+    
+
 }

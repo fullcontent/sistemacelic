@@ -82,6 +82,12 @@ class AppServiceProvider extends ServiceProvider
                                     'url'  =>  route('servico.andamento'),
                                     'icon'  =>  'glyphicon glyphicon-object-align-left text-yellow',
                                 ],
+
+                                [
+                                    'text' => 'A vencer',
+                                    'url'  =>  route('servico.vencer'),
+                                    'icon'  =>  'glyphicon glyphicon-time text-yellow',
+                                ],
                                 [
                                     'text' => 'Finalizados',
                                     'url'  =>  route('servico.finalizado'),

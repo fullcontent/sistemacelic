@@ -88,6 +88,7 @@ class ServicosController extends Controller
         
         $servicos = Servico::with('unidade','empresa','responsavel')
                         ->where('licenca_validade','>',date('Y-m-d'))
+                        ->where('tipo','primario')
                         ->get();
         // $servicos = Servico::select('os','nome','tipo','responsavel_id','servicos.unidade_id','servicos.empresa_id')
         //             ->join('unidades', 'unidades.id', '=', 'unidade_id')
@@ -96,6 +97,8 @@ class ServicosController extends Controller
         // ->get();
 
         // return $servicos;
+
+        $servicos = $servicos->where('unidade.status','Ativa');
 
         return view('admin.lista-servicos')
                     ->with('servicos',$servicos);
@@ -106,6 +109,31 @@ class ServicosController extends Controller
         
         $servicos = Servico::with('unidade','empresa','responsavel')
                             ->where('licenca_validade','<',date('Y-m-d'))
+                            ->orWhereNull('licenca_validade')
+                            ->where('tipo','primario')
+
+                            
+                            ->get();
+        // $servicos = Servico::select('os','nome','tipo','responsavel_id','servicos.unidade_id','servicos.empresa_id')
+        //             ->join('unidades', 'unidades.id', '=', 'unidade_id')
+        //             ->join('empresas', 'empresas.id', '=', 'empresa_id')
+                    
+        // ->get();
+
+       $servicos = $servicos->where('unidade.status','Ativa')->where('responsavel.id',Auth::id());
+
+       
+
+
+        return view('admin.lista-servicos')
+                    ->with('servicos',$servicos);
+    }
+
+    public function listaVencer()
+    {
+        
+        $servicos = Servico::with('unidade','empresa','responsavel')
+                            ->where('licenca_validade','<',\Carbon\Carbon::today()->addDays(60))
                             ->get();
         // $servicos = Servico::select('os','nome','tipo','responsavel_id','servicos.unidade_id','servicos.empresa_id')
         //             ->join('unidades', 'unidades.id', '=', 'unidade_id')
@@ -115,7 +143,7 @@ class ServicosController extends Controller
 
         // return $servicos;
 
-        return view('admin.lista-servicos')
+        return view('admin.lista-servicos-vencer')
                     ->with('servicos',$servicos);
     }
 
