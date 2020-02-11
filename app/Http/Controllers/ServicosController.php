@@ -406,6 +406,12 @@ class ServicosController extends Controller
             $servico->licenca_validade = Carbon::createFromFormat('d/m/Y', $request->licenca_validade)->toDateString();
         }
 
+        if($request->licenca_validade == '')
+
+
+        {
+            $servico->licenca_validade = $request->licenca_validade;
+        }
 
         $servico->observacoes   = $request->observacoes;
         

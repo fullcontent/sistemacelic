@@ -7,8 +7,11 @@
 
 
 @section('content')
-
-
+  
+  <div class="col-4">
+    <a href="{{route('servicos.index')}}" class="btn btn-primary">Voltar</a>
+  </div>
+  
 <div class="row">
     <div class="col-md-12">
         
@@ -19,9 +22,12 @@
 </div>
 
 
- 
+
 <div class="col-md-12">
     
+    
+   
+
     <div class="box box-info">
             <div class="box-header with-border">
               <h3 class="box-title">Detalhes do serviço {{$servico->os}}</h3>

@@ -27,7 +27,7 @@
 	<div class="form-group">
 		
 		{!! Form::label('situacao', 'Situação', array('class'=>'control-label')) !!}
-		{!! Form::select('situacao', array('andamento' => 'Andamento', 'finalizado' => 'Finalizado','vencimento'=>'Vencimento'), null, ['class'=>'form-control'])!!}
+		{!! Form::select('situacao', array('andamento' => 'Andamento', 'finalizado' => 'Finalizado'), null, ['class'=>'form-control'])!!}
 		
 	</div>
 </div>

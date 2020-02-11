@@ -28,9 +28,20 @@
                   <tr>
                     <td><a href="{{route('taxas.show',$taxa->id)}}">{{$taxa->nome}}</a></td>
                     <td>R$ {{$taxa->valor}}</td>
-                    <td><span class="label label-success">{{ \Carbon\Carbon::parse($taxa->vencimento)->format('d/m/Y')}}
+                    <td><span class="label label-default">{{ \Carbon\Carbon::parse($taxa->vencimento)->format('d/m/Y')}}
 </span></td>
-                    <td>{{$taxa->situacao}}</td>
+                    <td>
+                      @switch($taxa->vencimento)
+
+                        @case($taxa->vencimento >= date('Y-m-d'))
+                          <span class="label label-success">Aberto</span>
+                        @break
+                      
+                        @case($taxa->vencimento < date('Y-m-d'))
+                            <span class="label label-danger">Vencida</span>
+                        @break
+                      @endswitch
+                    </td>
                     <td>{{$taxa->servico->os}}</td>
                     <td>
         @if(empty($taxa->comprovante))

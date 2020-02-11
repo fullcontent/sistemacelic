@@ -14,25 +14,22 @@
                 <table class="table no-margin" id="servicos">
                   <thead>
                   <tr>
-                    <th>OS</th>
+                    
                     <th>Serviço</th>
                     <th>Status</th>
-                    
-                    <th></th>
+                  
                   </tr>
                   </thead>
                   <tbody>
                     @foreach($servicos as $servico)
                   <tr>
-                    <td>{{$servico->os}}</td>
-                    <td>{{$servico->nome}}</td>
-                    <td><span class="label label-success">{{$servico->situacao}}</span></td>
                     
+                    <td><a href="{{route('servicos.show',$servico->id)}}">{{$servico->os}} | {{$servico->nome}}</a></td>
                     <td>
-                      <a href="{{route('servicos.show',$servico->id)}}">Detalhes</a>
-                      
-
+                      <span class="label label-success">{{$servico->situacao}}</span>
                     </td>
+                    
+                    
                   </tr>
                   @endforeach
                   

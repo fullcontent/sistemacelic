@@ -12,12 +12,12 @@
                 <thead>
                 <tr>
                   <th>OS</th>
-                  <th>Tipo</th>
+                 
                   <th>Serviço</th>
                   <th>Cod. Unid.</th>
-                  <th>Empresa/Unidade</th>
+                  <th>Unidade</th>
                   <th>Situação</th>
-                  <th>Responsável</th>
+                  
                   <th></th>
                 </thead>
                 <tbody>
@@ -25,7 +25,7 @@
                 	
                 	<tr>
 	              	<td>{{$servico->os}}</td>
-	              	<td>{{$servico->tipo}}</td>
+	              	
 	              	<td><a href="{{route('servicos.show', $servico->id)}}">{{$servico->nome}}</a></td>
 
 	              	@php
@@ -40,8 +40,33 @@
 	              	@endphp
 	              	<td>{{$servico->unidade->codigo ?? ''}}</td>
 	              	<td><a href="{{$route}}">{{$empresa}}</a></td>
-	              	<td>{{$servico->situacao}}</td>
-	              	<td>{{$servico->responsavel->name}}</td>
+	              	<td>
+	              		@switch($servico->situacao)
+
+	              			@case('andamento')
+								<button type="button" class="btn btn-xs btn-warning">Andamento</button>
+	              				@break
+
+	              			@case('finalizado')
+
+	              				@if($servico->licenca_validade >= date('Y-m-d'))
+									
+									<button type="button" class="btn btn-xs btn-success">Finalizado</button>
+	              					@elseif($servico->licenca_validade < date('Y-m-d'))
+	              					<button type="button" class="btn btn-xs btn-danger">Finalizado</button>
+
+	              				@endif
+
+								
+	              				@break
+
+	              			@case('arquivado')
+								<button type="button" class="btn btn-xs btn-default">Arquivado</button>
+	              				@break
+
+	              		@endswitch
+	              	</td>
+	              	
 
 					<td><a href="{{route('servicos.show', $servico->id)}}"><i class="glyphicon glyphicon-list-alt
 "></i></a>

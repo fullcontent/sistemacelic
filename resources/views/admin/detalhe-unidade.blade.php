@@ -19,18 +19,18 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-5">
         
         @include('admin.components.widget-servicos')
         
     </div>
-    <div class="col-md-6">
+    <div class="col-md-7">
         
         @include('admin.components.widget-taxas')
         
     </div>
 
-     <div class="col-md-6">
+     <div class="col-md-7">
         
         @include('admin.components.widget-arquivos')
         

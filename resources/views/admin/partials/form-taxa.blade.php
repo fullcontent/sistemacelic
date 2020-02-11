@@ -37,7 +37,7 @@
       <div class="col-md-3">
         <div class="form-group">
         {!! Form::label('situacao', 'Situação', array('class'=>'control-label')) !!}
-        {!! Form::select('situacao',array('aberto' => 'Em aberto', 'vencimento' => 'Vencimento','vencida'=>'Vencida', 'pago'=>'Pago'), null, ['class'=>'form-control','id'=>'situacao']) !!}
+        {!! Form::select('situacao',array('aberto' => 'Em aberto','vencida'=>'Vencida', 'pago'=>'Pago'), null, ['class'=>'form-control','id'=>'situacao']) !!}
         </div>
         
       </div>

@@ -26,12 +26,16 @@
 
                     	if($historico->user->privileges == 'cliente')
                     	{
-                    		$label = "fa fa-user bg-aqua";
+                    		$label = "fa fa-user bg-red";
                     	}
-                    	else
+                    	elseif($historico->user->privileges == 'admin')
                     	{
-                    		$label = "fa fa-copyright bg-green";
+                    		$label = "fa fa-copyright bg-aqua";
                     	}
+                      else
+                      {
+                        $label = "fa fa-weixin bg-default";
+                      }
 
 
                     @endphp

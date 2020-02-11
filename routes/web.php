@@ -24,7 +24,7 @@ Route::get('/', function () {
 		
 		Route::get('/home', function() {
 
-		event(new \App\Events\UserLoggedIn(auth()->user()));
+		
 		
 		return view('admin.dashboard');
 		})->name('home');
@@ -91,11 +91,7 @@ Route::get('/', function () {
 	});
 
 
-Route::get('/teste', function() {
 
-		
-    //
-});
 
 Route::get('/taxa/notify', 'TaxasController@notifyUser');
 
