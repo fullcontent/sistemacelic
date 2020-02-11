@@ -91,13 +91,7 @@ Route::get('/', function () {
 
 Route::get('/teste', function() {
 
-	$servicos = App\Models\Taxa::all();
-
-	return $servicos;
-
-	
-
-	
+		
     //
 });
 
