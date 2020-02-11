@@ -26,7 +26,17 @@
                     
                     <td><a href="{{route('servicos.show',$servico->id)}}">{{$servico->os}} | {{$servico->nome}}</a></td>
                     <td>
-                      <span class="label label-success">{{$servico->situacao}}</span>
+                      @switch($servico->situacao)
+
+                        @case('andamento')
+                            <span class="label label-warning">Andamento</span>
+                        @break
+
+                        @case('finalizado')
+                            <span class="label label-success">Finalizado</span>
+                        @break
+
+                      @endswitch
                     </td>
                     
                     

@@ -24,7 +24,7 @@
                   </tr>
                   </thead>
                   <tbody>
-                    @foreach($taxas->take(5) as $taxa)
+                    @foreach($taxas->where('situacao','aberto') as $taxa)
                   <tr>
                     <td><a href="{{route('taxas.show',$taxa->id)}}">{{$taxa->nome}}</a></td>
                     <td>R$ {{$taxa->valor}}</td>
@@ -34,11 +34,21 @@
                       @switch($taxa->vencimento)
 
                         @case($taxa->vencimento >= date('Y-m-d'))
-                          <span class="label label-success">Aberto</span>
+                            @if($taxa->comprovante)
+                              <span class="label label-success">Pago</span>
+                            @else
+                            
+                            <span class="label label-warning">Aberto</span>
+                          @endif
+                          
                         @break
                       
                         @case($taxa->vencimento < date('Y-m-d'))
+                            @if($taxa->comprovante)
+                                <span class="label label-success">Pago</span>
+                            @else
                             <span class="label label-danger">Vencida</span>
+                            @endif
                         @break
                       @endswitch
                     </td>

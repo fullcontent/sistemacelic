@@ -33,6 +33,25 @@
                   <input type="checkbox" data-id="{{$pendencia->id}}" @if($pendencia->status == 'concluido') checked="" @endif>
                   <!-- todo text -->
                   <span class="text">{{$pendencia->pendencia}}</span>
+                 @switch($pendencia->vencimento)
+                        
+                        @case($pendencia->vencimento > date('Y-m-d'))
+                            <span class="label label-success">{{ \Carbon\Carbon::parse($pendencia->vencimento)->format('d/m/Y')}}</span>
+                        @break
+
+                        @case($pendencia->vencimento < date('Y-m-d'))
+                            <span class="label label-danger">{{ \Carbon\Carbon::parse($pendencia->vencimento)->format('d/m/Y')}}</span>
+                        @break
+
+                        @case($pendencia->vencimento == date('Y-m-d'))
+                            <span class="label label-warning">{{ \Carbon\Carbon::parse($pendencia->vencimento)->format('d/m/Y')}}</span>
+                        @break
+
+
+
+
+
+                  @endswitch
                   <!-- Emphasis label -->
                   
                   <!-- General tools such as edit or delete-->
