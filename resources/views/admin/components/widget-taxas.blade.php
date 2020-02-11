@@ -45,7 +45,7 @@
         <a href="{{ url("uploads/$taxa->comprovante") }}" class="btn btn-xs btn-success" target="_blank">Ver Comprovante</a>
         @endunless</td>
         <td>
-                    <a href="{{route('taxas.destroy',$taxa->id)}}" onclick="return confirm('Tem certeza que deseja excluir a taxa?');"><i class="fa fa-trash"></i></a></td>
+                    <a href="{{route('taxas.delete',$taxa->id)}}" onclick="return confirm('Tem certeza que deseja excluir a taxa?');"><i class="fa fa-trash"></i></a></td>
 
                   </tr>
                   @endforeach

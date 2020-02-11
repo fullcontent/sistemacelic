@@ -229,6 +229,8 @@ class TaxasController extends Controller
     public function destroy($id)
     {
         //
+
+
     }
 
     public function salvarHistorico()
@@ -260,6 +262,14 @@ class TaxasController extends Controller
 
         
         auth()->user()->notifications->where('id',$request->notif_id)->markAsRead();
+        return redirect()->back();
+    }
+
+    public function delete($id)
+    {   
+
+        $t = Taxa::destroy($id);
+        
         return redirect()->back();
     }
 
