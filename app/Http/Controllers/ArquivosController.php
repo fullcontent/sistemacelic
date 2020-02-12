@@ -130,4 +130,19 @@ class ArquivosController extends Controller
     {
         //
     }
+
+    public function download($id)
+    {
+        
+        $file = Arquivo::find($id);
+
+        $filename = $file->arquivo;
+        $extension = substr($filename, -4);
+        
+        $arquivo = $file->nome.' - '.$file->unidade->nomeFantasia.$extension;
+
+        
+        return response()->download(public_path('uploads/'.$file->arquivo.''),$arquivo);
+
+    }
 }

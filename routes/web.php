@@ -66,6 +66,8 @@ Route::get('/', function () {
 		Route::get('/servico/vencidos/', 'ServicosController@listaVencidos')->name('servico.vencido');
 		Route::get('/servico/vencer/', 'ServicosController@listaVencer')->name('servico.vencer');
 
+		Route::get('/arquivo/download/{id}', 'ArquivosController@download')->name('arquivo.download');
+
 		
 		
 
