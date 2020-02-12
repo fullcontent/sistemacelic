@@ -68,6 +68,8 @@ Route::get('/', function () {
 		Route::get('/servico/inativos/', 'ServicosController@listaInativo')->name('servico.inativo');
 		Route::get('/servico/lista/', 'ServicosController@lista')->name('servico.lista');
 
+		Route::get('/servico/renovar/{id}', 'ServicosController@renovar')->name('servico.renovar');
+
 
 		Route::get('/arquivo/download/{id}', 'ArquivosController@download')->name('arquivo.download');
 

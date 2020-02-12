@@ -84,7 +84,9 @@
 
 	              		@endswitch
 
-					
+					@if (\Request::is('admin/servico/vencer'))  
+  							<a href="{{route('servico.renovar',$servico->id)}}" class="btn btn-xs btn-primary">Renovar</a>
+					@endif
 
 	              	</td>
 	              	

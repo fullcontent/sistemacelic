@@ -9,6 +9,7 @@ use App\User;
 use Carbon\Carbon;
 use App\Models\Empresa;
 use App\Models\Unidade;
+use App\Models\Arquivo;
 
 
 use Auth;
@@ -53,7 +54,7 @@ class ServicosController extends Controller
         						->where('responsavel_id',Auth::id())
         						->get();
 
-        $servicos = $servicos->where('unidade.status','Ativa');
+        $servicos = $servicos->where('unidade.status','Ativa')->where('situacao','<>','arquivado');
 
         return view('admin.lista-servicos')
                     ->with('servicos',$servicos);
@@ -157,7 +158,69 @@ class ServicosController extends Controller
         return view('admin.lista-servicos')
                     ->with('servicos',$servicos);
     }
-    
+
+
+    public function renovar($id)
+    {
+        $servico = Servico::find($id);
+        $servico->situacao = 'arquivado';
+        $servico->save();
+
+        
+        if($servico->unidade_id)
+        {
+
+            $initial = substr($servico->os, 0,2);
+
+            
+            $lastOS = Servico::where('os','like', '%'.$initial.'%')->orderBy('os','DESC')->pluck('os')->first();
+
+            $number = substr($lastOS, 2,4);
+            $number = str_pad($number+1, 4, "000", STR_PAD_LEFT);
+
+            $os = substr($lastOS, 0,2);
+            $os .= $number;
+
+        }
+
+        
+              
+
+
+        $newService = new Servico;
+
+        $newService->nome = $servico->nome;
+        $newService->tipo = $servico->tipo;        
+        $newService->responsavel_id = $servico->responsavel_id;
+        $newService->observacoes = $servico->observacoes;
+
+        $newService->unidade_id = $servico->unidade_id;
+        $newService->licenca_emissao = $servico->licenca_emissao;
+        $newService->licenca_validade = $servico->licenca_validade;
+
+        $newService->situacao = 'andamento';
+        $newService->os = $os;
+
+
+        $newService->save();
+
+
+
+        $arquivoDigital = new Arquivo;
+        $arquivoDigital->servico_id = $servico->id;
+        $arquivoDigital->unidade_id = $servico->unidade_id;
+        $arquivoDigital->nome = $servico->nome.' - '.Carbon::create($servico->licenca_validade)->format('d/m/Y');
+        $arquivoDigital->arquivo = $servico->licenca_anexo;
+        $arquivoDigital->save();
+
+
+        
+
+
+        return redirect()->route('servicos.show',$newService->id);
+        
+
+    }
 
 
 
