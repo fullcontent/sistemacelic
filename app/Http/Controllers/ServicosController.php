@@ -34,14 +34,26 @@ class ServicosController extends Controller
     public function index()
     {
         
-        $servicos = Servico::with('unidade','empresa','responsavel')->get();
-        // $servicos = Servico::select('os','nome','tipo','responsavel_id','servicos.unidade_id','servicos.empresa_id')
-        //             ->join('unidades', 'unidades.id', '=', 'unidade_id')
-        //             ->join('empresas', 'empresas.id', '=', 'empresa_id')
-                    
-        // ->get();
+       
+        $servicos = Servico::with('unidade','empresa','responsavel')
+        						// ->where('responsavel_id',Auth::id())
+        						->get();
 
-        // return $servicos;
+        // $servicos = $servicos->where('unidade.status','Ativa');
+
+        return view('admin.lista-servicos')
+                    ->with('servicos',$servicos);
+    }
+
+    public function lista()
+    {
+        
+       
+        $servicos = Servico::with('unidade','empresa','responsavel')
+        						->where('responsavel_id',Auth::id())
+        						->get();
+
+        $servicos = $servicos->where('unidade.status','Ativa');
 
         return view('admin.lista-servicos')
                     ->with('servicos',$servicos);
@@ -52,14 +64,13 @@ class ServicosController extends Controller
         
 
         
-        $servicos = Servico::with('unidade','empresa','responsavel')->where('situacao','andamento')->get();
-        // $servicos = Servico::select('os','nome','tipo','responsavel_id','servicos.unidade_id','servicos.empresa_id')
-        //             ->join('unidades', 'unidades.id', '=', 'unidade_id')
-        //             ->join('empresas', 'empresas.id', '=', 'empresa_id')
-                    
-        // ->get();
+        $servicos = Servico::with('unidade','empresa','responsavel')
+        					->where('situacao','andamento')
+        					->where('responsavel_id',Auth::id())
+        					->get();
 
-        // return $servicos;
+
+       $servicos = $servicos->where('unidade.status','Ativa'); 
 
         return view('admin.lista-servicos')
                     ->with('servicos',$servicos);
@@ -70,14 +81,12 @@ class ServicosController extends Controller
         
 
         
-        $servicos = Servico::with('unidade','empresa','responsavel')->where('situacao','finalizado')->get();
-        // $servicos = Servico::select('os','nome','tipo','responsavel_id','servicos.unidade_id','servicos.empresa_id')
-        //             ->join('unidades', 'unidades.id', '=', 'unidade_id')
-        //             ->join('empresas', 'empresas.id', '=', 'empresa_id')
-                    
-        // ->get();
+        $servicos = Servico::with('unidade','empresa','responsavel')
+        						->where('situacao','finalizado')
+        						->where('responsavel_id',Auth::id())
+        						->get();
 
-        // return $servicos;
+        $servicos = $servicos->where('unidade.status','Ativa');							      
 
         return view('admin.lista-servicos')
                     ->with('servicos',$servicos);
@@ -89,14 +98,9 @@ class ServicosController extends Controller
         $servicos = Servico::with('unidade','empresa','responsavel')
                         ->where('licenca_validade','>',date('Y-m-d'))
                         ->where('tipo','primario')
+                        ->where('responsavel_id',Auth::id())
                         ->get();
-        // $servicos = Servico::select('os','nome','tipo','responsavel_id','servicos.unidade_id','servicos.empresa_id')
-        //             ->join('unidades', 'unidades.id', '=', 'unidade_id')
-        //             ->join('empresas', 'empresas.id', '=', 'empresa_id')
-                    
-        // ->get();
-
-        // return $servicos;
+       
 
         $servicos = $servicos->where('unidade.status','Ativa');
 
@@ -111,16 +115,12 @@ class ServicosController extends Controller
                             ->where('licenca_validade','<',date('Y-m-d'))
                             ->orWhereNull('licenca_validade')
                             ->where('tipo','primario')
+                            ->where('responsavel_id',Auth::id())
 
                             
                             ->get();
-        // $servicos = Servico::select('os','nome','tipo','responsavel_id','servicos.unidade_id','servicos.empresa_id')
-        //             ->join('unidades', 'unidades.id', '=', 'unidade_id')
-        //             ->join('empresas', 'empresas.id', '=', 'empresa_id')
-                    
-        // ->get();
-
-       $servicos = $servicos->where('unidade.status','Ativa')->where('responsavel.id',Auth::id());
+        
+       $servicos = $servicos->where('unidade.status','Ativa');
 
        
 
@@ -134,18 +134,30 @@ class ServicosController extends Controller
         
         $servicos = Servico::with('unidade','empresa','responsavel')
                             ->where('licenca_validade','<',\Carbon\Carbon::today()->addDays(60))
+                            ->where('responsavel_id',Auth::id())
+                            ->where('situacao','Finalizado')
                             ->get();
-        // $servicos = Servico::select('os','nome','tipo','responsavel_id','servicos.unidade_id','servicos.empresa_id')
-        //             ->join('unidades', 'unidades.id', '=', 'unidade_id')
-        //             ->join('empresas', 'empresas.id', '=', 'empresa_id')
-                    
-        // ->get();
 
-        // return $servicos;
+       $servicos = $servicos->where('unidade.status','Ativa');
 
-        return view('admin.lista-servicos-vencer')
+        return view('admin.lista-servicos')
                     ->with('servicos',$servicos);
     }
+
+    public function listaInativo()
+    {
+        
+        $servicos = Servico::with('unidade','empresa','responsavel')
+                            
+                            ->where('responsavel_id',Auth::id())
+                            ->get();
+
+       $servicos = $servicos->where('unidade.status','Inativa');
+
+        return view('admin.lista-servicos')
+                    ->with('servicos',$servicos);
+    }
+    
 
 
 

@@ -65,6 +65,9 @@ Route::get('/', function () {
 		Route::get('/servico/vigentes/', 'ServicosController@listaVigentes')->name('servico.vigente');
 		Route::get('/servico/vencidos/', 'ServicosController@listaVencidos')->name('servico.vencido');
 		Route::get('/servico/vencer/', 'ServicosController@listaVencer')->name('servico.vencer');
+		Route::get('/servico/inativos/', 'ServicosController@listaInativo')->name('servico.inativo');
+		Route::get('/servico/lista/', 'ServicosController@lista')->name('servico.lista');
+
 
 		Route::get('/arquivo/download/{id}', 'ArquivosController@download')->name('arquivo.download');
 
@@ -101,10 +104,7 @@ Route::get('/', function () {
 
 Route::get('/teste', function() {
 
-	$servico = App\Models\Unidade::pluck('status');
-
-	return $servico;
-    //
+	
 });
 
 

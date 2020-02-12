@@ -72,7 +72,7 @@ class AppServiceProvider extends ServiceProvider
 
                                 [
                                     'text'=>'Todos os serviços',
-                                    'url'  =>  ''.Auth::user()->privileges.'/servicos',
+                                    'url'  =>  route('servico.lista'),
                                     'icon'=>'glyphicon glyphicon-wrench',
 
 
@@ -102,6 +102,17 @@ class AppServiceProvider extends ServiceProvider
                                     'text' => 'Vencidos',
                                     'url'  =>  route('servico.vencido'),
                                     'icon'  =>  'glyphicon glyphicon-remove-sign text-red',
+                                ],
+                                [
+                                    'text' => 'Unid. inativas',
+                                    'url'  =>  route('servico.inativo'),
+                                    'icon'  =>  'glyphicon glyphicon-ban-circle text-red',
+                                ],
+                                [
+                                    'text' => 'Listagem geral',
+                                    'url'  =>  ''.Auth::user()->privileges.'/servicos',
+                                    'icon'  =>  'glyphicon glyphicon-th-list
+',
                                 ],
 
 

@@ -41,22 +41,40 @@
 	              	<td>{{$servico->unidade->codigo ?? ''}}</td>
 	              	<td><a href="{{$route}}">{{$empresa}}</a></td>
 	              	<td>
+
+	              		
+
 	              		@switch($servico->situacao)
 
 	              			@case('andamento')
-								<button type="button" class="btn btn-xs btn-warning">Andamento</button>
+
+								@if(($servico->licenca_validade >= date('Y-m-d')) && ($servico->tipo == 'primario'))
+									
+									<button type="button" class="btn btn-xs btn-success">Andamento</button>
+	              					@elseif(($servico->licenca_validade < date('Y-m-d'))&& ($servico->tipo == 'primario'))
+	              					<button type="button" class="btn btn-xs btn-danger">Andamento</button>
+								@elseif($servico->tipo == 'secundario')
+									<button type="button" class="btn btn-xs btn-warning">Andamento</button>
+
+	              				@endif
+
+								
+
+
 	              				@break
 
 	              			@case('finalizado')
 
-	              				@if($servico->licenca_validade >= date('Y-m-d'))
+	              				@if(($servico->licenca_validade >= date('Y-m-d')) && ($servico->tipo == 'primario'))
 									
 									<button type="button" class="btn btn-xs btn-success">Finalizado</button>
-	              					@elseif($servico->licenca_validade < date('Y-m-d'))
+	              					@elseif(($servico->licenca_validade < date('Y-m-d'))&& ($servico->tipo == 'primario'))
 	              					<button type="button" class="btn btn-xs btn-danger">Finalizado</button>
 
-	              				@endif
+	              				@elseif($servico->tipo == 'secundario')
+									<button type="button" class="btn btn-xs btn-warning">Finalizado</button>
 
+	              				@endif
 								
 	              				@break
 
@@ -65,6 +83,9 @@
 	              				@break
 
 	              		@endswitch
+
+					
+
 	              	</td>
 	              	
 
