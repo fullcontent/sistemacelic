@@ -209,12 +209,18 @@ class ServicosController extends Controller
 
             foreach($servico->taxas as $t)
             {
+                
+                if($t->boleto)
+                {
                 $arquivoTaxa = new Arquivo;
                 $arquivoTaxa->servico_id = $servico->id;
                 $arquivoTaxa->unidade_id = $servico->unidade_id;
                 $arquivoTaxa->nome = $t->nome;
                 $arquivoTaxa->arquivo = $t->boleto;
-                $arquivoTaxa->save();
+                $arquivoTaxa->save(); 
+                }
+
+                
 
                 if($t->comprovante)
                 {
