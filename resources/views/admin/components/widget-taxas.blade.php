@@ -1,6 +1,6 @@
 <div class="box box-info">
             <div class="box-header with-border">
-              <h3 class="box-title">Taxas em aberto</h3>
+              <h3 class="box-title">Taxa</h3>
 
               <div class="box-tools pull-right">
                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -24,7 +24,7 @@
                   </tr>
                   </thead>
                   <tbody>
-                    @foreach($taxas->where('situacao','aberto') as $taxa)
+                    @foreach($taxas as $taxa)
                   <tr>
                     <td><a href="{{route('taxas.show',$taxa->id)}}">{{$taxa->nome}}</a></td>
                     <td>R$ {{$taxa->valor}}</td>

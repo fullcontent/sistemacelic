@@ -139,8 +139,10 @@ class ArquivosController extends Controller
         $filename = $file->arquivo;
         $extension = substr($filename, -4);
         
-         $arquivo = $file->unidade->codigo.' - '.$file->unidade->nomeFantasia.' - '.$file->servico->nome.' - '.\Carbon\Carbon::create($file->servico->licenca_validade)->format('d-m-Y').$extension;
+        $arquivo = $file->unidade->codigo.' - '
+                    .$file->unidade->nomeFantasia.' - '.$file->nome.$extension;
 
+        
         
         return response()->download(public_path('uploads/'.$file->arquivo.''),$arquivo);
 

@@ -201,20 +201,44 @@ class ServicosController extends Controller
         $newService->situacao = 'andamento';
         $newService->os = $os;
 
-
         $newService->save();
 
+
+        if($servico->taxas)
+        {
+
+            foreach($servico->taxas as $t)
+            {
+                $arquivoTaxa = new Arquivo;
+                $arquivoTaxa->servico_id = $servico->id;
+                $arquivoTaxa->unidade_id = $servico->unidade_id;
+                $arquivoTaxa->nome = $t->nome;
+                $arquivoTaxa->arquivo = $t->boleto;
+                $arquivoTaxa->save();
+
+                if($t->comprovante)
+                {
+                    $arquivoTaxa = new Arquivo;
+                    $arquivoTaxa->servico_id = $servico->id;
+                    $arquivoTaxa->unidade_id = $servico->unidade_id;
+                    $arquivoTaxa->nome = 'Comprovante '.$t->nome;
+                    $arquivoTaxa->arquivo = $t->comprovante;
+                    $arquivoTaxa->save();
+                }
+            }
+
+
+        }
 
 
         $arquivoDigital = new Arquivo;
         $arquivoDigital->servico_id = $servico->id;
         $arquivoDigital->unidade_id = $servico->unidade_id;
-        $arquivoDigital->nome = $servico->nome.' - '.Carbon::create($servico->licenca_validade)->format('d/m/Y');
+        $arquivoDigital->nome = $servico->nome.' - '.Carbon::create($servico->licenca_validade)->format('d-m-Y');
         $arquivoDigital->arquivo = $servico->licenca_anexo;
         $arquivoDigital->save();
 
 
-        
 
 
         return redirect()->route('servicos.show',$newService->id);
