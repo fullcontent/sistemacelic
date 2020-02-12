@@ -30,7 +30,7 @@ class UnidadesController extends Controller
     public function index()
     {
         //
-        $unidades = Unidade::all();
+        $unidades = Unidade::with('servicos')->get();
         return view('admin.lista-unidades')->with('unidades',$unidades);
     }
 
