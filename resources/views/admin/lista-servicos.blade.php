@@ -107,6 +107,8 @@
 
 
 @section('js')
+
+
 <script src="http://cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"></script>
 <script>
 		$(function () {

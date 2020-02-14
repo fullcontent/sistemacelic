@@ -3,7 +3,7 @@
 
 
 @section('content_header')
-    <h1>Dashboard</h1>
+    <h1>Seja bem vindo, {{$user = Auth::user()->name}}</h1>
 @stop
 
 
@@ -19,69 +19,81 @@
 </div>
 @endforeach
 @endif
-<div class="row">
-        <div class="col-lg-3 col-xs-6">
-          <!-- small box -->
-          <div class="small-box bg-aqua">
-            <div class="inner">
-              <h3>150</h3>
 
-              <p>New Orders</p>
-            </div>
-            <div class="icon">
-              <i class="ion ion-bag"></i>
-            </div>
-            <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
-          </div>
-        </div>
-        <!-- ./col -->
+    
+    
+<div class="row">       
         <div class="col-lg-3 col-xs-6">
           <!-- small box -->
           <div class="small-box bg-green">
             <div class="inner">
-              <h3>53<sup style="font-size: 20px">%</sup></h3>
+              <h3>{{count($finalizados)}}</h3>
 
-              <p>Bounce Rate</p>
+              <p>Serviços Finalizados</p>
             </div>
             <div class="icon">
               <i class="ion ion-stats-bars"></i>
             </div>
-            <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            <a href="{{route('servico.finalizado')}}" class="small-box-footer">Visualizar <i class="fa fa-arrow-circle-right"></i></a>
           </div>
         </div>
         <!-- ./col -->
-        <div class="col-lg-3 col-xs-6">
-          <!-- small box -->
-          <div class="small-box bg-yellow">
-            <div class="inner">
-              <h3>44</h3>
-
-              <p>User Registrations</p>
-            </div>
-            <div class="icon">
-              <i class="ion ion-person-add"></i>
-            </div>
-            <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
-          </div>
-        </div>
-        <!-- ./col -->
+       
         <div class="col-lg-3 col-xs-6">
           <!-- small box -->
           <div class="small-box bg-red">
             <div class="inner">
-              <h3>65</h3>
+              <h3>{{count($vencer)}}</h3>
 
-              <p>Unique Visitors</p>
+              <p>Licenças a vencer</p>
+            </div>
+            <div class="icon">
+              
+              <i class="ion ion-alert"></i>
+            </div>
+            <a href="{{route('servico.vencer')}}" class="small-box-footer">Visualizar <i class="fa fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        <!-- ./col -->
+
+        <div class="col-lg-3 col-xs-6">
+          <!-- small box -->
+          <div class="small-box bg-yellow">
+            <div class="inner">
+              <h3>{{count($pendencias->where('status','pendente'))}}</h3>
+
+              <p>Pendencias não resolvidas</p>
             </div>
             <div class="icon">
               <i class="ion ion-pie-graph"></i>
             </div>
-            <a href="#" class="small-box-footer">More info <i class="fa fa-arrow-circle-right"></i></a>
+            <a href="#" class="small-box-footer"><i class="fa fa-arrow-circle-right"></i></a>
           </div>
         </div>
         <!-- ./col -->
       </div>
-    <p>You are logged in!</p>
-    <h1>{{$user = Auth::user()->name}}</h1>
-    <h2>{{$user = Auth::user()->privileges}}</h2>
+
+
+@if(count($pendencias->where('status','pendente')->where('vencimento',date('Y-m-d'))))
+
+@include('admin.components.widget-pendencias-dia')
+
+@endif
+
+
+@if(count($pendencias->where('status','pendente')->where('vencimento','<',date('Y-m-d'))))
+
+@include('admin.components.widget-pendencias-atrasadas')
+
+@endif
+
+
+@if(count($pendencias->where('status','pendente')))
+
+@include('admin.components.widget-pendencias-usuario')
+
+@endif
+
+
+
 @stop

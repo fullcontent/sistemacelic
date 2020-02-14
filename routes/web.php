@@ -22,11 +22,26 @@ Route::get('/', function () {
 	Route::prefix('admin')->group(function () {
 
 		
+		
+
 		Route::get('/home', function() {
 
-		
-		
-		return view('admin.dashboard');
+		$vencer = App\Models\Servico::where('licenca_validade','<',date('Y-m-d'))->where('situacao','finalizado')->where('responsavel_id',Auth::id())->get();
+
+		$finalizados = App\Models\Servico::where('situacao','finalizado')->where('responsavel_id',Auth::id())->get();
+
+
+		$pendencias = App\Models\Pendencia::with('servico','unidade')->where('responsavel_id',Auth::id())->get();
+
+
+		return view('admin.dashboard')
+					->with([
+						'vencer'=>$vencer,
+						'finalizados'=>$finalizados,
+						'pendencias'=>$pendencias,
+						
+					]);
+
 		})->name('home');
 
 
