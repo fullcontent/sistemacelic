@@ -86,6 +86,8 @@ Route::get('/', function () {
 
 
 		Route::get('/arquivo/download/{id}', 'ArquivosController@download')->name('arquivo.download');
+		Route::get('/arquivo/delete/{id}', 'ArquivosController@delete')->name('arquivo.delete');
+
 
 		Route::post('salvarInteracao', 'ServicosController@salvarInteracao')->name('interacao.store');
 

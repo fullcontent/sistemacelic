@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Arquivo;
+use Illuminate\Support\Facades\Storage;
+
 
 class ArquivosController extends Controller
 {
@@ -129,6 +131,9 @@ class ArquivosController extends Controller
     public function destroy($id)
     {
         //
+
+
+
     }
 
     public function download($id)
@@ -146,5 +151,18 @@ class ArquivosController extends Controller
         
         return response()->download(public_path('uploads/'.$file->arquivo.''),$arquivo);
 
+    }
+
+    public function delete($id)
+    {
+        $file = Arquivo::find($id);
+
+        $delete = Storage::delete($file->arquivo);
+
+        $file->delete();
+
+
+
+        return redirect()->back();
     }
 }

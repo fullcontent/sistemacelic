@@ -11,10 +11,11 @@
             <!-- /.box-header -->
             <div class="box-body">
               <div class="table-responsive">
-                <table class="table no-margin">
+                <table class="table no-margin" id="lista-arquivos">
                   <thead>
                   <tr>
                     <th>Nome</th>
+                    <th></th>
                     <th></th>
                   </tr>
                   </thead>
@@ -23,6 +24,7 @@
                    <tr>
                    	<td>{{$a->nome}}</td>
                    	<td><a href="{{ route('arquivo.download',$a->id) }}" class="btn btn-xs btn-default" target="_self">Download</a></td>
+                    <td><a href="{{route('arquivo.delete',$a->id)}}" onclick="return confirm('Tem certeza que deseja excluir o arquivo?');"><i class="fa fa-trash"></i></a></td>
                    </tr>
                   @endforeach
                   </tbody>
@@ -100,3 +102,30 @@
           <!-- /.modal-dialog -->
         </div>
           </div>
+
+
+@section('js')
+
+
+<script src="http://cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"></script>
+<script>
+    $(function () {
+        $('#lista-arquivos').DataTable({
+          "paging": false,
+          "lengthChange": false,
+          "searching": true,
+          "ordering": false,
+          "info": false,
+          "autoWidth": false,
+           "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
+            }           
+  });
+$('.confirmation').on('click', function () {
+            return confirm('Você deseja excluir o serviço?');
+          });
+         
+        });
+
+    </script>
+@stop
