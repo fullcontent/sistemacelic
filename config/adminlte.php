@@ -30,9 +30,11 @@ return [
     |
     */
 
-    'logo' => '<b>Sistema</b>Celic',
+    'logo' => '<img src="'.url('img/logoCastro2.png').'">',
 
-    'logo_mini' => '<b>C</b>elic',
+    'login_logo' => '<img src="'.url('img/logoCastro2.png').'">',
+
+    'logo_mini' => '<img src="'.url('img/logoCastro.png').'">',
 
     /*
     |--------------------------------------------------------------------------
