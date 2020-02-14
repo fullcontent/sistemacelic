@@ -36,7 +36,7 @@
                   <li>
                     <i class="fa fa-clock bg-gray"></i>
                     <div class="timeline-item">
-                      <a href="{{route('interacoes.lista',$servico->id)}}" class="btn btn-flat">Visualizar todas as interações</a>
+                      <a href="{{route('cliente.interacoes.lista',$servico->id)}}" class="btn btn-flat">Visualizar todas as interações</a>
 
                     </div>
                     
@@ -47,7 +47,7 @@
                 
                 <div class="box-header">
                   
-                  {!! Form::open(['route'=>'interacao.salvar']) !!}
+                  {!! Form::open(['route'=>'cliente.interacao.salvar']) !!}
                   <div class="input-group">
                   {!! Form::text('observacoes', null, ['class'=>'form-control','id'=>'observacoes','placeholder'=>'Digite a mensagem']) !!}
                   {!! Form::hidden('servico_id',$servico->id) !!}

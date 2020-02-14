@@ -24,7 +24,7 @@
                   </tr>
                   </thead>
                   <tbody>
-                    @foreach($taxas as $taxa)
+                    @foreach($taxas ?? '' as $taxa)
                   <tr>
                     <td><a href="{{route('taxas.show',$taxa->id)}}">{{$taxa->nome}}</a></td>
                     <td>R$ {{$taxa->valor}}</td>

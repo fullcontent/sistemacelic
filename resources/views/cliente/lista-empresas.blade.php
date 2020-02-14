@@ -33,8 +33,8 @@
 	              	<td>{{$empresa->cidade}}/{{$empresa->uf}}</td>
 	              	<td>{{$empresa->telefone}}</td>
 					
-					<td><a href="{{route('empresa.unidades',$empresa->id)}}" class="btn btn-flat btn-info">Unidades</a>
-						<a href="{{route('empresa.show',$empresa->id)}}" class="btn btn-flat btn-warning">Detalhes</a>
+					<td><a href="{{route('cliente.empresa.unidades',$empresa->id)}}" class="btn btn-flat btn-info">Unidades</a>
+						<a href="{{route('cliente.empresa.show',$empresa->id)}}" class="btn btn-flat btn-warning">Detalhes</a>
 						</td>
 	                </tr>
 	            @endforeach

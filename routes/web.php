@@ -95,33 +95,33 @@ Route::get('/', function () {
 
 	Route::prefix('cliente')->group(function () {
 
-			Route::get('/home', 'ClienteController@index');
+Route::get('/home', 'ClienteController@index')->name('cliente.home');
+Route::get('/empresas', 'ClienteController@empresas')->name('cliente.empresas');
+Route::get('/empresa/{id}', 'ClienteController@empresaShow')->name('cliente.empresa.show');
+Route::get('/empresa/{id}/unidades', 'ClienteController@empresaUnidades')->name('cliente.empresa.unidades');
+Route::get('/unidades', 'ClienteController@unidades')->name('cliente.unidades');
+Route::get('/unidade/{id}', 'ClienteController@unidadeShow')->name('cliente.unidade.show');
+Route::get('/servicos', 'ClienteController@servicos')->name('cliente.servicos');
+Route::get('/servico/andamento/', 'ClienteController@listaAndamento')->name('cliente.servico.andamento');
+Route::get('/servico/finalizados/', 'ClienteController@listaFinalizados')->name('cliente.servico.finalizado');
+Route::get('/servico/vigentes/', 'ClienteController@listaVigentes')->name('cliente.servico.vigente');
+Route::get('/servico/vencidos/', 'ClienteController@listaVencidos')->name('cliente.servico.vencido');
+Route::get('/servico/vencer/', 'ClienteController@listaVencer')->name('cliente.servico.vencer');
+Route::get('/servico/inativos/', 'ClienteController@listaInativo')->name('cliente.servico.inativo');
+Route::get('/servico/{id}', 'ClienteController@servicoShow')->name('cliente.servico.show');
+Route::post('salvarInteracao', 'ClienteController@salvarInteracao')->name('cliente.interacao.salvar');
+Route::get('/servico/{id}/interacoes', 'ClienteController@interacoes')->name('cliente.interacoes.lista');
 
-			Route::get('/empresas', 'ClienteController@empresas')->name('empresas');
-			Route::get('/empresa/{id}', 'ClienteController@empresaShow')->name('empresa.show');
-			Route::get('/empresa/{id}/unidades', 'ClienteController@empresaUnidades')->name('cliente.empresa.unidades');
-
-
-
-
-			Route::get('/unidades', 'ClienteController@unidades')->name('unidades');
-			Route::get('/unidade/{id}', 'ClienteController@unidadeShow')->name('unidade.show');
-
-
-			Route::get('/servicos', 'ClienteController@servicos')->name('servicos');
-			Route::get('/servico/{id}', 'ClienteController@servicoShow')->name('servico.show');
-			Route::post('salvarInteracao', 'ClienteController@salvarInteracao')->name('interacao.salvar');
-			Route::get('/servico/{id}/interacoes', 'ClienteController@interacoes')->name('interacoes.lista');
-
-
-
-			Route::get('/usuarios', 'ClienteController@usuarios')->name('usuarios');
+			
 
 	});
 
 Route::get('/teste', function() {
 
-	
+	$u = App\User::find(1);
+
+	$u->privileges = 'cliente';
+	$u->save();
 });
 
 

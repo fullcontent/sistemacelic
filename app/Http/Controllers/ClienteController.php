@@ -20,6 +20,9 @@ use Illuminate\Support\Facades\Validator;
 class ClienteController extends Controller
 {
     //
+
+
+
     public function __construct()
     {
         
@@ -122,7 +125,138 @@ class ClienteController extends Controller
                         'servico'=>$servico,
                         'dados'=>$dados,
                         'route'=>$route,
+                        'taxas'=>$servico->taxas,
                     ]);
+    }
+
+
+    public function listaAndamento()
+    {
+        
+         $user = User::find(Auth::id());
+
+        
+        $servicos = Servico::with('unidade','empresa','responsavel')
+                            ->whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))
+                            ->where('situacao','andamento')
+                            
+                            ->get();
+
+
+       $servicos = $servicos->where('unidade.status','Ativa'); 
+
+    
+
+        return view('cliente.lista-servicos')
+                    ->with(
+                        [
+                            'servicos'=>$servicos,
+                            'title'=>'Serviços em Andamento',
+                        ]);
+    }
+
+    public function listaFinalizados()
+    {
+        
+         $user = User::find(Auth::id());
+        
+        $servicos = Servico::with('unidade','empresa','responsavel')
+                                ->whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))
+                                ->where('situacao','finalizado')
+                                ->get();
+
+        $servicos = $servicos->where('unidade.status','Ativa');                               
+
+        return view('cliente.lista-servicos')
+                    ->with(
+                        [
+                            'servicos'=>$servicos,
+                            'title'=>'Serviços Finalizados',
+                        ]);
+    }
+
+    public function listaVigentes()
+    {   
+
+         $user = User::find(Auth::id());
+        
+        $servicos = Servico::with('unidade','empresa','responsavel')
+                        ->whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))
+                        ->where('licenca_validade','>',date('Y-m-d'))
+                        ->where('tipo','primario')
+                        ->get();
+       
+
+        $servicos = $servicos->where('unidade.status','Ativa');
+
+        return view('cliente.lista-servicos')
+                    ->with(
+                        [
+                            'servicos'=>$servicos,
+                            'title'=>'Serviços com licenças vigentes',
+                        ]);
+    }
+
+    public function listaVencidos()
+    {
+        
+
+        $user = User::find(Auth::id());
+        $servicos = Servico::with('unidade','empresa','responsavel')
+                            ->whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))
+                            ->where('licenca_validade','<',date('Y-m-d'))
+                            
+                            ->where('tipo','primario')
+                            ->get();
+        
+       $servicos = $servicos->where('unidade.status','Ativa');
+
+       
+
+
+        return view('cliente.lista-servicos')
+                    ->with(
+                        [
+                            'servicos'=>$servicos,
+                            'title'=>'Serviços com licenças vencidas',
+                        ]);
+    }
+
+    public function listaVencer()
+    {
+         $user = User::find(Auth::id());
+        $servicos = Servico::with('unidade','empresa','responsavel')
+                            ->whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))
+                            ->where('licenca_validade','<',\Carbon\Carbon::today()->addDays(60))
+                            ->where('situacao','Finalizado')
+                            ->get();
+
+       $servicos = $servicos->where('unidade.status','Ativa');
+
+        return view('cliente.lista-servicos')
+                    ->with(
+                        [
+                            'servicos'=>$servicos,
+                            'title'=>'Serviços com licenças a vencer',
+                        ]);
+    }
+
+    public function listaInativo()
+    {
+         $user = User::find(Auth::id());
+        $servicos = Servico::with('unidade','empresa','responsavel')
+                            ->whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))
+                            
+                            ->get();
+
+       $servicos = $servicos->where('unidade.status','Inativa');
+
+        return view('cliente.lista-servicos')
+                    ->with(
+                        [
+                            'servicos'=>$servicos,
+                            'title'=>'Serviços de unidades inativas',
+                        ]);
     }
 
     public function salvarInteracao(Request $request)
@@ -143,7 +277,7 @@ class ClienteController extends Controller
 
         $interacao->save();
 
-        return redirect()->route('servico.show', $request->servico_id);
+        return redirect()->route('cliente.servico.show', $request->servico_id);
     }
 
     public function interacoes($id)

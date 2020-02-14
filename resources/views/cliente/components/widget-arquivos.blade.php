@@ -32,9 +32,8 @@
             </div>
             <!-- /.box-body -->
             <div class="box-footer clearfix">
-              <button type="button" class="btn btn-info" data-toggle="modal" data-target="#cadastro-arquivo">
-                <span class="glyphicon glyphicon-plus-sign"></span> Adicionar
-              </button>
+              
+              
               
             </div>
             <!-- /.box-footer -->

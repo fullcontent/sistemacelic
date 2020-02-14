@@ -27,12 +27,12 @@
 
 	              	
 	              	
-	              	<td><a href="{{route('unidade.show', $unidade->id)}}">{{$unidade->nomeFantasia}}</a></td>
+	              	<td><a href="{{route('cliente.unidade.show', $unidade->id)}}">{{$unidade->nomeFantasia}}</a></td>
 	              	<td>{{$unidade->cnpj}}</td>
 	              	<td>{{$unidade->cidade}}/{{$unidade->uf}}</td>
 	              	<td>{{$unidade->telefone}}</td>
 	              	
-					<td><a href="{{route('unidade.show', $unidade->id)}}" class="btn btn-flat btn-warning">Detalhes</a></td>
+					<td><a href="{{route('cliente.unidade.show', $unidade->id)}}" class="btn btn-flat btn-warning">Detalhes</a></td>
 	                </tr>
 	            @endforeach
                 </tbody>

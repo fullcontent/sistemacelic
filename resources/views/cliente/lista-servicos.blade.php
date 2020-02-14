@@ -6,7 +6,7 @@
 	
 	<div class="box">
 				<div class="box-header">
-					<h2>Listando todos os serviços</h2>
+					<h2>{{$title}}</h2>
 				</div>
 
 				<table id="lista-servicos" class="table table-bordered table-hover">
@@ -48,7 +48,7 @@
 	              	<td><span class="label {{$label}}">{{$servico->situacao}}</span></td>
 	              	<td>{{$servico->responsavel->name}}</td>
 
-					<td><a href="{{route('servico.show', $servico->id)}}" class="btn btn-flat btn-warning">Detalhes</a></td>
+					<td><a href="{{route('cliente.servico.show', $servico->id)}}" class="btn btn-flat btn-warning">Detalhes</a></td>
 	                </tr>
 	            @endforeach
                 </tbody>

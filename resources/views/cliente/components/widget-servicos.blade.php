@@ -1,6 +1,6 @@
 <div class="box box-info">
             <div class="box-header with-border">
-              <h3 class="box-title">Serviços</h3>
+              <h3 class="box-title">Serviços primários</h3>
 
               <div class="box-tools pull-right">
                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -11,24 +11,54 @@
             <!-- /.box-header -->
             <div class="box-body">
               <div class="table-responsive">
-                <table class="table no-margin">
+                <table class="table no-margin" id="servicos">
                   <thead>
                   <tr>
-                    <th>OS</th>
+                    
                     <th>Serviço</th>
                     <th>Status</th>
-                    <th>Obs</th>
-                    <th></th>
+                  
                   </tr>
                   </thead>
                   <tbody>
-                    @foreach($servicos as $servico)
+                    @foreach($servicos->where('tipo','primario') as $servico)
                   <tr>
-                    <td>{{$servico->os}}</td>
-                    <td>{{$servico->nome}}</td>
-                    <td><span class="label label-success">{{$servico->situacao}}</span></td>
-                    <td>{{$servico->observacoes}}</td>
-                    <td><a href="{{route('servico.show',$servico->id)}}">Detalhes</a></td>
+                    
+                    <td><a href="{{route('cliente.servico.show',$servico->id)}}">{{$servico->os}} | {{$servico->nome}}</a></td>
+                    <td>
+                      @switch($servico->situacao)
+
+                      @case('andamento')
+                          @if($servico->licenca_validade >= date('Y-m-d'))
+                  
+                           <a href="{{route('cliente.servico.show',$servico->id)}}" class="btn btn-xs btn-success">Andamento</a>
+                          @elseif($servico->licenca_validade < date('Y-m-d'))
+                          <a href="{{route('cliente.servico.show',$servico->id)}}" class="btn btn-xs btn-danger">Andamento</a>
+
+                        @endif
+                        @break
+
+                      @case('finalizado')
+
+                        @if($servico->licenca_validade >= date('Y-m-d'))
+                  
+                           <a href="{{route('cliente.servico.show',$servico->id)}}" class="btn btn-xs btn-success">Finalizado</a>
+                          @elseif($servico->licenca_validade < date('Y-m-d'))
+                          <a href="{{route('cliente.servico.show',$servico->id)}}" class="btn btn-xs btn-danger">Finalizado</a>
+
+                        @endif
+
+                
+                        @break
+
+                      @case('arquivado')
+                <button type="button" class="btn btn-xs btn-default">Arquivado</button>
+                        @break
+
+                    @endswitch
+                    </td>
+                    
+                    
                   </tr>
                   @endforeach
                   
@@ -38,6 +68,10 @@
               <!-- /.table-responsive -->
             </div>
             <!-- /.box-body -->
-            
+            <div class="box-footer clearfix">
+             
+            </div>
             <!-- /.box-footer -->
           </div>
+
+

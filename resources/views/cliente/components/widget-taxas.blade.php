@@ -1,6 +1,6 @@
 <div class="box box-info">
             <div class="box-header with-border">
-              <h3 class="box-title">Taxas</h3>
+              <h3 class="box-title">Taxa</h3>
 
               <div class="box-tools pull-right">
                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -18,16 +18,55 @@
                     <th>Valor</th>
                     <th>Vencimento</th>
                     <th>Situacao</th>
+                    <th>O.S.</th>
+                    <th></th>
+                    
                   </tr>
                   </thead>
                   <tbody>
-                    @foreach($taxas->take(5) as $taxa)
+                    @foreach($taxas ?? '' as $taxa)
                   <tr>
-                    <td>{{$taxa->nome}}</td>
+                    <td><a href="{{route('taxas.show',$taxa->id)}}">{{$taxa->nome}}</a></td>
                     <td>R$ {{$taxa->valor}}</td>
-                    <td><span class="label label-success">{{ \Carbon\Carbon::parse($taxa->vencimento)->format('d/m/Y')}}
+                    <td><span class="label label-default">{{ \Carbon\Carbon::parse($taxa->vencimento)->format('d/m/Y')}}
 </span></td>
-                    <td>{{$taxa->situacao}}</td>
+                    <td>
+                      @switch($taxa->vencimento)
+
+                        @case($taxa->vencimento >= date('Y-m-d'))
+                            @if($taxa->comprovante)
+                              <span class="label label-success">Pago</span>
+                            @else
+                            
+                            <span class="label label-warning">Aberto</span>
+                          @endif
+                          
+                        @break
+                      
+                        @case($taxa->vencimento < date('Y-m-d'))
+                            @if($taxa->comprovante)
+                                <span class="label label-success">Pago</span>
+                            @else
+                            <span class="label label-danger">Vencida</span>
+                            @endif
+                        @break
+                      @endswitch
+                    </td>
+                    <td>{{$taxa->servico->os}}</td>
+                    <td>
+        @if(empty($taxa->comprovante))
+        @unless ( empty($taxa->boleto))
+        
+        <a href="{{ url("uploads/$taxa->boleto") }}" class="btn btn-xs btn-warning" target="_blank">Ver Boleto</a>
+        @endunless
+        @endif
+        
+        @unless ( empty($taxa->comprovante) )
+        
+        <a href="{{ url("uploads/$taxa->comprovante") }}" class="btn btn-xs btn-success" target="_blank">Ver Comprovante</a>
+        @endunless</td>
+        
+
                   </tr>
                   @endforeach
                   
@@ -38,7 +77,8 @@
             </div>
             <!-- /.box-body -->
             <div class="box-footer clearfix">
-              <a href="javascript:void(0)" class="btn btn-sm btn-default btn-flat pull-right">Todas as Taxas</a>
+           
+              
             </div>
             <!-- /.box-footer -->
           </div>
