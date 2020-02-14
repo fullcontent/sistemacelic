@@ -114,7 +114,7 @@ class ServicosController extends Controller
         
         $servicos = Servico::with('unidade','empresa','responsavel')
                             ->where('licenca_validade','<',date('Y-m-d'))
-                            ->orWhereNull('licenca_validade')
+                         
                             ->where('tipo','primario')
                             ->where('responsavel_id',Auth::id())
 

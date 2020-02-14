@@ -195,7 +195,7 @@ class AppServiceProvider extends ServiceProvider
                             ],
                                 
                             ]//EndSubmenu
-                            ],
+                            ]
 
 
 
