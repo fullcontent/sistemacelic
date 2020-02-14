@@ -25,7 +25,7 @@
                   </tr>
                   </thead>
                   <tbody>
-                    @foreach(@if(count($pendencias->where('status','pendente')->where('vencimento',date('Y-m-d')))) as $p)
+                    @foreach($pendencias->where('status','pendente')->where('vencimento',date('Y-m-d')) as $p)
                   <tr>
                     <td><a href="{{route('servicos.show',$p->servico_id)}}">{{$p->servico['unidade']['codigo']}}</a></td>
                     <td><a href="{{route('servicos.show',$p->servico_id)}}">{{$p->servico['unidade']['nomeFantasia']}}</a></td>
