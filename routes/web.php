@@ -65,7 +65,6 @@ Route::get('/', function () {
 		Route::get('/usuario/editar/{id}', 'UsersController@editar')->name('usuario.editar');
 		Route::post('/usuario/editar/{id}', 'UsersController@update')->name('usuario.update');
 		Route::post('/usuario','UsersController@store')->name('usuario.store');
-		Route::post('salvarInteracao', 'ServicosController@salvarInteracao')->name('interacao.store');
 		Route::get('/servico/delete/{id}','ServicosController@delete')->name('servico.delete');
 
 		Route::get('/pendencia/done/{id}', 'PendenciasController@done')->name('pendencia.done');
@@ -87,6 +86,13 @@ Route::get('/', function () {
 
 
 		Route::get('/arquivo/download/{id}', 'ArquivosController@download')->name('arquivo.download');
+
+		Route::post('salvarInteracao', 'ServicosController@salvarInteracao')->name('interacao.store');
+
+
+		
+		Route::get('/servico/{id}/interacoes', 'ServicosController@interacoes')->name('interacoes.lista');
+
 
 		
 		
@@ -120,7 +126,7 @@ Route::get('/teste', function() {
 
 	$u = App\User::find(1);
 
-	$u->privileges = 'cliente';
+	$u->privileges = 'admin';
 	$u->save();
 });
 

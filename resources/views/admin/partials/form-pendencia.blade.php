@@ -57,13 +57,26 @@
 
 </div>
 
+
+
 @section('js')
 
 <script>
 	
 	$(document).ready(function() {
 
-  	$("#vencimento").datepicker();
+    // Get users 'today' date
+var Today = new Date();
+
+  	$("#vencimento").datepicker({
+      defaultDate:Today,
+      showButtonPanel:true,
+      todayHighlight: true,
+
+    });
+    
+
+  
 
    	
 	  	

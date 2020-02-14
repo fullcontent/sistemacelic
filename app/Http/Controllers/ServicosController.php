@@ -697,10 +697,10 @@ class ServicosController extends Controller
     }
 
 
-    public function listarInteracoes($id)
+    public function interacoes($id)
     {
-        
-        return $id;
+        $interacoes = Historico::where('servico_id',$id)->orderBy('created_at','desc')->get();
 
+        return view('admin.lista-interacoes')->with('interacoes',$interacoes);
     }
 }
