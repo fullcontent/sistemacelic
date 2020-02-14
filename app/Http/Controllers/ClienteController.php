@@ -101,7 +101,8 @@ class ClienteController extends Controller
     	$servicos = Servico::whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))->with('unidade','empresa','responsavel')->get();
 
         return view('cliente.lista-servicos')
-                    ->with('servicos', $servicos);
+                    ->with('servicos', $servicos)
+                    ->with('title','Listando todos os serviços');
 
 
     }
