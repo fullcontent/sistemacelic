@@ -126,10 +126,14 @@ Route::get('/servico/{id}/interacoes', 'ClienteController@interacoes')->name('cl
 
 Route::get('/teste', function() {
 
-	$u = App\User::find(1);
+	$s = App\Models\Servico::where('id',1)->get();
 
-	$u->privileges = 'admin';
-	$u->save();
+	$p = App\Models\Pendencia::where('servico_id',2)->get();
+
+
+	
+
+	dump($p);
 });
 
 

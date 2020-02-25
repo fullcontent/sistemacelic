@@ -19,8 +19,7 @@
 	
 
       			<div class="box-footer">
-      			<a href="{!!redirect()->back()!!}" class="btn btn-default">Voltar</a>
-                
+      			            
                 <button type="submit" class="btn btn-info">Cadastrar</button>
               	</div>
     	
