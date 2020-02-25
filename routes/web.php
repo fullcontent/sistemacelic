@@ -26,12 +26,15 @@ Route::get('/', function () {
 
 		Route::get('/home', function() {
 
-		$vencer = App\Models\Servico::where('licenca_validade','<',date('Y-m-d'))->where('situacao','finalizado')->where('responsavel_id',Auth::id())->get();
+			$user = Auth::id();
+			// $user = App\User::find(2);
 
-		$finalizados = App\Models\Servico::where('situacao','finalizado')->where('responsavel_id',Auth::id())->get();
+		$vencer = App\Models\Servico::where('licenca_validade','<',date('Y-m-d'))->where('situacao','finalizado')->where('responsavel_id',$user)->get();
+
+		$finalizados = App\Models\Servico::where('situacao','finalizado')->where('responsavel_id',$user)->get();
 
 
-		$pendencias = App\Models\Pendencia::with('servico','unidade')->where('responsavel_id',Auth::id())->get();
+		$pendencias = App\Models\Pendencia::with('servico','unidade')->where('responsavel_id',$user)->get();
 
 
 		return view('admin.dashboard')

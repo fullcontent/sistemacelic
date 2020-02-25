@@ -62,7 +62,7 @@
             <div class="inner">
               <h3>{{count($pendencias->where('status','pendente'))}}</h3>
 
-              <p>Pendencias não resolvidas</p>
+              <p>Serviços em andamento</p>
             </div>
             <div class="icon">
               <i class="ion ion-pie-graph"></i>
