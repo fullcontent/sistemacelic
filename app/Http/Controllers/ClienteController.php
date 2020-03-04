@@ -55,7 +55,8 @@ class ClienteController extends Controller
     }
 
     public function empresaShow($id)
-    {
+    {   
+
         $empresa = Empresa::find($id);
         return view('cliente.detalhe-empresa')
                     ->with([
@@ -67,21 +68,52 @@ class ClienteController extends Controller
     }
 
     public function unidadeShow($id)
-    {
+    {   
+
+
         $unidade = Unidade::find($id);
-        return view('cliente.detalhe-empresa')
+        $access = UserAccess::where('user_id',Auth::id())->whereNull('empresa_id')->get();
+
+        if($access->pluck('unidade_id')->contains($id))
+        {
+            return view('cliente.detalhe-empresa')
                     ->with([
                         'dados'=>$unidade,
                         'servicos'=>$unidade->servicos,
                         'taxas' => $unidade->taxas,
                         'route' => 'unidades.edit',
                     ]);
+        }
+        else
+        {
+            return view('errors.403');
+        }
+
+
+        
+        
     }
 
     public function empresaUnidades($id)
-    {
+    {   
         $unidades = Unidade::with('empresa')->where('empresa_id','=',$id)->get();
-        return view('cliente.lista-unidades')->with('unidades',$unidades);
+
+        $access = UserAccess::where('user_id',Auth::id())->whereNull('unidade_id')->get();
+
+        if($access->pluck('empresa_id')->contains($id))
+        {
+            return view('cliente.lista-unidades')->with('unidades',$unidades);
+        }
+
+        else
+        {
+            return view('errors.403');
+        }
+
+
+
+
+        
     }
 
     public function unidades()
@@ -108,7 +140,12 @@ class ClienteController extends Controller
     }
 
     public function servicoShow($id)
-    {
+    {   
+
+
+
+
+
         $servico = Servico::find($id);
 
         if($servico->unidade_id){
