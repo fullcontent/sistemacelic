@@ -345,6 +345,8 @@ class ServicosController extends Controller
             
         }
 
+        $servico = null;
+
        
          
 
@@ -355,6 +357,7 @@ class ServicosController extends Controller
                     'id'=>$id,
                     'users'=>$users,
                     'os' => $os,
+                    'servico'=>$servico,
                 ]);
     }
 

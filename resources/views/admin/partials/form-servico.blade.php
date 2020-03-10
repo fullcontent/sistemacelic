@@ -26,16 +26,8 @@
 	
 	<div class="form-group">
 		
-		@if($servico->situacao == 'arquivado')
-			
-			{!! Form::label('situacao', 'Situação', array('class'=>'control-label')) !!}
-			{!! Form::select('situacao', array('arquivado' => 'Arquivado'), null, ['class'=>'form-control','disabled'=>true])!!}
-		@else
-
 		{!! Form::label('situacao', 'Situação', array('class'=>'control-label')) !!}
-		{!! Form::select('situacao', array('andamento' => 'Andamento', 'finalizado' => 'Finalizado'), null, ['class'=>'form-control'])!!}
-
-		@endif
+			{!! Form::select('situacao', array('andamento' => 'Andamento', 'finalizado' => 'Finalizado','arquivado'=>'Arquivado'), null, ['class'=>'form-control'])!!}
 
 		
 		
