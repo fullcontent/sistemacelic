@@ -129,14 +129,13 @@ Route::get('/servico/{id}/interacoes', 'ClienteController@interacoes')->name('cl
 
 Route::get('/teste', function() {
 
-	$s = App\Models\Servico::where('id',1)->get();
+		
 
-	$p = App\Models\Pendencia::where('servico_id',2)->get();
+		
 
-
+		$s = \App\Models\Pendencia::where('servico_id','')->get();
+		dump($s);
 	
-
-	dump($p);
 });
 
 

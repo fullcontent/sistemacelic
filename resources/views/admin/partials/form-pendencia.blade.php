@@ -29,7 +29,7 @@
        <div class="col-md-3">
         <div class="form-group">
         {!! Form::label('responsavel_tipo', 'Responsabilidade', array('class'=>'control-label')) !!}
-        {!! Form::select('responsavel_tipo', array('usuario' => 'Castro', 'cliente' => 'Cliente','op'=>'Orgão Público'), 'usuario', ['class'=>'form-control','id'=>'responsavel_tipo']) !!}
+        {!! Form::select('responsavel_tipo', array('usuario' => 'Castro', 'cliente' => 'Cliente','op'=>'Orgão Público'), null, ['class'=>'form-control','id'=>'responsavel_tipo']) !!}
         </div>
         
       </div>
