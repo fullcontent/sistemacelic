@@ -14,7 +14,7 @@
             <!-- /.box-header -->
             <div class="box-body">
               <div class="table-responsive">
-                <table id="lista-pendencias" class="table table-bordered table-hover">
+                <table id="lista-pendencias-atrasadas" class="table table-bordered table-hover">
                   <thead>
                   <tr>
                     <th>Cod.</th>
