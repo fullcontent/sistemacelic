@@ -687,7 +687,14 @@ class ServicosController extends Controller
 
     public function delete($id)
     {
-        $servico = Servico::destroy($id);
+        $servico = Servico::find($id);
+
+        $servico->pendencias()->delete();
+        $servico->taxas()->delete();
+
+        $servico->delete();
+
+
         return redirect()->route('servico.lista');
     }
 
