@@ -97,6 +97,11 @@ class AppServiceProvider extends ServiceProvider
                             'icon'  =>  'glyphicon glyphicon-ok-sign text-green',
                             ],
                             [
+                            'text' => 'Arquivados',
+                            'url'  =>  route('servico.arquivado'),
+                            'icon'  =>  'glyphicon glyphicon-inbox',
+                            ],
+                            [
                             'text' => 'Vigentes',
                             'url'  =>  route('servico.vigente'),
                             'icon'  =>  'glyphicon glyphicon-tags text-aqua',

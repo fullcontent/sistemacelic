@@ -65,7 +65,7 @@
 	              	<td>
 	              	@php
 
-	              	$lic = $unidade->servicos->where('tipo','primario');
+	              	$lic = $unidade->servicos->where('tipo','primario')->unique('nome');
 
 
 
