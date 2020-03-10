@@ -109,6 +109,23 @@ class ServicosController extends Controller
                     ->with('servicos',$servicos);
     }
 
+    public function listaArquivados()
+    {
+        
+        $servicos = Servico::with('unidade','empresa','responsavel')
+                        // ->where('licenca_validade','>',date('Y-m-d'))
+                        // ->where('tipo','primario')
+                        ->where('responsavel_id',Auth::id())
+                        ->where('situacao','arquivado')
+                        ->get();
+       
+
+        $servicos = $servicos->where('unidade.status','Ativa');
+
+        return view('admin.lista-servicos')
+                    ->with('servicos',$servicos);
+    }
+
     public function listaVencidos()
     {
         
