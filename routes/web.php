@@ -132,11 +132,6 @@ Route::get('/teste', function() {
 
 		
 
-		
-
-		$s = \App\Models\Pendencia::where('servico_id',557)->delete();
-		dump($s);
-	
 });
 
 

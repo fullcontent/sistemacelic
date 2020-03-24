@@ -101,6 +101,50 @@
 </div>
 
 
+<div class="col-md-12">
+	
+	
+</div>
+
+
+<div class="col-md-4">
+	
+	<div class="form-group">
+		
+		{!! Form::label('laudo_numero', 'N. laudo de exigência', array('class'=>'control-label')) !!}
+		{!! Form::text('laudo_numero', null, ['class'=>'form-control','id'=>'laudo_numero']) !!}
+		
+	</div>
+</div>
+
+<div class="col-md-4">
+	
+	<div class="form-group">
+		
+		{!! Form::label('laudo_emissao', 'Emissão laudo', array('class'=>'control-label')) !!}
+		{!! Form::text('laudo_emissao', null, ['class'=>'form-control','id'=>'laudo_emissao','data-date-format'=>'dd/mm/yyyy']) !!}
+		
+	</div>
+</div>
+
+
+	
+
+<div class="col-md-4">
+	
+	<div class="form-group">
+		
+		{!! Form::label('laudo_anexo', 'Anexo laudo.', array('class'=>'control-label')) !!}
+		{!! Form::file('laudo_anexo', null, ['class'=>'form-control','id'=>'laudo_anexo']) !!}
+
+		@unless ( empty($servico->laudo_anexo) )
+    		
+    		<a href="{{ url("storage/$servico->laudo_anexo") }}" class="btn btn-xs btn-warning" target="_blank">Ver laudo</a>
+		@endunless
+		
+	</div>
+</div>
+
 
 
 

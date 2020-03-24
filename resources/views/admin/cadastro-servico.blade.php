@@ -38,6 +38,7 @@
   	$("#protocolo_emissao").datepicker();
   	$("#licenca_emissao").datepicker();
   	$("#licenca_vencimento").datepicker();
+  	$("#laudo_emissao").datepicker();
 
   	$("#os").val("{!! $os !!}");  	
 	  	

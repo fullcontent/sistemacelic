@@ -381,6 +381,11 @@ class ServicosController extends Controller
 
         
         $servico->protocolo_numero  =   $request->protocolo_numero;
+        
+
+        
+
+        $servico->laudo_numero = $request->laudo_numero;
 
         
         if($request->protocolo_emissao)
@@ -397,7 +402,14 @@ class ServicosController extends Controller
             $servico->licenca_validade = Carbon::createFromFormat('d/m/Y', $request->licenca_validade)->toDateString();
         }
 
-        // return $request;
+        if($request->laudo_emissao)
+        {
+            $servico->laudo_emissao = Carbon::createFromFormat('d/m/Y', $request->laudo_emissao)->toDateString();
+        }
+
+        
+
+
 
 
         //Upload de anexos com md5
@@ -429,6 +441,21 @@ class ServicosController extends Controller
                 // Se tiver funcionado o arquivo foi armazenado em storage/app/public/categories/nomedinamicoarquivo.extensao
 
                 $servico->protocolo_anexo = $upload;
+
+
+            }
+
+        if ($request->hasFile('laudo_anexo') && $request->file('laudo_anexo')->isValid()) {
+                $nameFile = null;
+                $name = uniqid(date('HisYmd'));
+                $extension = $request->laudo_anexo->extension();
+
+                $nameFile = "{$name}.{$extension}";
+                // Faz o upload:
+                $upload = $request->laudo_anexo->storeAs('protocolos', $nameFile);
+                // Se tiver funcionado o arquivo foi armazenado em storage/app/public/categories/nomedinamicoarquivo.extensao
+
+                $servico->laudo_anexo = $upload;
 
 
             }
@@ -555,6 +582,11 @@ class ServicosController extends Controller
        {
         $servico->licenca_validade = date('d/m/Y',strtotime($servico->licenca_validade));
        }
+
+       if($servico->laudo_emissao)
+       {
+        $servico->laudo_emissao = date('d/m/Y',strtotime($servico->laudo_emissao));
+       }
         
         
         return view('admin.editar-servico')
@@ -585,6 +617,7 @@ class ServicosController extends Controller
 
         
         $servico->protocolo_numero  =   $request->protocolo_numero;
+        $servico->laudo_numero = $request->laudo_numero;
 
 
        
@@ -620,6 +653,23 @@ class ServicosController extends Controller
 
             }
 
+          // Se informou o arquivo, retorna um boolean
+        if ($request->hasFile('laudo_anexo') && $request->file('laudo_anexo')->isValid()) {
+                $nameFile = null;
+                $name = uniqid(date('HisYmd'));
+                $extension = $request->laudo_anexo->extension();
+                $nameFile = "{$name}.{$extension}";
+                // Faz o upload:
+                $upload = $request->laudo_anexo->storeAs('protocolos', $nameFile);
+                // Se tiver funcionado o arquivo foi armazenado em storage/app/public/categories/nomedinamicoarquivo.extensao
+
+                $servico->laudo_anexo = $upload;
+
+
+            }
+
+
+
 
        if($request->protocolo_emissao)
         {
@@ -640,6 +690,11 @@ class ServicosController extends Controller
 
         {
             $servico->licenca_validade = $request->licenca_validade;
+        }
+
+        if($request->laudo_emissao)
+        {
+            $servico->laudo_emissao = Carbon::createFromFormat('d/m/Y', $request->laudo_emissao)->toDateString();
         }
 
         $servico->observacoes   = $request->observacoes;
