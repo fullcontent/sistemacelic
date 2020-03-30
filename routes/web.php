@@ -24,28 +24,7 @@ Route::get('/', function () {
 		
 		
 
-		Route::get('/home', function() {
-
-			$user = Auth::id();
-			// $user = App\User::find(2);
-
-		$vencer = App\Models\Servico::where('licenca_validade','<',date('Y-m-d'))->where('situacao','finalizado')->where('responsavel_id',$user)->get();
-
-		$finalizados = App\Models\Servico::where('situacao','finalizado')->where('responsavel_id',$user)->get();
-
-
-		$pendencias = App\Models\Pendencia::with('servico','unidade')->where('responsavel_id',$user)->get();
-
-
-		return view('admin.dashboard')
-					->with([
-						'vencer'=>$vencer,
-						'finalizados'=>$finalizados,
-						'pendencias'=>$pendencias,
-						
-					]);
-
-		})->name('home');
+		Route::get('/home', 'AdminController@index')->name('dashboard');
 
 
 
@@ -130,7 +109,7 @@ Route::get('/servico/{id}/interacoes', 'ClienteController@interacoes')->name('cl
 
 Route::get('/teste', function() {
 
-		return "teste";
+		
 
 });
 

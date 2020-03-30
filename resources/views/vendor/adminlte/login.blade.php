@@ -15,6 +15,7 @@
         <!-- /.login-logo -->
         <div class="login-box-body">
             <p class="login-box-msg">{{ __('adminlte::adminlte.login_message') }}</p>
+            <h1>{{ $message ?? ''}}</h1>
             <form action="{{ url(config('adminlte.login_url', 'login')) }}" method="post">
                 {{ csrf_field() }}
 

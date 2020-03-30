@@ -28,7 +28,7 @@ class AdminMiddleware
                 }
                 else
                 {
-                return redirect('/');
+                return view('auth.login')->with('message','Sessão expirada.');
                 }
 
            
