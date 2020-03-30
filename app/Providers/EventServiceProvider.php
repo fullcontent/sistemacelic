@@ -16,10 +16,7 @@ class EventServiceProvider extends ServiceProvider
      */
     protected $listen = [
         
-        'App\Events\UserLoggedIn' => [
-            'App\Listeners\NotificacaoTaxaTomorrow',
-            'App\Listeners\NotificacaoTaxaToday',
-    ],
+       
     
     ];
 
