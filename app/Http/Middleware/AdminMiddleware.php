@@ -17,11 +17,22 @@ class AdminMiddleware
     public function handle($request, Closure $next)
     {   
 
-        if(Auth::user()->privileges == 'admin') {
-                       
+                if (Auth::check()) {
+
+                if(Auth::user()->privileges == 'admin') {
+
                 return $next($request);
-        }
+                }
+
+                return redirect('/notAllowed');
+                }
+                else
+                {
+                return redirect('/');
+                }
+
+           
+
         
-        return redirect('/notAllowed');
     }
 }
