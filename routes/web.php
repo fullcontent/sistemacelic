@@ -130,7 +130,7 @@ Route::get('/servico/{id}/interacoes', 'ClienteController@interacoes')->name('cl
 
 Route::get('/teste', function() {
 
-		
+		return "teste";
 
 });
 
@@ -138,8 +138,17 @@ Route::get('/teste', function() {
 Route::get('/taxa/notify', 'TaxasController@notifyUser');
 
 
+Route::get('/markAsRead', function()
+{
+	
+	$notif_id = $_GET['notif_id'];
+	auth()->user()->unreadNotifications->where('id', $notif_id)->markAsRead();
+	return \Response::json($notif_id, 200);
+
+});
+
 Route::get('clearNotifications', function(){
 
-	auth()->user()->notifications->markAsRead();
+	auth()->user()->notifications()->delete();
 	return redirect()->back();
 })->name('clearNotifications');
