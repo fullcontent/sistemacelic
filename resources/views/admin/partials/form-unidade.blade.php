@@ -78,7 +78,7 @@
               
               <div class="form-group">
                   
-                  {!! Form::label('inscricaoEst', 'Inscriçao Estadual', array('class'=>'control-label')) !!}
+                  {!! Form::label('inscricaoEst', 'Inscrição Estadual', array('class'=>'control-label')) !!}
                   {!! Form::text('inscricaoEst', null, ['class'=>'form-control','id'=>'inscricaoEst']) !!}
         
               </div>
@@ -102,7 +102,7 @@
                 
                 <div class="form-group">
                     
-                    {!! Form::label('inscricaoImo', 'Inscrção Imobiliária', array('class'=>'control-label')) !!}
+                    {!! Form::label('inscricaoImo', 'Inscrição Imobiliária', array('class'=>'control-label')) !!}
                     {!! Form::text('inscricaoImo', null, ['class'=>'form-control','id'=>'inscricaoImo']) !!}
           
                 </div>
