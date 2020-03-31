@@ -40,6 +40,13 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+
+    public function routeNotificationForMail($notification)
+    {
+    
+    return $this->email;
+    }
+
    
     public function empresas()
     {
@@ -74,6 +81,8 @@ class User extends Authenticatable
     {
         return $this->belongsToMany('App\UserAccess','user_accesses','user_id','unidade_id');
     }
+    
+
     
     
     

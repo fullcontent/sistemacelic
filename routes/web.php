@@ -109,7 +109,17 @@ Route::get('/servico/{id}/interacoes', 'ClienteController@interacoes')->name('cl
 
 Route::get('/teste', function() {
 
-		return \Carbon\Carbon::now()->addDays(60);
+		// $licenca = Servico::where('tipo','primario')->where('situacao','finalizado')->whereDate('licenca_validade','=',Carbon::now()->addDays(60))->get();
+
+			$l = App\Models\Servico::find(589);
+
+            $user = App\User::find($l->responsavel_id);
+            $user->notify(new App\Notifications\Licenca60days($l,$user)); 
+
+            return new App\Mail\VencimentoLicenca60days($l);
+
+       
+
 
 });
 

@@ -8,7 +8,9 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Queue\SerializesModels;
 
+use App\Mail\VencimentoLicenca60days;
 
+use App\User;
 
 
 class Licenca60days extends Notification
@@ -16,16 +18,19 @@ class Licenca60days extends Notification
     use Queueable, SerializesModels;
 
     public $servico;
+    public $user;
+    
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($servico)
+    public function __construct($servico,$user)
     {
         //
         $this->servico = $servico;
+        $this->user = $user;
 
     }
 
@@ -37,7 +42,7 @@ class Licenca60days extends Notification
      */
     public function via($notifiable)
     {
-        return ['database'];
+        return ['mail','database'];
     }
 
 
@@ -56,5 +61,15 @@ class Licenca60days extends Notification
             'action'=> route('servicos.show', $this->servico->id),
 
         ];
+    }
+
+    public function toMail($notifiable)
+    {   
+
+        return (new VencimentoLicenca60days($this->servico))
+                                ->subject('Vencimento de licença!')
+                                ->to($this->user->email);
+
+       
     }
 }
