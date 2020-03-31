@@ -246,17 +246,7 @@ class TaxasController extends Controller
     }
 
 
-    public function notifyUser()
-    {
-        $taxa = Taxa::find(35);
-        // $user = \App\User::find($taxa->servico->responsavel->id);
-        $user = \App\User::find(Auth::id());
-        $user->notify(new \App\Notifications\VencimentoTaxaTomorrow($taxa));
-
-        return "notifyUser";
-
-    }
-
+    
     public function markAsRead(Request $request)
     {   
 

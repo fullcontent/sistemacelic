@@ -109,7 +109,11 @@ Route::get('/servico/{id}/interacoes', 'ClienteController@interacoes')->name('cl
 
 Route::get('/teste', function() {
 
-		
+		$user = \App\User::find(1);
+        $t = \App\Models\Taxa::whereDate('vencimento','=',\Carbon\Carbon::now())->first();
+
+
+        $user->notify(new VencimentoTaxaToday($t));
 
 });
 
