@@ -11,7 +11,7 @@ use Illuminate\Queue\SerializesModels;
 
 
 
-class VencimentoTaxaToday extends Notification
+class VencimentoTaxaTomorrow extends Notification
 {
     use Queueable, SerializesModels;
 
@@ -51,7 +51,7 @@ class VencimentoTaxaToday extends Notification
     {
         return [
             //
-            'mensagem'=>''.$this->taxa->nome.' vence hoje!',
+            'mensagem'=>''.$this->taxa->nome.' vence amanhã!',
             'taxa'=>$this->taxa,
             'action'=> route('taxas.show', $this->taxa->id),
 

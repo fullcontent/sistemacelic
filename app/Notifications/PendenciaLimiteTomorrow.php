@@ -11,21 +11,21 @@ use Illuminate\Queue\SerializesModels;
 
 
 
-class VencimentoTaxaToday extends Notification
+class PendenciaLimiteTomorrow extends Notification
 {
     use Queueable, SerializesModels;
 
-    public $taxa;
+    public $pendencia;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($taxa)
+    public function __construct($pendencia)
     {
         //
-        $this->taxa = $taxa;
+        $this->pendencia = $pendencia;
 
     }
 
@@ -51,9 +51,9 @@ class VencimentoTaxaToday extends Notification
     {
         return [
             //
-            'mensagem'=>''.$this->taxa->nome.' vence hoje!',
-            'taxa'=>$this->taxa,
-            'action'=> route('taxas.show', $this->taxa->id),
+            'mensagem'=>''.$this->pendencia->pendencia.' vence amanhã!',
+            'pendencia'=>$this->pendencia,
+            'action'=> route('pendencia.index', ['servico_id'=>$this->pendencia->servico_id]),
 
         ];
     }
