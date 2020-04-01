@@ -73,14 +73,16 @@
 	              	foreach($lic as $l)
 	              	{	
 
-	              		if($l->licenca_validade > date('Y-m-d'))
+	              		if($l->licenca_validade >= date('Y-m-d'))
 		              		{
 		              			$label = "btn btn-success btn-xs";
 		              		}
-		              	else{
+		              	elseif($l->licenca_validade < date('Y-m-d'))
+		              	{
 
 		              		$label = "btn btn-danger btn-xs";
 		              	}
+
 	              		
 	              		switch($l->nome){
 	              			case 'Alvará de Publicidade':

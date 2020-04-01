@@ -40,16 +40,14 @@
 
                       @case('finalizado')
 
-                        @if($servico->licenca_validade >= date('Y-m-d'))
-                  
-                           <a href="{{route('servicos.show',$servico->id)}}" class="btn btn-xs btn-success">Finalizado</a>
+                          @if($servico->licenca_validade >= date('Y-m-d'))
+
+                          <a href="{{route('servicos.show',$servico->id)}}" class="btn btn-xs btn-success">Finalizado</a>
                           @elseif($servico->licenca_validade < date('Y-m-d'))
                           <a href="{{route('servicos.show',$servico->id)}}" class="btn btn-xs btn-danger">Finalizado</a>
+                          @endif
 
-                        @endif
-
-                
-                        @break
+                          @break
 
                       @case('arquivado')
                 <button type="button" class="btn btn-xs btn-default">Arquivado</button>
