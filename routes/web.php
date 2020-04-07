@@ -47,6 +47,8 @@ Route::get('/', function () {
 		Route::get('/usuario/editar/{id}', 'UsersController@editar')->name('usuario.editar');
 		Route::post('/usuario/editar/{id}', 'UsersController@update')->name('usuario.update');
 		Route::post('/usuario','UsersController@store')->name('usuario.store');
+		Route::get('/usuario/delete/{id}', 'UsersController@delete')->name('usuario.delete');
+		
 		Route::get('/servico/delete/{id}','ServicosController@delete')->name('servico.delete');
 
 		Route::get('/pendencia/done/{id}', 'PendenciasController@done')->name('pendencia.done');

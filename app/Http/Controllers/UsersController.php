@@ -148,4 +148,12 @@ class UsersController extends Controller
 
 
     }
+
+    public function delete($id)
+    {
+        $user = User::destroy($id);
+    
+
+        return route('usuarios.index');
+    }
 }

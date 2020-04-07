@@ -38,6 +38,7 @@
                   <ul class="dropdown-menu" role="menu">
 
                   	<li><a href="{{route('usuario.editar', $user->id)}}">Editar</a></li>
+                  	<li><a href="{{route('usuario.delete', $user->id)}}" class="confirmation">Excluir</a></li>
                                     
                   </ul>
                 </div>
@@ -67,6 +68,12 @@
             }
 		     
 		    });
+		    $('.confirmation').on('click', function () {
+        		return confirm('Você deseja excluir o usuario?');
+    			});
+		     
+		   
   });
+
     </script>
   @stop
