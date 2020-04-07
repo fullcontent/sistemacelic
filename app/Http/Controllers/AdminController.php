@@ -28,7 +28,7 @@ class AdminController extends Controller
     	$user = Auth::id();
 
     		
-		$vencer = Servico::where('licenca_validade','<',date('Y-m-d'))->where('situacao','finalizado')->where('responsavel_id',$user)->get();
+		$vencer = Servico::where('licenca_validade','<',\Carbon\Carbon::today()->addDays(60))->where('situacao','finalizado')->where('responsavel_id',$user)->get();
 
 		$finalizados = Servico::where('situacao','finalizado')->where('responsavel_id',$user)->get();
 
