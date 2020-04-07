@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Auth;
+use Illuminate\Support\Facades\Hash;
 
 
 use App\UserAccess;
@@ -333,6 +334,61 @@ class ClienteController extends Controller
         $servicos = Servico::whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))->get();
 
         return $servicos;
+    }
+
+
+    public function editarUsuario()
+    {   
+        
+        $id = Auth::id();
+
+        $usuario = User::with('empresas','unidades')->find($id);
+        $empresas = Empresa::pluck('nomeFantasia','id');
+        $unidades = Unidade::pluck('nomeFantasia','id');
+        
+        $access = UserAccess::with('empresa','unidade')->where('user_id',$id)->get();
+
+        
+        
+        return view('admin.editar-usuario')
+        ->with([
+            'usuario'=>$usuario,
+            'empresas'=>$empresas,
+            'unidades'=>$unidades,
+            'user_access'=>$access,
+        ]);
+    }
+
+    public function updateUsuario(Request $request)
+    {
+
+        
+
+        $id = Auth::id();
+        
+        $usuario = User::find($id);
+
+        
+        if($request->password!=null)
+        {
+            $usuario->password = Hash::make($request->password);
+        }
+
+        
+        $usuario->name      =   $request->name;
+        $usuario->email     =   $request->email;
+        // $usuario->privileges=   $request->privileges;
+
+        
+        // $usuario->acesso_empresa()->sync($request->empresas_user_access);
+        // $usuario->acesso_unidade    ()->sync($request->unidades_user_access);
+
+        $usuario->save();
+
+
+        
+        return $this->index();
+                    
     }
 
     
