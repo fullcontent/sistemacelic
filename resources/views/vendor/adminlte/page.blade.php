@@ -60,7 +60,7 @@
 
                     <ul class="nav navbar-nav">
                         
-                        <li class="dropdown notifications-menu">
+        <li class="dropdown notifications-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
               <i class="glyphicon glyphicon-bell"></i>
               <span class="label label-warning">{{count(auth()->user()->unreadNotifications)}}</span>
@@ -91,6 +91,31 @@
               <li class="footer"><a href="#">Todas as notificações</a></li>
             </ul>
           </li>
+
+          <li class="dropdown tasks-menu">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+              
+              <span class="hidden-xs">{{ auth()->user()->name }}</span>
+            </a>
+            <ul class="dropdown-menu">
+              <!-- User image -->
+              <li class="header"></li>
+                <li>
+                    <ul class="menu">
+                    @if(auth()->user()->privileges == 'cliente')    
+                    <li><a href="{{route('cliente.usuario.editar')}}">Editar perfil</a></li>
+                    @elseif(auth()->user()->privileges == 'admin')
+                    <li><a href="{{route('usuario.editar',auth()->user()->id)}}">Editar perfil</a></li>
+                    @endif
+
+                </ul>
+            </li>
+              <li class="footer"></li>
+            </ul>
+          </li>
+
+
+
                         
                         <li>
                             <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">

@@ -47,6 +47,12 @@ class User extends Authenticatable
     return $this->email;
     }
 
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new Notifications\ResetPasswordNotification($token));
+    }
+
+
    
     public function empresas()
     {

@@ -17,8 +17,16 @@
 		<h3 class="box-title">Editar usuário</h3>
 	</div>
 	
+	@if(auth()->user()->privileges == 'admin')
 	
 	{!! Form::model($usuario,['route'=>['usuario.update', $usuario->id]]) !!}
+
+	@elseif(auth()->user()->privileges == 'cliente')
+	{!! Form::model($usuario,['route'=>['cliente.usuario.update']]) !!}
+	@endif
+	
+	
+
 	@include('admin.partials.form-usuario')
 	<div class="box-footer">
 		<a href="{{route('usuarios.index')}}" class="btn btn-default">Voltar</a>
