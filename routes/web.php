@@ -41,6 +41,7 @@ Route::get('/', function () {
 		Route::get('/empresa/cadastro', 'EmpresasController@cadastro')->name('empresa.cadastro');
 		Route::get('/unidade/cadastro', 'UnidadesController@cadastro')->name('unidade.cadastro');
 		Route::post('/unidade/{id}', 'UnidadesController@editar')->name('unidade.editar');
+		Route::get('/unidade/{id}', 'UnidadesController@delete')->name('unidade.delete');
 		Route::post('/empresa/{id}', 'EmpresasController@editar')->name('empresa.editar');
 		Route::get('/usuarios', 'UsersController@index')->name('usuarios.index');
 		Route::get('/usuario/cadastro', 'UsersController@cadastro')->name('usuario.cadastro');
@@ -48,7 +49,7 @@ Route::get('/', function () {
 		Route::post('/usuario/editar/{id}', 'UsersController@update')->name('usuario.update');
 		Route::post('/usuario','UsersController@store')->name('usuario.store');
 		Route::get('/usuario/delete/{id}', 'UsersController@delete')->name('usuario.delete');
-		
+
 		Route::get('/servico/delete/{id}','ServicosController@delete')->name('servico.delete');
 
 		Route::get('/pendencia/done/{id}', 'PendenciasController@done')->name('pendencia.done');
