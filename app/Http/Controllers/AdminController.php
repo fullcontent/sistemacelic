@@ -27,14 +27,21 @@ class AdminController extends Controller
     {
     	$user = Auth::id();
 
+    	
+
     		
 		$vencer = Servico::where('licenca_validade','<',\Carbon\Carbon::today()->addDays(60))->where('situacao','finalizado')->where('responsavel_id',$user)->get();
+		$vencer = $vencer->where('unidade.status','Ativa');
+
 
 		$finalizados = Servico::where('situacao','finalizado')->where('responsavel_id',$user)->get();
+		$finalizados = $finalizados->where('unidade.status','Ativa');
+
 
 		$pendencias = Pendencia::with('servico','unidade')->where('responsavel_id',$user)->get();
 
 
+		
 		
 		return view('admin.dashboard')
 					->with([
