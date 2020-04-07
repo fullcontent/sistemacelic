@@ -102,6 +102,8 @@ Route::get('/servico/inativos/', 'ClienteController@listaInativo')->name('client
 Route::get('/servico/{id}', 'ClienteController@servicoShow')->name('cliente.servico.show');
 Route::post('salvarInteracao', 'ClienteController@salvarInteracao')->name('cliente.interacao.salvar');
 Route::get('/servico/{id}/interacoes', 'ClienteController@interacoes')->name('cliente.interacoes.lista');
+Route::get('/usuario/editar/', 'ClienteController@editarUsuario')->name('cliente.usuario.editar');
+Route::post('/usuario/editar/', 'ClienteController@updateUsuario')->name('cliente.usuario.update');
 
 			
 

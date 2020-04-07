@@ -45,10 +45,48 @@
 	              		}	              
 	              	@endphp
 	              	<td>{{$empresa}}</td>
-	              	<td><span class="label {{$label}}">{{$servico->situacao}}</span></td>
+	              	<td>@switch($servico->situacao)
+
+	              			@case('andamento')
+
+								@if(($servico->licenca_validade >= date('Y-m-d')) && ($servico->tipo == 'primario'))
+									
+									<button type="button" class="btn btn-xs btn-success">Andamento</button>
+	              					@elseif(($servico->licenca_validade < date('Y-m-d'))&& ($servico->tipo == 'primario'))
+	              					<button type="button" class="btn btn-xs btn-danger">Andamento</button>
+								@elseif($servico->tipo == 'secundario')
+									<button type="button" class="btn btn-xs btn-warning">Andamento</button>
+
+	              				@endif
+
+								
+
+
+	              				@break
+
+	              			@case('finalizado')
+
+	              				@if(($servico->licenca_validade >= date('Y-m-d')) && ($servico->tipo == 'primario'))
+									
+									<button type="button" class="btn btn-xs btn-success">Finalizado</button>
+	              					@elseif(($servico->licenca_validade < date('Y-m-d'))&& ($servico->tipo == 'primario'))
+	              					<button type="button" class="btn btn-xs btn-danger">Finalizado</button>
+
+	              				@elseif($servico->tipo == 'secundario')
+									<button type="button" class="btn btn-xs btn-warning">Finalizado</button>
+
+	              				@endif
+								
+	              				@break
+
+	              			@case('arquivado')
+								<button type="button" class="btn btn-xs btn-default">Arquivado</button>
+	              				@break
+
+	              		@endswitch</td>
 	              	<td>{{$servico->responsavel->name}}</td>
 
-					<td><a href="{{route('cliente.servico.show', $servico->id)}}" class="btn btn-flat btn-warning">Detalhes</a></td>
+					<td><a href="{{route('cliente.servico.show', $servico->id)}}" class="btn btn-xs btn-flat btn-info">Detalhes</a></td>
 	                </tr>
 	            @endforeach
                 </tbody>

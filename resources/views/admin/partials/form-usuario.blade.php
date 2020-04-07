@@ -26,7 +26,9 @@
 			{!! Form::password('password', null, ['class'=>'form-control','id'=>'password']) !!}
 		</div>
 	</div>
+	
 
+	@unless(auth()->user()->privileges != 'admin')
 	<div class="col-md-12">
 		
 		<div class="form-group">
@@ -56,7 +58,8 @@
 						
 		</div>
 	</div>
-
+	
+	@endunless
 
 
 
