@@ -745,11 +745,10 @@ class ServicosController extends Controller
 
     public function delete($id)
     {
-        $servico = Servico::find($id);
 
+        $servico = Servico::find($id);
         $servico->pendencias()->delete();
         $servico->taxas()->delete();
-
         $servico->delete();
 
 

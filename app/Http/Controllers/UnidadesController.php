@@ -164,9 +164,13 @@ class UnidadesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
-        //
+    public function delete($id)
+    {   
+
+        $unidade = Unidade::destroy($id);
+    
+        return $this->index();
+
     }
 
 

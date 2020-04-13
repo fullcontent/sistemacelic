@@ -14,7 +14,7 @@
 <div class="box box-primary">
 	
 	<div class="box-header with-border">
-		<h3 class="box-title">Editar unidadae</h3>
+		<h3 class="box-title">Editar unidade <span><b>{{$unidade->nomeFantasia}}</b></span></h3>
 	</div>
 	
 	

@@ -133,6 +133,7 @@
                   	<li class="divider"></li>
                     <li><a href="{{route('unidades.show', $unidade->id)}}">Detalhes</a></li>
                     <li><a href="{{route('unidades.edit', $unidade->id)}}">Editar</a></li>
+                    <li><a href="{{route('unidade.delete', $unidade->id)}}" class="confirmation">Excluir</a></li>
                                     
                   </ul>
                 </div>
@@ -161,6 +162,9 @@
             }
 		     
 		    });
+		    $('.confirmation').on('click', function () {
+        		return confirm('Você deseja excluir a unidade?\nTodos os dados relacionados a ela serão excluidos.');
+    			});
   });
     </script>
   @stop
