@@ -43,6 +43,7 @@ Route::get('/', function () {
 		Route::post('/unidade/{id}', 'UnidadesController@editar')->name('unidade.editar');
 		Route::get('/unidade/{id}', 'UnidadesController@delete')->name('unidade.delete');
 		Route::post('/empresa/{id}', 'EmpresasController@editar')->name('empresa.editar');
+		Route::post('/empresa/{id}', 'EmpresasController@delete')->name('empresa.delete');
 		Route::get('/usuarios', 'UsersController@index')->name('usuarios.index');
 		Route::get('/usuario/cadastro', 'UsersController@cadastro')->name('usuario.cadastro');
 		Route::get('/usuario/editar/{id}', 'UsersController@editar')->name('usuario.editar');

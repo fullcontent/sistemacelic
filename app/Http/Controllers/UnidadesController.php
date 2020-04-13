@@ -167,7 +167,7 @@ class UnidadesController extends Controller
     public function delete($id)
     {   
 
-        
+        $unidade = Unidade::destroy($id);
     
         return $this->index();
 

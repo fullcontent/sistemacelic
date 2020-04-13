@@ -52,6 +52,7 @@
                   	<li class="divider"></li>
                     <li><a href="{{route('empresas.show', $empresa->id)}}">Detalhes</a></li>
                     <li><a href="{{route('empresas.edit', $empresa->id)}}">Editar</a></li>
+                    <li><a href="{{route('empresas.delete', $empresa->id)}}" class="confirmation">Excluir</a></li>
                                     
                   </ul>
                 </div>
@@ -86,6 +87,9 @@
 
 
 		    });
+		     $('.confirmation').on('click', function () {
+        		return confirm('Você deseja excluir a empresa?\nTodos os dados relacionados a ela serão excluidos.');
+    			});
   });
 
 
