@@ -51,12 +51,22 @@
 
 
 
-<div class="col-md-12">
+<div class="col-md-6">
 	
 	<div class="form-group">
 		
 		{!! Form::label('nome', 'Serviço', array('class'=>'control-label')) !!}
 		{!! Form::text('nome', null, ['class'=>'form-control','id'=>'nome']) !!}
+		
+	</div>
+</div>
+
+<div class="col-md-6">
+	
+	<div class="form-group">
+		
+		{!! Form::label('solicitante', 'Solicitante', array('class'=>'control-label')) !!}
+		{!! Form::text('solicitante', null, ['class'=>'form-control','id'=>'solicitante']) !!}
 		
 	</div>
 </div>

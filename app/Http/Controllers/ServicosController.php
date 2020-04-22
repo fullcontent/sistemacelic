@@ -465,6 +465,7 @@ class ServicosController extends Controller
         // $servico->protocolo_anexo   = $request->protocolo_anexo;
 
         $servico->observacoes   = $request->observacoes;
+        $servico->solicitante = $request->solicitante;
 
 
         if($request->t == 'unidade')
@@ -698,6 +699,7 @@ class ServicosController extends Controller
         }
 
         $servico->observacoes   = $request->observacoes;
+        $servico->solicitante = $request->solicitante;
         
 
         

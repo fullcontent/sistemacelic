@@ -45,6 +45,7 @@
                   <p><b>Ordem de serviço: </b>{{$servico->os}}</p>
                   <p><b>Nome: </b>{{$servico->nome}}</p>
                   <p><b>Responsável: </b>{{$servico->responsavel->name}}</p>
+                  <p><b>Solicitante: </b>{{$servico->solicitante}}</p>
                   <p><b>Início do processo: </b>{{\Carbon\Carbon::parse($servico->created_at)->format('d/m/Y')}}</p>
                   
                   @unless ( empty($servico->protocolo_numero) )
