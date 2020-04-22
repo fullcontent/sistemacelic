@@ -19,6 +19,7 @@ class CreateServicosTable extends Migration
 
             $table->string('tipo');//Primario, Secundario;            
             $table->string('nome');
+
             $table->string('os');
 
             $table->string('protocolo_anexo')->nullable();
