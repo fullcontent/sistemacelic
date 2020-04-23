@@ -54,22 +54,23 @@ class TaxasController extends Controller
         $taxa = new Taxa;
 
         $taxa->nome  = $request->nome;
-        $taxa->emissao = Carbon::createFromFormat('d/m/Y', $request->emissao)->toDateString(); 
         $taxa->servico_id = $request->servico_id;
-        $taxa->vencimento = Carbon::createFromFormat('d/m/Y', $request->vencimento)->toDateString(); 
+        
+
+        $taxa->emissao = Carbon::createFromFormat('d/m/Y', $request->emissao)->toDateString(); 
+        
+        $taxa->vencimento = Carbon::createFromFormat('d/m/Y', $request->vencimento)->toDateString();
+        
+        if($taxa->pagamento)
+        {
+             $taxa->pagamento = Carbon::createFromFormat('d/m/Y', $request->pagamento)->toDateString();
+        }
+       
+        
+
         $taxa->valor =  str_replace (',', '.', str_replace ('.', '', $request->valor));
         
-        if($request->observacoes)
-        {
-            $taxa->observacoes = $request->observacoes;
-        }
-        else
-        {
-            $taxa->observacoes = ".";
-        }
         
-        // $taxa->boleto   =   $request->boleto;
-        // $taxa->comprovante = $request->comprovante;
         $taxa->situacao = $request->situacao;
 
          // Se informou o arquivo, retorna um boolean
@@ -101,6 +102,9 @@ class TaxasController extends Controller
 
             }
 
+        $taxa->reembolso = $request->reembolso;
+        
+
         $taxa->save();
 
 
@@ -131,6 +135,8 @@ class TaxasController extends Controller
 
         $taxa->emissao = Carbon::parse($taxa->emissao)->format('d/m/Y');
         $taxa->vencimento = Carbon::parse($taxa->vencimento)->format('d/m/Y');
+        $taxa->pagamento = Carbon::parse($taxa->pagamento)->format('d/m/Y');
+
 
         return view('admin.editar-taxa')->with(['taxa'=>$taxa,'servicos'=>$servicos]);
     }
@@ -171,12 +177,17 @@ class TaxasController extends Controller
         $taxa->nome  = $request->nome;
         $taxa->emissao = Carbon::createFromFormat('d/m/Y', $request->emissao)->toDateString(); 
         
+        if($taxa->pagamento)
+        {
+             $taxa->pagamento = Carbon::createFromFormat('d/m/Y', $request->pagamento)->toDateString();
+        }
         $taxa->vencimento = Carbon::createFromFormat('d/m/Y', $request->vencimento)->toDateString(); 
         $taxa->valor =  str_replace (',', '.', str_replace ('.', '', $request->valor));
         $taxa->observacoes = $request->observacoes;
         // $taxa->boleto   =   $request->boleto;
         // $taxa->comprovante = $request->comprovante;
         $taxa->situacao = $request->situacao;
+        $taxa->reembolso = $request->reembolso;
 
 
 
