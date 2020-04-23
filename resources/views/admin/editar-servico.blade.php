@@ -33,17 +33,19 @@
 
 <script>
 	
-	$(document).ready(function() {
+$(document).ready(function() {
 
   	$("#protocolo_emissao").datepicker();
-  	$("#protocolo_validade").datepicker();
   	$("#licenca_emissao").datepicker();
-  	$("#licenca_validade").datepicker();
+  	$("#licenca_vencimento").datepicker();
+  	$("#laudo_emissao").datepicker();
+
+document.getElementById('servico_lpu').onchange = function() {
+var selem = document.getElementById('servico_lpu'); 
+document.getElementById('nome').value = selem.options[selem.selectedIndex].text;
+}
 
 
-  	
-
-	  	
  
 });
 </script>

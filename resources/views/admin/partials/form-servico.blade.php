@@ -49,7 +49,32 @@
 	</div>
 </div>
 
+@switch($t ?? '')
 
+			@case('empresa')
+					{!! Form::hidden('empresa_id', $id ?? '') !!}
+			@break
+
+			@case('unidade')
+					{!! Form::hidden('unidade_id', $id ?? '') !!}
+					
+			@break
+
+		@endswitch
+
+
+			{!! Form::hidden('t',$t ?? '' ?? '') !!}
+
+
+<div class="col-md-6">
+	
+	<div class="form-group">
+		
+		{!! Form::label('servico_lpu', 'LPU', array('class'=>'control-label')) !!}
+		{!! Form::select('servico_lpu',$servico_lpu, null, ['class'=>'form-control','id'=>'servico_lpu']) !!}
+		
+	</div>
+</div>
 
 <div class="col-md-6">
 	
@@ -61,7 +86,9 @@
 	</div>
 </div>
 
-<div class="col-md-6">
+
+
+<div class="col-md-12">
 	
 	<div class="form-group">
 		
@@ -216,20 +243,7 @@
 
 		
 
-		@switch($t ?? '')
-
-			@case('empresa')
-					{!! Form::hidden('empresa_id', $id ?? '') !!}
-			@break
-
-			@case('unidade')
-					{!! Form::hidden('unidade_id', $id ?? '') !!}
-			@break
-
-		@endswitch
-
-
-			{!! Form::hidden('t',$t ?? '' ?? '') !!}
+		
 
 
 </div>

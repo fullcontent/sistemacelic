@@ -17,7 +17,10 @@ class CreateServicosTable extends Migration
             $table->increments('id');
             $table->timestamps();
 
-            $table->string('tipo');//Primario, Secundario;            
+            $table->string('tipo');//Primario, Secundario;
+
+            $table->integer('servicoLpu_id');            
+            
             $table->string('nome');
 
             $table->string('os');
@@ -35,7 +38,7 @@ class CreateServicosTable extends Migration
             $table->foreign('responsavel_id')->references('id')->on('users');
             
         
-            $table->string('situacao');//Finalizado, Andamento, Vencimento
+            $table->string('situacao'); //Finalizado, Andamento, Vencimento
 
             $table->text('observacoes')->nullable();
             

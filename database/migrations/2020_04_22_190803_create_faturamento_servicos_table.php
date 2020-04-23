@@ -14,13 +14,16 @@ class CreateFaturamentoServicosTable extends Migration
     public function up()
     {
         Schema::create('faturamento_servicos', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->increments('id');
             $table->timestamps();
 
-                $table->unsignedBigInteger('faturamento_id');
-                $table->foreign('faturamento_id')->references('id')->on('faturamentos');
-                $table->unsignedBigInteger('servico_id');
+               
+
+                $table->unsignedInteger('servico_id');
                 $table->foreign('servico_id')->references('id')->on('servicos');
+
+                 $table->unsignedInteger('faturamento_id');
+                $table->foreign('faturamento_id')->references('id')->on('faturamentos');
 
         });
     }

@@ -14,10 +14,10 @@ class CreateFaturamentosTable extends Migration
     public function up()
     {
         Schema::create('faturamentos', function (Blueprint $table) {
-            $table->integer('id');
+            $table->increments('id');
             $table->timestamps();
 
-            $table->integer('cliente_id');
+            $table->integer('empresa_id');
 
 
             $table->float('valorFaturado',10,2)->nullable();

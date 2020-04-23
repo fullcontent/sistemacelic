@@ -42,6 +42,9 @@ class Servico extends Model
             return $this->hasMany('App\Models\Arquivo');
         }
 
-    
+    public function servicoLpu()
+    {
+        return $this->belongsTo('App\Models\ServicoLpu','servico_lpu');
+    }
 
 }

@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use App\Models\Empresa;
 use App\Models\Unidade;
 use App\Models\Arquivo;
+use App\Models\ServicoLpu;
 
 
 use Auth;
@@ -315,6 +316,8 @@ class ServicosController extends Controller
 
                     $os .= $number;
 
+                    $servico_lpu = ServicoLpu::where('empresa_id',$u->empresa->id)->pluck('documento','id')->toArray();
+
 
                 break;
             case 'empresa':
@@ -340,6 +343,8 @@ class ServicosController extends Controller
 
                     $os .= $number;
 
+                    $servico_lpu = ServicoLpu::where('empresa_id',$u->id)->pluck('documento','id')->toArray();
+
                 break;
             
             
@@ -347,6 +352,7 @@ class ServicosController extends Controller
 
         $servico = null;
 
+        
        
          
 
@@ -358,6 +364,7 @@ class ServicosController extends Controller
                     'users'=>$users,
                     'os' => $os,
                     'servico'=>$servico,
+                    'servico_lpu'=>$servico_lpu,
                 ]);
     }
 
@@ -466,6 +473,7 @@ class ServicosController extends Controller
 
         $servico->observacoes   = $request->observacoes;
         $servico->solicitante = $request->solicitante;
+        $servico->servico_lpu = $request->servico_lpu;
 
 
         if($request->t == 'unidade')
@@ -515,6 +523,8 @@ class ServicosController extends Controller
         $servico = Servico::find($id);
 
        
+
+       
         //Check if is empresa or unidade
 
         if($servico->unidade_id){
@@ -536,6 +546,7 @@ class ServicosController extends Controller
                         'taxas'=>$servico->taxas,
                         'pendencias'=>$servico->pendencias,
                         'arquivo'=>'servico',
+                        
                     ]);
     }
 
@@ -551,6 +562,9 @@ class ServicosController extends Controller
 
         $servico = Servico::find($id);
         $users = User::where('privileges','=','admin')->pluck('name','id')->toArray();
+
+        $servico_lpu = ServicoLpu::where('empresa_id',$servico->unidade->empresa->id)->pluck('documento','id')->toArray();
+
 
         //Check if is empresa or unidade
 
@@ -589,6 +603,7 @@ class ServicosController extends Controller
         $servico->laudo_emissao = date('d/m/Y',strtotime($servico->laudo_emissao));
        }
         
+       
         
         return view('admin.editar-servico')
                     ->with([
@@ -596,6 +611,7 @@ class ServicosController extends Controller
                         'dados'=>$dados,
                         'route'=>$route,
                         'users'=>$users,
+                        'servico_lpu'=>$servico_lpu,
                     ]);
     }
 
@@ -700,10 +716,11 @@ class ServicosController extends Controller
 
         $servico->observacoes   = $request->observacoes;
         $servico->solicitante = $request->solicitante;
+        $servico->servico_lpu = $request->servico_lpu;
         
 
         
-
+        
         $servico->save();
 
         
