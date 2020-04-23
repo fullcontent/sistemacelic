@@ -42,13 +42,13 @@
         
       </div>
 
-      <div class="col-md-4">
+      <div class="col-md-3">
         <div class="form-group">
         {!! Form::label('emissao', 'Emissão', array('class'=>'control-label')) !!}
         {!! Form::text('emissao', null, ['class'=>'form-control','id'=>'emissao','data-date-format'=>'dd/mm/yyyy']) !!}
         </div>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-3">
         <div class="form-group">
         {!! Form::label('vencimento', 'Vencimento', array('class'=>'control-label')) !!}
         {!! Form::text('vencimento', null, ['class'=>'form-control','id'=>'vencimento','data-date-format'=>'dd/mm/yyyy']) !!}
@@ -60,8 +60,14 @@
         {!! Form::text('valor', null, ['class'=>'form-control','id'=>'valor']) !!}
         </div>
       </div>
+      <div class="col-md-2">
+        <div class="form-group">
+        {!! Form::label('reembolso', 'Reembolso', array('class'=>'control-label')) !!}
+        {!! Form::select('reembolso', ['sim'=>'Sim','nao'=>'Não'] ,null, ['class'=>'form-control','id'=>'reembolso']) !!}
+        </div>
+      </div>
 
-      <div class="col-md-6">
+      <div class="col-md-4">
         <div class="form-group">
         {!! Form::label('boleto', 'Boleto', array('class'=>'control-label')) !!}
         {!! Form::file('boleto', null, ['class'=>'form-control','id'=>'boleto']) !!}
@@ -73,7 +79,7 @@
     
         </div>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-4">
         <div class="form-group">
         {!! Form::label('comprovante', 'Comprovante', array('class'=>'control-label')) !!}
         {!! Form::file('comprovante', null, ['class'=>'form-control','id'=>'comprovante']) !!}
@@ -83,6 +89,14 @@
         @endunless
         </div>
       </div>
+      
+      <div class="col-md-4">
+        <div class="form-group">
+        {!! Form::label('pagamento', 'Data de Pagamento', array('class'=>'control-label')) !!}
+        {!! Form::text('pagamento', null, ['class'=>'form-control','id'=>'pagamento','data-date-format'=>'dd/mm/yyyy']) !!}
+        </div>
+      </div>
+
 
       <div class="col-md-12">
         <div class="form-group">

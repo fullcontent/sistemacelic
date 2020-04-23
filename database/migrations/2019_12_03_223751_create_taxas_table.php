@@ -27,6 +27,8 @@ class CreateTaxasTable extends Migration
             $table->text('observacoes')->nullable();
             $table->date('emissao');
             $table->date('vencimento');
+            $table->date('pagamento');
+            $table->string('reembolso');
             
             $table->string('situacao');
 
