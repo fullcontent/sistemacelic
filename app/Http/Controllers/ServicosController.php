@@ -474,6 +474,7 @@ class ServicosController extends Controller
         $servico->observacoes   = $request->observacoes;
         $servico->solicitante = $request->solicitante;
         $servico->servico_lpu = $request->servico_lpu;
+        $servico->tipoLicenca = $request->tipoLicenca;
 
 
         if($request->t == 'unidade')
@@ -717,6 +718,7 @@ class ServicosController extends Controller
         $servico->observacoes   = $request->observacoes;
         $servico->solicitante = $request->solicitante;
         $servico->servico_lpu = $request->servico_lpu;
+        $servico->tipoLicenca = $request->tipoLicenca;
         
 
         
