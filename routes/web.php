@@ -36,6 +36,10 @@ Route::get('/', function () {
 		Route::resource('/arquivo','ArquivosController');
 		
 
+		Route::get('/faturamento/create','FaturamentoController@create')->name('faturamento.create');
+		Route::post('/faturamento/step2','FaturamentoController@step2')->name('faturamento.step2');
+		Route::post('/faturamento/step3','FaturamentoController@step3')->name('faturamento.step3');
+
 
 		Route::get('/empresa/{empresa}/unidades','EmpresasController@unidades')->name('empresa.unidades');
 		Route::get('/empresa/cadastro', 'EmpresasController@cadastro')->name('empresa.cadastro');

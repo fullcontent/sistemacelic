@@ -34,6 +34,11 @@ class Empresa extends Model
 			return $this->hasMany('App\Models\Arquivo');
 		}
 
+		public function servicosFaturar()
+		{
+			return $this->hasManyThrough('App\Models\Servico','App\Models\Unidade','empresa_id');
+		}
+
 
 
 }
