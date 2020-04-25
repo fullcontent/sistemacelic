@@ -98,8 +98,9 @@
 	</div>
 </div>
 
-
-<div class="col-md-4">
+<div class="col-md-12">
+	
+	<div class="col-md-4">
 	
 	<div class="form-group">
 		
@@ -137,14 +138,14 @@
 	</div>
 </div>
 
-
-<div class="col-md-12">
-	
-	
 </div>
 
 
-<div class="col-md-4">
+
+
+<div class="col-md-12">
+	
+	<div class="col-md-4">
 	
 	<div class="form-group">
 		
@@ -181,13 +182,8 @@
 		
 	</div>
 </div>
-
-
-
-
-
-
-
+	
+</div>
 
 
 
@@ -204,31 +200,41 @@
 	</div>
 </div>
 
-
-
-
-
-<div class="col-md-3">
+<div class="col-md-12">
 	
-	<div class="form-group">
-		
-		{!! Form::label('licenca_emissao', 'Emissão Licença', array('class'=>'control-label')) !!}
-		{!! Form::text('licenca_emissao', null, ['class'=>'form-control','id'=>'licenca_emissao','data-date-format'=>'dd/mm/yyyy']) !!}
-		
-	</div>
+			<div class="col-md-2">
+			
+			<div class="form-group">
+				
+				{!! Form::label('tipoLicenca', 'Tipo de Licença', array('class'=>'control-label')) !!}
+				{!! Form::select('tipoLicenca', array('renovavel' => 'Renovável', 'definitiva' => 'Definitiva','n/a'=>'Não Aplicada'), null, ['class'=>'form-control'])!!}
+			</div>
+		</div>
+
+
+		<div class="col-md-3">
+			
+			<div class="form-group">
+				
+				{!! Form::label('licenca_emissao', 'Emissão Licença', array('class'=>'control-label')) !!}
+				{!! Form::text('licenca_emissao', null, ['class'=>'form-control','id'=>'licenca_emissao','data-date-format'=>'dd/mm/yyyy']) !!}
+				
+			</div>
+		</div>
+
+		<div class="col-md-3">
+			
+			<div class="form-group">
+				
+				{!! Form::label('licenca_validade', 'Vencimento Licença', array('class'=>'control-label')) !!}
+				{!! Form::text('licenca_validade', null, ['class'=>'form-control','id'=>'licenca_validade','data-date-format'=>'dd/mm/yyyy']) !!}
+				
+			</div>
 </div>
 
-<div class="col-md-3">
-	
-	<div class="form-group">
-		
-		{!! Form::label('licenca_validade', 'Vencimento Licença', array('class'=>'control-label')) !!}
-		{!! Form::text('licenca_validade', null, ['class'=>'form-control','id'=>'licenca_validade','data-date-format'=>'dd/mm/yyyy']) !!}
-		
-	</div>
-</div>
 
-<div class="col-md-6">
+
+<div class="col-md-4">
 	
 	<div class="form-group">
 		
@@ -241,7 +247,15 @@
 	</div>
 </div>
 
-		
+</div>
+
+
+
+
+
+
+
+
 
 		
 

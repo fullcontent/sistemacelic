@@ -41,6 +41,8 @@ class CreateServicosTable extends Migration
             $table->string('situacao'); //Finalizado, Andamento, Vencimento
 
             $table->text('observacoes')->nullable();
+
+            $table->string('tipoLicenca');
             
         
             
