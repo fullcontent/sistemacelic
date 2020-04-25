@@ -65,9 +65,7 @@
 	              	<td>
 	              	@php
 
-	              	$lic = $unidade->servicos->where('tipo','primario')->unique('nome');
-
-
+	              	$lic = $unidade->servicos->where('tipo','primario')->sortByDesc('created_at')->unique('nome');
 
 
 	              	foreach($lic as $l)
