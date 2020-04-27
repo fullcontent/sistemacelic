@@ -81,6 +81,8 @@
 		              		$label = "btn btn-danger btn-xs";
 		              	}
 
+
+
 	              		
 	              		switch($l->nome){
 	              			case 'Alvará de Publicidade':
@@ -108,6 +110,11 @@
 	              			$name = "LA";
 	              			break;
 
+	              		}
+
+	              		if(empty($name))
+	              		{
+	              			$name = "n/a";
 	              		}
 
 	              		
