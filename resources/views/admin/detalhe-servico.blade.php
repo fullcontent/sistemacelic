@@ -65,7 +65,10 @@
                 
                 <div class="col-sm-6">
                   
-                  @unless ( empty($servico->licenca_anexo) )  
+                  @unless ( empty($servico->licenca_anexo) ) 
+
+                  <p><b>Tipo da Licença: </b>{{$servico->tipoLicenca}}</p>
+
                   <p><b>Emissão da Licença: </b>{{\Carbon\Carbon::parse($servico->licenca_emissao)->format('d/m/Y')}}</p>
                   <p><b>Validade da Licença </b>{{\Carbon\Carbon::parse($servico->licenca_validade)->format('d/m/Y')}}</p>
                   <p><b>Emissão Documento: </b> <a href="{{ url("uploads/$servico->licenca_anexo") }}" class="btn btn-xs btn-warning" target="_blank">Ver Licença</a></p>

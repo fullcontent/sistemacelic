@@ -476,6 +476,15 @@ class ServicosController extends Controller
         $servico->servico_lpu = $request->servico_lpu;
         $servico->tipoLicenca = $request->tipoLicenca;
 
+        if($servico->tipoLicenca == 'n/a' || 'definitiva')
+        {
+            
+            $servico->licenca_validade = '2059-12-31';
+        }
+
+
+        
+
 
         if($request->t == 'unidade')
         {
@@ -721,6 +730,11 @@ class ServicosController extends Controller
         $servico->tipoLicenca = $request->tipoLicenca;
         
 
+        if($servico->tipoLicenca == 'n/a' || 'definitiva')
+        {
+            
+            $servico->licenca_validade = '2059-12-31';
+        }
         
         
         $servico->save();
