@@ -11,6 +11,7 @@ use App\Models\Empresa;
 use App\Models\Unidade;
 use App\Models\Arquivo;
 use App\Models\ServicoLpu;
+use App\UserAccess;
 
 
 use Auth;
@@ -49,13 +50,19 @@ class ServicosController extends Controller
 
     public function lista()
     {
-        
        
-        $servicos = Servico::with('unidade','empresa','responsavel')
-        						->where('responsavel_id',Auth::id())
+
+       $unidadesList = Unidade::where('empresa_id', UserAccess::where('user_id',Auth::id())->pluck('empresa_id'))->pluck('id');
+
+       $servicos = Servico::with('unidade','empresa','responsavel')
+        						->whereIn('unidade_id',$unidadesList)
+                                ->orWhere('responsavel_id',Auth::id())
         						->get();
 
-        $servicos = $servicos->where('unidade.status','Ativa')->where('situacao','<>','arquivado');
+
+        $servicos = $servicos->where('situacao','<>','arquivado');
+
+
 
         return view('admin.lista-servicos')
                     ->with('servicos',$servicos);
@@ -66,13 +73,18 @@ class ServicosController extends Controller
         
 
         
-        $servicos = Servico::with('unidade','empresa','responsavel')
-        					->where('situacao','andamento')
-        					->where('responsavel_id',Auth::id())
-        					->get();
+    $unidadesList = Unidade::where('empresa_id', UserAccess::where('user_id',Auth::id())->pluck('empresa_id'))->pluck('id');
+
+       $servicos = Servico::with('unidade','empresa','responsavel')
+                                ->where('situacao','Andamento')
+                                ->whereIn('unidade_id',$unidadesList)
+                                ->orWhere('responsavel_id',Auth::id())
+                                ->get();
 
 
-       $servicos = $servicos->where('unidade.status','Ativa'); 
+        $servicos = $servicos->where('situacao','<>','arquivado');
+
+
 
         return view('admin.lista-servicos')
                     ->with('servicos',$servicos);
@@ -81,14 +93,18 @@ class ServicosController extends Controller
     public function listaFinalizados()
     {
         
+        $unidadesList = Unidade::where('empresa_id', UserAccess::where('user_id',Auth::id())->pluck('empresa_id'))->pluck('id');
+
+
 
         
         $servicos = Servico::with('unidade','empresa','responsavel')
-        						->where('situacao','finalizado')
-        						->where('responsavel_id',Auth::id())
+        						
+        						->whereIn('unidade_id',$unidadesList)
+                                ->orWhere('responsavel_id',Auth::id())
         						->get();
 
-        $servicos = $servicos->where('unidade.status','Ativa');							      
+        $servicos = $servicos->where('unidade.status','Ativa')->where('situacao','Finalizado');							      
 
         return view('admin.lista-servicos')
                     ->with('servicos',$servicos);
@@ -96,27 +112,32 @@ class ServicosController extends Controller
 
     public function listaVigentes()
     {
-        
+        $unidadesList = Unidade::where('empresa_id', UserAccess::where('user_id',Auth::id())->pluck('empresa_id'))->pluck('id');
+
         $servicos = Servico::with('unidade','empresa','responsavel')
-                        ->where('licenca_validade','>',date('Y-m-d'))
-                        ->where('tipo','primario')
-                        ->where('responsavel_id',Auth::id())
+                        
+                        
+                        ->whereIn('unidade_id',$unidadesList)
+                        ->orWhere('responsavel_id',Auth::id())
                         ->get();
        
 
-        $servicos = $servicos->where('unidade.status','Ativa');
+        $servicos = $servicos->where('unidade.status','Ativa')->where('licenca_validade','>',date('Y-m-d'))->where('tipo','primario');
 
         return view('admin.lista-servicos')
                     ->with('servicos',$servicos);
     }
 
     public function listaArquivados()
-    {
+    {   
+
+         $unidadesList = Unidade::where('empresa_id', UserAccess::where('user_id',Auth::id())->pluck('empresa_id'))->pluck('id');
         
         $servicos = Servico::with('unidade','empresa','responsavel')
                         // ->where('licenca_validade','>',date('Y-m-d'))
                         // ->where('tipo','primario')
-                        ->where('responsavel_id',Auth::id())
+                        ->whereIn('unidade_id',$unidadesList)
+                        ->orWhere('responsavel_id',Auth::id())
                         ->where('situacao','arquivado')
                         ->get();
        
@@ -128,18 +149,17 @@ class ServicosController extends Controller
     }
 
     public function listaVencidos()
-    {
+    {   
+
+        $unidadesList = Unidade::where('empresa_id', UserAccess::where('user_id',Auth::id())->pluck('empresa_id'))->pluck('id');
         
         $servicos = Servico::with('unidade','empresa','responsavel')
-                            ->where('licenca_validade','<',date('Y-m-d'))
-                         
-                            ->where('tipo','primario')
-                            ->where('responsavel_id',Auth::id())
-
+                            ->whereIn('unidade_id',$unidadesList)
+                            ->orWhere('responsavel_id',Auth::id())
                             
                             ->get();
         
-       $servicos = $servicos->where('unidade.status','Ativa');
+       $servicos = $servicos->where('unidade.status','Ativa')->where('licenca_validade','<',date('Y-m-d'))->where('tipo','primario')->where('situacao','<>','arquivado');
 
        
 
@@ -149,15 +169,20 @@ class ServicosController extends Controller
     }
 
     public function listaVencer()
-    {
+    {   
+
+        $unidadesList = Unidade::where('empresa_id', UserAccess::where('user_id',Auth::id())->pluck('empresa_id'))->pluck('id');
+        
         
         $servicos = Servico::with('unidade','empresa','responsavel')
                             ->where('licenca_validade','<',\Carbon\Carbon::today()->addDays(60))
-                            ->where('responsavel_id',Auth::id())
+                            ->whereIn('unidade_id',$unidadesList)
+                            ->orWhere('responsavel_id',Auth::id())
                             ->where('situacao','Finalizado')
+                            
                             ->get();
 
-       $servicos = $servicos->where('unidade.status','Ativa');
+       // $servicos = $servicos->where('unidade.status','Ativa')->where('situacao','Finalizado');
 
         return view('admin.lista-servicos')
                     ->with('servicos',$servicos);
@@ -166,9 +191,12 @@ class ServicosController extends Controller
     public function listaInativo()
     {
         
+        $unidadesList = Unidade::where('empresa_id', UserAccess::where('user_id',Auth::id())->pluck('empresa_id'))->pluck('id');
+        
         $servicos = Servico::with('unidade','empresa','responsavel')
+                            ->whereIn('unidade_id',$unidadesList)
+                            ->orWhere('responsavel_id',Auth::id())
                             
-                            ->where('responsavel_id',Auth::id())
                             ->get();
 
        $servicos = $servicos->where('unidade.status','Inativa');
@@ -476,7 +504,7 @@ class ServicosController extends Controller
         $servico->servico_lpu = $request->servico_lpu;
         $servico->tipoLicenca = $request->tipoLicenca;
 
-        if($servico->tipoLicenca == 'n/a' || 'definitiva')
+        if($servico->tipoLicenca == 'n/a' || $servico->tipoLicenca == 'definitiva')
         {
             
             $servico->licenca_validade = '2059-12-31';
@@ -730,7 +758,7 @@ class ServicosController extends Controller
         $servico->tipoLicenca = $request->tipoLicenca;
         
 
-        if($servico->tipoLicenca == 'n/a' || 'definitiva')
+        if($servico->tipoLicenca == 'n/a' || $servico->tipoLicenca == 'definitiva')
         {
             
             $servico->licenca_validade = '2059-12-31';

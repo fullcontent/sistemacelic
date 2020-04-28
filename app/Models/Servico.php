@@ -47,4 +47,6 @@ class Servico extends Model
         return $this->belongsTo('App\Models\ServicoLpu','servico_lpu');
     }
 
+    
+
 }

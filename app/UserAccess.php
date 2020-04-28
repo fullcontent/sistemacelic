@@ -24,4 +24,10 @@ class UserAccess extends Model
     {
     	return $this->belongsTo("App\User");
     }
+
+    public function empresas()
+    {
+        return $this->belongsToMany("App\Models\Empresa");
+    }
+
 }
