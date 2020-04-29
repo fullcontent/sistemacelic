@@ -60,14 +60,14 @@
           <!-- small box -->
           <div class="small-box bg-yellow">
             <div class="inner">
-              <h3>{{count($pendencias->where('status','pendente'))}}</h3>
+              <h3>{{count($andamento)}}</h3>
 
               <p>Serviços em andamento</p>
             </div>
             <div class="icon">
               <i class="ion ion-pie-graph"></i>
             </div>
-            <a href="#" class="small-box-footer"><i class="fa fa-arrow-circle-right"></i></a>
+            <a href="{{route('servico.andamento')}}" class="small-box-footer">Visualizar <i class="fa fa-arrow-circle-right"></i></a>
           </div>
         </div>
         <!-- ./col -->

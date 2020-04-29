@@ -73,7 +73,7 @@
 
                   <p><b>Emissão da Licença: </b>{{\Carbon\Carbon::parse($servico->licenca_emissao)->format('d/m/Y')}}</p>
 
-                  @if($servico->tipoLicenca == 'n/a' || $servico->tipoLicenca == 'definitiva')
+                  @if($servico->tipoLicenca == 'renovavel')
                     
                     <p><b>Validade da Licença </b>{{\Carbon\Carbon::parse($servico->licenca_validade)->format('d/m/Y')}}</p>
 

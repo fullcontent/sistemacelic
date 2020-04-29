@@ -4,9 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Auth;
+use DB;
 use App\User;
 use App\Models\Servico;
 use App\Models\Pendencia;
+use App\UserAccess;
+use App\Models\Unidade;
+
 
 use App\Notifications\TestNotification;
 
@@ -25,31 +29,86 @@ class AdminController extends Controller
 
     public function index()
     {
-    	$user = Auth::id();
-
-    	
-
-    		
-		$vencer = Servico::where('licenca_validade','<',\Carbon\Carbon::today()->addDays(60))->where('situacao','finalizado')->where('responsavel_id',$user)->get();
-		$vencer = $vencer->where('unidade.status','Ativa');
-
-
-		$finalizados = Servico::where('situacao','finalizado')->where('responsavel_id',$user)->get();
-		$finalizados = $finalizados->where('unidade.status','Ativa');
-
-
-		$pendencias = Pendencia::with('servico','unidade')->where('responsavel_id',$user)->get();
-
-
+    			
+		
 		
 		
 		return view('admin.dashboard')
 					->with([
-						'vencer'=>$vencer,
-						'finalizados'=>$finalizados,
-						'pendencias'=>$pendencias,
+						'vencer'=>$this->servicosVencer(),
+						'finalizados'=>$this->servicosFinalizados(),
+						'andamento'=>$this->servicosAndamento(),
+						'pendencias'=>$this->pendencias(),
 						
 					]);
+    }
+
+    public function getUnidadesList()
+    {
+        $unidadesList = Unidade::where('empresa_id', UserAccess::where('user_id',Auth::id())->pluck('empresa_id'))->pluck('id');
+
+        return $unidadesList;
+    }
+
+    public function pendencias()
+    {	
+
+    	
+    		$servicos = Servico::whereIn('unidade_id',$this->getUnidadesList())->pluck('id');
+    		$pendencias = Pendencia::with('servico','unidade')
+    						// ->where('responsavel_id', Auth::id())
+    						->whereIn('servico_id', $servicos)
+    						->orWhere('responsavel_id',Auth::id())
+    						->get();
+
+        	
+        	return $pendencias;
+    }
+
+    public function servicosVencer()
+    {
+    	$servicos = Servico::with('unidade','empresa','responsavel')
+                                ->whereIn('unidade_id',$this->getUnidadesList())
+                                ->orWhere('responsavel_id',Auth::id())
+                                ->get();
+
+        $servicos = $servicos->where('licenca_validade','<',\Carbon\Carbon::today()->addDays(60))
+                            ->where('unidade.status','=','ativa')
+                            ->where('situacao','=','finalizado');  
+
+         return $servicos;
+    }
+
+    public function servicosFinalizados()
+    {
+    	 $servicos = Servico::with('unidade','empresa','responsavel')
+        						
+        						->whereIn('unidade_id',$this->getUnidadesList())
+                                ->orWhere('responsavel_id',Auth::id())
+        						->get();
+
+
+        $servicos = $servicos->where('situacao','=','finalizado')
+                                ->where('unidade.status','ativa')
+                                ->where('situacao','<>','arquivado');
+
+         return $servicos;
+    }
+
+    public function servicosAndamento()
+    {
+    	 $servicos = Servico::with('unidade','empresa','responsavel')
+                                
+                                ->whereIn('unidade_id',$this->getUnidadesList())
+                                ->orWhere('responsavel_id',Auth::id())
+                                ->get();
+
+
+        $servicos = $servicos->where('situacao','=','andamento')
+                                ->where('unidade.status','ativa')
+                                ->where('situacao','<>','arquivado');
+
+        return $servicos;
     }
 
 
