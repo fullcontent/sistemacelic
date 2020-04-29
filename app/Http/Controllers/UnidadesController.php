@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Unidade;
 use App\Models\Empresa;
+use App\Models\Servico;
+use App\Models\Pendencia;
+use App\Models\Taxa;
 
 use Illuminate\Support\Facades\Validator;
 
@@ -167,8 +170,28 @@ class UnidadesController extends Controller
     public function delete($id)
     {   
 
-        $unidade = Unidade::destroy($id);
-    
+        //Select unidade
+
+        $unidade = Unidade::find($id);
+
+
+        //Select and delete services from unidade
+
+        $servicos = Servico::where('unidade_id',$unidade->id)->get();
+
+        //Delete all pendencias and taxas
+
+        foreach($servicos as $s)
+        {
+
+            $pendencia = Pendencia::where('servico_id',$s->id)->delete();
+            $taxa = Taxa::where('servico_id',$s->id)->delete();
+            $s->delete();
+
+        }
+
+        $unidade->delete();
+
         return $this->index();
 
     }
