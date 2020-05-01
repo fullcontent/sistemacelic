@@ -54,13 +54,14 @@ class ServicosController extends Controller
 
        $servicos = Servico::with('unidade','empresa','responsavel')
                                 
-                                ->whereIn('unidade_id',$this->getUnidadesList())
+                                // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
                                 ->get();
 
 
-        $servicos = $servicos->where('situacao','<>','arquivado');
-        $servicos = $servicos->where('unidade.status','ativa');
+        $servicos = $servicos->where('situacao','<>','arquivado')
+                                ->where('unidade.status','=','Ativa');
+      
 
 
 
@@ -73,13 +74,13 @@ class ServicosController extends Controller
         
         $servicos = Servico::with('unidade','empresa','responsavel')
                                 
-                                ->whereIn('unidade_id',$this->getUnidadesList())
+                                // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
                                 ->get();
 
 
         $servicos = $servicos->where('situacao','=','andamento')
-                                ->where('unidade.status','ativa')
+                                ->where('unidade.status','=','Ativa')
                                 ->where('situacao','<>','arquivado');
 
 
@@ -94,13 +95,13 @@ class ServicosController extends Controller
                 
         $servicos = Servico::with('unidade','empresa','responsavel')
         						
-        						->whereIn('unidade_id',$this->getUnidadesList())
+        						// ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
         						->get();
 
 
         $servicos = $servicos->where('situacao','=','finalizado')
-                                ->where('unidade.status','ativa')
+                                ->where('unidade.status','=','Ativa')
                                 ->where('situacao','<>','arquivado');
         
 
@@ -113,12 +114,12 @@ class ServicosController extends Controller
     public function listaVigentes()
     {
         $servicos = Servico::with('unidade','empresa','responsavel')
-                                ->whereIn('unidade_id',$this->getUnidadesList())
+                                // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
                                 ->get();
 
 
-        $servicos = $servicos->where('unidade.status','ativa')
+        $servicos = $servicos->where('unidade.status','=','Ativa')
                                 ->where('licenca_validade','>',date('Y-m-d'))
                                 ->where('tipo','primario')
                                 ->where('situacao','<>','arquivado');
@@ -133,7 +134,7 @@ class ServicosController extends Controller
         
         
         $servicos = Servico::with('unidade','empresa','responsavel')
-                                ->whereIn('unidade_id',$this->getUnidadesList())
+                                // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
                                 ->get();
        
@@ -149,11 +150,11 @@ class ServicosController extends Controller
 
                
         $servicos = Servico::with('unidade','empresa','responsavel')
-                                ->whereIn('unidade_id',$this->getUnidadesList())
+                                // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
                                 ->get();
         
-       $servicos = $servicos->where('unidade.status','=','ativa')
+       $servicos = $servicos->where('unidade.status','=','Ativa')
                             ->where('licenca_validade','<',date('Y-m-d'))
                             ->where('tipo','=','primario')
                             ->where('situacao','<>','arquivado');
@@ -169,12 +170,12 @@ class ServicosController extends Controller
     {   
 
         $servicos = Servico::with('unidade','empresa','responsavel')
-                                ->whereIn('unidade_id',$this->getUnidadesList())
+                                // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
                                 ->get();
 
         $servicos = $servicos->where('licenca_validade','<',\Carbon\Carbon::today()->addDays(60))
-                            ->where('unidade.status','=','ativa')
+                            ->where('unidade.status','=','Ativa')
                             ->where('situacao','=','finalizado');        
         
        
