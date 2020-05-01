@@ -54,7 +54,7 @@ class ServicosController extends Controller
 
        $servicos = Servico::with('unidade','empresa','responsavel')
                                 
-                                ->whereIn('unidade_id',$this->getUnidadesList())
+                                // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
                                 ->get();
 
@@ -73,7 +73,7 @@ class ServicosController extends Controller
         
         $servicos = Servico::with('unidade','empresa','responsavel')
                                 
-                                ->whereIn('unidade_id',$this->getUnidadesList())
+                                // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
                                 ->get();
 
@@ -94,7 +94,7 @@ class ServicosController extends Controller
                 
         $servicos = Servico::with('unidade','empresa','responsavel')
         						
-        						->whereIn('unidade_id',$this->getUnidadesList())
+        						// ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
         						->get();
 
@@ -113,7 +113,7 @@ class ServicosController extends Controller
     public function listaVigentes()
     {
         $servicos = Servico::with('unidade','empresa','responsavel')
-                                ->whereIn('unidade_id',$this->getUnidadesList())
+                                // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
                                 ->get();
 
@@ -133,7 +133,7 @@ class ServicosController extends Controller
         
         
         $servicos = Servico::with('unidade','empresa','responsavel')
-                                ->whereIn('unidade_id',$this->getUnidadesList())
+                                // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
                                 ->get();
        
@@ -149,7 +149,7 @@ class ServicosController extends Controller
 
                
         $servicos = Servico::with('unidade','empresa','responsavel')
-                                ->whereIn('unidade_id',$this->getUnidadesList())
+                                // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
                                 ->get();
         
@@ -169,7 +169,7 @@ class ServicosController extends Controller
     {   
 
         $servicos = Servico::with('unidade','empresa','responsavel')
-                                ->whereIn('unidade_id',$this->getUnidadesList())
+                                // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
                                 ->get();
 
@@ -190,7 +190,7 @@ class ServicosController extends Controller
         
                
         $servicos = Servico::with('unidade','empresa','responsavel')
-                                ->whereIn('unidade_id',$this->getUnidadesList())
+                                // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
                                 ->get();
 
