@@ -43,21 +43,16 @@ class AdminController extends Controller
 					]);
     }
 
-    public function getUnidadesList()
-    {
-        $unidadesList = Unidade::where('empresa_id', UserAccess::where('user_id',Auth::id())->pluck('empresa_id'))->pluck('id');
-
-        return $unidadesList;
-    }
+    
 
     public function pendencias()
     {	
 
     	
-    		$servicos = Servico::whereIn('unidade_id',$this->getUnidadesList())->pluck('id');
+    		// $servicos = Servico::whereIn('unidade_id',$this->getUnidadesList())->pluck('id');
     		$pendencias = Pendencia::with('servico','unidade')
-    						// ->where('responsavel_id', Auth::id())
-    						->whereIn('servico_id', $servicos)
+    						->where('responsavel_id', Auth::id())
+    						// ->whereIn('servico_id', $servicos)
     						->orWhere('responsavel_id',Auth::id())
     						->get();
 
@@ -68,12 +63,12 @@ class AdminController extends Controller
     public function servicosVencer()
     {
     	$servicos = Servico::with('unidade','empresa','responsavel')
-                                ->whereIn('unidade_id',$this->getUnidadesList())
+                                // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
                                 ->get();
 
         $servicos = $servicos->where('licenca_validade','<',\Carbon\Carbon::today()->addDays(60))
-                            ->where('unidade.status','=','ativa')
+                            ->where('unidade.status','=','Ativa')
                             ->where('situacao','=','finalizado');  
 
          return $servicos;
@@ -83,13 +78,13 @@ class AdminController extends Controller
     {
     	 $servicos = Servico::with('unidade','empresa','responsavel')
         						
-        						->whereIn('unidade_id',$this->getUnidadesList())
+        						// ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
         						->get();
 
 
         $servicos = $servicos->where('situacao','=','finalizado')
-                                ->where('unidade.status','ativa')
+                                ->where('unidade.status','Ativa')
                                 ->where('situacao','<>','arquivado');
 
          return $servicos;
@@ -99,13 +94,13 @@ class AdminController extends Controller
     {
     	 $servicos = Servico::with('unidade','empresa','responsavel')
                                 
-                                ->whereIn('unidade_id',$this->getUnidadesList())
+                                // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
                                 ->get();
 
 
         $servicos = $servicos->where('situacao','=','andamento')
-                                ->where('unidade.status','ativa')
+                                ->where('unidade.status','Ativa')
                                 ->where('situacao','<>','arquivado');
 
         return $servicos;
