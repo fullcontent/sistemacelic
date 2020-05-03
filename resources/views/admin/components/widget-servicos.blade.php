@@ -17,6 +17,7 @@
                     
                     <th>Serviço</th>
                     <th>Status</th>
+                    <th></th>
                   
                   </tr>
                   </thead>
@@ -55,6 +56,8 @@
 
                     @endswitch
                     </td>
+                    <td><a href="{{route('servico.delete', $servico->id)}}" class="confirmation danger" alt="Excluir serviço"> <i class="glyphicon glyphicon-trash
+"></i></a></td>
                     
                     
                   </tr>
@@ -73,4 +76,10 @@
             <!-- /.box-footer -->
           </div>
 
-
+<script>
+  $('.confirmation').on('click', function () {
+            return confirm('Você deseja excluir o serviço?');
+          });
+         
+       
+</script>
