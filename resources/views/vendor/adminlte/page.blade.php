@@ -166,12 +166,15 @@
 
             <!-- Content Header (Page header) -->
             <section class="content-header">
+
                 @yield('content_header')
+                 {{Breadcrumbs::render()}}
+
             </section>
 
             <!-- Main content -->
             <section class="content">
-
+            
                 @yield('content')
 
             </section>

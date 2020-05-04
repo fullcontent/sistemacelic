@@ -1,5 +1,9 @@
 @extends('adminlte::page')
 
+@section('content_header')
+    <h1>{{$taxa->nome}}</h1>
+@stop
+
 
 
 @section('content')

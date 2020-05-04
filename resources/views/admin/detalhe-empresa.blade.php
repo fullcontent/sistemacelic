@@ -14,6 +14,7 @@
 <div class="row">
   <div class="col-md-12">
     @include('admin.components.widget-detalhes')
+    @include('admin.components.widget-unidades')
     
   </div>
 </div>
