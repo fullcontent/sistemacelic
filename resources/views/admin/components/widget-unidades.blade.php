@@ -1,49 +1,17 @@
-@extends('adminlte::page')
-@section('content_header')
-    <h1>Listagem de unidades</h1>
-@stop
-
-
-@section('content')
-			
-
-			<div class="box">
-				<div class="box-header">
-					<a class="btn btn-app" href="{{route('unidade.cadastro')}}">
-	                		<i class="fa fa-plus"></i> Cadastrar
-	         			</a>
-				<div class="pull-right">
-					
-
-					<div class="btn-group-vertical" style="padding-left:20px;">
-						<p class="text-left "><b>CB: </b><small>AVCB</small></p>
-						<p class="text-left "><b>AS: </b><small>Alvará Sanitário</small></p>
-
-
-					</div>
-					<div class="btn-group-vertical" style="padding-left:20px;">
-
-					<p class="text-left"><b>AF: </b><small>Alvará de Funcionamento</small></p>
-					<p class="text-left "><b>AP: </b><small>Alvará de Publicidade</small></p>
-					
-					
-                      
-                  </div>
-                  <div class="btn-group-vertical" style="padding-left:20px;">
-                  	<p class="text-left "><b>PC: </b><small>Alvará da Polícia Civil</small></p>
-					<p class="text-left "><b>LA: </b><small>Licença Ambiental</small></p>
-					
-                     
-                    </div>
-				</div>
-
-				</div>
-	         	
-
-
-				
-
-				<table id="lista-unidades" class="table table-bordered table-hover">
+<div class="box box-info collapsed-box">
+	<div class="box-header with-border">
+		
+		<a href="#" data-widget="collapse"><h3 class="box-title">Unidades</h3></a>
+		<div class="box-tools pull-right">
+			<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+			</button>
+			<button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+		</div>
+	</div>
+	<!-- /.box-header -->
+	<div class="box-body">
+		
+			<table id="lista-unidades" class="table table-bordered table-hover">
                 <thead>
                 <tr>
                  
@@ -57,7 +25,7 @@
                   <th></th>
                 </thead>
                 <tbody>
-				@foreach($unidades as $unidade)
+				@foreach($dados->unidades as $unidade)
                 	<tr>
 
 	              	<td>{{$unidade->codigo}}</td>
@@ -150,29 +118,7 @@
 	            @endforeach
                 </tbody>
               </table>   
-			</div>
-	 		
-@stop
 
-@section('js')
-<script src="http://cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"></script>
-<script>
-		$(function () {
-		    $('#lista-unidades').DataTable({
-		      "paging": true,
-		      "lengthChange": true,
-		      "searching": true,
-		      "ordering": true,
-		      "info": true,
-		      "autoWidth": false,
-		       "language": {
-                "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
-            }
-		     
-		    });
-		    $('.confirmation').on('click', function () {
-        		return confirm('Você deseja excluir a unidade?\nTodos os dados relacionados a ela serão excluidos.');
-    			});
-  });
-    </script>
-  @stop
+	</div>
+
+</div>
