@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Unidade;
+use App\UserAccess;
+use App\Models\Taxa;
 use App\Models\Empresa;
 use App\Models\Servico;
+use App\Models\Unidade;
 use App\Models\Pendencia;
-use App\Models\Taxa;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -174,6 +175,10 @@ class UnidadesController extends Controller
 
         $unidade = Unidade::find($id);
 
+        $access = UserAccess::where('unidade_id',$unidade->id)->delete();
+       
+
+        
 
         //Select and delete services from unidade
 
@@ -191,6 +196,9 @@ class UnidadesController extends Controller
         }
 
         $unidade->delete();
+
+       
+
 
         return $this->index();
 
