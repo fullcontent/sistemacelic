@@ -26,7 +26,7 @@
                   <tbody>
                     @foreach($taxas ?? '' as $taxa)
                   <tr>
-                    <td><a href="{{route('taxas.show',$taxa->id)}}">{{$taxa->nome}}</a></td>
+                    <td><a href="{{route('cliente.taxa.show',['id'=>$taxa->servico_id,'taxa'=>$taxa->id])}}">{{$taxa->nome}}</a></td>
                     <td>R$ {{$taxa->valor}}</td>
                     <td><span class="label label-default">{{ \Carbon\Carbon::parse($taxa->vencimento)->format('d/m/Y')}}
 </span></td>

@@ -124,6 +124,12 @@
      	</div>	
     @endif 
 
+    @if(count($pendencias->where('status','pendente')))
+
+@include('admin.components.widget-pendencias-usuario')
+
+@endif
+
 @endsection
 
 

@@ -6,7 +6,7 @@
 
 @section('content')
 	
-	<div class="box" style="padding: 20px;">
+	<div class="box" style="padding: 5px;">
 				<div class="box-header">
 					
 				</div>

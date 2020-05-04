@@ -2,18 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Auth;
-use Illuminate\Support\Facades\Hash;
-
-
-use App\UserAccess;
 use App\User;
-use App\Models\Empresa;
-use App\Models\Unidade;
+use App\UserAccess;
+use App\Models\Taxa;
 
+
+use App\Models\Empresa;
 use App\Models\Servico;
+use App\Models\Unidade;
 use App\Models\Historico;
+
+use App\Models\Pendencia;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -33,12 +35,12 @@ class ClienteController extends Controller
 
     public function index()
     {   
-
-       
+     
 
     	return view ('cliente.dashboard')
                         ->with([
                             'servicos'=>$this->getServicosCliente(),
+                            'pendencias'=>$this->getPendenciasCliente(),
 
 
                         ]);
@@ -131,7 +133,14 @@ class ClienteController extends Controller
     {   
         $user = User::find(Auth::id());
 
-    	$servicos = Servico::whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))->with('unidade','empresa','responsavel')->get();
+        $servicos = Servico::whereIn('empresa_id',$user->empresas->pluck('id'))
+                            ->orWhereIn('unidade_id', $user->unidades->pluck('id'))
+                            ->with('unidade','empresa','responsavel')
+                            ->get();
+        
+        $servicos = $servicos->where('situacao','<>','arquivado');
+
+        
 
         return view('cliente.lista-servicos')
                     ->with('servicos', $servicos)
@@ -142,9 +151,6 @@ class ClienteController extends Controller
 
     public function servicoShow($id)
     {   
-
-
-
 
 
         $servico = Servico::find($id);
@@ -168,6 +174,16 @@ class ClienteController extends Controller
                     ]);
     }
 
+    public function showTaxa(Request $request)
+    {
+        $taxa = Taxa::find($request->taxa);
+
+        return view('cliente.detalhe-taxa')
+                    ->with([
+                        'taxa'=>$taxa,
+                    ]);
+    }
+
 
     public function listaAndamento()
     {
@@ -176,13 +192,15 @@ class ClienteController extends Controller
 
         
         $servicos = Servico::with('unidade','empresa','responsavel')
-                            ->whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))
+                            ->whereIn('empresa_id',$user->empresas->pluck('id'))
+                            ->orWhereIn('unidade_id', $user->unidades->pluck('id'))
                             ->where('situacao','andamento')
                             
                             ->get();
 
 
-       $servicos = $servicos->where('unidade.status','Ativa'); 
+        $servicos = $servicos->where('situacao','=','andamento')
+                              ->where('situacao','<>','arquivado');
 
     
 
@@ -200,11 +218,12 @@ class ClienteController extends Controller
          $user = User::find(Auth::id());
         
         $servicos = Servico::with('unidade','empresa','responsavel')
-                                ->whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))
-                                ->where('situacao','finalizado')
+                                ->whereIn('empresa_id',$user->empresas->pluck('id'))
+                                ->orWhereIn('unidade_id', $user->unidades->pluck('id'))
                                 ->get();
 
-        $servicos = $servicos->where('unidade.status','Ativa');                               
+        $servicos = $servicos->where('situacao','=','finalizado')
+                            ->where('situacao','<>','arquivado');                             
 
         return view('cliente.lista-servicos')
                     ->with(
@@ -220,13 +239,15 @@ class ClienteController extends Controller
          $user = User::find(Auth::id());
         
         $servicos = Servico::with('unidade','empresa','responsavel')
-                        ->whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))
-                        ->where('licenca_validade','>',date('Y-m-d'))
-                        ->where('tipo','primario')
+                        ->whereIn('empresa_id',$user->empresas->pluck('id'))
+                        ->orWhereIn('unidade_id', $user->unidades->pluck('id'))
                         ->get();
        
 
-        $servicos = $servicos->where('unidade.status','Ativa');
+        $servicos = $servicos->where('unidade.status','=','Ativa')
+                        ->where('licenca_validade','>',date('Y-m-d'))
+                        ->where('tipo','primario')
+                        ->where('situacao','<>','arquivado');
 
         return view('cliente.lista-servicos')
                     ->with(
@@ -242,13 +263,14 @@ class ClienteController extends Controller
 
         $user = User::find(Auth::id());
         $servicos = Servico::with('unidade','empresa','responsavel')
-                            ->whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))
-                            ->where('licenca_validade','<',date('Y-m-d'))
-                            
-                            ->where('tipo','primario')
+                            ->whereIn('empresa_id',$user->empresas->pluck('id'))
+                            ->orWhereIn('unidade_id', $user->unidades->pluck('id'))
                             ->get();
         
-       $servicos = $servicos->where('unidade.status','Ativa');
+        $servicos = $servicos->where('unidade.status','=','Ativa')
+                            ->where('licenca_validade','<',date('Y-m-d'))
+                            ->where('tipo','=','primario')
+                            ->where('situacao','<>','arquivado');
 
        
 
@@ -265,12 +287,12 @@ class ClienteController extends Controller
     {
          $user = User::find(Auth::id());
         $servicos = Servico::with('unidade','empresa','responsavel')
-                            ->whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))
-                            ->where('licenca_validade','<',\Carbon\Carbon::today()->addDays(60))
-                            ->where('situacao','Finalizado')
+                            ->whereIn('empresa_id',$user->empresas->pluck('id'))
+                            ->orWhereIn('unidade_id', $user->unidades->pluck('id'))
                             ->get();
 
-       $servicos = $servicos->where('unidade.status','Ativa');
+        $servicos = $servicos->where('licenca_validade','<',\Carbon\Carbon::today()->addDays(60))
+                            ->where('situacao','=','finalizado'); 
 
         return view('cliente.lista-servicos')
                     ->with(
@@ -284,11 +306,11 @@ class ClienteController extends Controller
     {
          $user = User::find(Auth::id());
         $servicos = Servico::with('unidade','empresa','responsavel')
-                            ->whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))
-                            
+                            ->whereIn('empresa_id',$user->empresas->pluck('id'))
+                            ->orWhereIn('unidade_id', $user->unidades->pluck('id'))
                             ->get();
 
-       $servicos = $servicos->where('unidade.status','Inativa');
+        $servicos = $servicos->where('unidade.status','=','Inativa');
 
         return view('cliente.lista-servicos')
                     ->with(
@@ -331,9 +353,23 @@ class ClienteController extends Controller
     {
         $user = User::find(Auth::id());
 
-        $servicos = Servico::whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))->get();
+        $servicos = Servico::whereIn('empresa_id',$user->empresas->pluck('id'))
+                            ->orWhereIn('unidade_id', $user->unidades->pluck('id'))
+                            ->get();
 
         return $servicos;
+    }
+
+    public function getPendenciasCliente()
+    {
+        $pendencias = Pendencia::with('servico','unidade')
+    						->where('responsavel_id', Auth::id())
+    						// ->whereIn('servico_id', $servicos)
+    						->orWhere('responsavel_id',Auth::id())
+    						->get();
+
+        	
+        	return $pendencias;
     }
 
 
@@ -389,6 +425,13 @@ class ClienteController extends Controller
         
         return $this->index();
                     
+    }
+
+    public function getUnidadesList()
+    {
+        $unidadesList = Unidade::where('empresa_id', UserAccess::where('user_id',Auth::id())->pluck('empresa_id'))->pluck('id');
+
+        return $unidadesList;
     }
 
     

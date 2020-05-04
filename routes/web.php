@@ -114,6 +114,7 @@ Route::post('salvarInteracao', 'ClienteController@salvarInteracao')->name('clien
 Route::get('/servico/{id}/interacoes', 'ClienteController@interacoes')->name('cliente.interacoes.lista');
 Route::get('/usuario/editar/', 'ClienteController@editarUsuario')->name('cliente.usuario.editar');
 Route::post('/usuario/editar/', 'ClienteController@updateUsuario')->name('cliente.usuario.update');
+Route::get('/servico/{id}/taxas/{taxa}','ClienteController@showTaxa')->name('cliente.taxa.show');
 
 			
 

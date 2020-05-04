@@ -1,7 +1,7 @@
 @extends('adminlte::page')
 
 @section('content_header')
-    <h1></h1>
+    <h1>Detalhes do serviço</h1>
 @stop
 
 
@@ -82,7 +82,7 @@
 </div>
 
 <div class="col-md-7">
-  @include('admin.components.widget-taxas')
+  @include('cliente.components.widget-taxas')
 </div>
 
 

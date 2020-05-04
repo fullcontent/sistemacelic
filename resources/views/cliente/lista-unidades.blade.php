@@ -1,5 +1,8 @@
 @extends('adminlte::page')
 
+@section('content_header')
+    <h1>Listagem de unidades</h1>
+@stop
 
 @section('content')
 			
@@ -63,7 +66,7 @@
 	              	<td>
 	              	@php
 
-	              	$lic = $unidade->servicos->where('tipo','primario');
+	              	$lic = $unidade->servicos->where('tipo','primario')->sortByDesc('created_at')->unique('nome');
 
 
 
@@ -109,7 +112,7 @@
 	              		}
 
 	              		
-	              		echo "<a href='/admin/servicos/".$l->id."' type=button class='".$label."'>".$name."</a>";
+	              		echo "<a href='/cliente/servico/".$l->id."' type=button class='".$label."'>".$name."</a>";
 	              	}
 
 	              	@endphp

@@ -1,13 +1,13 @@
 @extends('adminlte::page')
 
-
+@section('content_header')
+    <h1>Listagem de serviços</h1>
+@stop
 
 @section('content')
 	
-	<div class="box">
-				<div class="box-header">
-					<h2>{{$title}}</h2>
-				</div>
+<div class="box" style="padding: 20px;">
+	<div class="box-header">
 
 				<table id="lista-servicos" class="table table-bordered table-hover">
                 <thead>
