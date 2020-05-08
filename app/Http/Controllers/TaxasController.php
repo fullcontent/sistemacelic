@@ -61,7 +61,7 @@ class TaxasController extends Controller
         
         $taxa->vencimento = Carbon::createFromFormat('d/m/Y', $request->vencimento)->toDateString();
         
-        if($taxa->pagamento)
+        if($request->pagamento)
         {
              $taxa->pagamento = Carbon::createFromFormat('d/m/Y', $request->pagamento)->toDateString();
         }
@@ -104,7 +104,7 @@ class TaxasController extends Controller
 
         $taxa->reembolso = $request->reembolso;
         
-
+        
         $taxa->save();
 
 
