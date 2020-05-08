@@ -14,7 +14,7 @@
 
 	
 
-	{!! Form::open(['route'=>'servicos.store','id'=>'cadastroServico']) !!}
+	{!! Form::open(['route'=>'servicos.store','id'=>'cadastroServico','enctype'=>'multipart/form-data']) !!}
 
 
 	@include('admin.partials.form-servico')

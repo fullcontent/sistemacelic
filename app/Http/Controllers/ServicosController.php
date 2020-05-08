@@ -481,7 +481,7 @@ class ServicosController extends Controller
 
                 $nameFile = "{$name}.{$extension}";
                 // Faz o upload:
-                $upload = $request->laudo_anexo->storeAs('protocolos', $nameFile);
+                $upload = $request->laudo_anexo->storeAs('laudos', $nameFile);
                 // Se tiver funcionado o arquivo foi armazenado em storage/app/public/categories/nomedinamicoarquivo.extensao
 
                 $servico->laudo_anexo = $upload;
@@ -490,10 +490,7 @@ class ServicosController extends Controller
             }
 
 
-        // $servico->licenca_anexo = $request->licenca_anexo;
-        // $servico->protocolo_anexo   = $request->protocolo_anexo;
-
-        $servico->observacoes   = $request->observacoes;
+         $servico->observacoes   = $request->observacoes;
         $servico->solicitante = $request->solicitante;
         $servico->servico_lpu = $request->servico_lpu;
         $servico->tipoLicenca = $request->tipoLicenca;
@@ -519,7 +516,7 @@ class ServicosController extends Controller
         }
         
         
-
+        
         $servico->save();
      
 
@@ -709,7 +706,7 @@ class ServicosController extends Controller
                 $extension = $request->laudo_anexo->extension();
                 $nameFile = "{$name}.{$extension}";
                 // Faz o upload:
-                $upload = $request->laudo_anexo->storeAs('protocolos', $nameFile);
+                $upload = $request->laudo_anexo->storeAs('laudos', $nameFile);
                 // Se tiver funcionado o arquivo foi armazenado em storage/app/public/categories/nomedinamicoarquivo.extensao
 
                 $servico->laudo_anexo = $upload;
@@ -758,7 +755,7 @@ class ServicosController extends Controller
             $servico->licenca_validade = '2059-12-31';
         }
         
-        
+       
         $servico->save();
 
         
