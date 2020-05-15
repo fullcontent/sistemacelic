@@ -49,13 +49,12 @@ class AdminController extends Controller
     {	
 
     	
-    		// $servicos = Servico::whereIn('unidade_id',$this->getUnidadesList())->pluck('id');
+    		$servicos = Servico::where('responsavel_id',Auth::id())->pluck('id');
     		$pendencias = Pendencia::with('servico','unidade')
-    						->where('responsavel_id', Auth::id())
-    						// ->whereIn('servico_id', $servicos)
-    						->orWhere('responsavel_id',Auth::id())
-    						->get();
-
+                            ->where('responsavel_id', Auth::id())
+                            ->orWhereIn('pendencias.servico_id',$servicos)
+            				->get();
+           
         	
         	return $pendencias;
     }

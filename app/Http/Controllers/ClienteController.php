@@ -365,7 +365,7 @@ class ClienteController extends Controller
         $pendencias = Pendencia::with('servico','unidade')
     						->where('responsavel_id', Auth::id())
     						// ->whereIn('servico_id', $servicos)
-    						->orWhere('responsavel_id',Auth::id())
+    						// ->orWhere('responsavel_id',Auth::id())
     						->get();
 
         	
