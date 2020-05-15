@@ -48,6 +48,12 @@
         </div>
       </div>
 
+      <div class="col-md-12">
+        <div class="form-group">
+           {!! Form::label('observacoes', 'Observações', array('class'=>'control-label')) !!}
+           {!! Form::textarea('observacoes', null, ['class'=>'form-control','id'=>'observacoes']) !!}
+        </div>
+      </div>
      
 
      

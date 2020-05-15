@@ -70,7 +70,10 @@ class PendenciasController extends Controller
         $pendencia->responsavel_tipo = $request->responsavel_tipo;
         $pendencia->responsavel_id = $request->responsavel_id;
         $pendencia->status = $request->status;
+        $pendencia->observacoes = $request->observacoes;
 
+
+        
         $pendencia->save();
 
         return redirect(route('pendencia.index',['servico_id'=>$pendencia->servico_id]));
@@ -137,6 +140,7 @@ class PendenciasController extends Controller
         $pendencia->responsavel_tipo = $request->responsavel_tipo;
         $pendencia->responsavel_id = $request->responsavel_id;
         $pendencia->status = $request->status;
+        $pendencia->observacoes = $request->observacoes;
 
 
         $pendencia->save();
