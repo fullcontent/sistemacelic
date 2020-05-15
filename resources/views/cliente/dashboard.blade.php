@@ -74,11 +74,11 @@
                       <tbody>
                         @foreach($pendencias->where('status','pendente') as $p)
                       <tr>
-                        <td><a href="{{route('servicos.show',$p->servico_id)}}">{{$p->servico['unidade']['codigo']}}</a></td>
-                        <td><a href="{{route('servicos.show',$p->servico_id)}}">{{$p->servico['unidade']['nomeFantasia']}}</a></td>
-                        <td><a href="{{route('servicos.show',$p->servico_id)}}">{{$p->servico['nome']}}</a></td>
-                        <td><a href="{{route('servicos.show',$p->servico_id)}}">{{$p->pendencia}}</a></td>
-                        <td><a href="{{route('servicos.show',$p->servico_id)}}">{{\Carbon\Carbon::parse($p->vencimento)->format('d/m/Y')}}</a></td>
+                        <td><a href="{{route('cliente.servico.show',$p->servico_id)}}">{{$p->servico['unidade']['codigo']}}</a></td>
+                        <td><a href="{{route('cliente.servico.show',$p->servico_id)}}">{{$p->servico['unidade']['nomeFantasia']}}</a></td>
+                        <td><a href="{{route('cliente.servico.show',$p->servico_id)}}">{{$p->servico['nome']}}</a></td>
+                        <td><a href="{{route('cliente.servico.show',$p->servico_id)}}">{{$p->pendencia}}</a></td>
+                        <td><a href="{{route('cliente.servico.show',$p->servico_id)}}">{{\Carbon\Carbon::parse($p->vencimento)->format('d/m/Y')}}</a></td>
                       </tr>
                         @endforeach
                       
