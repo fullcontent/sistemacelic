@@ -17,18 +17,25 @@
     
   </div>
 </div>
+
 <div class="row">
-  <div class="col-md-5">
-    
+  <div class="col-md-6">
     @include('cliente.components.widget-servicos')
-    
   </div>
-  <div class="col-md-7">
+  <div class="col-md-6">
+    @include('cliente.components.widget-servicos-secundarios')
+  </div>
+</div>
+<div class="row">
+  
+  
+  <div class="col-md-6">
     
     @include('cliente.components.widget-taxas')
     
   </div>
-  <div class="col-md-7">
+ 
+  <div class="col-md-6">
     
     @include('cliente.components.widget-arquivos')
     
