@@ -71,6 +71,7 @@
         </div>
         <!-- /.login-box-body -->
     </div><!-- /.login-box -->
+    <p class="text-center">Copyright © Castro Empresarial. Todos os direitos reservados.</p>
 @stop
 
 @section('adminlte_js')
