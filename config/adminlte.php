@@ -30,7 +30,7 @@ return [
     |
     */
 
-    'logo' => '<img src="img/logoCelicNew.png">',
+    'logo' => '<img src="img/logoCelicLogin.png">',
 
     'login_logo' => '<img src="img/logoCelicLogin.png" width="280">',
 
