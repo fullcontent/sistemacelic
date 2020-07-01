@@ -32,7 +32,7 @@ return [
 
     'logo' => '<img src="img/logoCelicNew.png">',
 
-    'login_logo' => '<img src="img/logoCelicNew.png" width="280">',
+    'login_logo' => '<img src="img/logoCelicLogin.png" width="280">',
 
     'logo_mini' => '<img src="http://sistemacelic.net/img/logoCelicMini.png">',
 
