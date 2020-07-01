@@ -30,11 +30,11 @@ return [
     |
     */
 
-    'logo' => '<img src="http://sistemacelic.net/img/logoCastro2.png">',
+    'logo' => '<img src="http://sistemacelic.net/img/logoCelic.png">',
 
-    'login_logo' => '<img src="http://sistemacelic.net/img/logoCastro2.png">',
+    'login_logo' => '<img src="http://sistemacelic.net/img/logoCelicLogin.png">',
 
-    'logo_mini' => '<img src="http://sistemacelic.net/img/logoCastro.png">',
+    'logo_mini' => '<img src="http://sistemacelic.net/img/logoCelicMini.png">',
 
     /*
     |--------------------------------------------------------------------------
