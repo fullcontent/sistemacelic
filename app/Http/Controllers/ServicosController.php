@@ -2,19 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Servico;
-use App\Models\Historico;
+use Auth;
 use App\User;
 use Carbon\Carbon;
-use App\Models\Empresa;
-use App\Models\Unidade;
-use App\Models\Arquivo;
-use App\Models\ServicoLpu;
 use App\UserAccess;
+use App\Models\Arquivo;
+use App\Models\Empresa;
+use App\Models\Servico;
+use App\Models\Unidade;
+use App\Models\Historico;
+use App\Models\ServicoLpu;
 
 
-use Auth;
+
+use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\Validator;
 
 
@@ -410,11 +412,13 @@ class ServicosController extends Controller
         $servico->nome  =   $request->nome;
         $servico->situacao  =  $request->situacao;
         $servico->responsavel_id = $request->responsavel_id;
-
-        
+               
         $servico->protocolo_numero  =   $request->protocolo_numero;
         
-
+        $servico->observacoes   = $request->observacoes;
+        $servico->solicitante = $request->solicitante;
+        $servico->servico_lpu = $request->servico_lpu;
+        $servico->tipoLicenca = $request->tipoLicenca;
         
 
         $servico->laudo_numero = $request->laudo_numero;
@@ -490,10 +494,7 @@ class ServicosController extends Controller
             }
 
 
-         $servico->observacoes   = $request->observacoes;
-        $servico->solicitante = $request->solicitante;
-        $servico->servico_lpu = $request->servico_lpu;
-        $servico->tipoLicenca = $request->tipoLicenca;
+         
 
         if($servico->tipoLicenca == 'n/a' || $servico->tipoLicenca == 'definitiva')
         {
@@ -515,10 +516,29 @@ class ServicosController extends Controller
             $servico->unidade_id = $request->empresa_id;
         }
         
-        
-        
+
+
+
+              
         $servico->save();
-     
+        
+
+       
+
+
+        //Insert Faturamento
+
+        
+        $faturamento = new ServicoFinanceiro();
+        $faturamento->servico_id = $servico->id;
+        
+        $faturamento->valorTotal = $request->valorTotal;
+        $faturamento->valorFaturado = $request->valorFaturado;
+        $faturamento->valorFaturar = $request->valorFaturar;
+        $faturamento->valorAberto = $request->valorAberto;
+
+        $faturamento->save();      
+
 
         
 
