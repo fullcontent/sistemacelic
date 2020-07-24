@@ -186,6 +186,45 @@
 </div>
 
 
+<div class="row">
+	<div class="col-md-12">
+		<div class="col-md-3">
+			<div class="form-group">
+					
+				{!! Form::label('valorTotal', 'Valor Total', array('class'=>'control-label')) !!}
+				{!! Form::text('valorTotal', null, ['class'=>'form-control','id'=>'valorTotal']) !!}
+				
+			</div>
+		</div>
+		<div class="col-md-3">
+			<div class="form-group">
+					
+				{!! Form::label('valorFaturado', 'Valor Faturado', array('class'=>'control-label')) !!}
+				{!! Form::text('valorFaturado', null, ['class'=>'form-control','id'=>'valorFaturado']) !!}
+				
+			</div>
+		</div>
+		<div class="col-md-3">
+			<div class="form-group">
+					
+				{!! Form::label('valorFaturar', 'Valor Faturar', array('class'=>'control-label')) !!}
+				{!! Form::text('valorFaturar', null, ['class'=>'form-control','id'=>'valorFaturar']) !!}
+				
+			</div>
+		</div>
+		<div class="col-md-3">
+			<div class="form-group">
+					
+				{!! Form::label('valorAberto', 'Valor Aberto', array('class'=>'control-label')) !!}
+				{!! Form::text('valorAberto', null, ['class'=>'form-control','id'=>'valorAberto']) !!}
+				
+			</div>
+		</div>
+	</div>
+	
+</div>
+
+
 
 
 
