@@ -693,10 +693,29 @@ class ServicosController extends Controller
         $servico->protocolo_numero  =   $request->protocolo_numero;
         $servico->laudo_numero = $request->laudo_numero;
 
+        $servico->observacoes   = $request->observacoes;
+        $servico->solicitante = $request->solicitante;
+        $servico->servico_lpu = $request->servico_lpu;
+        $servico->tipoLicenca = $request->tipoLicenca;
 
-       
-       
 
+
+        //Edit Financeiro
+
+        
+        $financeiro = ServicoFinanceiro::find($servico->financeiro->id);
+
+        $financeiro->valorTotal = $request->valorTotal;
+        $financeiro->valorFaturado = $request->valorFaturado;
+        $financeiro->valorFaturar = $request->valorFaturar;
+        $financeiro->valorAberto = $request->valorAberto;
+        $financeiro->status = $request->financeiroStatus;
+
+        $financeiro->save();
+
+
+
+        //-----------------------------------
 
         // Se informou o arquivo, retorna um boolean
         if ($request->hasFile('licenca_anexo') && $request->file('licenca_anexo')->isValid()) {
@@ -771,10 +790,7 @@ class ServicosController extends Controller
             $servico->laudo_emissao = Carbon::createFromFormat('d/m/Y', $request->laudo_emissao)->toDateString();
         }
 
-        $servico->observacoes   = $request->observacoes;
-        $servico->solicitante = $request->solicitante;
-        $servico->servico_lpu = $request->servico_lpu;
-        $servico->tipoLicenca = $request->tipoLicenca;
+       
         
 
         if($servico->tipoLicenca == 'n/a' || $servico->tipoLicenca == 'definitiva')
@@ -783,6 +799,7 @@ class ServicosController extends Controller
             $servico->licenca_validade = '2059-12-31';
         }
         
+
        
         $servico->save();
 
