@@ -186,6 +186,52 @@
 </div>
 
 
+<div class="row">
+	<div class="col-md-12">
+		<div class="col-md-2">
+			<div class="form-group">
+					
+				{!! Form::label('valorTotal', 'Valor Total', array('class'=>'control-label')) !!}
+				{!! Form::text('valorTotal', $financeiro->valorTotal, ['class'=>'form-control','id'=>'valorTotal']) !!}
+				
+			</div>
+		</div>
+		<div class="col-md-2">
+			<div class="form-group">
+					
+				{!! Form::label('valorFaturado', 'Valor Faturado', array('class'=>'control-label')) !!}
+				{!! Form::text('valorFaturado', $financeiro->valorFaturado, ['class'=>'form-control','id'=>'valorFaturado']) !!}
+				
+			</div>
+		</div>
+		<div class="col-md-2">
+			<div class="form-group">
+					
+				{!! Form::label('valorFaturar', 'Valor Faturar', array('class'=>'control-label')) !!}
+				{!! Form::text('valorFaturar', $financeiro->valorFaturar, ['class'=>'form-control','id'=>'valorFaturar']) !!}
+				
+			</div>
+		</div>
+		<div class="col-md-2">
+			<div class="form-group">
+					
+				{!! Form::label('valorAberto', 'Valor Aberto', array('class'=>'control-label')) !!}
+				{!! Form::text('valorAberto', $financeiro->valorAberto, ['class'=>'form-control','id'=>'valorAberto']) !!}
+				
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="form-group">
+				
+				{!! Form::label('financeiroStatus', 'Status', array('class'=>'control-label')) !!}
+				{!! Form::select('financeiroStatus', array('aberto' => 'Aberto', 'faturado' => 'Faturado','faturar'=>'Faturar','parcial'=>'Parcial'), $financeiro->status, ['class'=>'form-control'])!!}
+			</div>
+		</div>
+	</div>
+	
+</div>
+
+
 
 
 

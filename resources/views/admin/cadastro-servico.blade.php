@@ -116,11 +116,6 @@
 		};
 		
 
-
-		
-
-
-
 document.getElementById('servico_lpu').onchange = function() {
 var selem = document.getElementById('servico_lpu'); 
 document.getElementById('nome').value = selem.options[selem.selectedIndex].text;

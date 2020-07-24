@@ -47,6 +47,11 @@ class Servico extends Model
         return $this->belongsTo('App\Models\ServicoLpu','servico_lpu');
     }
 
+    public function financeiro()
+    {
+        return $this->hasOne('App\Models\ServicoFinanceiro','servico_id');
+    }
+
     
 
 }

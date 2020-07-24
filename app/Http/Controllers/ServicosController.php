@@ -2,19 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Servico;
-use App\Models\Historico;
+use Auth;
 use App\User;
 use Carbon\Carbon;
-use App\Models\Empresa;
-use App\Models\Unidade;
-use App\Models\Arquivo;
-use App\Models\ServicoLpu;
 use App\UserAccess;
+use App\Models\Arquivo;
+use App\Models\Empresa;
+use App\Models\Servico;
+use App\Models\Unidade;
+use App\Models\Historico;
+use App\Models\ServicoLpu;
 
 
-use Auth;
+
+use App\Models\ServicoFinanceiro;
+
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -410,11 +413,13 @@ class ServicosController extends Controller
         $servico->nome  =   $request->nome;
         $servico->situacao  =  $request->situacao;
         $servico->responsavel_id = $request->responsavel_id;
-
-        
+               
         $servico->protocolo_numero  =   $request->protocolo_numero;
         
-
+        $servico->observacoes   = $request->observacoes;
+        $servico->solicitante = $request->solicitante;
+        $servico->servico_lpu = $request->servico_lpu;
+        $servico->tipoLicenca = $request->tipoLicenca;
         
 
         $servico->laudo_numero = $request->laudo_numero;
@@ -490,10 +495,7 @@ class ServicosController extends Controller
             }
 
 
-         $servico->observacoes   = $request->observacoes;
-        $servico->solicitante = $request->solicitante;
-        $servico->servico_lpu = $request->servico_lpu;
-        $servico->tipoLicenca = $request->tipoLicenca;
+         
 
         if($servico->tipoLicenca == 'n/a' || $servico->tipoLicenca == 'definitiva')
         {
@@ -515,10 +517,30 @@ class ServicosController extends Controller
             $servico->unidade_id = $request->empresa_id;
         }
         
-        
-        
+
+
+
+              
         $servico->save();
-     
+        
+
+       
+
+
+        //Insert Faturamento
+
+        
+        $faturamento = new ServicoFinanceiro();
+        $faturamento->servico_id = $servico->id;
+        
+        $faturamento->valorTotal = $request->valorTotal;
+        $faturamento->valorFaturado = $request->valorFaturado;
+        $faturamento->valorFaturar = $request->valorFaturar;
+        $faturamento->valorAberto = $request->valorAberto;
+        $faturamento->status = $request->financeiroStatus;
+
+        $faturamento->save();      
+
 
         
 
@@ -590,10 +612,13 @@ class ServicosController extends Controller
         
 
         $servico = Servico::find($id);
+
+        
         $users = User::where('privileges','=','admin')->pluck('name','id')->toArray();
 
         $servico_lpu = ServicoLpu::where('empresa_id',$servico->unidade->empresa->id)->pluck('documento','id')->toArray();
 
+        
 
         //Check if is empresa or unidade
 
@@ -641,6 +666,9 @@ class ServicosController extends Controller
                         'route'=>$route,
                         'users'=>$users,
                         'servico_lpu'=>$servico_lpu,
+                        'financeiro'=>$servico->financeiro,
+                        
+                        
                     ]);
     }
 
@@ -665,10 +693,29 @@ class ServicosController extends Controller
         $servico->protocolo_numero  =   $request->protocolo_numero;
         $servico->laudo_numero = $request->laudo_numero;
 
+        $servico->observacoes   = $request->observacoes;
+        $servico->solicitante = $request->solicitante;
+        $servico->servico_lpu = $request->servico_lpu;
+        $servico->tipoLicenca = $request->tipoLicenca;
 
-       
-       
 
+
+        //Edit Financeiro
+
+        
+        $financeiro = ServicoFinanceiro::find($servico->financeiro->id);
+
+        $financeiro->valorTotal = $request->valorTotal;
+        $financeiro->valorFaturado = $request->valorFaturado;
+        $financeiro->valorFaturar = $request->valorFaturar;
+        $financeiro->valorAberto = $request->valorAberto;
+        $financeiro->status = $request->financeiroStatus;
+
+        $financeiro->save();
+
+
+
+        //-----------------------------------
 
         // Se informou o arquivo, retorna um boolean
         if ($request->hasFile('licenca_anexo') && $request->file('licenca_anexo')->isValid()) {
@@ -743,10 +790,7 @@ class ServicosController extends Controller
             $servico->laudo_emissao = Carbon::createFromFormat('d/m/Y', $request->laudo_emissao)->toDateString();
         }
 
-        $servico->observacoes   = $request->observacoes;
-        $servico->solicitante = $request->solicitante;
-        $servico->servico_lpu = $request->servico_lpu;
-        $servico->tipoLicenca = $request->tipoLicenca;
+       
         
 
         if($servico->tipoLicenca == 'n/a' || $servico->tipoLicenca == 'definitiva')
@@ -755,6 +799,7 @@ class ServicosController extends Controller
             $servico->licenca_validade = '2059-12-31';
         }
         
+
        
         $servico->save();
 
