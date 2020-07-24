@@ -15,8 +15,9 @@ use App\Models\ServicoLpu;
 
 
 
-use Illuminate\Http\Request;
+use App\Models\ServicoFinanceiro;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -536,6 +537,7 @@ class ServicosController extends Controller
         $faturamento->valorFaturado = $request->valorFaturado;
         $faturamento->valorFaturar = $request->valorFaturar;
         $faturamento->valorAberto = $request->valorAberto;
+        $faturamento->status = $request->financeiroStatus;
 
         $faturamento->save();      
 
@@ -610,10 +612,13 @@ class ServicosController extends Controller
         
 
         $servico = Servico::find($id);
+
+        
         $users = User::where('privileges','=','admin')->pluck('name','id')->toArray();
 
         $servico_lpu = ServicoLpu::where('empresa_id',$servico->unidade->empresa->id)->pluck('documento','id')->toArray();
 
+        
 
         //Check if is empresa or unidade
 
@@ -661,6 +666,9 @@ class ServicosController extends Controller
                         'route'=>$route,
                         'users'=>$users,
                         'servico_lpu'=>$servico_lpu,
+                        'financeiro'=>$servico->financeiro,
+                        
+                        
                     ]);
     }
 
