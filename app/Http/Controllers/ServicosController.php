@@ -657,6 +657,22 @@ class ServicosController extends Controller
         $servico->laudo_emissao = date('d/m/Y',strtotime($servico->laudo_emissao));
        }
         
+
+       if(!$servico->financeiro)
+       {
+           
+            $financeiro = new ServicoFinanceiro();
+            $financeiro->servico_id = $servico->id;
+            $financeiro->valorTotal = 0;
+            $financeiro->valorFaturado = 0;
+            $financeiro->valorFaturar = 0;
+            $financeiro->valorAberto = 0;
+            $financeiro->status = 'aberto';
+
+            $financeiro->save();
+            $servico->financeiro = $financeiro;
+        
+       }
        
         
         return view('admin.editar-servico')
