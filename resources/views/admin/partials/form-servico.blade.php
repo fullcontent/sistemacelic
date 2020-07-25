@@ -186,6 +186,9 @@
 </div>
 
 
+@if(Route::is('servicos.edit'))
+
+
 <div class="row">
 	<div class="col-md-12">
 		<div class="col-md-2">
@@ -230,6 +233,55 @@
 	</div>
 	
 </div>
+
+@elseif(Route::is('servicos.create'))
+
+<div class="row">
+	<div class="col-md-12">
+		<div class="col-md-2">
+			<div class="form-group">
+					
+				{!! Form::label('valorTotal', 'Valor Total', array('class'=>'control-label')) !!}
+				{!! Form::text('valorTotal', 0, ['class'=>'form-control','id'=>'valorTotal']) !!}
+				
+			</div>
+		</div>
+		<div class="col-md-2">
+			<div class="form-group">
+					
+				{!! Form::label('valorFaturado', 'Valor Faturado', array('class'=>'control-label')) !!}
+				{!! Form::text('valorFaturado', 0, ['class'=>'form-control','id'=>'valorFaturado']) !!}
+				
+			</div>
+		</div>
+		<div class="col-md-2">
+			<div class="form-group">
+					
+				{!! Form::label('valorFaturar', 'Valor Faturar', array('class'=>'control-label')) !!}
+				{!! Form::text('valorFaturar', 0, ['class'=>'form-control','id'=>'valorFaturar']) !!}
+				
+			</div>
+		</div>
+		<div class="col-md-2">
+			<div class="form-group">
+					
+				{!! Form::label('valorAberto', 'Valor Aberto', array('class'=>'control-label')) !!}
+				{!! Form::text('valorAberto', 0, ['class'=>'form-control','id'=>'valorAberto']) !!}
+				
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="form-group">
+				
+				{!! Form::label('financeiroStatus', 'Status', array('class'=>'control-label')) !!}
+				{!! Form::select('financeiroStatus', array('aberto' => 'Aberto', 'faturado' => 'Faturado','faturar'=>'Faturar','parcial'=>'Parcial'), 0, ['class'=>'form-control'])!!}
+			</div>
+		</div>
+	</div>
+	
+</div>
+
+@endif
 
 
 

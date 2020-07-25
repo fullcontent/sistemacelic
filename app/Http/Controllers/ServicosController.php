@@ -380,8 +380,9 @@ class ServicosController extends Controller
 
         $servico = null;
 
-        
-       
+
+
+           
          
 
 
@@ -393,6 +394,7 @@ class ServicosController extends Controller
                     'os' => $os,
                     'servico'=>$servico,
                     'servico_lpu'=>$servico_lpu,
+                    
                 ]);
     }
 
@@ -574,8 +576,7 @@ class ServicosController extends Controller
         $servico = Servico::find($id);
 
        
-
-       
+            
         //Check if is empresa or unidade
 
         if($servico->unidade_id){
@@ -612,8 +613,7 @@ class ServicosController extends Controller
         
 
         $servico = Servico::find($id);
-
-        
+                
         $users = User::where('privileges','=','admin')->pluck('name','id')->toArray();
 
         $servico_lpu = ServicoLpu::where('empresa_id',$servico->unidade->empresa->id)->pluck('documento','id')->toArray();
