@@ -886,6 +886,7 @@ class ServicosController extends Controller
         $interacao->servico_id = $request->servico_id;
         $interacao->observacoes = $request->observacoes;
         $interacao->user_id = Auth::id();
+        $interacao->created_at = Carbon::now('America/Sao_Paulo');
 
         $interacao->save();
 
