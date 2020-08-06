@@ -17,7 +17,8 @@
                  
                   <th>Serviço</th>
                   <th>Cod. Unid.</th>
-                  <th>Unidade</th>
+				  <th>Unidade</th>
+				  <th>Cidade</th>
                   <th>Situação</th>
                   
                   <th></th>
@@ -41,7 +42,8 @@
 	              		}
 	              	@endphp
 	              	<td>{{$servico->unidade->codigo ?? ''}}</td>
-	              	<td><a href="{{$route}}">{{$empresa}}</a></td>
+					  <td><a href="{{$route}}">{{$empresa}}</a></td>
+					<td>{{$servico->unidade->cidade}}/{{$servico->unidade->uf}}</td>
 	              	<td>
 
 	              		
