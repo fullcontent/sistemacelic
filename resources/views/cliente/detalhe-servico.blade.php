@@ -64,10 +64,40 @@
                 
                 <div class="col-sm-6">
                   
-                  @unless ( empty($servico->licenca_anexo) )  
+                  @unless ( empty($servico->licenca_anexo) ) 
+
+                  <p><b>Tipo da Licença: </b>
+                    @switch($servico->tipoLicenca)
+                        @case('renovavel')
+                            Renovável
+                            @break
+                        @case('n/a')
+                            Não Aplicada
+                            @break
+                        @case('definitiva')
+                            Definitiva
+                            @break
+                        
+                            
+                    @endswitch
+                  </p>
+
+
                   <p><b>Emissão da Licença: </b>{{\Carbon\Carbon::parse($servico->licenca_emissao)->format('d/m/Y')}}</p>
-                  <p><b>Validade da Licença </b>{{\Carbon\Carbon::parse($servico->licenca_validade)->format('d/m/Y')}}</p>
+
+                  @if($servico->tipoLicenca == 'renovavel')
+                    
+                    <p><b>Validade da Licença </b>{{\Carbon\Carbon::parse($servico->licenca_validade)->format('d/m/Y')}}</p>
+
+                  @endif
+                  
                   <p><b>Emissão Documento: </b> <a href="{{ url("uploads/$servico->licenca_anexo") }}" class="btn btn-xs btn-warning" target="_blank">Ver Licença</a></p>
+                  @endunless
+
+                  @unless ( empty($servico->laudo_anexo) )  
+                  <p><b>Emissão do Laudo: </b>{{\Carbon\Carbon::parse($servico->laudo_emissao)->format('d/m/Y')}}</p>
+                  <p><b>N. do Laudo </b> {{$servico->laudo_numero }}</p>
+                  <p><b>Laudo: </b> <a href="{{ url("uploads/$servico->laudo_anexo") }}" class="btn btn-xs btn-warning" target="_blank">Ver Laudo</a></p>
                   @endunless
 
                 </div>
@@ -83,6 +113,9 @@
 
 <div class="col-md-7">
   @include('cliente.components.widget-taxas')
+</div>
+<div class="col-md-5">
+  @include('cliente.components.widget-pendencias')
 </div>
 
 

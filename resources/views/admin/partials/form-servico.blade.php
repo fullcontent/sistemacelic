@@ -5,8 +5,11 @@
 	<div class="form-group">
 		
 		{!! Form::label('tipo', 'Tipo', array('class'=>'control-label')) !!}
+		@if($ps == 'primario')
 		{!! Form::select('tipo', array('primario' => 'Primário', 'secundario' => 'Secundário'), null, ['class'=>'form-control'])!!}
-		
+		@elseif($ps=='secundario')
+		{!! Form::select('tipo', array('secundario' => 'Secundário','primario' => 'Primário', ), null, ['class'=>'form-control'])!!}
+		@endif
 	</div>
 </div>
 

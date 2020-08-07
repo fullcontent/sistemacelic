@@ -37,7 +37,7 @@
       <div class="col-md-3">
         <div class="form-group">
         {!! Form::label('responsavel_id', 'Responsável', array('class'=>'control-label')) !!}
-        {!! Form::select('responsavel_id', $responsaveis ,null, ['class'=>'form-control','id'=>'responsavel_id']) !!}
+        {!! Form::select('responsavel_id', $responsaveis ,Auth::id(), ['class'=>'form-control','id'=>'responsavel_id']) !!}
         </div>
       </div>
 

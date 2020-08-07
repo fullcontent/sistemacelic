@@ -67,10 +67,22 @@
                   
                   @unless ( empty($servico->licenca_anexo) ) 
 
-                  <p><b>Tipo da Licença: </b>{{$servico->tipoLicenca}}</p>
-
-
-
+                  <p><b>Tipo da Licença: </b>
+                    @switch($servico->tipoLicenca)
+                        @case('renovavel')
+                            Renovável
+                            @break
+                        @case('n/a')
+                            Não Aplicada
+                            @break
+                        @case('definitiva')
+                            Definitiva
+                            @break
+                        
+                            
+                    @endswitch
+                  </p>
+                  
                   <p><b>Emissão da Licença: </b>{{\Carbon\Carbon::parse($servico->licenca_emissao)->format('d/m/Y')}}</p>
 
                   @if($servico->tipoLicenca == 'renovavel')
