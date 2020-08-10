@@ -685,8 +685,8 @@ class ServicosController extends Controller
                         'users'=>$users,
                         'servico_lpu'=>$servico_lpu,
                         'financeiro'=>$servico->financeiro,
-                        
-                        
+                        'ps'=>$servico->tipo,
+                                                
                     ]);
     }
 
