@@ -45,7 +45,7 @@
             <div class="inner">
               <h3>{{count($vencer)}}</h3>
 
-              <p>Licenças a vencer</p>
+              <p>Serviços a vencer</p>
             </div>
             <div class="icon">
               
