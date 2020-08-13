@@ -1,9 +1,9 @@
-<div class="box box-info">
+<div class="box box-info  collapsed-box">
             <div class="box-header with-border">
-              <h3 class="box-title">Taxa</h3>
+              <a href="#" data-widget="collapse"><h3 class="box-title">Taxa</h3></a>
 
               <div class="box-tools pull-right">
-                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i>
                 </button>
                 <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
               </div>
@@ -17,7 +17,7 @@
                     <th>Nome</th>
                     <th>Valor</th>
                     <th>Vencimento</th>
-                    <th>Situacao</th>
+                    <th>Situação</th>
                     <th>O.S.</th>
                     <th></th>
                     <th></th>
@@ -57,13 +57,13 @@
         @if(empty($taxa->comprovante))
         @unless ( empty($taxa->boleto))
         
-        <a href="{{ url("uploads/$taxa->boleto") }}" class="btn btn-xs btn-warning" target="_blank">Ver Boleto</a>
+        <a href="{{ url("uploads/$taxa->boleto") }}" class="btn btn-xs btn-warning" target="_blank"> Boleto</a>
         @endunless
         @endif
         
         @unless ( empty($taxa->comprovante) )
         
-        <a href="{{ url("uploads/$taxa->comprovante") }}" class="btn btn-xs btn-success" target="_blank">Ver Comprovante</a>
+        <a href="{{ url("uploads/$taxa->comprovante") }}" class="btn btn-xs btn-success" target="_blank">Comprovante</a>
         @endunless</td>
         <td>
                     <a href="{{route('taxas.delete',$taxa->id)}}" onclick="return confirm('Tem certeza que deseja excluir a taxa?');"><i class="fa fa-trash"></i></a></td>

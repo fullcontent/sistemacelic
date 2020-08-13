@@ -13,8 +13,8 @@
 				<table id="lista-servicos" class="table table-bordered table-hover">
                 <thead>
                 <tr>
-                  <th>OS</th>
-                 
+                  <th>Tipo</th>
+				  <th>OS</th>
                   <th>Serviço</th>
                   <th>Cod. Unid.</th>
 				  <th>Unidade</th>
@@ -27,7 +27,9 @@
 				@foreach($servicos as $servico)
                 	
                 	<tr>
-	              	<td>{{$servico->os}}</td>
+					<td>{{$servico->tipo}}</td>
+					<td>{{$servico->os}}</td>
+					 
 	              	
 	              	<td><a href="{{route('servicos.show', $servico->id)}}">{{$servico->nome}}</a></td>
 

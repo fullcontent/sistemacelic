@@ -5,11 +5,17 @@
 	<div class="form-group">
 		
 		{!! Form::label('tipo', 'Tipo', array('class'=>'control-label')) !!}
-		@if($ps == 'primario')
-		{!! Form::select('tipo', array('primario' => 'Primário', 'secundario' => 'Secundário'), null, ['class'=>'form-control'])!!}
-		@elseif($ps=='secundario')
-		{!! Form::select('tipo', array('secundario' => 'Secundário','primario' => 'Primário', ), null, ['class'=>'form-control'])!!}
-		@endif
+		
+		{!! Form::select('tipo', array(
+			'licencaOperacao' => 'Licenças de Operação',
+			'nRenovaveis' => 'Licenças/Projetos não renováveis',
+			'controleCertidoes' => 'Controle de Certidões',
+			'controleTaxas' => 'Controle de Taxas',
+			'facilitiesRealEstate' => 'Facilities/Real Estate'
+			), 
+			null, ['class'=>'form-control'])!!}
+		
+		
 	</div>
 </div>
 
@@ -32,8 +38,6 @@
 		{!! Form::label('situacao', 'Situação', array('class'=>'control-label')) !!}
 			{!! Form::select('situacao', array('andamento' => 'Andamento', 'finalizado' => 'Finalizado','arquivado'=>'Arquivado'), null, ['class'=>'form-control'])!!}
 
-		
-		
 	</div>
 </div>
 
@@ -45,7 +49,7 @@
           
           {!! Form::label('responsavel_id', 'Responsável', array('class'=>'control-label')) !!}
           
-          {!! Form::select('responsavel_id', $users, null, ['class'=>'form-control']) !!}
+          {!! Form::select('responsavel_id', $users, Auth::id(), ['class'=>'form-control']) !!}
 
         </div>
 		
@@ -189,55 +193,7 @@
 </div>
 
 
-@if(Route::is('servicos.edit'))
 
-
-<div class="row">
-	<div class="col-md-12">
-		<div class="col-md-2">
-			<div class="form-group">
-					
-				{!! Form::label('valorTotal', 'Valor Total', array('class'=>'control-label')) !!}
-				{!! Form::text('valorTotal', $financeiro->valorTotal, ['class'=>'form-control','id'=>'valorTotal']) !!}
-				
-			</div>
-		</div>
-		<div class="col-md-2">
-			<div class="form-group">
-					
-				{!! Form::label('valorFaturado', 'Valor Faturado', array('class'=>'control-label')) !!}
-				{!! Form::text('valorFaturado', $financeiro->valorFaturado, ['class'=>'form-control','id'=>'valorFaturado']) !!}
-				
-			</div>
-		</div>
-		<div class="col-md-2">
-			<div class="form-group">
-					
-				{!! Form::label('valorFaturar', 'Valor Faturar', array('class'=>'control-label')) !!}
-				{!! Form::text('valorFaturar', $financeiro->valorFaturar, ['class'=>'form-control','id'=>'valorFaturar']) !!}
-				
-			</div>
-		</div>
-		<div class="col-md-2">
-			<div class="form-group">
-					
-				{!! Form::label('valorAberto', 'Valor Aberto', array('class'=>'control-label')) !!}
-				{!! Form::text('valorAberto', $financeiro->valorAberto, ['class'=>'form-control','id'=>'valorAberto']) !!}
-				
-			</div>
-		</div>
-		<div class="col-md-4">
-			<div class="form-group">
-				
-				{!! Form::label('financeiroStatus', 'Status', array('class'=>'control-label')) !!}
-				{!! Form::select('financeiroStatus', array('aberto' => 'Aberto', 'faturado' => 'Faturado','faturar'=>'Faturar','parcial'=>'Parcial'), $financeiro->status, ['class'=>'form-control'])!!}
-			</div>
-		</div>
-	</div>
-	
-</div>
-
-@elseif(Route::is('servicos.create'))
 
 <div class="row">
 	<div class="col-md-12">
@@ -249,46 +205,10 @@
 				
 			</div>
 		</div>
-		<div class="col-md-2">
-			<div class="form-group">
-					
-				{!! Form::label('valorFaturado', 'Valor Faturado', array('class'=>'control-label')) !!}
-				{!! Form::text('valorFaturado', 0, ['class'=>'form-control','id'=>'valorFaturado']) !!}
-				
-			</div>
-		</div>
-		<div class="col-md-2">
-			<div class="form-group">
-					
-				{!! Form::label('valorFaturar', 'Valor Faturar', array('class'=>'control-label')) !!}
-				{!! Form::text('valorFaturar', 0, ['class'=>'form-control','id'=>'valorFaturar']) !!}
-				
-			</div>
-		</div>
-		<div class="col-md-2">
-			<div class="form-group">
-					
-				{!! Form::label('valorAberto', 'Valor Aberto', array('class'=>'control-label')) !!}
-				{!! Form::text('valorAberto', 0, ['class'=>'form-control','id'=>'valorAberto']) !!}
-				
-			</div>
-		</div>
-		<div class="col-md-4">
-			<div class="form-group">
-				
-				{!! Form::label('financeiroStatus', 'Status', array('class'=>'control-label')) !!}
-				{!! Form::select('financeiroStatus', array('aberto' => 'Aberto', 'faturado' => 'Faturado','faturar'=>'Faturar','parcial'=>'Parcial'), 0, ['class'=>'form-control'])!!}
-			</div>
-		</div>
+		
 	</div>
 	
 </div>
-
-@endif
-
-
-
-
 
 
 <div class="col-md-12">

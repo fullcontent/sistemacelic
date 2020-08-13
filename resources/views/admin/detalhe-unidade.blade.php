@@ -19,22 +19,34 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-5">
+    <div class="col-md-6">
         
-        @include('admin.components.widget-servicos')
-        @include('admin.components.widget-servicos-secundarios')
+        @if(count($servicos->where('tipo','primario')))
+            @include('admin.components.widget-servicos')
+        @endif
+
+        @if(count($servicos->where('tipo','secundario')))
+            @include('admin.components.widget-servicos-secundarios')
+        @endif
+        
+
+        
         
     </div>
-    <div class="col-md-7">
+    <div class="col-md-6">
         
-        @include('admin.components.widget-taxas')
+        @if(count($taxas))
+            @include('admin.components.widget-taxas')
+        @endif
+       
+
+        @if(count($dados->arquivos))
+            @include('admin.components.widget-arquivos')
+        @endif
+       
         
     </div>
 
-     <div class="col-md-7">
-        
-        @include('admin.components.widget-arquivos')
-        
-    </div>
+     
 </div>
 @endsection
