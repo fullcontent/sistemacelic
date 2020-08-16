@@ -21,30 +21,51 @@
 <div class="row">
     <div class="col-md-6">
         
-        @if(count($servicos->where('tipo','primario')))
-            @include('admin.components.widget-servicos')
+        @if(count($servicos->where('tipo','licencaOperacao')))
+            @include('admin.components.widget-licencasOperacao')
         @endif
-
-        @if(count($servicos->where('tipo','secundario')))
-            @include('admin.components.widget-servicos-secundarios')
+    
+    </div>
+    <div class="col-md-6">
+        
+        @if(count($servicos->where('tipo','nRenovaveis')))
+            @include('admin.components.widget-naoRenovaveis')
         @endif
+       
         
+    </div>
 
+    <div class="col-md-6">
         
+        @if(count($servicos->where('tipo','controleCertidoes')))
+            @include('admin.components.widget-controleCertidoes')
+        @endif
+       
+        
+    </div>
+
+    <div class="col-md-6">
+        
+        @if(count($servicos->where('tipo','controleTaxas')))
+            @include('admin.components.widget-controleTaxas')
+        @endif
+       
         
     </div>
     <div class="col-md-6">
         
-        @if(count($taxas))
-            @include('admin.components.widget-taxas')
-        @endif
-       
-
-        @if(count($dados->arquivos))
-            @include('admin.components.widget-arquivos')
+        @if(count($servicos->where('tipo','facilitiesRealEstate')))
+            @include('admin.components.widget-facilities')
         @endif
        
         
+    </div>
+
+
+    <div class="col-md-6">
+        @if(count($dados->arquivos))
+            @include('admin.components.widget-arquivos')
+        @endif
     </div>
 
      

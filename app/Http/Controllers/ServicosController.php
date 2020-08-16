@@ -312,7 +312,7 @@ class ServicosController extends Controller
         //
 
         $tipo = $request->t;
-        $ps = $request->ps;
+        $tipoServico = $request->tipoServico;
     
         $id = $request->id;
         $users = User::where('privileges','=','admin')->pluck('name','id')->toArray();
@@ -395,7 +395,8 @@ class ServicosController extends Controller
                     'os' => $os,
                     'servico'=>$servico,
                     'servico_lpu'=>$servico_lpu,
-                    'ps'=>$ps,
+                    'tipoServico'=>$tipoServico,
+                    
                     
                 ]);
     }

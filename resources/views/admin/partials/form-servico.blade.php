@@ -6,6 +6,18 @@
 		
 		{!! Form::label('tipo', 'Tipo', array('class'=>'control-label')) !!}
 		
+		@if(Route::is('servicos.create'))
+		
+		{!! Form::select('tipo', array(
+			'licencaOperacao' => 'Licenças de Operação',
+			'nRenovaveis' => 'Licenças/Projetos não renováveis',
+			'controleCertidoes' => 'Controle de Certidões',
+			'controleTaxas' => 'Controle de Taxas',
+			'facilitiesRealEstate' => 'Facilities/Real Estate'
+			), 
+			$tipoServico, ['class'=>'form-control'])!!}
+
+		@else
 		{!! Form::select('tipo', array(
 			'licencaOperacao' => 'Licenças de Operação',
 			'nRenovaveis' => 'Licenças/Projetos não renováveis',
@@ -14,6 +26,7 @@
 			'facilitiesRealEstate' => 'Facilities/Real Estate'
 			), 
 			null, ['class'=>'form-control'])!!}
+		@endif
 		
 		
 	</div>
