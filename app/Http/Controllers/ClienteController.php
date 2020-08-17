@@ -247,7 +247,7 @@ class ClienteController extends Controller
 
         $servicos = $servicos->where('unidade.status','=','Ativa')
                         ->where('licenca_validade','>',date('Y-m-d'))
-                        ->where('tipo','primario')
+                        ->where('tipo','licencaOperacao')
                         ->where('situacao','<>','arquivado');
 
         return view('cliente.lista-servicos')
@@ -270,7 +270,7 @@ class ClienteController extends Controller
         
         $servicos = $servicos->where('unidade.status','=','Ativa')
                             ->where('licenca_validade','<',date('Y-m-d'))
-                            ->where('tipo','=','primario')
+                            ->where('tipo','=','licencaOperacao')
                             ->where('situacao','<>','arquivado');
 
        
