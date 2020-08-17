@@ -11,8 +11,11 @@
   {{ session('success') }}
 </div>
 @endif
+
+
 <div class="row">
   <div class="col-md-12">
+    
     @include('cliente.components.widget-detalhes')
     
   </div>
@@ -20,26 +23,55 @@
 
 <div class="row">
   <div class="col-md-6">
-    @include('cliente.components.widget-servicos')
-  </div>
-  <div class="col-md-6">
-    @include('cliente.components.widget-servicos-secundarios')
-  </div>
-</div>
-<div class="row">
+      
+      @if(count($servicos->where('tipo','licencaOperacao')))
+          @include('cliente.components.widget-licencasOperacao')
+      @endif
   
-  
-  <div class="col-md-6">
-    
-    @include('cliente.components.widget-taxas')
-    
   </div>
- 
   <div class="col-md-6">
-    
-    @include('cliente.components.widget-arquivos')
-    
+      
+      @if(count($servicos->where('tipo','nRenovaveis')))
+          @include('cliente.components.widget-nRenovaveis')
+      @endif
+     
+      
   </div>
+
+  <div class="col-md-6">
+      
+      @if(count($servicos->where('tipo','controleCertidoes')))
+          @include('cliente.components.widget-controleCertidoes')
+      @endif
+     
+      
+  </div>
+
+  <div class="col-md-6">
+      
+      @if(count($servicos->where('tipo','controleTaxas')))
+          @include('cliente.components.widget-controleTaxas')
+      @endif
+     
+      
+  </div>
+  <div class="col-md-6">
+      
+      @if(count($servicos->where('tipo','facilitiesRealEstate')))
+          @include('cliente.components.widget-facilities')
+      @endif
+     
+      
+  </div>
+
+
+  <div class="col-md-6">
+      @if(count($dados->arquivos))
+          @include('cliente.components.widget-arquivos')
+      @endif
+  </div>
+
+   
 </div>
 @endsection
 

@@ -24,7 +24,27 @@
 				@foreach($servicos as $servico)
                 	<tr>
 	              	<td>{{$servico->os}}</td>
-	              	<td>{{$servico->tipo}}</td>
+					  
+					  <td>@switch($servico->tipo)
+						  @case('nRenovaveis')
+						  Licenças/Projetos não renováveis
+							  @break
+						  @case('licencaOperacao')
+							  Licença de Operação
+							  @break
+						  @case('controleCertidoes')
+							  Certidões
+							  @break
+						  @case('controleTaxas')
+							  Taxas
+							  @break
+						@case('facilitiesRealEstate')
+							Facilities/Real Estate
+							  @break
+						  @default
+							  
+					  @endswitch</td>
+					  
 	              	<td>{{$servico->nome}}</td>
 
 	              	@php
@@ -49,12 +69,12 @@
 
 	              			@case('andamento')
 
-								@if(($servico->licenca_validade >= date('Y-m-d')) && ($servico->tipo == 'primario'))
+								@if(($servico->licenca_validade >= date('Y-m-d')) && ($servico->tipo == 'licencaOperacao'))
 									
 									<button type="button" class="btn btn-xs btn-success">Andamento</button>
-	              					@elseif(($servico->licenca_validade < date('Y-m-d'))&& ($servico->tipo == 'primario'))
+	              					@elseif(($servico->licenca_validade < date('Y-m-d'))&& ($servico->tipo == 'licencaOperacao'))
 	              					<button type="button" class="btn btn-xs btn-danger">Andamento</button>
-								@elseif($servico->tipo == 'secundario')
+								@elseif($servico->tipo == 'nRenovaveis')
 									<button type="button" class="btn btn-xs btn-warning">Andamento</button>
 
 	              				@endif
@@ -66,13 +86,13 @@
 
 	              			@case('finalizado')
 
-	              				@if(($servico->licenca_validade >= date('Y-m-d')) && ($servico->tipo == 'primario'))
+	              				@if(($servico->licenca_validade >= date('Y-m-d')) && ($servico->tipo == 'licencaOperacao'))
 									
 									<button type="button" class="btn btn-xs btn-success">Finalizado</button>
-	              					@elseif(($servico->licenca_validade < date('Y-m-d'))&& ($servico->tipo == 'primario'))
+	              					@elseif(($servico->licenca_validade < date('Y-m-d'))&& ($servico->tipo == 'licencaOperacao'))
 	              					<button type="button" class="btn btn-xs btn-danger">Finalizado</button>
 
-	              				@elseif($servico->tipo == 'secundario')
+	              				@elseif($servico->tipo == 'nRenovaveis')
 									<button type="button" class="btn btn-xs btn-warning">Finalizado</button>
 
 	              				@endif

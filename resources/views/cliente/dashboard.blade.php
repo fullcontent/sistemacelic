@@ -103,20 +103,25 @@
 
      <div class="row">
      		<div class="col-md-6">
-     			<div class="box">
+          <div class="box box-info collapsed-box">
             <div class="box-header with-border">
-              <h3 class="box-title">Serviços primários - andamento</h3>
+              <a href="#" data-widget="collapse"><h3 class="box-title">Licenças de Operação em andamento</h3></a>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
             </div>
             <!-- /.box-header -->
             <div class="box-body">
-              <table id="servicos-primario" class="table table-bordered" >
+              <table id="licencaOperacao" class="table table-bordered" >
                 
               <thead>
                 
                 <tr>
                   <th>Código</th>
                   <th>Serviço</th>
-
                   <th>Vencimento</th>
                   
                 </tr>
@@ -124,7 +129,7 @@
                 
 
                 <tbody>
-				      @foreach($servicos->where('tipo','=','primario')->where('situacao','=','andamento') as $servico)
+				      @foreach($servicos->where('tipo','=','licencaOperacao')->where('situacao','=','andamento') as $servico)
 
                 <tr>
                 	<td>{{$servico->unidade->codigo}}</td>
@@ -141,18 +146,25 @@
           </div>
      		</div>
 
-        @if(count($servicos->where('tipo','secundario')->where('situacao','andamento')))
+      @if(count($servicos->where('tipo','nRenovaveis')->where('situacao','andamento')))
      		<div class="col-md-6">
-          <div class="box">
+          <div class="box box-info collapsed-box">
             <div class="box-header with-border">
-              <h3 class="box-title">Serviços secundários - andamento</h3>
+              <a href="#" data-widget="collapse"><h3 class="box-title">Licenças/Projetos não Renováveis em andamento</h3></a>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+              </div>
             </div>
             <!-- /.box-header -->
             <div class="box-body">
-              <table class="table table-bordered" id="servicos-secundario">
+              <table class="table table-bordered" id="nRenovaveis">
                
                <thead>
                   <tr>
+                   <th>Código</th> 
                   <th>O.S.</th>
                   <th>Nome</th>
                   
@@ -162,9 +174,10 @@
 
                
         <tbody>
-        @foreach($servicos->where('tipo','secundario')->where('situacao','andamento') as $servico)
+        @foreach($servicos->where('tipo','nRenovaveis')->where('situacao','andamento') as $servico)
 
                 <tr>
+                  <td>{{$servico->unidade->codigo}}</td>
                   <td>{{$servico->os}}</td>
                   <td><a href="{{route('cliente.servico.show',$servico->id)}}">{{$servico->nome}}</a></td>
                   
@@ -196,7 +209,7 @@
 
     $(function () {
         
-        $('#servicos-primario').DataTable({
+        $('#licencaOperacao').DataTable({
           "paging": true,
           "lengthChange": false,
           "searching": true,
@@ -210,7 +223,7 @@
 
         });
 
-        $('#servicos-secundario').DataTable({
+        $('#nRenovaveis').DataTable({
           "paging": true,
           "lengthChange": false,
           "searching": true,
