@@ -18,14 +18,49 @@
         
     </div>
 </div>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="box box-gray collapsed-box">
+          <div class="box-header with-border">
+            <a href="#" data-widget="collapse"><h3 class="box-title">Cadastrar novo</h3></a>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+            </div>
+          </div>
+          
+          <!-- /.box-header -->
+          <div class="box-body">
+            <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'nRenovavel'])}}" class="btn btn-block btn-default btn-flat">Projeto/Licença Não Renovável</a>
+            <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'controleCertidoes'])}}" class="btn btn-block btn-default btn-flat">Controle de Certidões</a>
+            <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'controleTaxa'])}}" class="btn btn-block btn-default btn-flat">Controle de Taxas</a>
+            <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'facilitiesRealEstate'])}}" class="btn btn-block btn-default btn-flat">Facilities/Real Estate</a>
+            <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'licencaOperacao'])}}" class="btn btn-block btn-default btn-flat">Licença de Operação</a>
+
+          </div>
+          <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+      </div>
+      <div class="col-md-9">
+        @if(count($dados->arquivos))
+            @include('admin.components.widget-arquivos')
+        @else
+        
+        @endif
+    </div>
+</div>
 <div class="row">
     <div class="col-md-6">
         
         @if(count($servicos->where('tipo','licencaOperacao')))
             @include('admin.components.widget-licencasOperacao')
-
         @else
-        <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'licencaOperacao'])}}" class="btn btn-sm btn-info btn-flat pull-left"><span class="glyphicon glyphicon-plus-sign"></span> Nova Licença de Operação</a>
+        
+       
+      
         @endif
     
     </div>
@@ -34,7 +69,8 @@
         @if(count($servicos->where('tipo','nRenovaveis')))
             @include('admin.components.widget-naoRenovaveis')
             @else
-        <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'nRenovavel'])}}" class="btn btn-sm btn-info btn-flat pull-left"><span class="glyphicon glyphicon-plus-sign"></span> Novo Projeto/Licença Não Renovável</a>
+           
+        
         @endif
        
         
@@ -44,8 +80,8 @@
         
         @if(count($servicos->where('tipo','controleCertidoes')))
             @include('admin.components.widget-controleCertidoes')
-            @else
-        <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'controleCertidoes'])}}" class="btn btn-sm btn-info btn-flat pull-left"><span class="glyphicon glyphicon-plus-sign"></span> Nova Certidão</a>
+        @else
+            
         @endif
        
         
@@ -56,7 +92,7 @@
         @if(count($servicos->where('tipo','controleTaxas')))
             @include('admin.components.widget-controleTaxas')
             @else
-        <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'controleTaxa'])}}" class="btn btn-sm btn-info btn-flat pull-left"><span class="glyphicon glyphicon-plus-sign"></span> Nova Taxa</a>
+           
         @endif
        
         
@@ -65,20 +101,15 @@
         
         @if(count($servicos->where('tipo','facilitiesRealEstate')))
             @include('admin.components.widget-facilities')
-
-            @else
-            <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'facilitiesRealEstate'])}}" class="btn btn-sm btn-info btn-flat pull-left"><span class="glyphicon glyphicon-plus-sign"></span> Nova Facilities/Real Estate</a>
+        @else
+       
         @endif
        
         
     </div>
 
 
-    <div class="col-md-6">
-        
-            @include('admin.components.widget-arquivos')
-        
-    </div>
+    
 
      
 </div>
