@@ -539,10 +539,7 @@ class ServicosController extends Controller
         $faturamento->servico_id = $servico->id;
         
         $faturamento->valorTotal = $request->valorTotal;
-        $faturamento->valorFaturado = $request->valorFaturado;
-        $faturamento->valorFaturar = $request->valorFaturar;
-        $faturamento->valorAberto = $request->valorAberto;
-        $faturamento->status = $request->financeiroStatus;
+        
 
         $faturamento->save();      
 
@@ -725,11 +722,7 @@ class ServicosController extends Controller
         $financeiro = ServicoFinanceiro::find($servico->financeiro->id);
 
         $financeiro->valorTotal = $request->valorTotal;
-        $financeiro->valorFaturado = $request->valorFaturado;
-        $financeiro->valorFaturar = $request->valorFaturar;
-        $financeiro->valorAberto = $request->valorAberto;
-        $financeiro->status = $request->financeiroStatus;
-
+        
         $financeiro->save();
 
 
