@@ -135,7 +135,7 @@
             
              <ul class="timeline timeline-inverse">
                                  
-                  
+                
                 @foreach($servico->historico as $historico)
                   <!-- timeline item -->
                   <li>

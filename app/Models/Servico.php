@@ -19,7 +19,7 @@ class Servico extends Model
     
     public function historico()
     {
-    	return $this->hasMany('App\Models\Historico')->orderBy('created_at','desc')->take(3);
+    	return $this->hasMany('App\Models\Historico')->orderBy('created_at','desc')->where('observacoes','not like',"%Alterou%")->take(5);
     }
 
     public function taxas()
