@@ -589,17 +589,35 @@ class ServicosController extends Controller
             $route = 'empresas.edit';
         }
 
+        $access = UserAccess::where('user_id',Auth::id())->whereNull('unidade_id')->pluck('empresa_id');
+        $empresa = Empresa::where('id',$servico->unidade->empresa_id)->pluck('id');
+        
+        if($access->contains($empresa[0]))
+        {
+            return view('admin.detalhe-servico')
+            ->with([
+                'servico'=>$servico,
+                'dados'=>$dados,
+                'route'=>$route,
+                'taxas'=>$servico->taxas,
+                'pendencias'=>$servico->pendencias,
+                'arquivo'=>'servico',
+                
+            ]);
 
-        return view('admin.detalhe-servico')
-                    ->with([
-                        'servico'=>$servico,
-                        'dados'=>$dados,
-                        'route'=>$route,
-                        'taxas'=>$servico->taxas,
-                        'pendencias'=>$servico->pendencias,
-                        'arquivo'=>'servico',
-                        
-                    ]);
+        }
+        else
+        {
+            return view('errors.403');
+        }
+            
+       
+
+  
+
+
+
+       
     }
 
     /**

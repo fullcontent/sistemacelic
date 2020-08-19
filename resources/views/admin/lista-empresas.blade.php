@@ -7,10 +7,12 @@
 			
 				<div class="box">
 					<div class="box-header">
-					
+						
+						@if(Auth::id() <= 8)
 						<a class="btn btn-app" href="{{route('empresa.cadastro')}}">
 	                		<i class="fa fa-plus"></i> Cadastrar
-	         			</a>
+						 </a>
+						@endif
 
 					</div>
 				

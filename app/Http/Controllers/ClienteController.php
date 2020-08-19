@@ -100,7 +100,6 @@ class ClienteController extends Controller
     public function empresaUnidades($id)
     {   
         $unidades = Unidade::with('empresa')->where('empresa_id','=',$id)->get();
-
         $access = UserAccess::where('user_id',Auth::id())->whereNull('unidade_id')->get();
 
         if($access->pluck('empresa_id')->contains($id))

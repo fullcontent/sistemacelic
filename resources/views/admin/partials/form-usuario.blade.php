@@ -53,8 +53,8 @@
 		
 		<div class="form-group">
 			 {{ Form::label('Unidades', null, ['class' => 'control-label']) }}
- 			{{ Form::select('unidades_user_access[]', $unidades, null,['class'=>'form-control','multiple'=>'multiple','id'=>'unidades_user_access']) }}
-
+ 			{{ Form::select('unidades_user_access[]', $unidades, null,['class'=>'form-control','multiple'=>'multiple','id'=>'unidades_user_access','disabled'=>'disabled']) }}
+			*desabilitado temporariamente
 						
 		</div>
 	</div>

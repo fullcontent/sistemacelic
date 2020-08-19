@@ -116,24 +116,30 @@ class AppServiceProvider extends ServiceProvider
                             'url'  =>  route('servico.inativo'),
                             'icon'  =>  'glyphicon glyphicon-ban-circle text-red',
                             ],
-                            [
-                            'text' => 'Listagem geral',
-                            'url'  =>  ''.Auth::user()->privileges.'/servicos',
-                            'icon'  =>  'glyphicon glyphicon-th-list',
-                            ],
+                            
                             ]
                             ]
 
 
                             );
-                            $event->menu->add(
-                            ['header'=> 'Administração'],
-                            [
-                            'text' => 'Usuários',
-                            'url'  =>  ''.Auth::user()->privileges.'/usuarios',
-                            'icon' => 'fa fa-users'
-                            ]
-                            );
+
+                            if(Auth::id() <= 3)
+                            {
+                                $event->menu->add(
+                                    ['header'=> 'Administração'],
+                                    [
+                                    'text' => 'Usuários',
+                                    'url'  =>  ''.Auth::user()->privileges.'/usuarios',
+                                    'icon' => 'fa fa-users'
+                                    ],
+                                    [
+                                        'text' => 'Listagem geral dos serviços',
+                                        'url'  =>  ''.Auth::user()->privileges.'/servicos',
+                                        'icon'  =>  'glyphicon glyphicon-th-list',
+                                        ],
+                                    );
+                            }
+                            
                             }
 
                         if(Auth::user()->privileges == 'cliente')

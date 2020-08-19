@@ -10,6 +10,7 @@ use App\Models\Unidade;
 use App\Models\Pendencia;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -33,8 +34,11 @@ class UnidadesController extends Controller
 
     public function index()
     {
-        //
-        $unidades = Unidade::with('servicos')->get();
+        
+        $access = UserAccess::where('user_id',Auth::id())->whereNull('unidade_id')->pluck('empresa_id');
+
+        $unidades = Unidade::with('servicos')->whereIn('empresa_id',$access)->get();
+
         return view('admin.lista-unidades')->with('unidades',$unidades);
     }
 
@@ -111,17 +115,28 @@ class UnidadesController extends Controller
     {
         //
         $unidade = Unidade::find($id);
+        $access = UserAccess::where('user_id',Auth::id())->whereNull('unidade_id')->pluck('empresa_id');
+        $unidades = Unidade::whereIn('empresa_id',$access)->pluck('id');
+        
+
+        if($unidades->contains($id))
+        {
+            return view('admin.detalhe-unidade')
+            ->with([
+                'dados'=>$unidade,
+                'servicos'=>$unidade->servicos,
+                'taxas'=>$unidade->taxas,
+                'route' => 'unidades.edit',
+                'arquivo'=>'unidade',
+        ]);
+        }
+        else
+        {
+            return view('errors.403');
+        }
 
 
-
-        return view('admin.detalhe-unidade')
-                    ->with([
-                        'dados'=>$unidade,
-                        'servicos'=>$unidade->servicos,
-                        'taxas'=>$unidade->taxas,
-                        'route' => 'unidades.edit',
-                        'arquivo'=>'unidade',
-                ]);
+        
     }
 
     /**
@@ -251,7 +266,10 @@ class UnidadesController extends Controller
 
     public function cadastro()
     {   
-        $empresas = Empresa::pluck('nomeFantasia','id')->toArray();
+
+        $access = UserAccess::where('user_id',Auth::id())->whereNull('unidade_id')->pluck('empresa_id');
+
+        $empresas = Empresa::whereIn('id',$access)->pluck('nomeFantasia','id')->toArray();
 
         return view('admin.cadastro-unidade')->with('empresas',$empresas);
     }
