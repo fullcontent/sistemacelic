@@ -71,6 +71,9 @@
           </div>
         </div>
         <!-- ./col -->
+        <div class="col-md-3 float">
+          @include('admin.components.widget-interacoesChat')
+        </div>
       </div>
 
 
@@ -93,6 +96,9 @@
 @include('admin.components.widget-pendencias-usuario')
 
 @endif
+
+
+
 
 
 
