@@ -29,7 +29,7 @@ class EmpresasController extends Controller
     public function index()
     {
         //
-        if(Auth::id() >= 3)
+        if(Auth::id() <= 3)
         {
             $empresas = Empresa::all();
         }

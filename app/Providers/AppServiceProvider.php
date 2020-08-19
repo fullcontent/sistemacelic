@@ -136,7 +136,7 @@ class AppServiceProvider extends ServiceProvider
                                         'text' => 'Listagem geral dos serviços',
                                         'url'  =>  ''.Auth::user()->privileges.'/servicos',
                                         'icon'  =>  'glyphicon glyphicon-th-list',
-                                        ],
+                                        ]
                                     );
                             }
                             
