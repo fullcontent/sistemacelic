@@ -844,7 +844,7 @@ class ServicosController extends Controller
                  
                     $history = new Historico();
                     $history->servico_id = $servico->id;
-                    $history->user_id = Auth::id();
+                        $history->user_id = Auth::id();
                     $history->observacoes = 'Alterou '.$value.' para "'.$key.'"';
                     $history->save();
              }
