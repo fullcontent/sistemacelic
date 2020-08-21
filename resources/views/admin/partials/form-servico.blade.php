@@ -61,8 +61,14 @@
 		 <div class="form-group">
           
           {!! Form::label('responsavel_id', 'Responsável', array('class'=>'control-label')) !!}
-          
-          {!! Form::select('responsavel_id', $users, Auth::id(), ['class'=>'form-control']) !!}
+		  
+		  
+		  @if(Route::is('servicos.edit'))
+		  {!! Form::select('responsavel_id', $users, null, ['class'=>'form-control']) !!}
+		  @elseif(Route::is('servicos.create'))
+		  {!! Form::select('responsavel_id', $users, Auth::id(), ['class'=>'form-control']) !!}
+		  @endif
+
 
         </div>
 		
