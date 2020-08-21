@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Carbon\Carbon;
 use App\Models\Empresa;
 use App\Models\Servico;
+use Illuminate\Http\Request;
 
 
 
@@ -45,18 +46,40 @@ class FaturamentoController extends Controller
     public function step2(Request $request)
     {
         
-        $empresa = Empresa::find($request->empresa_id);
-        $l = Empresa::with('servicosFaturar')->find($request->empresa_id);
+        $periodo = explode(' - ', $request->periodo);
+        $start_date = Carbon::parse($periodo[0])->toDateTimeString();
+        $end_date = Carbon::parse($periodo[1])->toDateTimeString();
+
         
-        $servicosFaturar = $l->servicosFaturar;
+        $empresas = Empresa::whereIn('id',$request->empresa_id)->get();
+        $s = array();
+        $s2 = collect();
+        
+        foreach($empresas->pluck('id') as $e)
+        {
+
+            $empresa = Empresa::whereHas('servicosFaturar')->with('servicosFaturar')->find($e);
+            $s = $empresa->servicosFaturar->pluck('id');
+            $s2 = $s2->merge($s);
+        }
+
+ 
 
 
-        // dd($servicosFaturar);
-
-
+        $servicosFaturar = Servico::with('financeiro')
+                            ->whereIn('id', $s2)
+                            ->whereHas('finalizado',function($q) use ($start_date, $end_date){
+                                return $q->whereBetween('created_at', [$start_date,$end_date]);
+                            })
+                            
+                            ->get();
+        
+        
+        
         return view('admin.faturamento.step2')->with([
                 'servicosFaturar'=>$servicosFaturar,
-                'empresa'=>$empresa,
+                'empresas'=>$empresas,
+                'periodo'=>$periodo,
             ]);
 
     }
