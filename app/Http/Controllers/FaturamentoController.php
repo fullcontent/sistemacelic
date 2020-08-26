@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\Empresa;
 use App\Models\Servico;
+use App\Models\Faturamento;
 use Illuminate\Http\Request;
+use App\Models\FaturamentoServico;
 
 
 
@@ -90,10 +92,13 @@ class FaturamentoController extends Controller
         $servicosFaturar = Servico::with('financeiro')
                             ->whereIn('id',$request->servicos)
                             ->get();
+
+        $total = $servicosFaturar->sum('financeiro.valorFaturado');
        
 
         return view('admin.faturamento.step3')->with([
             'servicosFaturar'=>$servicosFaturar,
+            'total'=>$total,
 
         ]);
     
@@ -101,11 +106,84 @@ class FaturamentoController extends Controller
     }
 
     public function step4(Request $request)
+    {   
+        $servicos = [];
+        //Selecionar os servicos based on servico_id of request
+
+            foreach($request->faturamento as $f)
+            {
+                $s = Servico::with('financeiro')->find($f['servico_id']);
+                
+                $newValorAberto = $s->financeiro->valorAberto - $f['valorFaturar'];
+                $valorFaturado  = $f['valorFaturar'];
+
+                // $financeiro = $s->financeiro()->update([
+                //     'valorAberto'=>$newValorAberto,
+                //     'valorFaturado'=>$valorFaturado,
+                // ]);
+              
+                array_push($servicos, $s->id);
+            }
+
+        //======================================================
+
+
+
+        $servicosFaturar = Servico::with('financeiro')
+                            ->whereIn('id',$servicos)
+                            ->get();
+              
+
+        $total = $servicosFaturar->sum('financeiro.valorFaturado');
+
+
+        $this->salvarFaturamento($servicos, $total, $request->obs, $request->descricao);
+                     
+
+        return view('admin.faturamento.step4')->with([
+            
+            'faturamentoItens'=>$servicosFaturar,
+            'totalFaturamento'=>$total,
+            'descricao'=>$request->descricao,
+            'obs'=>$request->obs,
+        ]);
+
+    }
+
+
+    public function salvarFaturamento($servicos, $total, $obs, $descricao)
     {
         
-        return view('admin.faturamento.step4')->with([
+        dump("Salvando Faturamento");
 
-        ]);
+        $faturamento = new Faturamento;
+        $faturamento->nome = $descricao;
+        $faturamento->obs = $obs;
+        $faturamento->valorTotal = $total;
+        $faturamento->empresa_id = 16; //TEST
+
+        $faturamento->save();
+        
+        dump("Faturamento Salvo");
+
+
+        dump("Inserindo itens do faturamento");
+
+            foreach($servicos as $s)
+            {   
+
+                $servico = Servico::with('financeiro')->find($s);
+                $faturamentoItem = new FaturamentoServico;
+                $faturamentoItem->servico_id = $servico->id;
+                $faturamentoItem->faturamento_id = $faturamento->id;
+                $faturamentoItem->valorFaturado = $servico->financeiro->valorFaturado;
+                $faturamentoItem->save();
+
+                dump("Inserindo iteM");    
+
+            }
+
+        dump("Finalizado");
 
     }
 

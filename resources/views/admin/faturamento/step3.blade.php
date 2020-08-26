@@ -16,7 +16,25 @@
 
 <div class="box-body">
 
-	
+	<div class="col-md-12">
+		
+		<div class="col-md-6">
+
+			{!! Form::label('descricao', 'Descrição do Faturamento') !!}
+			{!! Form::text('descricao', null, ['class'=>'form-control']) !!}	
+
+		</div>
+
+		<div class="col-md-6">
+
+			{!! Form::label('obs', 'Observações') !!}
+			{!! Form::text('obs', null, ['class'=>'form-control']) !!}	
+
+		</div>
+		
+
+
+	</div>
 
 	<div class="col-md-12">
 		
@@ -58,6 +76,11 @@
 						
 							
 			</tbody>
+			<tfoot>
+				<tr>
+				<td colspan="8" class="lead"><b>Total: </b> R$ {{$total}}</td>
+				</tr>
+			</tfoot>
 		</table>
 
 	</div>
@@ -66,7 +89,7 @@
 
 <div class="box-footer">
                 <a href="#" class="btn btn-default">Voltar</a>
-                <button type="submit" class="btn btn-info">Próximo Passo</button>
+                <button type="submit" class="btn btn-danger">GERAR FATURAMENTO</button>
               	</div>
     
 {!! Form::close() !!}

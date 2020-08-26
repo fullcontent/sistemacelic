@@ -53,6 +53,8 @@
 				<th>CNPJ</th>
 				<th>Serviço</th>
 				<th>Valor Total</th>
+				<th>Valor Faturado</th>
+				<th>Valor em Aberto</th>
 				
 				
 			</thead>
@@ -67,6 +69,8 @@
 								<td>{{$s->unidade->cnpj}}</td>
 								<td>{{$s->nome}}</td>
 								<td>R$ {{$s->financeiro['valorTotal']}}</td>
+								<td>R$ {{$s->financeiro['valorFaturado']}}</td>
+								<td>R$ {{$s->financeiro['valorAberto']}}</td>
 								
 
 							</tr>

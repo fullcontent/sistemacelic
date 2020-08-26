@@ -17,8 +17,8 @@
     <!-- info row -->
     <div class="row invoice-info">
       <div class="col-sm-6">
-        <p><b>RELATÓRIO DE FATURAMENTO </b>007-2020</p>
-        <p><b>Referência: </b>Observações</p>
+        <p><b>RELATÓRIO DE FATURAMENTO </b>{{$descricao}}</p>
+        <p><b>Referência: </b>{{$obs}}</p>
       </div>
       
     </div>
@@ -27,7 +27,7 @@
     <!-- Table row -->
     <div class="row">
       <div class="col-xs-12 table-responsive">
-        <table class="table table-striped">
+        <table class="table table-bordered">
           <thead>
           <tr>
             <th>Código</th>
@@ -38,6 +38,18 @@
             <th>Valor</th>
           </tr>
           </thead>
+          <tbody>
+              @foreach($faturamentoItens as $i)
+              <tr>
+                <td>{{$i->unidade->codigo}}</td>
+                  <td>{{$i->unidade->nomeFantasia}}</td>
+                  <td>{{$i->unidade->cidade}}/{{$i->unidade->uf}}</td>
+                  <td>{{$i->unidade->cnpj}}</td>
+                  <td>{{$i->nome}}</td>
+                  <td>R$ {{$i->financeiro->valorFaturado}}</td>
+              </tr>
+              @endforeach
+          </tbody>
           
         </table>
       </div>
@@ -52,7 +64,7 @@
       </div>
       <!-- /.col -->
       <div class="col-xs-6">
-        <p class="pull-right">Total</p>
+      <p class="pull-right lead"><b>Total: </b>R$ {{$totalFaturamento}}</p>
 
       </div>
       <!-- /.col -->
