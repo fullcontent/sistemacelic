@@ -117,10 +117,10 @@ class FaturamentoController extends Controller
                 $newValorAberto = $s->financeiro->valorAberto - $f['valorFaturar'];
                 $valorFaturado  = $f['valorFaturar'];
 
-                // $financeiro = $s->financeiro()->update([
-                //     'valorAberto'=>$newValorAberto,
-                //     'valorFaturado'=>$valorFaturado,
-                // ]);
+                $financeiro = $s->financeiro()->update([
+                    'valorAberto'=>$newValorAberto,
+                    'valorFaturado'=>$valorFaturado,
+                ]);
               
                 array_push($servicos, $s->id);
             }
