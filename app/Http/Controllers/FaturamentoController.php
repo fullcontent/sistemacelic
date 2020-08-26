@@ -87,10 +87,25 @@ class FaturamentoController extends Controller
     public function step3(Request $request)
     {
         
+        $servicosFaturar = Servico::with('financeiro')
+                            ->whereIn('id',$request->servicos)
+                            ->get();
+       
 
-        $servicosFaturar = Servico::whereIn('id',$request->servicos_id)->get();
-        return $servicosFaturar;
+        return view('admin.faturamento.step3')->with([
+            'servicosFaturar'=>$servicosFaturar,
 
+        ]);
+    
+
+    }
+
+    public function step4(Request $request)
+    {
+        
+        return view('admin.faturamento.step4')->with([
+
+        ]);
 
     }
 

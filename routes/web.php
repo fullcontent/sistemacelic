@@ -39,6 +39,7 @@ Route::get('/', function () {
 		Route::get('/faturamento/create','FaturamentoController@create')->name('faturamento.create');
 		Route::post('/faturamento/step2','FaturamentoController@step2')->name('faturamento.step2');
 		Route::post('/faturamento/step3','FaturamentoController@step3')->name('faturamento.step3');
+		Route::post('/faturamento/step4','FaturamentoController@step4')->name('faturamento.step4');
 
 
 		Route::get('/empresa/{empresa}/unidades','EmpresasController@unidades')->name('empresa.unidades');
