@@ -45,9 +45,9 @@
         <!-- /.box -->
       </div>
       <div class="col-md-9">
-        @if(count($dados->arquivos))
+        
             @include('admin.components.widget-arquivos')
-        @else
+        
         
         @endif
     </div>
