@@ -87,18 +87,25 @@ class FaturamentoController extends Controller
     }
 
     public function step3(Request $request)
-    {
+    {   
+
+        
         
         $servicosFaturar = Servico::with('financeiro')
                             ->whereIn('id',$request->servicos)
                             ->get();
 
-        $total = $servicosFaturar->sum('financeiro.valorFaturado');
-       
+        $total = $servicosFaturar->sum('financeiro.valorAberto');
+
+
+        $descricao = "00".Carbon::now()->month."-".Carbon::now()->year."";
+
 
         return view('admin.faturamento.step3')->with([
             'servicosFaturar'=>$servicosFaturar,
             'total'=>$total,
+            'empresa_id'=> $request->empresa_id,
+            'descricao'=>$descricao,
 
         ]);
     
@@ -114,13 +121,9 @@ class FaturamentoController extends Controller
             {
                 $s = Servico::with('financeiro')->find($f['servico_id']);
                 
-                $newValorAberto = $s->financeiro->valorAberto - $f['valorFaturar'];
-                $valorFaturado  = $f['valorFaturar'];
+                $valorFaturar = $f['valorFaturar'];
 
-                $financeiro = $s->financeiro()->update([
-                    'valorAberto'=>$newValorAberto,
-                    'valorFaturado'=>$valorFaturado,
-                ]);
+                $this->atualizarFinanceiro($s->id,$valorFaturar);
               
                 array_push($servicos, $s->id);
             }
@@ -134,10 +137,10 @@ class FaturamentoController extends Controller
                             ->get();
               
 
-        $total = $servicosFaturar->sum('financeiro.valorFaturado');
+        $total = $servicosFaturar->sum('financeiro.valorFaturar');
 
-
-        $this->salvarFaturamento($servicos, $total, $request->obs, $request->descricao);
+        
+        // $this->salvarFaturamento($servicos, $total, $request->obs, $request->descricao, $request->empresa_id);
                      
 
         return view('admin.faturamento.step4')->with([
@@ -150,25 +153,98 @@ class FaturamentoController extends Controller
 
     }
 
+    public function atualizarFinanceiro($servico_id, $valorFaturar)
+    {
+       
+        $s = Servico::with('financeiro')->find($servico_id);
 
-    public function salvarFaturamento($servicos, $total, $obs, $descricao)
+        
+            
+        if($s->financeiro->valorFaturado > 0)
+        {
+            
+            if($valorFaturar+$s->financeiro->valorFaturado == $s->financeiro->valorTotal)
+            {
+                dump("A soma da o total");
+                    //Para faturamento completo
+                    $s->financeiro()->update([
+                        'valorAberto'=>0,
+                        'valorFaturado'=>$s->financeiro->valorTotal,
+                        'valorFaturar'=>$valorFaturar,
+                        'status'=>'faturado',
+                    ]);
+            }
+            else{
+                dump("Nao alcancou o total ainda");
+                
+                $s->financeiro()->update([
+                    'valorAberto'=>$s->financeiro->valorAberto - $valorFaturar,
+                    'valorFaturado'=>$s->financeiro->valorFaturado + $valorFaturar,
+                    'valorFaturar'=>$valorFaturar,
+                    'status'=>'parcial',
+                ]);
+
+
+            }
+
+            
+        }
+
+        else{
+
+            //Se nao tiver nada faturado
+
+            if($valorFaturar == $s->financeiro->valorTotal)
+                {
+                //Para faturamento completo
+                    $s->financeiro()->update([
+                        'valorAberto'=>0,
+                        'valorFaturado'=>$valorFaturar,
+                        'status'=>'faturado',
+                    ]);
+                                        
+                }
+            elseif($valorFaturar < $s->financeiro->valorTotal)
+                {
+
+                //Para faturamento parcial
+                    $s->financeiro()->update([
+                        'valorAberto'=>$s->financeiro->valorAberto - $valorFaturar,
+                        'valorFaturado'=>$valorFaturar,
+                        'valorFaturar'=>$valorFaturar,
+                        'status'=>'parcial',
+                    ]);
+
+                }
+            
+
+        }
+
+
+          
+                
+
+        
+
+        
+
+        
+    }
+
+
+    public function salvarFaturamento($servicos, $total, $obs, $descricao,$empresa_id)
     {
         
-        dump("Salvando Faturamento");
-
+      
         $faturamento = new Faturamento;
         $faturamento->nome = $descricao;
         $faturamento->obs = $obs;
         $faturamento->valorTotal = $total;
-        $faturamento->empresa_id = 16; //TEST
+        $faturamento->empresa_id = $empresa_id; //TEST
 
         $faturamento->save();
         
-        dump("Faturamento Salvo");
-
-
-        dump("Inserindo itens do faturamento");
-
+       
             foreach($servicos as $s)
             {   
 
@@ -179,12 +255,11 @@ class FaturamentoController extends Controller
                 $faturamentoItem->valorFaturado = $servico->financeiro->valorFaturado;
                 $faturamentoItem->save();
 
-                dump("Inserindo iteM");    
+                
 
             }
 
-        dump("Finalizado");
-
+      
     }
 
 
@@ -237,4 +312,17 @@ class FaturamentoController extends Controller
     {
         //
     }
+
+
+    static function formatCnpjCpf($value)
+    {
+    $cnpj_cpf = preg_replace("/\D/", '', $value);
+    
+    if (strlen($cnpj_cpf) === 11) {
+        return preg_replace("/(\d{3})(\d{3})(\d{3})(\d{2})/", "\$1.\$2.\$3-\$4", $cnpj_cpf);
+    } 
+    
+    return preg_replace("/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/", "\$1.\$2.\$3/\$4-\$5", $cnpj_cpf);
+    }
+    
 }

@@ -17,6 +17,7 @@
 				<ul>
 					@foreach($empresas as $e)
 					<li>{{ $e['nomeFantasia'] }}</li>
+					@php $empresa_id = $e['id'] @endphp
 					@endforeach
 					
 				</ul></p>
@@ -40,7 +41,7 @@
 
 <div class="box-body">
 
-	
+	{!! Form::hidden('empresa_id', $empresa_id) !!}
 
 	<div class="col-md-12">
 		
@@ -52,9 +53,9 @@
 				<th>Cidade</th>
 				<th>CNPJ</th>
 				<th>Serviço</th>
-				<th>Valor Total</th>
-				<th>Valor Faturado</th>
-				<th>Valor em Aberto</th>
+				<th>Total</th>
+				
+				<th>Em Aberto</th>
 				
 				
 			</thead>
@@ -62,15 +63,15 @@
 
 							@foreach($servicosFaturar as $value => $s)
 							<tr>
-								<td>{{ Form::checkbox('servicos[]', $s->id)}}</td>	
+								<td>{{ Form::checkbox('servicos[]', $s->id,null,['class'=>'checkbox'])}}</td>	
 								<td>{{$s->unidade->codigo}}</td>
 								<td>{{$s->unidade->nomeFantasia}}</td>
 								<td>{{$s->unidade->cidade}}</td>
-								<td>{{$s->unidade->cnpj}}</td>
+								<td>@php echo App\Http\Controllers\FaturamentoController::formatCnpjCpf($s->unidade->cnpj); @endphp</td>
 								<td>{{$s->nome}}</td>
-								<td>R$ {{$s->financeiro['valorTotal']}}</td>
-								<td>R$ {{$s->financeiro['valorFaturado']}}</td>
-								<td>R$ {{$s->financeiro['valorAberto']}}</td>
+								<td>R$ {{number_format($s->financeiro['valorTotal'],2,'.',',')}}</td>
+								
+								<td>R$ {{number_format($s->financeiro['valorAberto'],2,'.',',')}}</td>
 								
 
 							</tr>
@@ -98,3 +99,18 @@
 @endsection
 
 
+@section('js')
+
+<script>
+	$('button[type="submit"]').on('click', function(e) {
+  e.preventDefault();
+  if($('.checkbox:checked').length > 0) {
+      $(this).parents('form').submit();
+      return;
+  }
+  alert('Selecione um serviço da lista!');
+  return false;
+});
+</script>
+
+@endsection

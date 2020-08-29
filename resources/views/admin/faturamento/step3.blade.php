@@ -12,7 +12,10 @@
 	</div>
 
 
+
 {!! Form::open(['route'=>'faturamento.step4','id'=>'cadastroFaturamento']) !!}
+
+{!! Form::hidden('empresa_id', $empresa_id) !!}
 
 <div class="box-body">
 
@@ -21,7 +24,7 @@
 		<div class="col-md-6">
 
 			{!! Form::label('descricao', 'Descrição do Faturamento') !!}
-			{!! Form::text('descricao', null, ['class'=>'form-control']) !!}	
+			{!! Form::text('descricao', $descricao, ['class'=>'form-control']) !!}	
 
 		</div>
 
@@ -31,6 +34,7 @@
 			{!! Form::text('obs', null, ['class'=>'form-control']) !!}	
 
 		</div>
+		
 		
 
 
@@ -61,10 +65,13 @@
 								<td>{{$s->unidade->codigo}}</td>
 								<td>{{$s->unidade->nomeFantasia}}</td>
 								<td>{{$s->unidade->cidade}}</td>
-								<td>{{$s->unidade->cnpj}}</td>
+								<td>@php
+									echo App\Http\Controllers\FaturamentoController::formatCnpjCpf($s->unidade->cnpj);
+								   @endphp
+								</td>
 								<td>{{$s->nome}}</td>
-								<td>R$ {{$s->financeiro['valorTotal']}}</td>
-								<td>R$ {{$s->financeiro['valorAberto']}}</td>
+								<td>R$ {{number_format($s->financeiro['valorTotal'],2,'.',',')}}</td>
+								<td>R$ {{number_format($s->financeiro['valorAberto'],2,'.',',')}}</td>
 								<td>{{Form::text('faturamento['.$value.'][valorFaturar]', $s->financeiro['valorAberto'])}}</td>
 								
 								{!! Form::hidden('faturamento['.$value.'][servico_id]', $s->id) !!}
@@ -78,7 +85,7 @@
 			</tbody>
 			<tfoot>
 				<tr>
-				<td colspan="8" class="lead"><b>Total: </b> R$ {{$total}}</td>
+				<td colspan="8" class="lead"><b>Total: </b> R$ {{number_format($total,2,'.',',')}}</td>
 				</tr>
 			</tfoot>
 		</table>
@@ -99,5 +106,7 @@
 
 
 @endsection
+
+
 
 

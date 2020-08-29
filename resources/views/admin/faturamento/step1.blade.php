@@ -16,7 +16,7 @@
 <div class="box-body">
 	<div class="col-md-6">
 		{!! Form::label('empresa_id', 'Selecione a empresa:', array('class'=>'control-label')) !!}
-		{{ Form::select('empresa_id[]', $empresas, null,['class'=>'form-control','multiple'=>'multiple','id'=>'empresas']) }}
+		{{ Form::select('empresa_id[]', $empresas, null,['class'=>'form-control','id'=>'empresas']) }}
 	
 	</div>
 

@@ -44,9 +44,9 @@
                 <td>{{$i->unidade->codigo}}</td>
                   <td>{{$i->unidade->nomeFantasia}}</td>
                   <td>{{$i->unidade->cidade}}/{{$i->unidade->uf}}</td>
-                  <td>{{$i->unidade->cnpj}}</td>
+                  <td>@php echo App\Http\Controllers\FaturamentoController::formatCnpjCpf($i->unidade->cnpj); @endphp</td>
                   <td>{{$i->nome}}</td>
-                  <td>R$ {{$i->financeiro->valorFaturado}}</td>
+                  <td>R$ {{number_format($i->financeiro->valorFaturar,2,'.',',')}}</td>
               </tr>
               @endforeach
           </tbody>
@@ -64,7 +64,7 @@
       </div>
       <!-- /.col -->
       <div class="col-xs-6">
-      <p class="pull-right lead"><b>Total: </b>R$ {{$totalFaturamento}}</p>
+      <p class="pull-right lead"><b>Total: </b>R$ {{number_format($totalFaturamento,2,'.',',')}}</p>
 
       </div>
       <!-- /.col -->
