@@ -36,6 +36,13 @@ Route::get('/', function () {
 		Route::resource('/arquivo','ArquivosController');
 		
 
+		
+		Route::get('/faturamentos', 'FaturamentoController@index')->name('faturamentos.index');
+		Route::get('/faturamento/show/{id}', 'FaturamentoController@show')->name('faturamento.show');
+
+		Route::get('/faturamento/delete/{id}', 'FaturamentoController@destroy')->name('faturamento.destroy');
+
+
 		Route::get('/faturamento/create','FaturamentoController@create')->name('faturamento.create');
 		Route::post('/faturamento/step2','FaturamentoController@step2')->name('faturamento.step2');
 		Route::post('/faturamento/step3','FaturamentoController@step3')->name('faturamento.step3');

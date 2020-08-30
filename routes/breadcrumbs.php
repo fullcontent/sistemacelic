@@ -4,11 +4,12 @@ Breadcrumbs::for('dashboard', function ($trail) {
     $trail->push('Dashboard', route('dashboard'));
 });
 
-
 Breadcrumbs::for('empresas.index', function ($trail) {
     $trail->parent('dashboard');
     $trail->push('Empresas', route('empresas.index'));
 });
+
+
 
 
 Breadcrumbs::for('empresa.unidades', function ($trail, $id) {
@@ -89,6 +90,22 @@ Breadcrumbs::for('taxas.show', function ($trail, $id) {
     $trail->push($taxa->nome, route('taxas.show',$taxa->id));
 });
 
+
+Breadcrumbs::for('faturamentos.index', function ($trail) {
+    $trail->parent('dashboard');
+    $trail->push('Faturamentos', route('faturamentos.index'));
+});
+
+Breadcrumbs::for('faturamento.create', function ($trail) {
+    $trail->parent('faturamentos.index');
+    $trail->push('Novo Faturamento', route('faturamento.create'));
+});
+
+Breadcrumbs::for('faturamento.show', function ($trail, $id) {
+	$faturamento = \App\Models\Faturamento::findOrFail($id);
+    $trail->parent('faturamentos.index');
+    $trail->push($faturamento->nome, route('faturamento.show',$faturamento->id));
+});
 
 //Breadcrumbs for cliente
 

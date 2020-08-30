@@ -21,7 +21,12 @@ class FaturamentoController extends Controller
      */
     public function index()
     {
-        //
+       $faturamentos = Faturamento::all();
+
+        return view('admin.faturamento.lista-faturamentos')->with([
+            'faturamentos'=>$faturamentos,
+        ]);
+
     }
 
     /**
@@ -73,9 +78,9 @@ class FaturamentoController extends Controller
                             ->whereHas('finalizado',function($q) use ($start_date, $end_date){
                                 return $q->whereBetween('created_at', [$start_date,$end_date]);
                             })
-                            
+                                                     
                             ->get();
-        
+              
         
         
         return view('admin.faturamento.step2')->with([
@@ -140,7 +145,7 @@ class FaturamentoController extends Controller
         $total = $servicosFaturar->sum('financeiro.valorFaturar');
 
         
-        // $this->salvarFaturamento($servicos, $total, $request->obs, $request->descricao, $request->empresa_id);
+        $this->salvarFaturamento($servicos, $total, $request->obs, $request->descricao, $request->empresa_id);
                      
 
         return view('admin.faturamento.step4')->with([
@@ -165,7 +170,7 @@ class FaturamentoController extends Controller
             
             if($valorFaturar+$s->financeiro->valorFaturado == $s->financeiro->valorTotal)
             {
-                dump("A soma da o total");
+                
                     //Para faturamento completo
                     $s->financeiro()->update([
                         'valorAberto'=>0,
@@ -175,8 +180,7 @@ class FaturamentoController extends Controller
                     ]);
             }
             else{
-                dump("Nao alcancou o total ainda");
-                
+                               
                 $s->financeiro()->update([
                     'valorAberto'=>$s->financeiro->valorAberto - $valorFaturar,
                     'valorFaturado'=>$s->financeiro->valorFaturado + $valorFaturar,
@@ -201,6 +205,7 @@ class FaturamentoController extends Controller
                         'valorAberto'=>0,
                         'valorFaturado'=>$valorFaturar,
                         'status'=>'faturado',
+                        'valorFaturar'=>$valorFaturar,
                     ]);
                                         
                 }
@@ -220,15 +225,7 @@ class FaturamentoController extends Controller
 
         }
 
-
-          
-                
-
-        
-
-        
-
-        
+   
     }
 
 
@@ -276,7 +273,22 @@ class FaturamentoController extends Controller
      */
     public function show($id)
     {
-        //
+        $faturamento = Faturamento::with('servicosFaturados.detalhes.unidade')->find($id);
+
+        
+
+        
+        
+        return view('admin.faturamento.detalhe-faturamento')->with([
+            
+            'faturamentoItens'=>$faturamento->servicosFaturados,
+            'totalFaturamento'=>$faturamento->valorTotal,
+            'descricao'=>$faturamento->nome,
+            'obs'=>$faturamento->obs,
+            'data'=>$faturamento->created_at,
+        ]);
+        
+
     }
 
     /**
@@ -310,7 +322,38 @@ class FaturamentoController extends Controller
      */
     public function destroy($id)
     {
-        //
+
+        //Selecionando faturamento a ser destruido
+
+        $faturamento = Faturamento::find($id);
+
+        
+        //Selecionando os servicos dentro desse faturamento
+
+
+        $faturamentoServicos = FaturamentoServico::where('faturamento_id',$id)->get();
+
+
+        foreach($faturamentoServicos as $f)
+        {
+            $s = Servico::with('financeiro')->find($f->servico_id);
+            $s->financeiro()->update([
+                'valorAberto'=>$f->valorFaturado,
+                'valorFaturado'=>$s->financeiro->valorTotal - $f->valorFaturado,
+                'valorFaturar'=>0,
+                'status'=>'aberto',
+            ]);
+
+            $f->destroy($f->id);
+        }
+        
+        //Excluindo faturamento
+
+        $faturamento->destroy($faturamento->id);
+
+
+        return $this->index();
+
     }
 
 
