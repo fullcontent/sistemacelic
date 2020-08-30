@@ -102,6 +102,7 @@ class FaturamentoController extends Controller
 
         $total = $servicosFaturar->sum('financeiro.valorAberto');
 
+        
 
         $descricao = "00".Carbon::now()->month."-".Carbon::now()->year."";
 
@@ -144,7 +145,7 @@ class FaturamentoController extends Controller
 
         $total = $servicosFaturar->sum('financeiro.valorFaturar');
 
-        
+                
         $this->salvarFaturamento($servicos, $total, $request->obs, $request->descricao, $request->empresa_id);
                      
 
@@ -157,6 +158,8 @@ class FaturamentoController extends Controller
         ]);
 
     }
+
+
 
     public function atualizarFinanceiro($servico_id, $valorFaturar)
     {
@@ -273,12 +276,11 @@ class FaturamentoController extends Controller
      */
     public function show($id)
     {
+        
+        
         $faturamento = Faturamento::with('servicosFaturados.detalhes.unidade')->find($id);
 
-        
 
-        
-        
         return view('admin.faturamento.detalhe-faturamento')->with([
             
             'faturamentoItens'=>$faturamento->servicosFaturados,

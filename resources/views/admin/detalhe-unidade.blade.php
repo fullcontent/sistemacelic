@@ -49,7 +49,7 @@
             @include('admin.components.widget-arquivos')
         
         
-        @endif
+       
     </div>
 </div>
 <div class="row">

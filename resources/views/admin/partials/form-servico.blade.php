@@ -220,7 +220,7 @@
 			<div class="form-group">
 					
 				{!! Form::label('valorTotal', 'Valor Total', array('class'=>'control-label')) !!}
-				{!! Form::text('valorTotal', 0, ['class'=>'form-control','id'=>'valorTotal']) !!}
+				{!! Form::text('valorTotal', $servico->financeiro->valorTotal, ['class'=>'form-control','id'=>'valorTotal']) !!}
 				
 			</div>
 		</div>

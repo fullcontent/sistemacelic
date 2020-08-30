@@ -740,6 +740,8 @@ class ServicosController extends Controller
         $financeiro = ServicoFinanceiro::find($servico->financeiro->id);
 
         $financeiro->valorTotal = $request->valorTotal;
+        $financeiro->valorAberto = $request->valorTotal;
+
         
         $financeiro->save();
 

@@ -8,7 +8,9 @@
 	
 	<div class="box" style="padding: 5px;">
 				<div class="box-header">
-					
+					<a class="btn btn-app" href="{{route('faturamento.create')}}">
+						<i class="fa fa-plus"></i> Cadastrar
+					 </a>
 				</div>
 				<table id="lista-faturamentos" class="table table-bordered table-hover">
                 <thead>
