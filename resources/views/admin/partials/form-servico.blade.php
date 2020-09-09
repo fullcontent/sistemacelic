@@ -220,14 +220,19 @@
 			<div class="form-group">
 					
 				{!! Form::label('valorTotal', 'Valor Total', array('class'=>'control-label')) !!}
+
+				@if(Route::is('servicos.create'))
+				{!! Form::text('valorTotal', null, ['class'=>'form-control','id'=>'valorTotal']) !!}
+				@else
 				{!! Form::text('valorTotal', $servico->financeiro->valorTotal, ['class'=>'form-control','id'=>'valorTotal']) !!}
-				
+				@endif
 			</div>
 		</div>
 		
 	</div>
 	
 </div>
+
 
 
 <div class="col-md-12">
