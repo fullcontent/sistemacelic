@@ -42,6 +42,8 @@ Route::get('/', function () {
 
 		Route::get('/faturamento/delete/{id}', 'FaturamentoController@destroy')->name('faturamento.destroy');
 
+		Route::post('/faturamento/addNF','FaturamentoController@addNF')->name('faturamento.addNF');
+
 
 		Route::get('/faturamento/create','FaturamentoController@create')->name('faturamento.create');
 		Route::post('/faturamento/step2','FaturamentoController@step2')->name('faturamento.step2');

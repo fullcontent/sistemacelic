@@ -1,5 +1,7 @@
 @extends('adminlte::page')
-
+@section('content_header')
+<h1>Editar serviço {{$servico->os}}</h1>
+@stop
 
 
 @section('content')
@@ -8,12 +10,7 @@
 
 	<div class="box box-primary">
 	
-	<div class="box-header with-border">
-		<h3 class="box-title">Editar serviço</h3>
-	</div>
-
 	
-
 	{!! Form::model($servico,['route'=>['servicos.update', $servico->id],'method'=>'put','enctype'=>'multipart/form-data']) !!}
 
 

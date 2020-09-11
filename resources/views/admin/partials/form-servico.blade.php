@@ -216,18 +216,34 @@
 
 <div class="row">
 	<div class="col-md-12">
-		<div class="col-md-2">
-			<div class="form-group">
+		
 					
-				{!! Form::label('valorTotal', 'Valor Total', array('class'=>'control-label')) !!}
 
 				@if(Route::is('servicos.create'))
+				<div class="col-md-2">
+					<div class="form-group">
+
+				{!! Form::label('valorTotal', 'Valor Total', array('class'=>'control-label')) !!}
 				{!! Form::text('valorTotal', null, ['class'=>'form-control','id'=>'valorTotal']) !!}
+
+					</div>
+				</div>
 				@else
+
+				<div class="col-md-2">
+					<div class="form-group">
+				{!! Form::label('valorTotal', 'Valor Total', array('class'=>'control-label')) !!}
 				{!! Form::text('valorTotal', $servico->financeiro->valorTotal, ['class'=>'form-control','id'=>'valorTotal']) !!}
+					</div>
+				</div>	
+				<div class="col-md-2">
+					<div class="form-group">
+				{!! Form::label('valorAberto', 'Valor em Aberto', array('class'=>'control-label')) !!}
+				{!! Form::text('valorAberto', $servico->financeiro->valorAberto, ['class'=>'form-control','id'=>'valorAberto']) !!}
+					</div>
+				</div>
 				@endif
-			</div>
-		</div>
+			
 		
 	</div>
 	

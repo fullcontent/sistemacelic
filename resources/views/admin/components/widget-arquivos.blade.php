@@ -111,7 +111,7 @@
 <script>
     $(function () {
         $('#lista-arquivos').DataTable({
-          "paging": false,
+          "paging": true,
           "lengthChange": false,
           "searching": true,
           "ordering": false,

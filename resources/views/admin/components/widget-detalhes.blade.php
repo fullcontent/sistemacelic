@@ -36,6 +36,5 @@
 			<p><b>CEP:</b> {{$dados->cep}}</p>
 		</div>
 		
-		<a href="{{route($route, $dados->id)}}" class="btn btn-info pull-right"><span class="glyphicon glyphicon-pencil"></span> Editar</a>
 	</div>
 </div>

@@ -32,6 +32,13 @@ Breadcrumbs::for('unidades.show', function ($trail,$id) {
     $trail->push($unidade->nomeFantasia, route('unidades.show',$id));
 });
 
+Breadcrumbs::for('unidades.edit', function ($trail,$id) {
+	$unidade = \App\Models\Unidade::findOrFail($id);
+	$empresa = \App\Models\Empresa::findOrFail($unidade->empresa_id);
+    $trail->parent('empresa.unidades',$empresa->id);
+    $trail->push($unidade->nomeFantasia, route('unidades.show',$id));
+});
+
 Breadcrumbs::for('servico.lista', function ($trail) {
     $trail->parent('dashboard');
     $trail->push('Serviços', route('servico.lista'));
@@ -81,6 +88,13 @@ Breadcrumbs::for('servicos.show', function ($trail, $id) {
 
 	$servico = \App\Models\Servico::findOrFail($id);
     $trail->parent('unidades.show',$servico->unidade_id);
+    $trail->push($servico->os, route('servicos.show',$id));
+});
+
+Breadcrumbs::for('servicos.edit', function ($trail, $id) {
+
+	$servico = \App\Models\Servico::findOrFail($id);
+    $trail->parent('servicos.show',$servico->id);
     $trail->push($servico->os, route('servicos.show',$id));
 });
 

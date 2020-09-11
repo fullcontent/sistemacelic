@@ -19,6 +19,7 @@
 				  <th>Cliente</th>
                   <th>Data</th>
 				  <th>Total</th>
+				  <th>NF</th>
 				  <th>Actions</th>
 				<tr>
                 </thead>
@@ -30,14 +31,64 @@
 				<td>{{$f->empresa->nomeFantasia}}</td>
 				<td>{{$f->created_at}}</td>
 				<td>R$ {{number_format($f->valorTotal,2,'.',',')}}</td>
-				<td><a href="{{route('faturamento.destroy',$f->id)}}" class="confirmation">Excluir faturamento</a></td>
+				<td>
+					@if(!$f->nf)
+					<button type="button" class="btn btn-warning btn-xs cadastroNF"data-toggle="modal" data-target="#cadastroNF" data-ID='{{$f->id}}' data-cliente='{{$f->empresa->nomeFantasia}}' data-nome='{{$f->nome}}'>
+						<span class="glyphicon glyphicon-plus-sign"></span> Cadastrar
+					  </button>
+					@else
+					{{$f->nf}}
+					@endif
+
+				</td>
+				<td><a href="{{route('faturamento.destroy',$f->id)}}" class="confirmation"> <i class="glyphicon glyphicon-trash
+					"></i></a></td>
 				</tr>
 
 				@endforeach
                 </tbody>
               </table>   
 			</div>
-	 		
+			
+			
+			<div class="modal fade" id="cadastroNF">
+				<div class="modal-dialog">
+				  <div class="modal-content">
+					<div class="modal-header">
+					  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">×</span></button>
+					  <h4 class="modal-title">Cadastrar NF</h4>
+					</div>
+					<div class="modal-body">
+					  
+						{!! Form::open(['route'=>'faturamento.addNF']) !!}
+						{!! Form::hidden('faturamentoID', null, ['class'=>'form-control','id'=>'faturamentoID']) !!}
+						
+						<div class="form-group">
+						{!! Form::label('faturamentoNome', 'Faturamento', array('class'=>'control-label')) !!}
+						{!! Form::text('faturamentoNome', null, ['class'=>'form-control','disabled'=>true,'id'=>'faturamentoNome']) !!}
+						</div>
+						<div class="form-group">
+						{!! Form::label('faturamentoCliente', 'Cliente', array('class'=>'control-label')) !!}
+						{!! Form::text('faturamentoCliente', null, ['class'=>'form-control','disabled'=>true,'id'=>'faturamentoCliente']) !!}
+						</div>
+						<div class="form-group">
+						{!! Form::label('nf', 'N.F.', array('class'=>'control-label')) !!}
+						{!! Form::text('nf', null, ['class'=>'form-control']) !!}
+						</div>
+
+					</div>
+					<div class="modal-footer">
+					  <button type="button" class="btn pull-left" data-dismiss="modal">Close</button>
+					  <button type="submit" class="btn btn-info">Cadastrar</button>
+	  
+					</div>
+					{!! Form::close() !!}
+				  </div>
+				  <!-- /.modal-content -->
+				</div>
+				<!-- /.modal-dialog -->
+			  </div>
 
 @endsection
 
@@ -49,7 +100,7 @@
 <script src="http://cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"></script>
 <script>
 		$(function () {
-		    $('#lista-servicos').DataTable({
+		    $('#lista-faturamentos').DataTable({
 		      "paging": true,
 		      "lengthChange": true,
 		      "searching": true,
@@ -61,10 +112,22 @@
             }           
   });
 $('.confirmation').on('click', function () {
-        		return confirm('Você deseja excluir o serviço?');
+        		return confirm('Você deseja excluir o faturamento?');
     			});
 		     
 		    });
+			
+$(document).on("click", ".cadastroNF", function () {
+     var faturamentoID = $(this).data('id');
+	 var faturamentoCliente = $(this).data('cliente');
+	 var faturamentoNome = $(this).data('nome');
 
-    </script>
+
+     $(".modal-body #faturamentoID").val( faturamentoID );
+	 $(".modal-body #faturamentoCliente").val( faturamentoCliente );
+	 $(".modal-body #faturamentoNome").val( faturamentoNome );
+     
+});			
+			
+</script>
   @stop

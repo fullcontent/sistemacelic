@@ -1,4 +1,10 @@
 @extends('adminlte::page')
+
+@section('content_header')
+<h1>Editar unidade {{$unidade->nomeFantasia}}</h1>
+@stop
+
+
 @section('content')
 @if(Session::has('errors'))
 @foreach($errors->all() as $error)
@@ -13,9 +19,6 @@
 
 <div class="box box-primary">
 	
-	<div class="box-header with-border">
-		<h3 class="box-title">Editar unidade <span><b>{{$unidade->nomeFantasia}}</b></span></h3>
-	</div>
 	
 	
 	{!! Form::model($unidade,['route'=>['unidade.editar', $unidade->id]]) !!}

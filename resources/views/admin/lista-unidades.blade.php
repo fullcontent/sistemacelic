@@ -41,6 +41,8 @@
 	         	
 
 
+				<div class="box-body">
+
 				
 
 				<table id="lista-unidades" class="table table-bordered table-hover">
@@ -144,14 +146,17 @@
                     <li><a href="{{route('unidades.edit', $unidade->id)}}">Editar</a></li>
                     <li><a href="{{route('unidade.delete', $unidade->id)}}" class="confirmation">Excluir</a></li>
                                     
-                  </ul>
+				  </ul>
+				  
                 </div>
 </td>
 	                </tr>
 	            @endforeach
                 </tbody>
-              </table>   
+			  </table> 
+			  
 			</div>
+		</div>
 	 		
 @stop
 

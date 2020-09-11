@@ -358,6 +358,18 @@ class FaturamentoController extends Controller
 
     }
 
+    public function addNF(Request $request)
+    {
+        
+        $faturamento = Faturamento::find($request->faturamentoID);
+
+        $faturamento->nf = $request->nf;
+        $faturamento->save();
+
+        return redirect()->route('faturamentos.index');
+
+    }
+
 
     static function formatCnpjCpf($value)
     {

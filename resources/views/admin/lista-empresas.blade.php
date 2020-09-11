@@ -15,6 +15,8 @@
 						@endif
 
 					</div>
+				<div class="box-body">
+
 				
 				<table id="lista-empresas" class="table table-bordered table-hover">
 
@@ -66,7 +68,8 @@
 	                </tr>
 	            @endforeach
                 </tbody>
-              </table>   
+			  </table>  
+			</div> 
 			</div>
 	 		
 @stop
