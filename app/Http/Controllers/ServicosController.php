@@ -410,6 +410,17 @@ class ServicosController extends Controller
     public function store(Request $request)
     {
         
+
+        $validator = Validator::make($request->all(), [
+
+            'valorTotal' => 'required'
+            
+
+        ])->validate();
+
+        if($validator->fails()) {
+            return Redirect::back()->withErrors($validator);
+        }
         
         
         $servico = new Servico;
