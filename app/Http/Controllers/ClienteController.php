@@ -35,8 +35,10 @@ class ClienteController extends Controller
 
     public function index()
     {   
-     
+        
+        $user = User::find(Auth::id());
 
+       
     	return view ('cliente.dashboard')
                         ->with([
                             'servicos'=>$this->getServicosCliente(),
@@ -75,9 +77,11 @@ class ClienteController extends Controller
 
 
         $unidade = Unidade::find($id);
-        $access = UserAccess::where('user_id',Auth::id())->whereNull('empresa_id')->get();
 
-        if($access->pluck('unidade_id')->contains($id))
+        $access = Unidade::whereIn('empresa_id', UserAccess::where('user_id',Auth::id())->pluck('empresa_id'))->get();
+
+
+        if($access->pluck('id')->contains($id))
         {
             return view('cliente.detalhe-empresa')
                     ->with([
@@ -122,7 +126,7 @@ class ClienteController extends Controller
     {
     	$user = User::find(Auth::id());
 
-        $unidades = $user->unidades;
+        $unidades = $this->getUnidadesCliente();
 
         return view('cliente.lista-unidades')->with('unidades',$unidades);
     }
@@ -132,10 +136,7 @@ class ClienteController extends Controller
     {   
         $user = User::find(Auth::id());
 
-        $servicos = Servico::whereIn('empresa_id',$user->empresas->pluck('id'))
-                            ->orWhereIn('unidade_id', $user->unidades->pluck('id'))
-                            ->with('unidade','empresa','responsavel')
-                            ->get();
+        $servicos = $this->getServicosCliente();
         
         $servicos = $servicos->where('situacao','<>','arquivado');
 
@@ -191,12 +192,7 @@ class ClienteController extends Controller
          $user = User::find(Auth::id());
 
         
-        $servicos = Servico::with('unidade','empresa','responsavel')
-                            ->whereIn('empresa_id',$user->empresas->pluck('id'))
-                            ->orWhereIn('unidade_id', $user->unidades->pluck('id'))
-                            ->where('situacao','andamento')
-                            
-                            ->get();
+         $servicos = $this->getServicosCliente();
 
 
         $servicos = $servicos->where('situacao','=','andamento')
@@ -217,10 +213,7 @@ class ClienteController extends Controller
         
          $user = User::find(Auth::id());
         
-        $servicos = Servico::with('unidade','empresa','responsavel')
-                                ->whereIn('empresa_id',$user->empresas->pluck('id'))
-                                ->orWhereIn('unidade_id', $user->unidades->pluck('id'))
-                                ->get();
+         $servicos = $this->getServicosCliente();
 
         $servicos = $servicos->where('situacao','=','finalizado')
                             ->where('situacao','<>','arquivado');                             
@@ -238,10 +231,7 @@ class ClienteController extends Controller
 
          $user = User::find(Auth::id());
         
-        $servicos = Servico::with('unidade','empresa','responsavel')
-                        ->whereIn('empresa_id',$user->empresas->pluck('id'))
-                        ->orWhereIn('unidade_id', $user->unidades->pluck('id'))
-                        ->get();
+         $servicos = $this->getServicosCliente();
        
 
         $servicos = $servicos->where('unidade.status','=','Ativa')
@@ -262,10 +252,7 @@ class ClienteController extends Controller
         
 
         $user = User::find(Auth::id());
-        $servicos = Servico::with('unidade','empresa','responsavel')
-                            ->whereIn('empresa_id',$user->empresas->pluck('id'))
-                            ->orWhereIn('unidade_id', $user->unidades->pluck('id'))
-                            ->get();
+        $servicos = $this->getServicosCliente();
         
         $servicos = $servicos->where('unidade.status','=','Ativa')
                             ->where('licenca_validade','<',date('Y-m-d'))
@@ -286,10 +273,7 @@ class ClienteController extends Controller
     public function listaVencer()
     {
          $user = User::find(Auth::id());
-        $servicos = Servico::with('unidade','empresa','responsavel')
-                            ->whereIn('empresa_id',$user->empresas->pluck('id'))
-                            ->orWhereIn('unidade_id', $user->unidades->pluck('id'))
-                            ->get();
+         $servicos = $this->getServicosCliente();
 
         $servicos = $servicos->where('licenca_validade','<',\Carbon\Carbon::today()->addDays(60))
                             ->where('situacao','=','finalizado'); 
@@ -305,10 +289,7 @@ class ClienteController extends Controller
     public function listaInativo()
     {
          $user = User::find(Auth::id());
-        $servicos = Servico::with('unidade','empresa','responsavel')
-                            ->whereIn('empresa_id',$user->empresas->pluck('id'))
-                            ->orWhereIn('unidade_id', $user->unidades->pluck('id'))
-                            ->get();
+         $servicos = $this->getServicosCliente();
 
         $servicos = $servicos->where('unidade.status','=','Inativa');
 
@@ -353,11 +334,21 @@ class ClienteController extends Controller
     {
         $user = User::find(Auth::id());
 
-        $servicos = Servico::whereIn('empresa_id',$user->empresas->pluck('id'))
-                            ->orWhereIn('unidade_id', $user->unidades->pluck('id'))
+        $unidades = Unidade::where('empresa_id', $user->empresas->pluck('id'))->pluck('id');
+
+        $servicos = Servico::orWhereIn('empresa_id',$user->empresas->pluck('id'))
+                            ->orWhereIn('unidade_id', $unidades)
                             ->get();
 
         return $servicos;
+    }
+
+    public function getUnidadesCliente()
+    {   
+        $user = User::find(Auth::id());
+        $unidades = Unidade::where('empresa_id', $user->empresas->pluck('id'))->get();
+
+        return $unidades;
     }
 
     public function getPendenciasCliente()
