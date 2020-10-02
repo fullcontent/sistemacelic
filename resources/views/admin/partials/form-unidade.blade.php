@@ -1,6 +1,10 @@
 <div class="box-body">
   
 
+    @if($errors->any())
+    {!! implode('', $errors->all('<div class="callout callout-danger">:message</div>')) !!}
+@endif
+
       
 
       <div class="col-md-12">

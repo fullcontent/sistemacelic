@@ -67,8 +67,15 @@ class UnidadesController extends Controller
                 'responsavel'=>'required',
                 'nomeFantasia' => 'required',
                 'email' => 'required|email',
+                'cnpj'=>'required',
+                'razaoSocial' => 'required',
+                
 
             ])->validate();
+
+            if($validator->fails()) {
+                return Redirect::back()->withErrors($validator);
+            }
 
             $empresa = new Unidade;
 
