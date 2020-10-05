@@ -411,16 +411,14 @@ class ServicosController extends Controller
     {
         
 
-        $validator = Validator::make($request->all(), [
-
-            'valorTotal' => 'required'
+        $request->validate([
+            'valorTotal' => 'required',
+            'os'=>'required',
+            'nome'=>'required',
+            'solicitante'=>'required',
             
-
-        ])->validate();
-
-        if($validator->fails()) {
-            return Redirect::back()->withErrors($validator);
-        }
+        ]);
+        
         
         
         $servico = new Servico;
