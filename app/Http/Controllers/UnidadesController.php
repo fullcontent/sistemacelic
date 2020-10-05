@@ -62,20 +62,20 @@ class UnidadesController extends Controller
     public function store(Request $request)
     {
         //
-        $validator = Validator::make($request->all(), [
+       
 
+
+            $request->validate([
                 'responsavel'=>'required',
                 'nomeFantasia' => 'required',
                 'email' => 'required|email',
                 'cnpj'=>'required',
                 'razaoSocial' => 'required',
                 
+            ]);
 
-            ])->validate();
-
-            if($validator->fails()) {
-                return Redirect::back()->withErrors($validator);
-            }
+            
+            
 
             $empresa = new Unidade;
 
