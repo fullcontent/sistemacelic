@@ -180,7 +180,8 @@ class ServicosController extends Controller
 
         $servicos = $servicos->where('licenca_validade','<',\Carbon\Carbon::today()->addDays(60))
                             
-                            ->where('situacao','=','finalizado');        
+                            ->where('situacao','=','finalizado') 
+                            ->where('tipo','=','licencaOperacao');       
         
        
 
