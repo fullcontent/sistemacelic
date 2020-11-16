@@ -95,7 +95,7 @@
 </div>
 
 <div class="box-footer">
-                <a href="#" class="btn btn-default">Voltar</a>
+                <a href="javascript: history.go(-1)" class="btn btn-default">Voltar</a>
                 <button type="submit" class="btn btn-danger">GERAR FATURAMENTO</button>
               	</div>
     
@@ -108,5 +108,9 @@
 @endsection
 
 
-
+<script>
+	function goBack() {
+	  window.history.back();
+	}
+	</script>
 
