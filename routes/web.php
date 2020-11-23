@@ -51,6 +51,12 @@ Route::get('/', function () {
 		Route::post('/faturamento/step4','FaturamentoController@step4')->name('faturamento.step4');
 
 
+		
+
+		Route::get('/reembolso/create','ReembolsoController@create')->name('reembolso.create');
+		Route::post('/reembolso/step2','ReembolsoController@step2')->name('reembolso.step2');
+
+
 		Route::get('/empresa/{empresa}/unidades','EmpresasController@unidades')->name('empresa.unidades');
 		Route::get('/empresa/cadastro', 'EmpresasController@cadastro')->name('empresa.cadastro');
 		Route::get('/unidade/cadastro', 'UnidadesController@cadastro')->name('unidade.cadastro');

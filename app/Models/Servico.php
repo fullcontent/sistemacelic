@@ -27,6 +27,12 @@ class Servico extends Model
         return $this->hasMany('App\Models\Taxa');
     }
 
+    public function reembolsos()
+    {
+        return $this->hasMany('App\Models\Taxa')->where('reembolso','sim');
+    }
+    
+
     public function pendencias()
     {
         return $this->hasMany('App\Models\Pendencia');
