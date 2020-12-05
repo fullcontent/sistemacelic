@@ -26,13 +26,13 @@
 				@foreach($reembolsos as $r)
 
 				<tr>
-					<td>{{$r->nome}}</td>
+					<td><a href="{{route('reembolso.show',$r->id)}}">{{$r->nome}}</a></td>
 					<td>{{$r->empresa->nomeFantasia}}</td>
-					<td>{{$r->created_at}}</td>
-					<td>{{$r->valorTotal}}</td>
+					<td>{{ \Carbon\Carbon::parse($r->created_at)->format('d/m/Y')}}</td>
+					<td>R$ {{number_format($r->valorTotal,2,'.',',')}}</td>
 					<td><a href="{{route('reembolso.destroy',$r->id)}}" class="confirmation"> <i class="glyphicon glyphicon-trash
 						"></i></a></td>				
-					<td><a href="{{route('reembolso.show',$r->id)}}">ver</a></td>
+				
 				</tr>
 
 				@endforeach

@@ -142,7 +142,12 @@ class AppServiceProvider extends ServiceProvider
                                     [
                                         'text' => 'Faturamentos',
                                         'url'  =>  ''.Auth::user()->privileges.'/faturamentos',
-                                        'icon'  =>  'glyphicon glyphicon-th-list',
+                                        'icon'  =>  'glyphicon glyphicon glyphicon-barcode',
+                                    ],
+                                    [
+                                        'text' => 'Reembolsos',
+                                        'url'  =>  ''.Auth::user()->privileges.'/reembolsos',
+                                        'icon'  =>  'glyphicon glyphicon glyphicon-usd',
                                     ]
                                 );
                             }
