@@ -52,9 +52,14 @@ Route::get('/', function () {
 
 
 		
+		Route::get('/reembolsos', 'ReembolsoController@index')->name('reembolsos.index');
+		Route::get('/reembolso/show/{id}', 'ReembolsoController@show')->name('reembolso.show');
+		Route::get('/reembolso/delete/{id}', 'ReembolsoController@destroy')->name('reembolso.destroy');
 
 		Route::get('/reembolso/create','ReembolsoController@create')->name('reembolso.create');
 		Route::post('/reembolso/step2','ReembolsoController@step2')->name('reembolso.step2');
+		Route::post('/reembolso/step3','ReembolsoController@step3')->name('reembolso.step3');
+		Route::post('/reembolso/step4','ReembolsoController@step4')->name('reembolso.step4');
 
 
 		Route::get('/empresa/{empresa}/unidades','EmpresasController@unidades')->name('empresa.unidades');

@@ -12,4 +12,10 @@ class Taxa extends Model
     {
     	return $this->belongsTo('App\Models\Servico');
     }
+
+    public function unidade()
+		{
+			return $this->hasOneThrough('App\Models\Unidade','App\Models\Servico','id','id','servico_id','unidade_id');
+        }
+    
 }

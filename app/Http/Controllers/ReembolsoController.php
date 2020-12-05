@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
+use App\Models\Taxa;
 use App\Models\Empresa;
 use App\Models\Servico;
+use App\Models\Reembolso;
 use Illuminate\Http\Request;
+use App\Models\ReembolsoTaxa;
 
 class ReembolsoController extends Controller
 {
@@ -16,7 +19,12 @@ class ReembolsoController extends Controller
      */
     public function index()
     {
-        //
+        $reembolsos = Reembolso::all();
+
+        return view('admin.reembolso.lista-reembolsos')->with([
+            'reembolsos'=>$reembolsos,
+        ]);
+
     }
 
     /**
@@ -77,9 +85,70 @@ class ReembolsoController extends Controller
 
         }
 
-        return $taxas;
+        //Buscando as taxas da lista
+
+        $t = Taxa::whereIn('id',$taxas)->get();
+
+        
+
+        
+
+        return view('admin.reembolso.step2')->with([
+            'taxas'=>$t,
+            'empresas'=>$empresas,
+            'periodo'=>$periodo,
+        ]);
+
         
         
+    }
+
+
+    public function step3(Request $request)
+    {
+        
+        $taxasReembolsar = Taxa::whereIn('id', $request->taxas)->get();
+        $total = $taxasReembolsar->sum('valor');
+        $descricao = "00".Carbon::now()->month."-".Carbon::now()->year."";
+
+
+        $empresa = Empresa::find($request->empresa_id);
+        
+        return view('admin.reembolso.step3')->with([
+            'taxasReembolsar'=>$taxasReembolsar,
+            'total'=>$total,
+            'empresa'=> $empresa,
+            'descricao'=>$descricao,
+
+        ]);
+    }
+
+    public function step4(Request $request)
+    {
+       
+        
+        $taxasReembolsar = Taxa::whereIn('id',$request->taxas)->get();
+        $total = $taxasReembolsar->sum('valor');
+        $empresa = Empresa::find($request->empresa_id);
+
+        setlocale (LC_TIME, 'pt-br');
+        $data = \Carbon\Carbon::now()->formatLocalized('%d de %B de %Y');
+        
+
+        $this->salvarReembolso($taxasReembolsar, $total, $request->descricao, $request->obs, $request->empresa_id);
+
+
+       return view('admin.reembolso.step4')->with([
+            
+            'reembolsoItens'=>$taxasReembolsar,
+            'empresa'=>$empresa,
+            'data'=>$data,
+            'totalReembolso'=>$total,
+            'descricao'=>$request->descricao,
+            'obs'=>$request->obs,
+        ]);
+        
+    
     }
 
     /**
@@ -101,7 +170,20 @@ class ReembolsoController extends Controller
      */
     public function show($id)
     {
-        //
+        $reembolso = Reembolso::with('taxas.taxa.unidade')->find($id);
+
+        $empresa = Empresa::find($reembolso->empresa_id);
+
+
+        return view('admin.reembolso.detalhe-reembolso')->with([
+            
+            'reembolsoItens'=>$reembolso->taxas,
+            'totalReembolso'=>$reembolso->valorTotal,
+            'descricao'=>$reembolso->nome,
+            'obs'=>$reembolso->obs,
+            'data'=>$reembolso->created_at,
+            'empresa'=>$empresa,
+        ]);
     }
 
     /**
@@ -135,6 +217,52 @@ class ReembolsoController extends Controller
      */
     public function destroy($id)
     {
-        //
+         //Selecionando reembolso a ser destruido
+
+         $reembolso = Reembolso::find($id);
+
+        
+         //Selecionando os servicos dentro desse reembolso
+ 
+ 
+         $reembolsoTaxas = ReembolsoTaxa::where('reembolso_id',$id)->get();
+ 
+ 
+         foreach($reembolsoTaxas as $f)
+         {
+            $r = ReembolsoTaxa::find($f->id);
+            $r->destroy($r->id);
+         }
+         
+         //Excluindo reembolso
+ 
+         $reembolso->destroy($reembolso->id);
+ 
+ 
+         return $this->index();
+    }
+
+    public function salvarReembolso($taxas, $total, $descricao, $obs, $empresa_id)
+    {
+       
+        $reembolso = new Reembolso;
+
+        $reembolso->empresa_id = $empresa_id;
+        $reembolso->nome = $descricao;
+        $reembolso->obs = $obs;
+        $reembolso->valorTotal = $total;
+
+        $reembolso->save();
+
+            foreach($taxas as $t)
+            {
+
+                $reembolsoTaxa = new ReembolsoTaxa;
+                $reembolsoTaxa->taxa_id = $t->id;
+                $reembolsoTaxa->reembolso_id = $reembolso->id;
+                $reembolsoTaxa->save();
+
+            }
+
     }
 }

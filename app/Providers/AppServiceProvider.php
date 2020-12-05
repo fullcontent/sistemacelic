@@ -40,6 +40,8 @@ class AppServiceProvider extends ServiceProvider
 
         
         
+            \Carbon\Carbon::setlocale(LC_TIME, 'pt-BR');
+
 
 
         $events->listen(BuildingMenu::class, function (BuildingMenu $event) {

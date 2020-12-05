@@ -14,8 +14,19 @@ class CreateReembolsosTable extends Migration
     public function up()
     {
         Schema::create('reembolsos', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            
+            $table->increments('id');
             $table->timestamps();
+
+            $table->integer('empresa_id');
+
+            $table->string('nome')->nullable();
+            $table->float('valorTotal')->nullable();
+            $table->string('obs')->nullable();
+
+            $table->date('dataPagamento')->nullable();
+
+
         });
     }
 

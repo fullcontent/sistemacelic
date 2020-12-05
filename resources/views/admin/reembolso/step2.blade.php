@@ -33,11 +33,11 @@
 <div class="box box-primary">
 	
 	<div class="box-header with-border">
-		<h3 class="box-title">Selecione os serviços que deseja incluir no faturamento: </h3>
+		<h3 class="box-title">Selecione as taxas que deseja incluir no reembolso: </h3>
 	</div>
 
 
-{!! Form::open(['route'=>'faturamento.step3','id'=>'cadastroFaturamento']) !!}
+{!! Form::open(['route'=>'reembolso.step3','id'=>'cadastroReembolso']) !!}
 
 <div class="box-body">
 
@@ -47,35 +47,38 @@
 		
 		<table class="table table-hover">
 			<thead>
-				<th></th>
-				<th>Cód.</th>
-				<th>Loja</th>
-				<th>Cidade</th>
-				<th>CNPJ</th>
-				<th>Serviço</th>
-				<th>Total</th>
 				
-				<th>Em Aberto</th>
+				<th></th>
+
+				<th>Cod.</th>
+				<th>Unidade</th>
+				<th>Serviço</th>
+				<th>Taxa</th>
+				<th>Solicitante</th>
+				<th>Valor</th>
+				<th>Vcto.</th>
+				<th>Pgto.</th>
 				
 				
 			</thead>
 			<tbody>
 
-							@foreach($servicosFaturar as $value => $s)
-							<tr>
-								<td>{{ Form::checkbox('servicos[]', $s->id,null,['class'=>'checkbox'])}}</td>	
-								<td>{{$s->unidade->codigo}}</td>
-								<td>{{$s->unidade->nomeFantasia}}</td>
-								<td>{{$s->unidade->cidade}}</td>
-								<td>@php echo App\Http\Controllers\FaturamentoController::formatCnpjCpf($s->unidade->cnpj); @endphp</td>
-								<td>{{$s->nome}}</td>
-								<td>R$ {{number_format($s->financeiro['valorTotal'],2,'.',',')}}</td>
-								
-								<td>R$ {{number_format($s->financeiro['valorAberto'],2,'.',',')}}</td>
-								
+				@foreach($taxas as $value => $s)
+				<tr>
+					<td>{{ Form::checkbox('taxas[]', $s->id,null,['class'=>'checkbox'])}}</td>
+					
+					<td>{{$s->unidade->codigo}}</td>
+					<td>{{$s->unidade->nomeFantasia}}</td>
+					<td>{{$s->servico->nome}}</td>
+					<td>{{$s->nome}}</td>
+					<td>{{$s->servico->solicitante}}</td>
+					<td>R$ {{number_format($s->valor,2,'.',',')}}</td>
+					<td>{{ \Carbon\Carbon::parse($s->vencimento)->format('d/m/Y')}}</td>
+					<td>{{ \Carbon\Carbon::parse($s->pagamento)->format('d/m/Y')}}</td>
+					
 
-							</tr>
-							@endforeach
+				</tr>
+				@endforeach		
 						
 							
 			</tbody>
@@ -108,7 +111,7 @@
       $(this).parents('form').submit();
       return;
   }
-  alert('Selecione um serviço da lista!');
+  alert('Selecione uma taxa da lista!');
   return false;
 });
 </script>

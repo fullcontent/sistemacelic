@@ -121,6 +121,7 @@ class FaturamentoController extends Controller
     public function step4(Request $request)
     {   
         $servicos = [];
+        
         //Selecionar os servicos based on servico_id of request
 
             foreach($request->faturamento as $f)

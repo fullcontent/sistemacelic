@@ -13,8 +13,9 @@ class CreateFaturamentosTable extends Migration
      */
     public function up()
     {
-        Schema::create('faturamentos', function (Blueprint $table) {
-            $table->increments('id');
+     Schema::create('faturamentos', function (Blueprint $table) {
+           
+        $table->increments('id');
             $table->timestamps();
 
             $table->integer('empresa_id');
