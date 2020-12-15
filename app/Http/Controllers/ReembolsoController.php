@@ -57,16 +57,16 @@ class ReembolsoController extends Controller
         foreach($empresas->pluck('id') as $e)
         {
 
-            $empresa = Empresa::whereHas('servicosFaturar')->with('servicosFaturar')->find($e);
+            $empresa = Empresa::find($e);
             $s = $empresa->servicosFaturar->pluck('id');
             $s2 = $s2->merge($s);
         }
 
         $servicosFaturar = Servico::whereIn('id', $s2)
                            
-                            ->whereHas('reembolsos')
+                            
                             ->with('reembolsos')
-                            ->whereHas('finalizado',function($q) use ($start_date, $end_date){
+                            ->whereHas('reembolsos',function($q) use ($start_date, $end_date){
                                 return $q->whereBetween('created_at', [$start_date,$end_date]);
                             })                     
                             ->get();

@@ -34,7 +34,7 @@
 </div>
 
 <div class="box-footer">
-                <a href="#" class="btn btn-default">Voltar</a>
+                <a href="{{route('dashboard')}}" class="btn btn-default">Voltar</a>
                 <button type="submit" class="btn btn-info">Próximo Passo</button>
               	</div>
     
