@@ -12,6 +12,8 @@
 		
 		@if(Route::is('servicos.create'))
 		
+		{{$tipoServico}}
+		
 		{!! Form::select('tipo', array(
 			'licencaOperacao' => 'Licenças de Operação',
 			'nRenovaveis' => 'Licenças/Projetos não renováveis',
