@@ -1,4 +1,4 @@
-<div class="box box-info  collapsed-box">
+<div class="box box-info ">
             <div class="box-header with-border">
               <a href="#" data-widget="collapse"><h3 class="box-title">Taxa</h3></a>
 

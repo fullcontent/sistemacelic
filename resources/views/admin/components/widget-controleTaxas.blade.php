@@ -1,4 +1,4 @@
-<div class="box box-danger  collapsed-box">
+<div class="box box-danger">
             <div class="box-header with-border">
               <a href="#" data-widget="collapse"><h3 class="box-title">Controle de Taxas</h3></a>
 
