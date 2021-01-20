@@ -542,13 +542,19 @@ class ServicosController extends Controller
        
 
 
-        //Insert Faturamento
+        //Insert Financeiro
 
         
         $faturamento = new ServicoFinanceiro();
         $faturamento->servico_id = $servico->id;
         
         $faturamento->valorTotal = $request->valorTotal;
+
+        //Inserir valor em aberto igual o valor total na criação.
+
+        $faturamento->valorAberto = $request->valorTotal;
+
+
         
 
         $faturamento->save();      
