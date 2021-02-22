@@ -72,7 +72,8 @@
 								<td>{{$s->nome}}</td>
 								<td>R$ {{number_format($s->financeiro['valorTotal'],2,'.',',')}}</td>
 								<td>R$ {{number_format($s->financeiro['valorAberto'],2,'.',',')}}</td>
-								<td>{{Form::text('faturamento['.$value.'][valorFaturar]', $s->financeiro['valorAberto'])}}</td>
+								<td><input class="form-control" type="number" required="true" name="faturamento[{{$value}}][valorFaturar]" min="0" max="{{$s->financeiro['valorAberto']}}" step=".01" value="{{$s->financeiro['valorAberto']}}"> 
+</td>
 								
 								{!! Form::hidden('faturamento['.$value.'][servico_id]', $s->id) !!}
 								{!! Form::hidden('faturamento['.$value.'][valorTotal]', $s->financeiro['valorTotal']) !!}
