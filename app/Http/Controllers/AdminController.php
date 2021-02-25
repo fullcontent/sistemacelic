@@ -10,6 +10,7 @@ use App\Models\Servico;
 use App\Models\Pendencia;
 use App\UserAccess;
 use App\Models\Unidade;
+use App\Models\Empresa;
 
 
 use App\Notifications\TestNotification;
@@ -103,6 +104,17 @@ class AdminController extends Controller
                                 ->where('situacao','<>','arquivado');
 
         return $servicos;
+    }
+
+
+    public function relatorioCompleto()
+    {
+        
+        $servicos = Servico::all();
+
+        return view('admin.relatorios.completo')->with('servicos',$servicos);
+
+
     }
 
 

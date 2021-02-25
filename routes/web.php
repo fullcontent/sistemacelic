@@ -27,6 +27,8 @@ Route::get('/', function () {
 		Route::get('/home', 'AdminController@index')->name('dashboard');
 
 
+		Route::get('/relatorio','AdminController@relatorioCompleto');
+
 
 		Route::resource('/empresas','EmpresasController');
 		Route::resource('/unidades','UnidadesController');
