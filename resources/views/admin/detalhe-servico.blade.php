@@ -126,18 +126,16 @@
 
 
 
-@if(count($taxas))
+
 <div class="col-md-7">
   @include('admin.components.widget-taxas')
 </div>
-@endif
 
 
-@if(count($pendencias))
 <div class="col-md-5">
   @include('admin.components.widget-pendencias')
 </div>
-@endif
+
 
 
 
