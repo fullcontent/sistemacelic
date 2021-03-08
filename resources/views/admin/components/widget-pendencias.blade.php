@@ -39,9 +39,10 @@
 
                   @endswitch
 
-                  <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#cadastro-arquivo">
+                
+                <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#cadastro-arquivo">
                 <span class="glyphicon glyphicon-plus-sign"></span>Anexar
-                  </button>
+                </button>
                   
                   <!-- Emphasis label -->
                   
