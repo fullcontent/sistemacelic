@@ -1,33 +1,4 @@
-@extends('adminlte::page')
-
-
-@section('content')
-
-<section class="invoice">
-    <!-- title row -->
-    <div class="row">
-      <div class="col-xs-12">
-        <h2 class="page-header">
-          <img src="{{asset('img/logoCastro.png')}}" alt="" width="300">
-          <small class="pull-right">Data: </small>
-        </h2>
-      </div>
-      <!-- /.col -->
-    </div>
-    <!-- info row -->
-    <div class="row invoice-info">
-      <div class="col-sm-6">
-        <p><b>RELATÓRIO DE SERVIÇOS: </b></p>
-        
-      </div>
-      
-    </div>
-    <!-- /.row -->
-
-    <!-- Table row -->
-    <div class="row">
-      <div class="col-xs-12 table-responsive">
-        <table class="table table-bordered">
+<table class="table table-bordered">
           <thead>
           <tr>
             <th>Razão Social</th>
@@ -81,19 +52,3 @@
           </tbody>
           
         </table>
-      </div>
-      <!-- /.col -->
-    </div>
-    <!-- /.row -->
-
-    
-    
-    <!-- this row will not appear when printing -->
-    <div class="row no-print">
-      <div class="col-xs-12">
-        
-      </div>
-    </div>
-  </section>
-
-@endsection

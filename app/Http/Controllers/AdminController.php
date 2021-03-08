@@ -112,7 +112,9 @@ class AdminController extends Controller
         
         $servicos = Servico::all();
 
-        return view('admin.relatorios.completo')->with('servicos',$servicos);
+        // dump($servicos);
+
+        return view('admin.relatorios.completo')->with(['servicos'=>$servicos]);
 
 
     }
