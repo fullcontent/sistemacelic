@@ -143,6 +143,14 @@ class ArquivosController extends Controller
         
         $pendencia->responsavel_id = $servico->responsavel_id;
         $pendencia->responsavel_tipo = 'usuario';
+        
+        $nome = $pendencia->pendencia;
+        $anexo = "[CLIENTE] ";
+
+        $pendencia->pendencia = $anexo;
+        $pendencia->pendencia .= $nome;
+        
+
         $pendencia->save();
 
         //===================================================
