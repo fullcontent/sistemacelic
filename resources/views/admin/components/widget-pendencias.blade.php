@@ -88,9 +88,9 @@
 							 {!! Form::label('arquivo', 'Arquivo', array('class'=>'control-label')) !!}
         				{!! Form::file('arquivo', null, ['class'=>'form-control','id'=>'arquivo']) !!}
 
-                {!! Form::hidden('pendencia_id', $pendencia->id) !!}
+                
 
-                {!! Form::hidden('servico_id', $pendencia->servico_id) !!}
+               
                 {!! Form::hidden('unidade_id', $servico->unidade_id) !!}
 
                 {!! Form::hidden('user_id', Auth::id()) !!}
