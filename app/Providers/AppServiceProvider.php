@@ -120,7 +120,25 @@ class AppServiceProvider extends ServiceProvider
                             ],
                             
                             ]
-                            ]
+                        ],
+                            [
+                                'text' => 'Pendências',
+                                'url'  =>  ''.Auth::user()->privileges.'/pendencias',
+                                'icon' => 'fa fa-tasks',
+                                'submenu'=>[
+                                [
+                                'text'=>'Minhas pendências',
+                                'url'  =>  route('pendencias.minhas'),
+                                'icon'=>'fa fa-user-secret',
+                                ],
+                                [
+                                'text' => 'Outras pendências',
+                                'url'  =>  route('pendencias.outras'),
+                                'icon'  =>  'fa fa-child',
+                                ],
+                                                                
+                                ]
+                                ]
 
 
                             );

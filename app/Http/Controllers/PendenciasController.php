@@ -32,6 +32,43 @@ class PendenciasController extends Controller
                     ]);
     }
 
+    public function minhas()
+    {
+        
+        $pendencias = Pendencia::where('responsavel_id',Auth::id())
+                     ->where('status','pendente')
+                    ->get();
+        
+                    return view('admin.lista-pendencias')
+                    ->with([
+                        'pendencias'=>$pendencias,
+                        'title'=>'Minhas pendências',
+                    ]);
+
+
+    }
+
+    public function outras()
+    {
+        
+        $servicos = Servico::where('responsavel_id',Auth::id())->pluck('id');
+            
+    		$pendencias = Pendencia::with('servico','unidade')
+                            ->where('responsavel_id', Auth::id())
+                            ->orWhereIn('pendencias.servico_id',$servicos)
+            				->get();
+
+            $pendencias = $pendencias->where('status','pendente');
+        	
+                            return view('admin.lista-pendencias')
+                            ->with([
+                                'pendencias'=>$pendencias,
+                                'title'=>'Outras pendências',
+                            ]);
+
+
+    }
+
     /**
      * Show the form for creating a new resource.
      *

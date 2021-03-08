@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Storage;
 use Auth;
 use App\User;
 
+use App\Models\Pendencia;
+use App\Models\Servico;
+
 
 class ArquivosController extends Controller
 {
@@ -132,8 +135,25 @@ class ArquivosController extends Controller
 
 
 
-             
+        //Alterar responsavel pela pendência 
 
+        $pendencia = Pendencia::find($request->pendencia_id);
+        $servico = Servico::find($pendencia->servico_id);
+
+        
+        $pendencia->responsavel_id = $servico->responsavel_id;
+        $pendencia->responsavel_tipo = 'usuario';
+        $pendencia->save();
+
+        //===================================================
+
+        //Notificar o usuario responsavel pelo serviço
+
+        
+
+
+        //===================================================
+        
 
         
         return redirect()->back();
