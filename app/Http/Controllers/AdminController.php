@@ -51,6 +51,7 @@ class AdminController extends Controller
 
     	
     		$servicos = Servico::where('responsavel_id',Auth::id())->pluck('id');
+            
     		$pendencias = Pendencia::with('servico','unidade')
                             ->where('responsavel_id', Auth::id())
                             ->orWhereIn('pendencias.servico_id',$servicos)

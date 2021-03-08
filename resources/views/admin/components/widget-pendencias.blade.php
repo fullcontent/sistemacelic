@@ -11,7 +11,7 @@
               <ul class="todo-list ui-sortable" data-widget="todo-list" id="todo-list">
                 
                 @foreach($pendencias->where('status','pendente') as $pendencia)
-                <li @if($pendencia->status == 'concluido') class='done' @endif>
+                <li @if($pendencia->status == 'concluido') class='done' @endif @if($pendencia->responsavel_id == Auth::id()) style="color:red;" @endif>
                   <!-- drag handle -->
                   
                   <!-- checkbox -->

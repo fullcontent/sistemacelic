@@ -34,6 +34,7 @@
 			<p><b>Complemento: </b>{{ $dados->complemento }}</p>
 			<p><b>Cidade/UF:</b> {{$dados->cidade}}/{{$dados->uf}}</p>
 			<p><b>CEP:</b> {{$dados->cep}}</p>
+			<p><b>Bairro:</b> {{$dados->bairro}}</p>
 		</div>
 		
 	</div>
