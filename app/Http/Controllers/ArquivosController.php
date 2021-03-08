@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Arquivo;
 use Illuminate\Support\Facades\Storage;
+use Auth;
+use App\User;
 
 
 class ArquivosController extends Controller
@@ -79,6 +81,21 @@ class ArquivosController extends Controller
             $a->servico_id = $request->servico_id;
         }
 
+        if($request->pendencia_id)
+        {
+            $route = 'servicos.show';
+            $id = $request->servico_id;
+            $a->pendencia_id = $request->pendencia_id;
+        }
+
+        $a->user_id = $request->user_id;
+
+        
+                
+        
+        
+
+        // return $a;
  
         $a->save();
 
@@ -88,53 +105,50 @@ class ArquivosController extends Controller
         
     }
 
+    public function anexar(Request $request)
+    {
+        $a = new Arquivo;
+
+        if ($request->hasFile('arquivo') && $request->file('arquivo')->isValid()) {
+                $nameFile = null;
+                $name = uniqid(date('HisYmd'));
+                $extension = $request->arquivo->extension();
+                $nameFile = "{$name}.{$extension}";
+                // Faz o upload:
+                $upload = $request->arquivo->storeAs('arquivos', $nameFile);
+                // Se tiver funcionado o arquivo foi armazenado em storage/app/public/categories/nomedinamicoarquivo.extensao
+
+                $a->arquivo = $upload;
+
+        }
+
+        $a->nome = $request->nome;
+        $a->user_id = $request->user_id;
+        $a->pendencia_id = $request->pendencia_id;
+        $a->servico_id = $request->servico_id;
+        $a->unidade_id = $request->unidade_id;
+
+        $a->save();
+
+
+
+             
+
+
+        
+        return redirect()->back();
+
+
+
+    }
+
     /**
      * Display the specified resource.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-
-
-
-    }
+    
 
     public function download($id)
     {
@@ -142,13 +156,14 @@ class ArquivosController extends Controller
         $file = Arquivo::find($id);
 
         $filename = $file->arquivo;
-        $extension = substr($filename, -4);
         
-        $arquivo = $file->unidade->codigo.' - '
-                    .$file->unidade->nomeFantasia.' - '.$file->nome.$extension;
+        $extension = pathinfo($filename, PATHINFO_EXTENSION);
+        
+        $arquivo = $file->unidade->codigo.' - '.$file->unidade->nomeFantasia.' - '.$file->nome.'.'.$extension;
 
         
-        
+
+                
         return response()->download(public_path('uploads/'.$file->arquivo.''),$arquivo);
 
     }

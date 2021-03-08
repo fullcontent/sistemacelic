@@ -22,7 +22,7 @@
                    @foreach($dados->arquivos as $a)
                    <tr>
                    	<td>{{$a->nome}}</td>
-                   	<td><a href="{{ url("uploads/$a->arquivo") }}" class="btn btn-xs btn-warning" target="_blank">Download</a></td>
+                     <td><a href="{{ route('arquivo.download',$a->id) }}" class="btn btn-xs btn-default" target="_self">Download</a></td>
                    </tr>
                   @endforeach
                   </tbody>
@@ -32,6 +32,9 @@
             </div>
             <!-- /.box-body -->
             <div class="box-footer clearfix">
+              <button type="button" class="btn btn-info" data-toggle="modal" data-target="#cadastro-arquivo">
+                <span class="glyphicon glyphicon-plus-sign"></span> Adicionar
+              </button>
               
               
               
@@ -48,7 +51,7 @@
               </div>
               <div class="modal-body">
                 
-					{!! Form::open(['route'=>'arquivo.store','enctype'=>'multipart/form-data']) !!}
+					{!! Form::open(['route'=>'cliente.arquivo.anexar','enctype'=>'multipart/form-data']) !!}
 						
 						<div class="form-group">
 							{!! Form::label('nome', 'Nome', array('class'=>'control-label')) !!}
@@ -63,25 +66,11 @@
 						</div>
               
               
-              @switch($arquivo ?? '')
+              {!! Form::hidden('unidade_id', $dados->id) !!}
 
-              @case('unidade')
-                {!! Form::hidden('unidade_id', $dados->id ?? '') !!}
-                {!! Form::hidden('route', 'unidade.show') !!}
-                @break
               
-              @case('empresa')
-                {!! Form::hidden('empresa_id', $dados->id ?? '') !!}
-                  {!! Form::hidden('route', 'empresa.show') !!}
-                @break
 
-              @case('servico')
-                {!! Form::hidden('servico_id', $dados->id ?? '') !!}
-                  {!! Form::hidden('route', 'servico.show') !!}
-                @break
-              @default
-                  <span>Something went wrong, please try again</span>
-              @endswitch
+              {!! Form::hidden('route',\Request::route()->getName()) !!}
              
 						
 					

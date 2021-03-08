@@ -38,6 +38,10 @@
 
 
                   @endswitch
+
+                  <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#cadastro-arquivo">
+                <span class="glyphicon glyphicon-plus-sign"></span>Anexar
+                  </button>
                   
                   <!-- Emphasis label -->
                   
@@ -59,6 +63,58 @@
             </div>
            
           </div>
+
+
+          <div class="modal fade" id="cadastro-arquivo">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title">Anexar arquivo a pendencia</h4>
+              </div>
+              <div class="modal-body">
+                
+					{!! Form::open(['route'=>'arquivo.store','enctype'=>'multipart/form-data']) !!}
+						
+						<div class="form-group">
+							{!! Form::label('nome', 'Nome', array('class'=>'control-label')) !!}
+							{!! Form::text('nome', null, ['class'=>'form-control','id'=>'email']) !!}
+
+						</div>
+
+						<div class="form-group">
+							 {!! Form::label('arquivo', 'Arquivo', array('class'=>'control-label')) !!}
+        				{!! Form::file('arquivo', null, ['class'=>'form-control','id'=>'arquivo']) !!}
+
+                {!! Form::hidden('pendencia_id', $pendencia->id) !!}
+
+                {!! Form::hidden('servico_id', $pendencia->servico_id) !!}
+                {!! Form::hidden('unidade_id', $servico->unidade_id) !!}
+
+                {!! Form::hidden('user_id', Auth::id()) !!}
+
+                
+
+						</div>
+              
+              
+           			
+					
+
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn pull-left" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-info">Cadastrar</button>
+
+              </div>
+              {!! Form::close() !!}
+            </div>
+            <!-- /.modal-content -->
+          </div>
+          <!-- /.modal-dialog -->
+        </div>
+      
 
 @section('js')
     <script>
