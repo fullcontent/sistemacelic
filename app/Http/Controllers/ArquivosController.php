@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Arquivo;
+use App\Models\Historico;
 use Illuminate\Support\Facades\Storage;
 use Auth;
 use App\User;
@@ -154,7 +155,15 @@ class ArquivosController extends Controller
         $pendencia->save();
 
         //===================================================
+        
+        
+        //Salvar historico
 
+
+        $this->salvarHistorico($servico, $pendencia);
+        
+        
+        
         //Notificar o usuario responsavel pelo serviço
 
         
@@ -207,5 +216,18 @@ class ArquivosController extends Controller
 
 
         return redirect()->back();
+    }
+
+
+    public function salvarHistorico($servico, $pendencia)
+    {
+         //Insert history
+
+        $history = new Historico();
+        $history->servico_id = $servico->id;
+        $history->user_id = Auth::id();
+        $history->observacoes = "Anexou documento ".$pendencia->pendencia." ";
+        $history->save();
+
     }
 }

@@ -41,7 +41,7 @@
 
                 
                 <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#cadastro-arquivo" data-nome="{{$pendencia->pendencia}}">
-                <span class="glyphicon glyphicon-plus-sign"></span>Anexar
+                <span class="fa fa-paperclip"></span>Anexar
                 </button>
                   
                   <!-- Emphasis label -->
@@ -123,9 +123,9 @@
         $('#cadastro-arquivo').on('show.bs.modal', function(e) {  
             var getIdFromRow = $(e.relatedTarget).data('nome');
 
-            console.log(getIdFromRow); 
-$("#nomeArquivo").val(getIdFromRow);
-});
+           
+            $("#nomeArquivo").val(getIdFromRow);
+            });
 
         
        $('#todo-list').todoList({ 
