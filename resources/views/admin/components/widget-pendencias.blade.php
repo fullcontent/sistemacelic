@@ -40,7 +40,7 @@
                   @endswitch
 
                 
-                <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#cadastro-arquivo">
+                <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#cadastro-arquivo" data-nome="{{$pendencia->pendencia}}">
                 <span class="glyphicon glyphicon-plus-sign"></span>Anexar
                 </button>
                   
@@ -80,7 +80,7 @@
 						
 						<div class="form-group">
 							{!! Form::label('nome', 'Nome', array('class'=>'control-label')) !!}
-							{!! Form::text('nome', null, ['class'=>'form-control','id'=>'email']) !!}
+							{!! Form::text('nome', null, ['class'=>'form-control','id'=>'nomeArquivo']) !!}
 
 						</div>
 
@@ -120,7 +120,13 @@
 @section('js')
     <script>
         
-      
+        $('#cadastro-arquivo').on('show.bs.modal', function(e) {  
+            var getIdFromRow = $(e.relatedTarget).data('nome');
+
+            console.log(getIdFromRow); 
+$("#nomeArquivo").val(getIdFromRow);
+});
+
         
        $('#todo-list').todoList({ 
 
