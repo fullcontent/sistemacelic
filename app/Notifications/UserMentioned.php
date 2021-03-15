@@ -52,12 +52,13 @@ class UserMentioned extends Notification
 
    
     public function toDatabase($notifiable)
-    {
+    {   
+        
         return [
             //
             'mensagem'=>'Voce foi mencionado nesse servico',
             'servico'=>$this->servico,
-            'action'=> route('servicos.show', $this->servico),
+            'action'=> route('cliente.servico.show', $this->servico),
 
         ];
     }

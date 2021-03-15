@@ -145,7 +145,7 @@ Route::post('/usuario/editar/', 'ClienteController@updateUsuario')->name('client
 Route::get('/servico/{id}/taxas/{taxa}','ClienteController@showTaxa')->name('cliente.taxa.show');
 
 Route::post('/arquivo/anexar','ArquivosController@anexar')->name('cliente.arquivo.anexar');
-
+Route::get('/users/list','ClienteController@usersList')->name('cliente.users.list');
 			
 
 	});

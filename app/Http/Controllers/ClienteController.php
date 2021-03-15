@@ -19,6 +19,10 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 
+use App\Notifications\UserMentioned;
+use Illuminate\Support\Facades\Notification;
+
+
 
 class ClienteController extends Controller
 {
@@ -319,6 +323,30 @@ class ClienteController extends Controller
 
         $interacao->save();
 
+
+
+         //Notify users
+         $mentions = preg_match_all('[\B@\w+\s\w+]', $request->observacoes, $users);
+        
+
+         if($mentions > 0)
+         {
+           
+             foreach($users as $users2)
+             {
+                 
+                foreach($users2 as $u)
+                {
+                    $u = ltrim($u, "@");
+                    
+                    $user = User::where('name','like', '%'.$u.'%')->get();
+                 
+                    Notification::send($user, new UserMentioned($interacao->servico_id));
+                }
+             }
+         }         
+
+
         return redirect()->route('cliente.servico.show', $request->servico_id);
     }
 
@@ -425,6 +453,19 @@ class ClienteController extends Controller
         return $unidadesList;
     }
 
+
+    public function usersList()
+	{
+		$users = User::all();
+
+		foreach($users as $u)
+		{
+
+			$u->name = "@".$u->name." ";
+		}
+
+		return json_encode($users);
+	}
     
 
     

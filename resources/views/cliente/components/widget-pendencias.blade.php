@@ -115,5 +115,21 @@ $('#cadastro-arquivo').on('show.bs.modal', function(e) {
            
             $("#nomeArquivo").val(getIdFromRow);
             });
+
+
+            $('#observacoes').mentionsInput({
+    onDataRequest:function (mode, query, callback) {
+      $.getJSON('{{route('cliente.users.list')}}', function(responseData) {
+        responseData = _.filter(responseData, function(item) { 
+          return item.name.toLowerCase().indexOf(query.toLowerCase()) > -1 
+          });
+        
+          callback.call(this, responseData);        
+      });
+    }
+
+    
+
+});
 </script>
 @stop

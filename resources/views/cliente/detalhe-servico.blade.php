@@ -192,7 +192,7 @@
                 
                 <div class="box-header">
                   
-                  {!! Form::open(['route'=>'interacao.store']) !!}
+                  {!! Form::open(['route'=>'cliente.interacao.salvar']) !!}
                   <div class="input-group">
                   {!! Form::text('observacoes', null, ['class'=>'form-control','id'=>'observacoes','placeholder'=>'Digite a mensagem']) !!}
                   {!! Form::hidden('servico_id',$servico->id) !!}
