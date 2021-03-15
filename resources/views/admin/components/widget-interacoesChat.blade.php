@@ -13,10 +13,11 @@
         </div>
       </div>
       <!-- /.box-header -->
-      <div class="box-body">
+      <div class="box-body" style="overflow: visible;">
         <!-- Conversations are loaded here -->
         <div class="direct-chat-messages">
             
+          
           <!-- Message. Default to the left -->
           <div class="direct-chat-msg">
               <a href="#" class="none">
@@ -30,13 +31,17 @@
             <!-- /.direct-chat-info -->
             
             <!-- /.direct-chat-img -->
-            <div class="direct-chat-text">
-              Essa é uma interação de teste, clique nela para abrir.
-            </div>
-        </a>
+                  <div class="direct-chat-text">
+                    Essa é uma interação de teste, clique nela para abrir.
+                  </div>
+                </a>
             <!-- /.direct-chat-text -->
           </div>
           <!-- /.direct-chat-msg -->
+
+
+
+        
 
         
 
@@ -49,7 +54,7 @@
                   {!! Form::open(['route'=>'interacao.store']) !!}
                   <div class="input-group">
                   
-                  {!! Form::text('observacoes', null, ['class'=>'form-control','id'=>'full','placeholder'=>'Digite a mensagem']) !!}
+                  {!! Form::text('observacoes', null, ['class'=>'form-control mention','id'=>'full','placeholder'=>'Digite a mensagem','autocomplete'=>'off']) !!}
                   {!! Form::hidden('servico_id',$servico->id) !!}
                   
                       <span class="input-group-btn">
@@ -70,3 +75,5 @@
     <!--/.direct-chat -->
 
 
+
+  

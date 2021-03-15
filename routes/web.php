@@ -117,7 +117,7 @@ Route::get('/', function () {
 		Route::get('/servico/{id}/interacoes', 'ServicosController@interacoes')->name('interacoes.lista');
 
 
-		
+		Route::get('/users/list','UsersController@usersList')->name('users.list');
 		
 
 	});

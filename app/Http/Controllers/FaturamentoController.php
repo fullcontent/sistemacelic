@@ -21,8 +21,8 @@ class FaturamentoController extends Controller
      */
     public function index()
     {
-    //    $faturamentos = Faturamento::all();
-            $faturamentos = Faturamento::where('empresa_id',16)->get();
+       $faturamentos = Faturamento::all();
+            // $faturamentos = Faturamento::where('empresa_id',16)->get();
 
         return view('admin.faturamento.lista-faturamentos')->with([
             'faturamentos'=>$faturamentos,

@@ -17,6 +17,10 @@ use App\Models\ServicoLpu;
 
 use App\Models\ServicoFinanceiro;
 
+use App\Notifications\UserMentioned;
+use Illuminate\Support\Facades\Notification;
+
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -908,6 +912,12 @@ class ServicosController extends Controller
     public function salvarInteracao(Request $request)
     {   
 
+       
+
+          
+        
+        
+        
         $validator = Validator::make($request->all(), [
 
                 'observacoes'=>'required',
@@ -922,6 +932,31 @@ class ServicosController extends Controller
         $interacao->created_at = Carbon::now('America/Sao_Paulo');
 
         $interacao->save();
+
+
+
+
+         //Notify users
+         $mentions = preg_match_all('[\B@\w+\s\w+]', $request->observacoes, $users);
+        
+
+         if($mentions > 0)
+         {
+           
+             foreach($users as $users2)
+             {
+                 
+                foreach($users2 as $u)
+                {
+                    $u = ltrim($u, "@");
+                    
+                    $user = User::where('name','like', '%'.$u.'%')->get();
+                 
+                    Notification::send($user, new UserMentioned($interacao->servico_id));
+                }
+             }
+         }         
+ 
 
         return redirect()->route('servicos.show', $request->servico_id);
     }

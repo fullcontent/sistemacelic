@@ -3,6 +3,9 @@
 @section('adminlte_css')
     <link rel="stylesheet"
           href="{{ asset('vendor/adminlte/dist/css/skins/skin-' . config('adminlte.skin', 'blue') . '.min.css')}} ">
+    <link rel="stylesheet"
+          href="{{ asset('vendor/mentions/jquery.mentions.css')}}">
+
     @stack('css')
     @yield('css')
 @stop
@@ -207,8 +210,12 @@
 
 @section('adminlte_js')
     <script src="{{ asset('vendor/adminlte/dist/js/adminlte.min.js') }}"></script>
-    <script src="{{ asset('vendor/mentions/bootstrap-typeahead.js') }}"></script>
-    <script src="{{ asset('vendor/mentions/mention.js') }}"></script>
+    <script src='https://cdn.rawgit.com/jashkenas/underscore/1.8.3/underscore-min.js' type='text/javascript'></script>
+    <script src='http://podio.github.io/jquery-mentions-input/lib/jquery.events.input.js' type='text/javascript'></script>
+    <script src='http://podio.github.io/jquery-mentions-input/lib/jquery.elastic.js' type='text/javascript'></script>
+    <script src='http://podio.github.io/jquery-mentions-input/jquery.mentionsInput.js' type='text/javascript'></script>
+
+    
     
     <script>
         $('a[data-notif-id]').click(function () {

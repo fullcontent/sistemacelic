@@ -155,5 +155,20 @@ class UsersController extends Controller
     
 
         return route('usuarios.index');
-    }
+	}
+	
+
+
+	public function usersList()
+	{
+		$users = User::all();
+
+		foreach($users as $u)
+		{
+
+			$u->name = "@".$u->name." ";
+		}
+
+		return json_encode($users);
+	}
 }
