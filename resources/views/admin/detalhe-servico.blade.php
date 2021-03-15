@@ -140,7 +140,14 @@
 
 
 <div class="row">
-    <div class="col-sm-12">
+  
+<div class="col-sm-6">
+
+@include('admin.components.widget-interacoesChat')
+</div>
+
+
+<div class="col-sm-6">
       <div class="box box-black">
             <div class="box-header with-border">
               <h3 class="box-title">Últimas Interações</h3>
