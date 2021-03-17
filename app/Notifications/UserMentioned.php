@@ -12,17 +12,18 @@ class UserMentioned extends Notification
 {
     use Queueable, SerializesModels;
 
-    public $servico;
+    public $servico, $route;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($servico)
+    public function __construct($servico, $route)
     {
         //
         $this->servico = $servico;
+        $this->route = $route;
     }
 
     /**
@@ -61,7 +62,7 @@ class UserMentioned extends Notification
             //
             'mensagem'=>'Voce foi mencionado nesse servico',
             'servico'=>$this->servico,
-            'action'=> route('cliente.servico.show', $this->servico),
+            'action'=> route($this->route, $this->servico),
 
         ];
     }

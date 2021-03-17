@@ -152,17 +152,20 @@ Route::get('/users/list','ClienteController@usersList')->name('cliente.users.lis
 
 Route::get('/teste', function() {
 
-		// $licenca = Servico::where('tipo','primario')->where('situacao','finalizado')->whereDate('licenca_validade','=',Carbon::now()->addDays(60))->get();
+		$user = \App\User::find(1);
 
-			$l = App\Models\Servico::find(589);
+		foreach ($user->unreadNotifications->where('type','App\Notifications\UserMentioned') as $notification) {
+			
+			dump($notification);
 
-            $user = App\User::find($l->responsavel_id);
-            $user->notify(new App\Notifications\Licenca60days($l,$user)); 
+		}
 
-            return new App\Mail\VencimentoLicenca60days($l);
 
-       
+});
 
+Route::get('/notAllowed' , function(){
+
+	return "NAO PERMITIDO";
 
 });
 

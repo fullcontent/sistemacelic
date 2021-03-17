@@ -950,9 +950,19 @@ class ServicosController extends Controller
                 {
                     $u = ltrim($u, "@");
                     
-                    $user = User::where('name','like', '%'.$u.'%')->get();
-                 
-                    Notification::send($user, new UserMentioned($interacao->servico_id));
+                    $user = User::where('name','like', '%'.$u.'%')->first();
+                    
+                    if($user->privileges == 'admin')
+                    {
+                        $route = 'servicos.show';
+                    }
+                    elseif($user->privileges == 'cliente')
+                    {
+                        $route = 'cliente.servico.show';
+                    }
+
+
+                    Notification::send($user, new UserMentioned($interacao->servico_id,$route));
                 }
              }
          }         
