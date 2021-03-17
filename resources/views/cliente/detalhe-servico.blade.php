@@ -131,13 +131,13 @@
           </div>
 </div>
 
-@if(count($taxas))
+@if(!count($taxas))
 <div class="col-md-7">
   @include('cliente.components.widget-taxas')
 </div>
 @endif
 
-@if(count($pendencias))
+@if(!count($pendencias))
 <div class="col-md-5">
   @include('cliente.components.widget-pendencias')
 </div>
