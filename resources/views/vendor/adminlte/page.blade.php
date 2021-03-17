@@ -61,17 +61,20 @@
 
 
 
-                    <ul class="nav navbar-nav">
-                        
+        <ul class="nav navbar-nav">
+
+
+
+                     <!-- MENÇOES DO USUARIO -->
         <li class="dropdown notifications-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <i class="glyphicon glyphicon-bell"></i>
-              <span class="label label-warning">{{count(auth()->user()->unreadNotifications)}}</span>
+              <i class="glyphicon glyphicon-comment"></i>
+              <span class="label label-info">{{count(auth()->user()->unreadNotifications->where('type','App\Notifications\UserMentioned'))}}</span>
             </a>
                 <ul class="dropdown-menu">
                        
 
-              <li class="header">Você tem {{count(auth()->user()->unreadNotifications)}} nova(s) notificação(es)</li>
+              <li class="header">Você foi mencionado {{count(auth()->user()->unreadNotifications->where('type','App\Notifications\UserMentioned'))}} vezes.</li>
               <li>
                 <!-- inner menu: contains the actual data -->
                 <ul class="menu">
@@ -80,7 +83,40 @@
                         List notifications
                    -->
                 
-                   @foreach(auth()->user()->unreadNotifications as $n)
+                   @foreach(auth()->user()->unreadNotifications->where('type','App\Notifications\UserMentioned') as $n)
+                        <li>
+                    <a href="{{$n->data['action']}}" data-notif-id="{{$n->id}}">
+                      <i class="glyphicon glyphicon-comment text-info"></i> {{$n->data['mensagem']}} #{{$n->data['servico']}}
+                    </a></li>
+
+
+                   @endforeach
+                  
+                </ul>
+              </li>
+              <li class="footer"><a href="#">Todas as notificações</a></li>
+            </ul>
+          </li>
+          
+          
+          <li class="dropdown notifications-menu">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <i class="glyphicon glyphicon-bell"></i>
+              <span class="label label-warning">{{count(auth()->user()->unreadNotifications->where('type','!=','App\Notifications\UserMentioned'))}}</span>
+            </a>
+                <ul class="dropdown-menu">
+                       
+
+              <li class="header">Você tem {{count(auth()->user()->unreadNotifications->where('type','!=','App\Notifications\UserMentioned'))}} nova(s) notificação(es)</li>
+              <li>
+                <!-- inner menu: contains the actual data -->
+                <ul class="menu">
+                  
+                  <!--
+                        List notifications
+                   -->
+                
+                   @foreach(auth()->user()->unreadNotifications->where('type','!=','App\Notifications\UserMentioned') as $n)
                         <li>
                     <a href="{{$n->data['action']}}" data-notif-id="{{$n->id}}">
                       <i class="glyphicon glyphicon-exclamation-sign text-yellow"></i> {{$n->data['mensagem']}}
@@ -94,6 +130,7 @@
               <li class="footer"><a href="#">Todas as notificações</a></li>
             </ul>
           </li>
+          
 
           <li class="dropdown tasks-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
