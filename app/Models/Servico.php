@@ -21,6 +21,15 @@ class Servico extends Model
     {
     	return $this->hasMany('App\Models\Historico')->orderBy('created_at','desc')->where('observacoes','not like',"%Alterou%")->take(5);
     }
+    public function ultimasInteracoes()
+    {
+    	return $this->hasMany('App\Models\Historico')->orderBy('created_at','desc')->where('observacoes','not like',"%Alterou%")->where('observacoes','not like','%@%')->take(5);
+    }
+
+    public function interacoes()
+    {
+    	return $this->hasMany('App\Models\Historico')->orderBy('created_at','desc')->where('observacoes','like',"%@%");
+    }
 
     public function taxas()
     {

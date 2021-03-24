@@ -145,11 +145,21 @@
 
 
 
+
+
+
 <div class="row">
-    <div class="col-sm-12">
+  
+<div class="col-sm-6">
+
+@include('admin.components.widget-interacoesChat')
+</div>
+
+
+<div class="col-sm-6">
       <div class="box box-black">
             <div class="box-header with-border">
-              <h3 class="box-title">Últimas Interações</h3>
+              <h3 class="box-title">Histórico</h3>
 
               <div class="box-tools pull-right">
                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -161,8 +171,8 @@
             
              <ul class="timeline timeline-inverse">
                                  
-                  
-                @foreach($servico->historico as $historico)
+                
+                @foreach($servico->ultimasInteracoes as $historico)
                   <!-- timeline item -->
                   <li>
                     
@@ -170,7 +180,7 @@
                     
                     <div class="timeline-item">
                       <span class="time"><i class="fa fa-clock"></i> {{\Carbon\Carbon::parse($historico->created_at)->format('d/m/Y H:m')}}</span>
-                      <h3 class="timeline-header"><a href="#">{{$historico->user->name}}</a> {{$historico->observacoes}}</h3>
+                      <h3 class="timeline-header"><a href="#">{{$historico->user->name ?? 'Robot'}}</a> {{$historico->observacoes}}</h3>
 
                       
                     </div>
@@ -182,7 +192,7 @@
                   <li>
                    <i class="fa fa-clock bg-gray"></i>
                    <div class="timeline-item">
-                      <a href="{{route('cliente.interacoes.lista',$servico->id)}}" class="btn btn-flat">Visualizar todas as interações</a>
+                      <a href="{{route('cliente.interacoes.lista',$servico->id)}}" class="btn btn-flat">Visualizar todo o histórico</a>
 
                     </div>
                   </li>
@@ -190,18 +200,7 @@
 
                 <div class="box-footer">
                 
-                <div class="box-header">
-                  
-                  {!! Form::open(['route'=>'cliente.interacao.salvar']) !!}
-                  <div class="input-group">
-                  {!! Form::text('observacoes', null, ['class'=>'form-control','id'=>'observacoes','placeholder'=>'Digite a mensagem']) !!}
-                  {!! Form::hidden('servico_id',$servico->id) !!}
-                  
-                      <span class="input-group-btn">
-                        <button type="submit" class="btn btn-info btn-flat">Enviar</button>
-                      </span>
-                </div>
-                {!! Form::close() !!}   
+               
 
                 </div>
 
@@ -212,9 +211,58 @@
   </div>
 
 
-</div> 
+  </div> 
 
 </div>
 
+
 @endsection
 
+
+@section('js')
+<script>
+ $('#full').mentionsInput({
+    onDataRequest:function (mode, query, callback) {
+      $.getJSON('{{route('cliente.users.list')}}', function(responseData) {
+        responseData = _.filter(responseData, function(item) { 
+          return item.name.toLowerCase().indexOf(query.toLowerCase()) > -1 
+          });
+        
+          callback.call(this, responseData);        
+      });
+    }
+
+    
+
+});
+
+$('.responder').click(function () {
+
+        
+var msg = $(this).data('msg');
+var userID = $(this).data('user');
+
+$.getJSON('{{route('cliente.users.list')}}', function(responseData) {
+
+ var user_filter = responseData.filter(element => element.id == userID);
+
+  var userName = JSON.stringify(user_filter);
+  var user = JSON.parse(userName);
+  
+   
+
+  $('#full').val(user[0].name).focus();
+
+  console.log(userName);
+
+});
+
+
+
+});
+</script>
+ 
+
+
+
+  @stop

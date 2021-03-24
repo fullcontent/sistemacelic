@@ -10,6 +10,8 @@
       <!-- See dist/js/pages/dashboard.js to activate the todoList plugin -->
       <ul class="todo-list ui-sortable" data-widget="todo-list" id="todo-list">
         
+        
+        
         @foreach($pendencias->where('status','pendente') as $pendencia)
         <li @if($pendencia->status == 'concluido') class='done' @endif>
           <!-- drag handle -->
@@ -117,19 +119,6 @@ $('#cadastro-arquivo').on('show.bs.modal', function(e) {
             });
 
 
-            $('#observacoes').mentionsInput({
-    onDataRequest:function (mode, query, callback) {
-      $.getJSON('{{route('cliente.users.list')}}', function(responseData) {
-        responseData = _.filter(responseData, function(item) { 
-          return item.name.toLowerCase().indexOf(query.toLowerCase()) > -1 
-          });
-        
-          callback.call(this, responseData);        
-      });
-    }
 
-    
-
-});
 </script>
 @stop

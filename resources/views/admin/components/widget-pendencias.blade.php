@@ -169,9 +169,37 @@ $('#full').mentionsInput({
       });
     }
 
+
+
     
 
 });
+
+
+$('.responder').click(function () {
+
+        
+  var msg = $(this).data('msg');
+  var userID = $(this).data('user');
+
+  $.getJSON('{{route('users.list')}}', function(responseData) {
+
+   var user_filter = responseData.filter(element => element.id == userID);
+
+   var userName = JSON.stringify(user_filter);
+  var user = JSON.parse(userName);
+    
+     
+
+    $('#full').val(user[0].name).focus();
+
+  });
+
+ 
+
+});
+
+  
 
 
 

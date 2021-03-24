@@ -150,7 +150,7 @@
 <div class="col-sm-6">
       <div class="box box-black">
             <div class="box-header with-border">
-              <h3 class="box-title">Últimas Interações</h3>
+              <h3 class="box-title">Histórico</h3>
 
               <div class="box-tools pull-right">
                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -163,7 +163,7 @@
              <ul class="timeline timeline-inverse">
                                  
                 
-                @foreach($servico->historico as $historico)
+                @foreach($servico->ultimasInteracoes as $historico)
                   <!-- timeline item -->
                   <li>
                     
@@ -183,7 +183,7 @@
                   <li>
                    <i class="fa fa-clock bg-gray"></i>
                    <div class="timeline-item">
-                      <a href="{{route('interacoes.lista',$servico->id)}}" class="btn btn-flat">Visualizar todas as interações</a>
+                      <a href="{{route('interacoes.lista',$servico->id)}}" class="btn btn-flat">Visualizar todo o histórico</a>
 
                     </div>
                   </li>

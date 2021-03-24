@@ -67,7 +67,7 @@
                 <div class="direct-chat-text">
                 <span class="msg">{{$n->observacoes}}</span>
                 
-                <p><b><a href="#" class="responder link" data-id="{{$n->id}}" data-user="{{$n->user_id}}" data-msg="{{$n->observacoes}}">Responder</a></b></p>
+                <p><b><a href="#" class="responder" data-id="{{$n->id}}" data-user="{{$n->user_id}}" data-msg="{{$n->observacoes}}">Responder</a></b></p>
                 
                 </div>
 
@@ -95,7 +95,7 @@
                 
                 <div class="box-header">
                   
-                  {!! Form::open(['route'=>'interacao.store']) !!}
+                  {!! Form::open(['route'=>'cliente.interacao.salvar']) !!}
                   <div class="input-group">
                   
                   {!! Form::text('observacoes', null, ['class'=>'form-control mention','id'=>'full','placeholder'=>'Digite a mensagem','autocomplete'=>'off']) !!}
@@ -120,4 +120,3 @@
 
 
 
-  
