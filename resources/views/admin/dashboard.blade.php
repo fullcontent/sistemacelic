@@ -75,26 +75,20 @@
       </div>
 
 
-@if(count($pendencias->where('status','pendente')->where('vencimento',date('Y-m-d'))))
+
+
+@if(count($pendencias->where('vencimento',date('Y-m-d'))))
 
 @include('admin.components.widget-pendencias-dia')
 
 @endif
 
 
-@if(count($pendencias->where('status','pendente')->where('vencimento','<',date('Y-m-d'))))
+@if(count($pendencias->where('vencimento','<',date('Y-m-d'))))
 
 @include('admin.components.widget-pendencias-atrasadas')
 
 @endif
-
-
-@if(count($pendencias->where('status','pendente')))
-
-@include('admin.components.widget-pendencias-usuario')
-
-@endif
-
 
 
 
