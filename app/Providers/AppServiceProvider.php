@@ -64,6 +64,12 @@ class AppServiceProvider extends ServiceProvider
                             'icon' => 'glyphicon glyphicon-home'
                             ],
                             [
+                                'text' => 'Relatorios',
+                                'url' =>  ''.Auth::user()->privileges.'/relatorios',
+                                'icon' => 'glyphicon glyphicon-object-align-bottom
+                                '
+                                ],
+                            [
                             'text' => 'Empresas',
                             'url' =>  ''.Auth::user()->privileges.'/empresas',
                             'icon' => 'glyphicon glyphicon-briefcase'

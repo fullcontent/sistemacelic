@@ -118,6 +118,12 @@ Route::get('/', function () {
 
 
 		Route::get('/users/list','UsersController@usersList')->name('users.list');
+
+		Route::get('/relatorios',function(){
+
+			return view('admin.relatorio');
+
+		});
 		
 
 	});
