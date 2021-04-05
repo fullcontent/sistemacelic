@@ -172,8 +172,25 @@ class ArquivosController extends Controller
         //===================================================
         
 
+        //Redirecionar para a pagina do serviço
+
+
+        $user = User::find($request->user_id);
+
+
+        if($user->privileges == 'cliente')
+        {
+
+            return redirect()->route('cliente.servico',$request->servico_id);
+
+        }
+
+        else
+        {
+            return redirect()->route('servico',$request->servico_id);
+        }
         
-        return redirect()->back();
+        
 
 
 
