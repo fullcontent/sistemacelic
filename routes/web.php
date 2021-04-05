@@ -152,7 +152,11 @@ Route::get('/servico/{id}/taxas/{taxa}','ClienteController@showTaxa')->name('cli
 
 Route::post('/arquivo/anexar','ArquivosController@anexar')->name('cliente.arquivo.anexar');
 Route::get('/users/list','ClienteController@usersList')->name('cliente.users.list');
-			
+Route::get('/relatorios',function(){
+
+	return view('admin.relatorio');
+
+});
 
 	});
 

@@ -95,7 +95,7 @@
                 
                 <div class="box-header">
                   
-                  {!! Form::open(['route'=>'cliente.interacao.salvar']) !!}
+                  {!! Form::open(['route'=>'cliente.interacao.salvar']) !!} 
                   <div class="input-group">
                   
                   {!! Form::text('observacoes', null, ['class'=>'form-control mention','id'=>'full','placeholder'=>'Digite a mensagem','autocomplete'=>'off']) !!}

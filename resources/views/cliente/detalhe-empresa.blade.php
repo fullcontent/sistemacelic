@@ -58,7 +58,7 @@
   <div class="col-md-6">
       
       @if(count($servicos->where('tipo','facilitiesRealEstate')))
-          @include('cliente.components.widget-facilities')
+          @include('cliente.components.widget-facilitiesRealEstate')
       @endif
      
       
