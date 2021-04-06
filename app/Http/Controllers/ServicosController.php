@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Auth;
+use Mail;
 use App\User;
 use Carbon\Carbon;
 use App\UserAccess;
@@ -18,6 +19,7 @@ use App\Models\ServicoLpu;
 use App\Models\ServicoFinanceiro;
 
 use App\Notifications\UserMentioned;
+use App\Mail\UsuarioMencionado;
 use Illuminate\Support\Facades\Notification;
 
 
@@ -911,12 +913,6 @@ class ServicosController extends Controller
 
     public function salvarInteracao(Request $request)
     {   
-
-       
-
-          
-        
-        
         
         $validator = Validator::make($request->all(), [
 
@@ -933,7 +929,7 @@ class ServicosController extends Controller
 
         $interacao->save();
 
-
+        $servico = Servico::find($request->servico_id);
 
 
          //Notify users
@@ -963,6 +959,7 @@ class ServicosController extends Controller
 
 
                     Notification::send($user, new UserMentioned($interacao->servico_id,$route));
+                    Mail::to($user)->send(new UsuarioMencionado($servico, $route));
                 }
              }
          }         
