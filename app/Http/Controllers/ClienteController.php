@@ -155,8 +155,8 @@ class ClienteController extends Controller
 
     public function servicoShow($id)
     {   
-
-
+        
+        
         $servico = Servico::find($id);
 
         if($servico->unidade_id){
@@ -169,6 +169,10 @@ class ClienteController extends Controller
             $route = 'empresas.edit';
         }
 
+
+        
+
+       
         return view('cliente.detalhe-servico')
                     ->with([
                         'servico'=>$servico,

@@ -162,20 +162,29 @@ Route::get('/relatorios',function(){
 
 Route::get('/teste', function() {
 
-		$user = \App\User::find(1);
+		
+	$user = \App\User::find(1);
+	$servico = \App\Models\Servico::find(1022);
 
-		foreach ($user->unreadNotifications->where('type','App\Notifications\UserMentioned') as $notification) {
-			
-			dump($notification);
+	if($user->privileges == 'admin')
+                    {
+                        $route = 'servicos.show';
+                    }
+                    elseif($user->privileges == 'cliente')
+                    {
+                        $route = 'cliente.servico.show';
+                    }
 
-		}
 
+	$sendmail = \Mail::to($user)->send(new \App\Mail\UsuarioMencionado($servico, $route));
+
+	dump($sendmail);
 
 });
 
 Route::get('/notAllowed' , function(){
 
-	return "NAO PERMITIDO";
+	return view('errors.403');
 
 });
 
