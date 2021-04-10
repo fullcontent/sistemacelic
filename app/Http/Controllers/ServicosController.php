@@ -306,6 +306,25 @@ class ServicosController extends Controller
     }
 
 
+    public function desconsiderar($id)
+    {
+        $servico = Servico::find($id);
+
+        $servico->situacao = 'nRenovado';
+        $servico->save();
+
+
+        //Insert history
+
+        $history = new Historico();
+        $history->servico_id = $servico->id;
+        $history->user_id = Auth::id();
+        $history->observacoes = "Serviço ".$servico->id." não renovado.";
+        $history->save();
+
+
+        return redirect()->route('servico.vencer');
+    }
 
 
 

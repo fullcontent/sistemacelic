@@ -42,6 +42,49 @@
             <div class="box-body">
                 
                 <div class="col-sm-6">
+                  <p><b>Situação: </b>
+                  @switch($servico->situacao)
+
+	              			@case('andamento')
+
+								@if(($servico->licenca_validade >= date('Y-m-d')) && ($servico->tipo == 'licencaOperacao'))
+									
+									<button type="button" class="btn btn-xs btn-success">Andamento</button>
+	              					@elseif(($servico->licenca_validade < date('Y-m-d'))&& ($servico->tipo == 'licencaOperacao'))
+	              					<button type="button" class="btn btn-xs btn-danger">Andamento</button>
+								@elseif($servico->tipo == 'nRenovaveis')
+									<button type="button" class="btn btn-xs btn-warning">Andamento</button>
+
+	              				@endif
+
+								
+
+
+	              				@break
+
+	              			@case('finalizado')
+
+	              				@if(($servico->licenca_validade >= date('Y-m-d')) && ($servico->tipo == 'licencaOperacao'))
+									
+									<button type="button" class="btn btn-xs btn-success">Finalizado</button>
+	              					@elseif(($servico->licenca_validade < date('Y-m-d'))&& ($servico->tipo == 'licencaOperacao'))
+	              					<button type="button" class="btn btn-xs btn-danger">Finalizado</button>
+
+	              				@elseif($servico->tipo == 'nRenovaveis')
+									<button type="button" class="btn btn-xs btn-warning">Finalizado</button>
+
+	              				@endif
+								
+	              				@break
+
+	              			@case('arquivado')
+								<button type="button" class="btn btn-xs btn-default">Arquivado</button>
+	              				@break
+							@case('nRenovado')
+								<button type="button" class="btn btn-xs btn-gray">Não renovado</button>
+	              				@break
+
+	              		@endswitch</p>
                   <p><b>Ordem de serviço: </b>{{$servico->os}}</p>
                   <p><b>Nome: </b>{{$servico->nome}}</p>
                   <p><b>Responsável: </b>{{$servico->responsavel->name}}</p>

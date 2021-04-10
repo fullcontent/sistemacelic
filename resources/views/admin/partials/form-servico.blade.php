@@ -55,8 +55,23 @@
 	<div class="form-group">
 		
 		{!! Form::label('situacao', 'Situação', array('class'=>'control-label')) !!}
-			{!! Form::select('situacao', array('andamento' => 'Andamento', 'finalizado' => 'Finalizado','arquivado'=>'Arquivado'), null, ['class'=>'form-control'])!!}
+			
+		@if(Route::is('servicos.create'))
 
+			{!! Form::select('situacao', array(
+				'andamento' => 'Andamento',
+				'finalizado' => 'Finalizado',
+				'arquivado'=>'Arquivado'
+				), null, ['class'=>'form-control'])!!}
+		@else
+		{!! Form::select('situacao', array(
+				'andamento' => 'Andamento',
+				'finalizado' => 'Finalizado',
+				'arquivado'=>'Arquivado',
+				'nRenovado'=>'Não Renovado'
+				), null, ['class'=>'form-control'])!!}
+
+		@endif
 	</div>
 </div>
 

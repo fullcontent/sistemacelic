@@ -104,6 +104,7 @@ Route::get('/', function () {
 		Route::get('/servico/arquivados/', 'ServicosController@listaArquivados')->name('servico.arquivado');
 
 		Route::get('/servico/renovar/{id}', 'ServicosController@renovar')->name('servico.renovar');
+		Route::get('/servico/desconsiderar/{id}', 'ServicosController@desconsiderar')->name('servico.desconsiderar');
 
 
 		Route::get('/arquivo/download/{id}', 'ArquivosController@download')->name('arquivo.download');

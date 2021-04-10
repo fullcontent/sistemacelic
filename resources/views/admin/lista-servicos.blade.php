@@ -105,11 +105,18 @@
 	              			@case('arquivado')
 								<button type="button" class="btn btn-xs btn-default">Arquivado</button>
 	              				@break
+							@case('nRenovado')
+								<button type="button" class="btn btn-xs btn-gray">Não renovado</button>
+	              				@break
 
 	              		@endswitch
 
 					@if (\Request::is('admin/servico/vencer'))  
   							<a href="{{route('servico.renovar',$servico->id)}}" class="btn btn-xs btn-primary">Renovar</a>
+					@endif
+
+					@if (\Request::is('admin/servico/vencer'))  
+  							<a href="{{route('servico.desconsiderar',$servico->id)}}" class="btn btn-xs btn-info">Desconsiderar</a>
 					@endif
 
 	              	</td>
