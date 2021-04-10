@@ -1,4 +1,10 @@
-<table class="table table-bordered">
+@extends('adminlte::page')
+
+@section('content')
+<div class="box">
+  <div class="box-header"></div>
+  <div class="box-body">
+  <table id="relatorio-completo" class="table table-bordered" >
           <thead>
           <tr>
             <th>Razão Social</th>
@@ -7,17 +13,29 @@
             <th>CNPJ</th>
             <th>Status</th>
             <th>Imóvel</th>
+            <th>Ins. Estadual</th>
+            <th>Ins. Municipal</th>
+            <th>Inscrição Imob.</th>
+            <th>Matrícula RI</th>
+            <th>Área da Loja</th>
             <th>Endereço</th>
             <th>Número</th>
             <th>Complemento</th>
             <th>Cidade/UF</th>
             <th>CEP</th>
+            <th>Tipo</th>
             <th>Ordem de Serviço</th>
-            <th>Nome</th>
+            <th>Situação</th>
             <th>Responsável</th>
+            <th>Nome</th>
             <th>Solicitante</th>
+            <th>N° Protocolo</th>
+            <th>Emissao Protocolo</th>
+            <th>Tipo Licença</th>
             <th>Emissão da licença</th>
             <th>Validade da licença</th>
+            <th>Valor Total</th>
+            <th>Valor em Aberto</th>
             
           </tr>
           </thead>
@@ -32,18 +50,37 @@
                     <td>{{$s->unidade->cnpj}}</td>
                     <td>{{$s->unidade->status}}</td>
                     <td>{{$s->unidade->tipoImovel}}</td>
+                    <td>{{$s->unidade->inscricaoEst}}</td>
+                    <td>{{$s->unidade->inscricaoMun}}</td>
+                    <td>{{$s->unidade->inscricaoImo}}</td>
+                    <td>{{$s->unidade->matriculaRI}}</td>
+                    <td>{{$s->unidade->area}}</td>
+
                     <td>{{$s->unidade->endereco}}</td>
                     <td>{{$s->unidade->numero}}</td>
                     <td>{{$s->unidade->complemento}}</td>
                     <td>{{$s->unidade->cidade}}/{{$s->unidade->uf}}</td>
                     <td>{{$s->unidade->cep}}</td>
+                    <td>{{$s->tipo}}</td>
+
+                    
                     <td>{{$s->os}}</td>
-                    <td>{{$s->nome}}</td>
+                    <td>{{$s->situacao}}</td>
                     <td>{{$s->responsavel->name}}</td>
+                    <td>{{$s->nome}}</td>
+                    
                     <td>{{$s->solicitante}}</td>
+
+                    <td>{{$s->protocolo_numero}}</td>
+                    <td>{{ \Carbon\Carbon::parse($s->protocolo_emissao)->format('d/m/Y')}}</td>
+
+                    <td>{{$s->tipo}}</td>  
                     <td>{{ \Carbon\Carbon::parse($s->licenca_emissao)->format('d/m/Y')}}</td>
                     <td>{{ \Carbon\Carbon::parse($s->licenca_validade)->format('d/m/Y')}}</td>
                     
+                    <td>{{$s->financeiro->valorTotal ?? '0'}}</td>
+                    <td>{{$s->financeiro->valorAberto ?? '0'}}</td> 
+
                 </tr>
 
                @endforeach 
@@ -52,3 +89,41 @@
           </tbody>
           
         </table>
+  </div>
+</div>
+
+@stop
+
+
+
+
+
+@section('js')
+<script src="http://cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"></script>
+<script>
+
+	
+
+$(function () {
+		    $('#relatorio-completo').DataTable({
+		      "paging": false,
+		      "lengthChange": true,
+		      "searching": true,
+		      "ordering": true,
+		      "info": false,
+		      "autoWidth": true,
+		       "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
+            }
+
+
+		    });
+		     $('.confirmation').on('click', function () {
+        		return confirm('Você deseja excluir a empresa?\nTodos os dados relacionados a ela serão excluidos.');
+    			});
+  });
+
+
+
+    </script>
+  @stop

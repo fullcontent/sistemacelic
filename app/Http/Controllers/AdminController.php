@@ -113,7 +113,7 @@ class AdminController extends Controller
     public function relatorioCompleto()
     {
         
-        $servicos = Servico::all();
+        $servicos = Servico::with('unidade','responsavel','financeiro')->whereNotIn('responsavel_id',[1])->get();
 
         // dump($servicos);
 
