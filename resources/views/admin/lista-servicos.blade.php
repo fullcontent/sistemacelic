@@ -105,8 +105,8 @@
 	              			@case('arquivado')
 								<button type="button" class="btn btn-xs btn-default">Arquivado</button>
 	              				@break
-							@case('nRenovado')
-								<button type="button" class="btn btn-xs btn-gray">Não renovado</button>
+							@case('standBy')
+								<button type="button" class="btn btn-xs btn-gray">Stand By</button>
 	              				@break
 
 	              		@endswitch

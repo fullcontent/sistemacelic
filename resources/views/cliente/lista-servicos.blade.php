@@ -103,6 +103,10 @@
 								<button type="button" class="btn btn-xs btn-default">Arquivado</button>
 	              				@break
 
+							@case('standBy')
+                      <button type="button" class="btn btn-xs btn-default">Stand By</button>
+                      @break
+
 	              		@endswitch</td>
 	              	<td>{{$servico->responsavel->name}}</td>
 

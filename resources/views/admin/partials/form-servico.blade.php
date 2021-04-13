@@ -68,7 +68,7 @@
 				'andamento' => 'Andamento',
 				'finalizado' => 'Finalizado',
 				'arquivado'=>'Arquivado',
-				'nRenovado'=>'Não Renovado'
+				'standBy'=>'Stand By'
 				), null, ['class'=>'form-control'])!!}
 
 		@endif
