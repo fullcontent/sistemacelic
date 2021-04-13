@@ -1,6 +1,6 @@
-@extends('adminlte::page')
 
-@section('content')
+
+
 <div class="box">
   <div class="box-header"></div>
   <div class="box-body">
@@ -74,7 +74,7 @@
                     <td>{{$s->protocolo_numero}}</td>
                     <td>{{ \Carbon\Carbon::parse($s->protocolo_emissao)->format('d/m/Y')}}</td>
 
-                    <td>{{$s->tipo}}</td>  
+                    <td>{{$s->tipoLicenca}}</td>  
                     <td>{{ \Carbon\Carbon::parse($s->licenca_emissao)->format('d/m/Y')}}</td>
                     <td>{{ \Carbon\Carbon::parse($s->licenca_validade)->format('d/m/Y')}}</td>
                     
@@ -92,7 +92,6 @@
   </div>
 </div>
 
-@stop
 
 
 
