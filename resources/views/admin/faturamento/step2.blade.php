@@ -45,9 +45,10 @@
 
 	<div class="col-md-12">
 		
-		<table class="table table-hover">
+		<table class="table table-hover" id="lista-servicos">
 			<thead>
 				<th></th>
+				<th>Finalizado</th>
 				<th>Cód.</th>
 				<th>Loja</th>
 				<th>Cidade</th>
@@ -63,7 +64,8 @@
 
 							@foreach($servicosFaturar as $value => $s)
 							<tr>
-								<td>{{ Form::checkbox('servicos[]', $s->id,null,['class'=>'checkbox'])}}</td>	
+								<td>{{ Form::checkbox('servicos[]', $s->id,null,['class'=>'checkbox'])}}</td>
+								<td>{{ \Carbon\Carbon::parse($s->finalizado->created_at)->format('d/m/Y')}}</td>	
 								<td>{{$s->unidade->codigo}}</td>
 								<td>{{$s->unidade->nomeFantasia}}</td>
 								<td>{{$s->unidade->cidade}}</td>
@@ -86,7 +88,7 @@
 </div>
 
 <div class="box-footer">
-                <a href="#" class="btn btn-default">Voltar</a>
+<a href="javascript: history.go(-1)" class="btn btn-default">Voltar</a>	
                 <button type="submit" class="btn btn-info">Próximo Passo</button>
               	</div>
     
@@ -102,6 +104,9 @@
 @section('js')
 
 <script>
+	
+	
+	
 	$('button[type="submit"]').on('click', function(e) {
   e.preventDefault();
   if($('.checkbox:checked').length > 0) {
@@ -111,6 +116,20 @@
   alert('Selecione um serviço da lista!');
   return false;
 });
+
+
+$('#lista-servicos').DataTable({
+		      "paging": true,
+		      "lengthChange": false,
+		      "searching": true,
+		      "ordering": true,
+		      "info": false,
+		      "autoWidth": false,
+		       "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
+            }           
+  });
+		    
 </script>
 
 @endsection

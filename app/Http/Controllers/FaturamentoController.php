@@ -71,17 +71,16 @@ class FaturamentoController extends Controller
             $s2 = $s2->merge($s);
         }
 
- 
 
-
+        
         $servicosFaturar = Servico::with('financeiro')
-                            ->whereIn('id', $s2)
-                            ->whereHas('finalizado',function($q) use ($start_date, $end_date){
+                            ->orWhereIn('id', $s2)
+                            ->whereHas('finalizado', function($q) use ($start_date, $end_date){
                                 return $q->whereBetween('created_at', [$start_date,$end_date]);
-                            })
-                                                     
+                            })                                             
                             ->get();
               
+                            
         
         
         return view('admin.faturamento.step2')->with([

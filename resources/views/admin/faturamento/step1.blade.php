@@ -20,6 +20,7 @@
 <div class="box-body">
 	<div class="col-md-6">
 		{!! Form::label('empresa_id', 'Selecione a empresa:', array('class'=>'control-label')) !!}
+		
 		{{ Form::select('empresa_id[]', $empresas, null,['class'=>'form-control','id'=>'empresas']) }}
 	
 	</div>
@@ -34,7 +35,7 @@
 </div>
 
 <div class="box-footer">
-                <a href="#" class="btn btn-default">Voltar</a>
+<a href="javascript: history.go(-1)" class="btn btn-default">Voltar</a>
                 <button type="submit" class="btn btn-info">Próximo Passo</button>
               	</div>
     

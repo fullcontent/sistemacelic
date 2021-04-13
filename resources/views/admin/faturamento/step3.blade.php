@@ -72,7 +72,8 @@
 								<td>{{$s->nome}}</td>
 								<td>R$ {{number_format($s->financeiro['valorTotal'],2,'.',',')}}</td>
 								<td>R$ {{number_format($s->financeiro['valorAberto'],2,'.',',')}}</td>
-								<td><input class="form-control" type="number" required="true" name="faturamento[{{$value}}][valorFaturar]" min="0" max="{{$s->financeiro['valorAberto']}}" step=".01" value="{{$s->financeiro['valorAberto']}}"> 
+								<td>
+								<input class="form-control" type="number" required="true" name="faturamento[{{$value}}][valorFaturar]" min="0" max="{{$s->financeiro['valorAberto']}}" step=".01" value="{{$s->financeiro['valorAberto']}}" onFocusOut="checar(this)"> 
 </td>
 								
 								{!! Form::hidden('faturamento['.$value.'][servico_id]', $s->id) !!}
@@ -108,10 +109,34 @@
 
 @endsection
 
+@section('js')
 
 <script>
 	function goBack() {
 	  window.history.back();
 	}
-	</script>
+
+	function checar(object)
+  {
+   
+
+	var value = object.value;
+	var max = object.max;
+
+	if(value > max)
+	{
+		window.alert('Valor a faturar não pode ser maior que o valor em aberto!');
+		object.value = max;
+	}
+
+  }
+	
+
+</script>
+
+
+
+@stop
+
+
 
