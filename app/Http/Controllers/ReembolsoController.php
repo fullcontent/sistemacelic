@@ -44,6 +44,11 @@ class ReembolsoController extends Controller
     public function step2(Request $request)
     {
         
+         
+         
+
+
+
         $periodo = explode(' - ', $request->periodo);
         $start_date = Carbon::parse($periodo[0])->toDateTimeString();
         $end_date = Carbon::parse($periodo[1])->toDateTimeString();
@@ -62,14 +67,21 @@ class ReembolsoController extends Controller
             $s2 = $s2->merge($s);
         }
 
+
+        
+
+
         $servicosFaturar = Servico::whereIn('id', $s2)
                            
                             
                             ->with('reembolsos')
                             ->whereHas('reembolsos',function($q) use ($start_date, $end_date){
-                                return $q->whereBetween('created_at', [$start_date,$end_date]);
+                                return $q->whereBetween('pagamento', [$start_date,$end_date]);
                             })                     
                             ->get();
+        
+
+        
 
         
         foreach($servicosFaturar as $s)
@@ -85,13 +97,11 @@ class ReembolsoController extends Controller
 
         }
 
-        //Buscando as taxas da lista
-
-        $t = Taxa::whereIn('id',$taxas)->get();
-
         
 
-        
+
+        $t = Taxa::whereIn('id',$taxas)->whereDoesntHave('reembolsada')->whereNotNull('pagamento')->get();
+          
 
         return view('admin.reembolso.step2')->with([
             'taxas'=>$t,

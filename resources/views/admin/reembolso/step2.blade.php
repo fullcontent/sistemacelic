@@ -58,7 +58,7 @@
 				<th>Valor</th>
 				<th>Vcto.</th>
 				<th>Pgto.</th>
-				
+							
 				
 			</thead>
 			<tbody>
@@ -75,7 +75,7 @@
 					<td>R$ {{number_format($s->valor,2,'.',',')}}</td>
 					<td>{{ \Carbon\Carbon::parse($s->vencimento)->format('d/m/Y')}}</td>
 					<td>{{ \Carbon\Carbon::parse($s->pagamento)->format('d/m/Y')}}</td>
-					
+										
 
 				</tr>
 				@endforeach		

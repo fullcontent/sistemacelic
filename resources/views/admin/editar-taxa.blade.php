@@ -44,22 +44,22 @@
 
 
   	$("#vencimento").datepicker();
-  	$("#pagamento").datepicker();
+  	
+	$("#pagamento").datepicker();
 
   	 	
   	$("#valor").mask('000.000.000.000.000,00', {reverse: true});
 
   	var comprovante = $("#comprovante").val();
 
-    if(comprovante) { // returns true if the string is not empty
-        alert(comprovante + " existe");
-    } else { // no file was selected
-        $("#pagamento").prop('disabled',true);
-    }
+    if(!comprovante) { // returns true if the string is not empty
+		$("#pagamento").prop('disabled',true).val();
+    } 
 
     $( "#comprovante" ).change(function() {
   		$("#pagamento").prop('disabled',false);
   		$("#situacao").val('pago');
+		  $("#pagamento").attr("required", "true");
 	});
 	  	
  	
