@@ -119,7 +119,7 @@
 
 
 $('#lista-servicos').DataTable({
-		      "paging": true,
+		      "paging": false,
 		      "lengthChange": false,
 		      "searching": true,
 		      "ordering": true,
