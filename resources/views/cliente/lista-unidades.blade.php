@@ -110,6 +110,10 @@
 	              			break;
 
 	              		}
+						  if(empty($name))
+	              		{
+	              			$name = "n/a";
+	              		}
 
 	              		
 	              		echo "<a href='/cliente/servico/".$l->id."' type=button class='".$label."'>".$name."</a>";
