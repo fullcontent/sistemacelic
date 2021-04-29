@@ -177,6 +177,11 @@ class TaxasController extends Controller
         $taxa->nome  = $request->nome;
         $taxa->emissao = Carbon::createFromFormat('d/m/Y', $request->emissao)->toDateString(); 
         
+
+        if($request->pagamento)
+        {
+            $taxa->pagamento = Carbon::createFromFormat('d/m/Y', $request->pagamento)->toDateString();
+        }
         if($taxa->pagamento)
         {
              $taxa->pagamento = Carbon::createFromFormat('d/m/Y', $request->pagamento)->toDateString();
@@ -221,8 +226,7 @@ class TaxasController extends Controller
             }
 
             
-      
-
+        
         $taxa->save();
 
         

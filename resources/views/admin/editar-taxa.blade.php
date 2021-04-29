@@ -53,14 +53,22 @@
   	var comprovante = $("#comprovante").val();
 
     if(!comprovante) { // returns true if the string is not empty
-		$("#pagamento").prop('disabled',true).val();
-    } 
+		$("#pagamento").prop('disabled',true).val(null);
 
-    $( "#comprovante" ).change(function() {
+    } 
+	
+		$( "#comprovante" ).change(function() {
   		$("#pagamento").prop('disabled',false);
   		$("#situacao").val('pago');
 		  $("#pagamento").attr("required", "true");
+		  var myDate = new Date();
+			var prettyDate =(myDate.getDate()+1) + '/' + myDate.getMonth() + '/' + myDate.getFullYear();
+
+		$("#pagamento").val(prettyDate).datepicker("setDate", myDate);
 	});
+	
+
+    
 	  	
  	
 });
