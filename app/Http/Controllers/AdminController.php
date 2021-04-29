@@ -51,7 +51,7 @@ class AdminController extends Controller
     {	
 
     	
-    		$servicos = Servico::where('responsavel_id',Auth::id())->pluck('id');
+    		$servicos = Servico::select('id')->where('responsavel_id',Auth::id())->get();
             
     		$pendencias = Pendencia::with('servico','unidade')
                             ->where('responsavel_id', Auth::id())
@@ -65,47 +65,47 @@ class AdminController extends Controller
 
     public function servicosVencer()
     {
-    	$servicos = Servico::with('unidade','empresa','responsavel')
-                                // ->whereIn('unidade_id',$this->getUnidadesList())
-                                ->orWhere('responsavel_id',Auth::id())
-                                ->select('id','nome')
-                                ->get();
+                    $servicos = Servico::with('unidade','empresa','responsavel')
+                    // ->whereIn('unidade_id',$this->getUnidadesList())
+                    ->orWhere('responsavel_id',Auth::id())
+                    ->get();
 
-        $servicos = $servicos->where('licenca_validade','<',\Carbon\Carbon::today()->addDays(60))
-                            // ->where('unidade.status','=','Ativa')
-                            ->where('situacao','=','finalizado');  
+                    $servicos = $servicos->where('licenca_validade','<',\Carbon\Carbon::today()->addDays(60))
+                        
+                        ->where('situacao','=','finalizado') 
+                        ->where('tipo','=','licencaOperacao');    
 
-         return $servicos;
-    }
+                    return $servicos;
+                }
 
     public function servicosFinalizados()
     {
-    	 $servicos = Servico::with('unidade','empresa','responsavel')
+        $servicos = Servico::with('unidade','empresa','responsavel')
         						
-        						// ->whereIn('unidade_id',$this->getUnidadesList())
-                                ->orWhere('responsavel_id',Auth::id())
-        						->get();
+        // ->whereIn('unidade_id',$this->getUnidadesList())
+        ->orWhere('responsavel_id',Auth::id())
+        ->get();
 
 
-        $servicos = $servicos->where('situacao','=','finalizado')
-                                // ->where('unidade.status','Ativa')
-                                ->where('situacao','<>','arquivado');
+$servicos = $servicos->where('situacao','=','finalizado')
+        
+        ->where('situacao','<>','arquivado');
 
          return $servicos;
     }
 
     public function servicosAndamento()
     {
-    	 $servicos = Servico::with('unidade','empresa','responsavel')
+        $servicos = Servico::with('unidade','empresa','responsavel')
                                 
-                                // ->whereIn('unidade_id',$this->getUnidadesList())
-                                ->orWhere('responsavel_id',Auth::id())
-                                ->get();
+        // ->whereIn('unidade_id',$this->getUnidadesList())
+        ->orWhere('responsavel_id',Auth::id())
+        ->get();
 
 
-        $servicos = $servicos->where('situacao','=','andamento')
-                                // ->where('unidade.status','Ativa')
-                                ->where('situacao','<>','arquivado');
+$servicos = $servicos->where('situacao','=','andamento')
+        
+        ->where('situacao','<>','arquivado');
 
         return $servicos;
     }
