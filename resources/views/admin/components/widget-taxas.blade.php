@@ -54,17 +54,20 @@
                     </td>
                     <td>{{$taxa->servico->os}}</td>
                     <td>
-        @if(empty($taxa->comprovante))
+        
+        
+        
         @unless ( empty($taxa->boleto))
         
         <a href="{{ url("uploads/$taxa->boleto") }}" class="btn btn-xs btn-warning" target="_blank"> Boleto</a>
         @endunless
-        @endif
+        
         
         @unless ( empty($taxa->comprovante) )
         
         <a href="{{ url("uploads/$taxa->comprovante") }}" class="btn btn-xs btn-success" target="_blank">Comprovante</a>
         @endunless</td>
+        
         <td>
                     <a href="{{route('taxas.delete',$taxa->id)}}" onclick="return confirm('Tem certeza que deseja excluir a taxa?');"><i class="fa fa-trash"></i></a></td>
 

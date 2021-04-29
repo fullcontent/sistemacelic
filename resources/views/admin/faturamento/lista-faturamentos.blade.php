@@ -74,7 +74,7 @@
 						</div>
 						<div class="form-group">
 						{!! Form::label('nf', 'N.F.', array('class'=>'control-label')) !!}
-						{!! Form::text('nf', null, ['class'=>'form-control']) !!}
+						{!! Form::text('nf', null, ['class'=>'form-control', 'id'=>'faturamentoNF']) !!}
 						</div>
 
 					</div>
@@ -118,6 +118,8 @@ $('.confirmation').on('click', function () {
 		    });
 			
 $(document).on("click", ".cadastroNF", function () {
+
+	
      var faturamentoID = $(this).data('id');
 	 var faturamentoCliente = $(this).data('cliente');
 	 var faturamentoNome = $(this).data('nome');
@@ -126,6 +128,12 @@ $(document).on("click", ".cadastroNF", function () {
      $(".modal-body #faturamentoID").val( faturamentoID );
 	 $(".modal-body #faturamentoCliente").val( faturamentoCliente );
 	 $(".modal-body #faturamentoNome").val( faturamentoNome );
+
+	 $('#cadastroNF').on('shown.bs.modal', function () {
+    $('.modal-body #faturamentoNF').focus();
+})  
+
+
      
 });			
 			

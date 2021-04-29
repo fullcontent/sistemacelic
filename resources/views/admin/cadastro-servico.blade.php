@@ -42,49 +42,47 @@
 
   	$("#os").val("{!! $os !!}");  	
 	
+	  var len = document.getElementById("servico_lpu").length;
 
+if(len)
+		{
+			// get reference to select element
+		var sel = document.getElementById('servico_lpu');
 
-			var len = document.getElementById("servico_lpu").length;
+		// create new option element
+		var opt = document.createElement('option');
 
-			if(len)
-					{
-						// get reference to select element
-					var sel = document.getElementById('servico_lpu');
+		// create text node to add to option element (opt)
+		opt.appendChild( document.createTextNode('Selecione o tipo de serviço') );
 
-					// create new option element
-					var opt = document.createElement('option');
+		// set value property of opt
+		opt.value = '0';
 
-					// create text node to add to option element (opt)
-					opt.appendChild( document.createTextNode('Selecione o tipo de serviço') );
+		opt.selected = true; 
 
-					// set value property of opt
-					opt.value = '0';
+		// add opt to end of select box (sel)
+		sel.appendChild(opt);
+		}
+else
+		{
+		var sel = document.getElementById('servico_lpu');
 
-					opt.selected = true; 
+		// create new option element
+		var opt = document.createElement('option');
 
-					// add opt to end of select box (sel)
-					sel.appendChild(opt);
-					}
-			else
-					{
-					var sel = document.getElementById('servico_lpu');
+		// create text node to add to option element (opt)
+		opt.appendChild( document.createTextNode('Essa empresa não possui LPU') );
+		sel.disabled = true;
+		opt.selected = true;
+		opt.value = '0';
+		sel.appendChild(opt);
 
-					// create new option element
-					var opt = document.createElement('option');
+		}
 
-					// create text node to add to option element (opt)
-					opt.appendChild( document.createTextNode('Essa empresa não possui LPU') );
-					sel.disabled = true;
-					opt.selected = true;
-					opt.value = '0';
-					sel.appendChild(opt);
-
-					}
+			
 
 		document.getElementById('tipoLicenca').onchange = function()
 		{
-
-			
 
 			switch(document.getElementById('tipoLicenca').value)
 			{
@@ -114,17 +112,58 @@
 				break;
 			}
 		};
-		
 
-document.getElementById('servico_lpu').onchange = function() {
-var selem = document.getElementById('servico_lpu'); 
-document.getElementById('nome').value = selem.options[selem.selectedIndex].text;
-}
+		var tipo = document.getElementById('tipo');
+
+		var listaServicos = "<select name='nome' class='form-control' id='nome'>";
+			
+				listaServicos += "<option>" + "AVCB" + "</option>";
+				listaServicos += "<option>" + "Alvará Sanitário" + "</option>";
+				listaServicos += "<option>" + "Alvará de Funcionamento" + "</option>";
+				listaServicos += "<option>" + "Alvará de Publicidade" + "</option>";
+				listaServicos += "<option>" + "Alvará da Polícia Civil" + "</option>";
+				listaServicos += "<option>" + "AMLURB" + "</option>";
+				listaServicos += "<option>" + "CREFITO" + "</option>";
+				listaServicos += "<option>" + "Licença Ambiental" + "</option>";
+				listaServicos += "<option>" + "Licença de Elevador" + "</option>";
+				listaServicos += "</select>";
+
+		if(tipo.value == 'licencaOperacao')
+		{
+			$('#nome').replaceWith(listaServicos);
+		}
 
 
 
- 
+
+
+
+
+		document.getElementById('tipo').onchange = function()
+		{
+
+			if(document.getElementById('tipo').value == 'licencaOperacao'){
+
+				$('#nome').replaceWith(listaServicos);
+			
+			}
+			if(document.getElementById('tipo').value != 'licencaOperacao'){
+
+				$('#nome').replaceWith('<input type="text" name="nome" id="nome" class="form-control">');
+
+			}
+
+			
+		};
+
+
+
+			
+		 
 });
+
+
+
 
 
 </script>

@@ -18,6 +18,7 @@
 					<div class="btn-group-vertical" style="padding-left:20px;">
 						<p class="text-left "><b>CB: </b><small>AVCB</small></p>
 						<p class="text-left "><b>AS: </b><small>Alvará Sanitário</small></p>
+						<p class="text-left "><b>LE: </b><small>Licença de Elevador</small></p>
 
 
 					</div>
@@ -25,6 +26,7 @@
 
 					<p class="text-left"><b>AF: </b><small>Alvará de Funcionamento</small></p>
 					<p class="text-left "><b>AP: </b><small>Alvará de Publicidade</small></p>
+					<p class="text-left "><b>AL: </b><small>AMLURB</small></p>
 					
 					
                       
@@ -32,6 +34,7 @@
                   <div class="btn-group-vertical" style="padding-left:20px;">
                   	<p class="text-left "><b>PC: </b><small>Alvará da Polícia Civil</small></p>
 					<p class="text-left "><b>LA: </b><small>Licença Ambiental</small></p>
+					<p class="text-left "><b>CR: </b><small>CREFITO</small></p>
 					
                      
                     </div>
@@ -52,6 +55,8 @@
                   <th>Cod.</th>
                   <th>Nome Fantasia</th>
                   <th>CNPJ</th>
+				  <th>Endereço</th>
+				  <th>Bairro</th>
                   <th>Cidade/UF</th>
                   <th>Licenças</th>
                   
@@ -66,6 +71,8 @@
 	              	
 	              	<td><a href="{{route('unidades.show', $unidade->id)}}">{{$unidade->nomeFantasia}}</a></td>
 	              	<td>{{$unidade->cnpj}}</td>
+					  <td>{{$unidade->endereco}}</td>
+					  <td>{{$unidade->bairro}}</td>
 	              	<td>{{$unidade->cidade}}/{{$unidade->uf}}</td>
 	              	<td>
 	              	@php
@@ -115,6 +122,20 @@
 	              			case 'Licença Ambiental':
 	              			$name = "LA";
 	              			break;
+
+							case 'Licença de Elevador':
+	              			$name = "LE";
+	              			break;
+							
+							case 'AMLURB':
+	              			$name = "AL";
+	              			break;
+							
+							case 'CREFITO':
+	              			$name = "CR";
+	              			break;
+
+
 
 	              		}
 

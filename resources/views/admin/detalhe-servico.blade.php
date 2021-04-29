@@ -125,8 +125,9 @@
                             
                     @endswitch
                   </p>
-                  
+                  @if($servico->tipoLicenca != 'n/a')
                   <p><b>Emissão da Licença: </b>{{\Carbon\Carbon::parse($servico->licenca_emissao)->format('d/m/Y')}}</p>
+                  @endif
 
                   @if($servico->tipoLicenca == 'renovavel')
                     

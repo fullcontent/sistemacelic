@@ -113,7 +113,7 @@ class PendenciasController extends Controller
         
         $pendencia->save();
 
-        return redirect(route('pendencia.index',['servico_id'=>$pendencia->servico_id]));
+        return redirect(route('servicos.show',$pendencia->servico_id));
 
    }
 
@@ -202,7 +202,7 @@ class PendenciasController extends Controller
 
         // return $pendencia;
 
-        return redirect(route('pendencia.index',['servico_id'=>$pendencia->servico_id]));
+        return redirect(route('servicos.show',$pendencia->servico_id));
 
 
     }

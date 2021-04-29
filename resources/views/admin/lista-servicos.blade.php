@@ -16,9 +16,12 @@
                   <th>Tipo</th>
 				  <th>OS</th>
                   <th>Serviço</th>
+				  <th>Venc. Licença</th>
                   <th>Cod. Unid.</th>
 				  <th>Unidade</th>
 				  <th>Cidade</th>
+				  <th>Solicitante</th>
+				  <th>N° Protocolo</th>
                   <th>Situação</th>
                   
                   <th></th>
@@ -50,6 +53,7 @@
 					 
 	              	
 	              	<td><a href="{{route('servicos.show', $servico->id)}}">{{$servico->nome}}</a></td>
+					  <td>{{ \Carbon\Carbon::parse($servico->licenca_validade)->format('d/m/Y')}}</td>
 
 	              	@php
 	              		if($servico->unidade_id){
@@ -64,6 +68,8 @@
 	              	<td>{{$servico->unidade->codigo ?? ''}}</td>
 					  <td><a href="{{$route}}">{{$empresa}}</a></td>
 					<td>{{$servico->unidade->cidade}}/{{$servico->unidade->uf}}</td>
+					<td>{{$servico->solicitante}}</td>
+					<td>{{$servico->protocolo_numero}}</td>
 	              	<td>
 
 	              		

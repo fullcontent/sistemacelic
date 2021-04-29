@@ -925,7 +925,9 @@ class ServicosController extends Controller
         $servico->delete();
 
 
-        return redirect()->route('servico.lista');
+
+
+        return redirect()->route('unidades.show',$servico->unidade_id);
     }
 
 
@@ -990,9 +992,22 @@ class ServicosController extends Controller
 
     public function interacoes($id)
     {
-        $interacoes = Historico::where('servico_id',$id)->orderBy('created_at','desc')->get();
+        $interacoes = Historico::where('servico_id',$id)
+                            
+                            ->with(['user'=>function($query){
+                                $query->select('id','name','privileges');
+                            }])
+                            ->orderBy('created_at','desc')
+                            ->get();
+        $servico = Servico::select('os','id')->find($id);
+        // dd($interacoes);
 
-        return view('admin.lista-interacoes')->with('interacoes',$interacoes);
+        return view('admin.lista-interacoes')->with(
+            [
+                'interacoes'=>$interacoes,
+                'servico'=>$servico,
+                
+                ]);
     }
 
 

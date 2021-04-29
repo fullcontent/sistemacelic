@@ -12,7 +12,7 @@
 		
 		@if(Route::is('servicos.create'))
 		
-		{{$tipoServico}}
+		
 		
 		{!! Form::select('tipo', array(
 			'licencaOperacao' => 'Licenças de Operação',
@@ -112,7 +112,6 @@
 
 			{!! Form::hidden('t',$t ?? '' ?? '') !!}
 
-
 <div class="col-md-6">
 	
 	<div class="form-group">
@@ -128,6 +127,8 @@
 	<div class="form-group">
 		
 		{!! Form::label('nome', 'Serviço', array('class'=>'control-label')) !!}
+		
+		
 		{!! Form::text('nome', null, ['class'=>'form-control','id'=>'nome']) !!}
 		
 	</div>
