@@ -8,6 +8,7 @@ use App\Models\Servico;
 use App\Models\Faturamento;
 use Illuminate\Http\Request;
 use App\Models\FaturamentoServico;
+use DB;
 
 
 
@@ -21,8 +22,17 @@ class FaturamentoController extends Controller
      */
     public function index()
     {
-       $faturamentos = Faturamento::all();
-            // $faturamentos = Faturamento::where('empresa_id',16)->get();
+       $faturamentos = Faturamento::query()
+       ->select('id','valorTotal','created_at','nf','nome','empresa_id')
+         ->with(['empresa' => function($query) {
+            $query->select('id','nomeFantasia');
+        }])
+        ->get();
+
+
+    //    return $faturamentos;
+    //    dd($faturamentos);
+    // $faturamentos = Faturamento::where('empresa_id',16)->get();
 
         return view('admin.faturamento.lista-faturamentos')->with([
             'faturamentos'=>$faturamentos,

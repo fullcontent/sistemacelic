@@ -19,7 +19,14 @@ class ReembolsoController extends Controller
      */
     public function index()
     {
-        $reembolsos = Reembolso::all();
+        
+
+        $reembolsos = Reembolso::query()
+       ->select('id','valorTotal','created_at','nome','empresa_id')
+         ->with(['empresa' => function($query) {
+            $query->select('id','nomeFantasia');
+        }])
+        ->get();
 
         return view('admin.reembolso.lista-reembolsos')->with([
             'reembolsos'=>$reembolsos,

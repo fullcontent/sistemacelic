@@ -68,6 +68,7 @@ class AdminController extends Controller
     	$servicos = Servico::with('unidade','empresa','responsavel')
                                 // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
+                                ->select('id','nome')
                                 ->get();
 
         $servicos = $servicos->where('licenca_validade','<',\Carbon\Carbon::today()->addDays(60))
