@@ -181,7 +181,7 @@ class ArquivosController extends Controller
         if($user->privileges == 'cliente')
         {
 
-            return redirect()->route('cliente.servico',$request->servico_id);
+            return redirect()->route('cliente.servico.show',$request->servico_id);
 
         }
 
