@@ -179,7 +179,7 @@ class ClienteController extends Controller
                         'dados'=>$dados,
                         'route'=>$route,
                         'taxas'=>$servico->taxas,
-                        'pendencias'=>$servico->pendencias->where('status','aberto'),
+                        'pendencias'=>$servico->pendencias,
                     ]);
     }
 
