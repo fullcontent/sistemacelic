@@ -13,6 +13,8 @@ use App\Models\Pendencia;
 use App\Models\Servico;
 
 
+
+
 class ArquivosController extends Controller
 {
     /**
@@ -50,9 +52,12 @@ class ArquivosController extends Controller
         if ($request->hasFile('arquivo') && $request->file('arquivo')->isValid()) {
                 $nameFile = null;
                 $name = uniqid(date('HisYmd'));
-                $extension = $request->arquivo->extension();
+                
+                $extension = $request->arquivo->getClientOriginalExtension();
+             
                 $nameFile = "{$name}.{$extension}";
-                // Faz o upload:
+
+                
                 $upload = $request->arquivo->storeAs('arquivos', $nameFile);
                 // Se tiver funcionado o arquivo foi armazenado em storage/app/public/categories/nomedinamicoarquivo.extensao
 
