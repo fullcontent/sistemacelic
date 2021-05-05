@@ -41,13 +41,13 @@
 
           @endswitch
 
-          @if(Auth::id() == $pendencia->responsavel_id)
+          
           <span class="pull-right">
           <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#cadastro-arquivo" data-nome="{{$pendencia->pendencia}}">
                 <span class="fa fa-paperclip"></span>Anexar
                 </button>
                   </span>
-          @endif
+         
         
         </li>
         @endforeach
