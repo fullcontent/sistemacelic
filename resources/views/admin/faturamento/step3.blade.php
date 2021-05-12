@@ -120,13 +120,21 @@
   {
    
 
-	var value = object.value;
-	var max = object.max;
+	var value = parseInt(object.value);
+	var max = parseInt(object.max);
 
 	if(value > max)
 	{
 		window.alert('Valor a faturar não pode ser maior que o valor em aberto!');
+		console.log("Não pode faturar");
 		object.value = max;
+
+		console.log(max);
+		console.log(value);
+	}
+	if(value < max)
+	{
+		console.log("Pode faturar");
 	}
 
   }
