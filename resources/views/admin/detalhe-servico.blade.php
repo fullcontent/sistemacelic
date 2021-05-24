@@ -97,7 +97,7 @@
                   <p><b>Número Protocolo: </b>{{$servico->protocolo_numero}}
 
                     @unless (empty($servico->protocolo_anexo))
-                    <a href="{{ url("uploads/$servico->protocolo_anexo") }}" class="btn btn-xs btn-warning" target="_blank">Ver Protocolo</a>
+                    <a href="{{ route('servico.downloadFile', ['servico_id'=> $servico->id,'tipo'=>'protocolo']) }}" class="btn btn-xs btn-warning" target="_blank">Ver Protocolo</a>
                     @endunless
           
 
@@ -135,13 +135,13 @@
 
                   @endif
                   
-                  <p><b>Emissão Documento: </b> <a href="{{ url("uploads/$servico->licenca_anexo") }}" class="btn btn-xs btn-warning" target="_blank">Ver Licença</a></p>
+                  <p><b>Emissão Documento: </b> <a href="{{ route('servico.downloadFile', ['servico_id'=> $servico->id,'tipo'=>'licenca']) }}" class="btn btn-xs btn-warning" target="_blank">Ver Licença</a></p>
                   @endunless
 
                   @unless ( empty($servico->laudo_anexo) )  
                   <p><b>Emissão do Laudo: </b>{{\Carbon\Carbon::parse($servico->laudo_emissao)->format('d/m/Y')}}</p>
                   <p><b>N. do Laudo </b> {{$servico->laudo_numero }}</p>
-                  <p><b>Laudo: </b> <a href="{{ url("uploads/$servico->laudo_anexo") }}" class="btn btn-xs btn-warning" target="_blank">Ver Laudo</a></p>
+                  <p><b>Laudo: </b> <a href="{{ route('servico.downloadFile', ['servico_id'=> $servico->id,'tipo'=>'laudo']) }}" class="btn btn-xs btn-warning" target="_blank">Ver Laudo</a></p>
                   @endunless
 
                 </div>

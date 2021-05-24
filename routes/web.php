@@ -109,8 +109,12 @@ Route::get('/', function () {
 		Route::get('/servico/renovar/{id}', 'ServicosController@renovar')->name('servico.renovar');
 		Route::get('/servico/desconsiderar/{id}', 'ServicosController@desconsiderar')->name('servico.desconsiderar');
 
+		Route::get('/servico/download/{tipo}/{servico_id}', 'ArquivosController@downloadFile')->name('servico.downloadFile');
+
 
 		Route::get('/arquivo/download/{id}', 'ArquivosController@download')->name('arquivo.download');
+		
+		
 		Route::get('/arquivo/delete/{id}', 'ArquivosController@delete')->name('arquivo.delete');
 
 

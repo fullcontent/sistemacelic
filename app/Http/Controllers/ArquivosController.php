@@ -227,6 +227,39 @@ class ArquivosController extends Controller
 
     }
 
+    public function downloadFile($tipo, $servico_id)
+    {
+        
+
+        $servico = Servico::find($servico_id);
+
+        switch ($tipo) {
+            case 'licenca':
+                $filename = $servico->licenca_anexo;
+                $tipo = "Licença";
+                break;
+                case 'laudo':
+                    $filename = $servico->laudo_anexo;
+                    $tipo = "Laudo";
+                    break;
+                    case 'protocolo':
+                        $filename = $servico->protocolo_anexo;
+                        $tipo = "Protocolo";
+                        break;
+            
+        }
+
+                       
+                
+        $extension = pathinfo($filename, PATHINFO_EXTENSION);
+        
+        $arquivo = $tipo.' '.$servico->unidade->codigo.' - '.$servico->unidade->nomeFantasia.' - '.$servico->nome.'.'.$extension;
+
+                       
+        return response()->download(public_path('uploads/'.$filename.''),$arquivo);
+
+    }
+
     public function delete($id)
     {
         $file = Arquivo::find($id);
