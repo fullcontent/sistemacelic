@@ -182,6 +182,9 @@ class TaxasController extends Controller
         {
             $taxa->pagamento = Carbon::createFromFormat('d/m/Y', $request->pagamento)->toDateString();
         }
+        else{
+            $taxa->pagamento = null;
+        }
         if($taxa->pagamento)
         {
              $taxa->pagamento = Carbon::createFromFormat('d/m/Y', $request->pagamento)->toDateString();
@@ -224,9 +227,9 @@ class TaxasController extends Controller
 
 
             }
-
-            
         
+        
+        // return $taxa;
         $taxa->save();
 
         
@@ -277,6 +280,24 @@ class TaxasController extends Controller
         $t = Taxa::destroy($id);
         
         return redirect()->back();
+    }
+
+
+    public function removerComprovante($id)
+    {
+        $taxa = Taxa::find($id);
+
+        $taxa->comprovante = null;
+        $taxa->pagamento = null;
+        $taxa->save();
+    }
+
+    public function removerBoleto($id)
+    {
+        $taxa = Taxa::find($id);
+
+        $taxa->boleto = null;
+        $taxa->save();
     }
 
 

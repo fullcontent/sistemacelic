@@ -92,6 +92,9 @@ Route::get('/', function () {
 
 
 		Route::get('/taxa/delete/{id}', 'TaxasController@delete')->name('taxas.delete');
+		Route::get('/taxa/removerComprovante/{id}', 'TaxasController@removerComprovante')->name('taxas.removerComprovante');
+		Route::get('/taxa/removerBoleto/{id}', 'TaxasController@removerBoleto')->name('taxas.removerBoleto');
+
 
 
 		Route::get('/servico/andamento/', 'ServicosController@listaAndamento')->name('servico.andamento');
