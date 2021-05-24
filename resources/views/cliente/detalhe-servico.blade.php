@@ -139,7 +139,7 @@
 </div>
 @endif
 
-@if(count($pendencias)>0)
+@if(count($pendencias->where('status','pendente'))>0)
 <div class="col-sm-6">
   @include('cliente.components.widget-pendencias')
 </div>
