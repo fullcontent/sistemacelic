@@ -557,9 +557,6 @@ class ServicosController extends Controller
             $servico->unidade_id = $request->empresa_id;
         }
         
-
-
-
               
         $servico->save();
         
@@ -598,7 +595,10 @@ class ServicosController extends Controller
 
         
 
-        return redirect()->route('servicos.show',$servico->id);
+
+
+
+        return redirect()->route('pendencia.create',$servico->id);
 
 
 
