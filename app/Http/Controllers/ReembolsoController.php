@@ -320,6 +320,7 @@ class ReembolsoController extends Controller
         $reembolso = Reembolso::with('taxas')->find($id);
         $pdf = new PDFMerger();
 
+        
 
         $pdf->addPDF(public_path('uploads/ReembolsoTemp.pdf'),'all');
 
@@ -331,15 +332,52 @@ class ReembolsoController extends Controller
        {
 
             $taxa = Taxa::find($t->taxa_id);
-            $pdf->addPDF(public_path("uploads/".$taxa->comprovante), 'all');
-            $pdf->addPDF(public_path("uploads/".$taxa->boleto), 'all');
+
+            if($taxa->comprovante)
+            {
+               
+                $extension = pathinfo(public_path("uploads/".$taxa->comprovante), PATHINFO_EXTENSION);
+                
+                if($extension == "png" || $extension == "jpg" || $extension == "jpeg")
+                {
+                   $compPDF = \PDF::loadHTML("<img src=".public_path("uploads/".$taxa->comprovante." width=100%>"));
+                   $compPDF->save(public_path('uploads/ComprovanteTEMP.pdf'));
+                   $pdf->addPDF(public_path("uploads/ComprovanteTEMP.pdf"), 'all');
+                }
+                else
+                {
+                    $pdf->addPDF(public_path("uploads/".$taxa->comprovante), 'all');
+                }
+
+
+            }
+
+            if($taxa->boleto)
+            {
+                $extension = pathinfo(public_path("uploads/".$taxa->boleto), PATHINFO_EXTENSION);
+                
+                if($extension == "png" || $extension == "jpg" || $extension == "jpeg")
+                {
+                   $compPDF = \PDF::loadHTML("<img src=".public_path("uploads/".$taxa->boleto." width=100%>"));
+                   $compPDF->save(public_path('uploads/boletoTEMP.pdf'));
+                   $pdf->addPDF(public_path("uploads/boletoTEMP.pdf"), 'all');
+                }
+                else
+                {
+                    $pdf->addPDF(public_path("uploads/".$taxa->boleto), 'all');
+                }
+            }
+           
+            
             
        }
 
 
-           
+
+       
+    
       // Merge the files and retrieve its PDF binary content
-      $pdf->merge('download', "".utf8_encode($reembolso->empresa->nomeFantasia)." Relatorio Reembolso ".$reembolso->nome."");
+      $pdf->merge('download', "".utf8_decode($reembolso->empresa->nomeFantasia)." Relatorio Reembolso ".$reembolso->nome.".pdf");
        
       
 
