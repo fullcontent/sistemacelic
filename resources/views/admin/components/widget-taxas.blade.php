@@ -1,6 +1,6 @@
 <div class="box box-info ">
             <div class="box-header with-border">
-              <a href="#" data-widget="collapse"><h3 class="box-title">Taxa</h3></a>
+              <h3 class="box-title"><i class="fa fa-credit-card"></i> Controle de Taxas</h3>
 
               <div class="box-tools pull-right">
                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i>

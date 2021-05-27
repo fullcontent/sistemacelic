@@ -97,7 +97,7 @@
                   <p><b>Número Protocolo: </b>{{$servico->protocolo_numero}}
 
                     @unless (empty($servico->protocolo_anexo))
-                    <a href="{{ route('servico.downloadFile', ['servico_id'=> $servico->id,'tipo'=>'protocolo']) }}" class="btn btn-xs btn-warning" target="_blank">Ver Protocolo</a>
+                    <a href="{{ route('servico.downloadFile', ['servico_id'=> $servico->id,'tipo'=>'protocolo']) }}" class="btn btn-xs btn-warning" target="_blank"><i class="fa fa-file"></i> Ver Protocolo</a>
                     @endunless
           
 
@@ -141,7 +141,7 @@
                   @unless ( empty($servico->laudo_anexo) )  
                   <p><b>Emissão do Laudo: </b>{{\Carbon\Carbon::parse($servico->laudo_emissao)->format('d/m/Y')}}</p>
                   <p><b>N. do Laudo </b> {{$servico->laudo_numero }}</p>
-                  <p><b>Laudo: </b> <a href="{{ route('servico.downloadFile', ['servico_id'=> $servico->id,'tipo'=>'laudo']) }}" class="btn btn-xs btn-warning" target="_blank">Ver Laudo</a></p>
+                  <p><b>Laudo: </b> <a href="{{ route('servico.downloadFile', ['servico_id'=> $servico->id,'tipo'=>'laudo']) }}" class="btn btn-xs btn-warning" target="_blank"><i class="fa fa-file"></i> Ver Laudo</a></p>
                   @endunless
 
                 </div>
@@ -153,7 +153,7 @@
               {!! Form::hidden('servicos[]',$servico->id) !!}
               {!! Form::hidden('empresa_id',$servico->unidade->empresa_id) !!}
             
-              <button type="submit" class="btn btn-danger pull-right">Faturar</button>
+              <button type="submit" class="btn btn-danger pull-right"><i class="fa fa-barcode"></i> Faturar</button>
             
               {!! Form::close() !!}
 
@@ -194,7 +194,7 @@
 <div class="col-sm-6">
       <div class="box box-black">
             <div class="box-header with-border">
-              <h3 class="box-title">Histórico</h3>
+              <h3 class="box-title"><i class="fa fa-history"></i> Histórico</h3>
 
               <div class="box-tools pull-right">
                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>

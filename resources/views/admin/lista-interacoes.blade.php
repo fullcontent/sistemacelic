@@ -6,19 +6,18 @@
 
 @section('content')
 
-	
+
 	<div class="box">
 					<div class="box-header">
-					
-						<h4>Interações da O.S. {{$servico->os}}</h4>
-            <div class="pull-right">
-            <a href="{{route('servicos.show',$servico->id)}}" class="btn btn-default">Voltar</a>
-            </div>
+					<div class="pull-right">
+           <h3><a href="{{route('servicos.show',$servico->id)}}" class="btn btn-default"><i class="fa fa-chevron-left"></i> Voltar</a></h3>
             
-
+            </div>
+						<h4>Interações da O.S. {{$servico->os}}</h4>
+            
 					</div>
 
-
+           
 		<ul class="timeline timeline-inverse">
                                  
                   
@@ -62,7 +61,7 @@
 
                 <div class="box-footer">
                
-                <a href="{{route('servicos.show',$historico->servico_id)}}" class="btn btn-default">Voltar</a>
+                <a href="{{route('servicos.show',$servico->id)}}" class="btn btn-default"><i class="fa fa-chevron-left"></i> Voltar</a>
                 
 
                 </div>

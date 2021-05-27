@@ -2,7 +2,7 @@
     <!-- DIRECT CHAT -->
     <div class="box box-warning direct-chat direct-chat-warning">
       <div class="box-header with-border">
-        <h3 class="box-title">Interações</h3>
+        <h3 class="box-title"><i class="fa fa-comments"></i> Interações</h3>
 
         <div class="box-tools pull-right">
           
