@@ -10,6 +10,14 @@ use App\Models\Reembolso;
 use Illuminate\Http\Request;
 use App\Models\ReembolsoTaxa;
 
+
+use PDFMerger;
+
+use Dompdf\Dompdf;
+use PDF;
+
+
+
 class ReembolsoController extends Controller
 {
     /**
@@ -280,6 +288,60 @@ class ReembolsoController extends Controller
                 $reembolsoTaxa->save();
 
             }
+
+    }
+
+    public function download($id)
+    {
+        
+        $reembolso = Reembolso::with('taxas.taxa.unidade')->find($id);
+        $empresa = Empresa::find($reembolso->empresa_id);
+
+        
+       
+
+
+        // $reembolsoR = \PDF::loadHTML('<h1>Test</h1>');
+
+        $reembolsoR = \PDF::loadview('admin.reembolso.pdf',[
+            'empresa'=>$empresa,
+            'reembolsoItens'=>$reembolso->taxas,
+            'descricao'=>$reembolso->nome,
+            'obs'=>$reembolso->obs,
+            'data'=>$reembolso->created_at,
+            'totalReembolso'=>$reembolso->valorTotal,
+            ]);
+
+              
+        
+
+        $reembolsoR->save(public_path('uploads/ReembolsoTemp.pdf'));
+
+        $reembolso = Reembolso::with('taxas')->find($id);
+        $pdf = new PDFMerger();
+
+
+        $pdf->addPDF(public_path('uploads/ReembolsoTemp.pdf'),'all');
+
+
+        
+
+
+       foreach($reembolso->taxas as $t)
+       {
+
+            $taxa = Taxa::find($t->taxa_id);
+            $pdf->addPDF(public_path("uploads/".$taxa->comprovante), 'all');
+            $pdf->addPDF(public_path("uploads/".$taxa->boleto), 'all');
+            
+       }
+
+
+           
+      // Merge the files and retrieve its PDF binary content
+      $pdf->merge('download', "".utf8_encode($reembolso->empresa->nomeFantasia)." Relatorio Reembolso ".$reembolso->nome."");
+       
+      
 
     }
 }

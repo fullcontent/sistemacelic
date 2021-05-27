@@ -63,6 +63,8 @@ Route::get('/', function () {
 		Route::post('/reembolso/step3','ReembolsoController@step3')->name('reembolso.step3');
 		Route::post('/reembolso/step4','ReembolsoController@step4')->name('reembolso.step4');
 
+		Route::get('/reembolso/{id}/download','ReembolsoController@download')->name('reembolso.download');
+
 
 		Route::get('/empresa/{empresa}/unidades','EmpresasController@unidades')->name('empresa.unidades');
 		Route::get('/empresa/cadastro', 'EmpresasController@cadastro')->name('empresa.cadastro');
