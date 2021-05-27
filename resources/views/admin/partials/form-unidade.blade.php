@@ -60,7 +60,7 @@
           <div class="form-group">
                   
                   {!! Form::label('status', 'Status', array('class'=>'control-label')) !!}
-                  {!! Form::select('status', array('ativa' => 'Ativa', 'inativa' => 'Inativa'), null, ['class'=>'form-control'])!!}
+                  {!! Form::select('status', array('ativa' => 'Ativa', 'inativa' => 'Inativa','prospeccao'=>'Prospecção'), null, ['class'=>'form-control'])!!}
         
               </div>
 
