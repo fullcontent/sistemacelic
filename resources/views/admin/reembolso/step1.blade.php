@@ -20,7 +20,9 @@
 <div class="box-body">
 	<div class="col-md-6">
 		{!! Form::label('empresa_id', 'Selecione a empresa:', array('class'=>'control-label')) !!}
-		{{ Form::select('empresa_id[]', $empresas, null,['class'=>'form-control','id'=>'empresas']) }}
+		{{ Form::select('empresa_id[]', $empresas, null,['multiple'=>'multiple','class'=>'form-control','id'=>'empresas']) }}
+		<a href="#" id="selectAll">Selecionar Todas</a> | 
+		<a href="#" id="selectNone">Limpar seleção</a>
 	
 	</div>
 
@@ -55,7 +57,27 @@
 
 <script>
 
-$('#periodo').daterangepicker()
+$('#periodo').daterangepicker();
+
+	$("#selectAll").click(function(){ 
+		
+		$("#empresas option").each(function(){
+			$(this).prop('selected', true);
+		});
+		
+	});
+
+	$("#selectNone").click(function(){ 
+		
+		$("#empresas option").each(function(){
+			$(this).prop('selected', false);
+		});
+		
+	});
+
+	
+
+
 
 </script>
 @endsection
