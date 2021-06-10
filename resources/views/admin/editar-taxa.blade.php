@@ -73,10 +73,9 @@
   		$("#pagamento").prop('disabled',false);
   		$("#situacao").val('pago');
 		$("#pagamento").attr("required", "true");
-		var myDate = new Date();
-		var prettyDate =(myDate.getDate()+1) + '/' + myDate.getMonth() + '/' + myDate.getFullYear();
+		
 
-		$("#pagamento").val(prettyDate).datepicker("setDate", myDate);
+		$("#pagamento").prop('required',true).val(null);
 	});
 
 
