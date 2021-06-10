@@ -64,7 +64,7 @@
 	
 	if(comprovante) {
 		$("#pagamento").prop('disabled',true).val(pagamento);
-		$("#situacao").prop('disabled',true).val('{{$taxa->situacao}}');
+		$("#situacao").prop('readonly',true).val('{{$taxa->situacao}}');
 		$("#comprovante").hide();
     }
 	
@@ -78,6 +78,9 @@
 
 		$("#pagamento").val(prettyDate).datepicker("setDate", myDate);
 	});
+
+
+
 
     
 	
