@@ -108,7 +108,7 @@
                 
                 <div class="col-sm-6">
                   
-                  @unless ( empty($servico->licenca_anexo) ) 
+                  
 
                   <p><b>Tipo da Licença: </b>
                     @switch($servico->tipoLicenca)
@@ -116,7 +116,7 @@
                             Renovável
                             @break
                         @case('n/a')
-                            Não Aplicada
+                            Não aplicada
                             @break
                         @case('definitiva')
                             Definitiva
@@ -125,6 +125,8 @@
                             
                     @endswitch
                   </p>
+
+                  @unless ( empty($servico->licenca_anexo) ) 
                   @if($servico->tipoLicenca != 'n/a')
                   <p><b>Emissão da Licença: </b>{{\Carbon\Carbon::parse($servico->licenca_emissao)->format('d/m/Y')}}</p>
                   @endif
@@ -138,6 +140,9 @@
                   <p><b>Emissão Documento: </b> <a href="{{ route('servico.downloadFile', ['servico_id'=> $servico->id,'tipo'=>'licenca']) }}" class="btn btn-xs btn-warning" target="_blank">Ver Licença</a></p>
                   @endunless
 
+                  
+                  
+                  
                   @unless ( empty($servico->laudo_anexo) )  
                   <p><b>Emissão do Laudo: </b>{{\Carbon\Carbon::parse($servico->laudo_emissao)->format('d/m/Y')}}</p>
                   <p><b>N. do Laudo </b> {{$servico->laudo_numero }}</p>
