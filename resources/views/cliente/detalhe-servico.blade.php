@@ -84,7 +84,7 @@
                 
                 <div class="col-sm-6">
                   
-                  @unless ( empty($servico->licenca_anexo) ) 
+                 
 
                   <p><b>Tipo da Licença: </b>
                     @switch($servico->tipoLicenca)
@@ -101,7 +101,7 @@
                             
                     @endswitch
                   </p>
-
+                  @unless ( empty($servico->licenca_anexo) ) 
 
                   <p><b>Emissão da Licença: </b>{{\Carbon\Carbon::parse($servico->licenca_emissao)->format('d/m/Y')}}</p>
 
