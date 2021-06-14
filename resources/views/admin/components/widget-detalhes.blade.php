@@ -1,7 +1,7 @@
 <div class="box box-gray">
 	<div class="box-header with-border">
 		
-		<a href="#" data-widget="collapse"><h3 class="box-title text-bold">{{$dados->codigo}} | {{$dados->nomeFantasia}}</h3></a>
+		<a href="{{route('unidades.show',$dados->id)}}"><h3 class="box-title text-bold">{{$dados->codigo}} | {{$dados->nomeFantasia}}</h3></a>
 		<div class="box-tools pull-right">
 			<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
 			</button>
@@ -36,6 +36,11 @@
 			<p><b>CEP:</b> {{$dados->cep}}</p>
 			<p><b>Bairro:</b> {{$dados->bairro}}</p>
 		</div>
-		
+
+		@if(Route::is('unidades.show'))
+		<div class="pull-right">
+		<a href="{{route('unidades.edit', $dados->id)}}" class="btn btn-info pull-right"><span class="glyphicon glyphicon-pencil"></span> Editar</a>
+		</div>
+		@endif
 	</div>
 </div>
