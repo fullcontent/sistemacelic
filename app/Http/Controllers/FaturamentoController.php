@@ -517,4 +517,22 @@ class FaturamentoController extends Controller
     return preg_replace("/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/", "\$1.\$2.\$3/\$4-\$5", $cnpj_cpf);
     }
     
+
+    public function getAllServicesFinished()
+    {
+        $servicosFaturar = Servico::whereHas('finalizado')->with('finalizado')->take(500)->get();
+
+        $servicos = [];
+
+        foreach($servicosFaturar as $s)
+        {
+            
+             array_push($servicos, ['servico_id' => $s->id, 'finalizado' => \Carbon\Carbon::parse($s->finalizado->created_at)->toDateTimeString()]);
+           
+        }
+
+        dump($servicos);
+    }
+
+
 }
