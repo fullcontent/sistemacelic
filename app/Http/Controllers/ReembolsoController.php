@@ -109,6 +109,7 @@ class ReembolsoController extends Controller
         }
 
         
+        
 
 
         $t2 = Taxa::whereIn('id',$taxas)
