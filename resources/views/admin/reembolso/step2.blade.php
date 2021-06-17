@@ -21,6 +21,7 @@
 					@endforeach
 					
 				</ul></p>
+			<p><b>Taxas já dentro de um relatório de reembolso: </b><button onclick="mostrarTaxas()" id="btnMostrar">Incluir</button></p>
 			</div>
 			
 		</div>
@@ -34,6 +35,7 @@
 	
 	<div class="box-header with-border">
 		<h3 class="box-title">Selecione as taxas que deseja incluir no reembolso: </h3>
+		
 	</div>
 
 
@@ -42,9 +44,9 @@
 <div class="box-body">
 
 	{!! Form::hidden('empresa_id', $empresa_id) !!}
-
+	
 	<div class="col-md-12">
-		
+	
 		<table class="table table-hover">
 			<thead>
 				
@@ -55,7 +57,7 @@
 				<th>Serviço</th>
 				<th>Taxa</th>
 				<th>Solicitante</th>
-				<th>Valor</th>
+				<th width="100">Valor</th>
 				<th>Vcto.</th>
 				<th>Pgto.</th>
 							
@@ -79,7 +81,23 @@
 
 				</tr>
 				@endforeach		
-						
+
+				@foreach($reembolsadas as $value2 => $s2)
+				<tr style="background-color: #ccc; display: none;" id="reembolsada">
+					<td>{{ Form::checkbox('taxas[]', $s2->id,null,['class'=>'checkbox','id'=>'reembolsada2'])}}</td>
+					
+					<td>{{$s2->unidade->codigo}}</td>
+					<td>{{$s2->unidade->nomeFantasia}}</td>
+					<td>{{$s2->servico->nome}}</td>
+					<td>{{$s2->nome}}</td>
+					<td>{{$s2->servico->solicitante}}</td>
+					<td>R$ {{number_format($s2->valor,2,'.',',')}}</td>
+					<td>{{ \Carbon\Carbon::parse($s2->vencimento)->format('d/m/Y')}}</td>
+					<td>{{ \Carbon\Carbon::parse($s2->pagamento)->format('d/m/Y')}}</td>
+										
+
+				</tr>
+				@endforeach			
 							
 			</tbody>
 		</table>
@@ -106,14 +124,37 @@
 
 <script>
 	$('button[type="submit"]').on('click', function(e) {
-  e.preventDefault();
-  if($('.checkbox:checked').length > 0) {
-      $(this).parents('form').submit();
-      return;
-  }
-  alert('Selecione uma taxa da lista!');
-  return false;
-});
+				e.preventDefault();
+				if($('.checkbox:checked').length > 0) {
+					$(this).parents('form').submit();
+					return;
+				}
+				alert('Você deve selecionar pelo menos uma taxa da lista!');
+				return false;
+	});
+
+	function mostrarTaxas() {
+		var x = document.getElementById("reembolsada");
+		if (x.style.display === "none") {
+			x.style.display = "";
+			$('#btnMostrar').text("Esconder");
+		} else {
+			x.style.display = "none";
+			$('#btnMostrar').text("Mostrar");
+		}
+		}
+
+
+		$(":checkbox").on("change", function() {
+        //When the id is test1
+        //And name is A
+        //And it's checked
+        if (this.id === "reembolsada2") {
+			
+            alert ("Essa taxa ja está dentro de um relatório de reembolso.");
+        }
+    });
+
 </script>
 
 @endsection

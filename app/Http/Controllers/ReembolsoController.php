@@ -108,21 +108,34 @@ class ReembolsoController extends Controller
 
         }
 
-        
+
         
 
 
-        $t2 = Taxa::whereIn('id',$taxas)
+        $taxasAberto = Taxa::whereIn('id',$taxas)
                 ->whereDoesntHave('reembolsada')
+                // ->whereHas('reembolsada')
                 ->whereNotNull('pagamento')
                 ->whereBetween('pagamento', [$start_date,$end_date])
                 ->get();
+                
+                $taxasReembolsadas = Taxa::whereIn('id',$taxas)
+                // ->whereDoesntHave('reembolsada')
+                ->whereHas('reembolsada')
+                ->whereNotNull('pagamento')
+                ->whereBetween('pagamento', [$start_date,$end_date])
+                ->get();    
+                
+
+       
+
         
         
 
 
         return view('admin.reembolso.step2')->with([
-            'taxas'=>$t2,
+            'taxas'=>$taxasAberto,
+            'reembolsadas'=>$taxasReembolsadas,
             'empresas'=>$empresas,
             'periodo'=>$periodo,
         ]);
