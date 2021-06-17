@@ -60,10 +60,7 @@ class ReembolsoController extends Controller
     {
         
          
-         
-
-
-
+        
         $periodo = explode(' - ', $request->periodo);
         $start_date = Carbon::parse($periodo[0])->toDateTimeString();
         $end_date = Carbon::parse($periodo[1])->toDateTimeString();
@@ -95,18 +92,17 @@ class ReembolsoController extends Controller
                             })                     
                             ->get();
         
-
-        
-
-        
+                      
+               
         foreach($servicosFaturar as $s)
         {
 
             foreach($s->reembolsos as $r)
             {
-
+                
                 $t = $r->id;
                 $taxas = $taxas->merge($t);
+
             }
 
 
@@ -115,11 +111,17 @@ class ReembolsoController extends Controller
         
 
 
-        $t = Taxa::whereIn('id',$taxas)->whereDoesntHave('reembolsada')->whereNotNull('pagamento')->get();
-          
+        $t2 = Taxa::whereIn('id',$taxas)
+                ->whereDoesntHave('reembolsada')
+                ->whereNotNull('pagamento')
+                ->whereBetween('pagamento', [$start_date,$end_date])
+                ->get();
+        
+        
+
 
         return view('admin.reembolso.step2')->with([
-            'taxas'=>$t,
+            'taxas'=>$t2,
             'empresas'=>$empresas,
             'periodo'=>$periodo,
         ]);
