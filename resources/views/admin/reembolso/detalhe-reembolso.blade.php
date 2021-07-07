@@ -49,8 +49,8 @@
 								<td>{{$s->taxa->nome}}</td>
 								<td>{{$s->taxa->servico->solicitante}}</td>
 								<td>R$ {{number_format($s->taxa->valor,2,'.',',')}}</td>
-								<td>{{ \Carbon\Carbon::parse($s->vencimento)->format('d/m/Y')}}</td>
-								<td>{{ \Carbon\Carbon::parse($s->pagamento)->format('d/m/Y')}}</td>
+								<td>{{ \Carbon\Carbon::parse($s->taxa->vencimento)->format('d/m/Y')}}</td>
+								<td>{{ \Carbon\Carbon::parse($s->taxa->pagamento)->format('d/m/Y')}}</td>
               </tr>
               @endforeach
           </tbody>
