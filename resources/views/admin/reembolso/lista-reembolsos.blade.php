@@ -31,7 +31,7 @@
 					<td>{{ \Carbon\Carbon::parse($r->created_at)->format('d/m/Y')}}</td>
 					<td>R$ {{number_format($r->valorTotal,2,'.',',')}}</td>
 					<td>
-					<a href="{{route('reembolso.download',$r->id)}}" type="button" class="btn btn-success btn-xs">Download</a> 
+					<a href="{{route('reembolso.download',$r->id)}}" type="button" class="btn btn-success btn-xs" target="_blank">Download</a> 
 					<a href="{{route('reembolso.destroy',$r->id)}}" type="button" class="confirmation btn btn-danger btn-xs"> <i class="glyphicon glyphicon-trash"></i></a>
 					</td>				
 				
