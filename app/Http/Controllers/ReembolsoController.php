@@ -361,8 +361,31 @@ class ReembolsoController extends Controller
                    $pdf->addPDF(public_path("uploads/ComprovanteTEMP.pdf"), 'all');
                 }
                 else
-                {
-                    $pdf->addPDF(public_path("uploads/".$taxa->comprovante), 'all');
+                {   
+                    $fp = @fopen(public_path("uploads/".$taxa->comprovante), 'rb');
+    
+                            if (!$fp) {
+                                return 0;
+                            }
+                            
+                            /* Reset file pointer to the start */
+                            fseek($fp, 0);
+                            /* Read 20 bytes from the start of the PDF */
+                            preg_match('/\d\.\d/',fread($fp,20),$match);
+                            
+                            fclose($fp);
+                            
+                            if (isset($match[0])) {
+
+                                
+                                if($match[0] <= 1.4)
+                                {
+                                    $pdf->addPDF(public_path("uploads/".$taxa->comprovante), 'all');
+                                }
+                               
+                            }
+
+                    
                 }
 
 
@@ -380,7 +403,32 @@ class ReembolsoController extends Controller
                 }
                 else
                 {
-                    $pdf->addPDF(public_path("uploads/".$taxa->boleto), 'all');
+
+                    $fp = @fopen(public_path("uploads/".$taxa->boleto), 'rb');
+    
+                    if (!$fp) {
+                        return 0;
+                    }
+                    
+                    /* Reset file pointer to the start */
+                    fseek($fp, 0);
+                    /* Read 20 bytes from the start of the PDF */
+                    preg_match('/\d\.\d/',fread($fp,20),$match);
+                    
+                    fclose($fp);
+                    
+                    if (isset($match[0])) {
+
+                       
+                        if($match[0] <= 1.4)
+                        {
+                            $pdf->addPDF(public_path("uploads/".$taxa->boleto), 'all');
+                        }
+                        
+                        
+                    }
+                    
+                    
                 }
             }
            
@@ -393,7 +441,7 @@ class ReembolsoController extends Controller
        
     
       // Merge the files and retrieve its PDF binary content
-      $pdf->merge('download', "".utf8_decode($reembolso->empresa->nomeFantasia)." Relatorio Reembolso ".$reembolso->nome.".pdf");
+      $pdf->merge('browser', "".utf8_decode($reembolso->empresa->nomeFantasia)." Relatorio Reembolso ".$reembolso->nome.".pdf");
        
       
 
