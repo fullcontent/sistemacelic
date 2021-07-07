@@ -92,8 +92,8 @@
 					<td>{{$s2->nome}}</td>
 					<td>{{$s2->servico->solicitante}}</td>
 					<td>R$ {{number_format($s2->valor,2,'.',',')}}</td>
-					<td>{{ \Carbon\Carbon::parse($s2->vencimento)->format('d/m/Y')}}</td>
-					<td>{{ \Carbon\Carbon::parse($s2->pagamento)->format('d/m/Y')}}</td>
+					<td>{{ \Carbon\Carbon::parse($s2->taxa->vencimento)->format('d/m/Y')}}</td>
+					<td>{{ \Carbon\Carbon::parse($s2->taxa->pagamento)->format('d/m/Y')}}</td>
 										
 
 				</tr>
