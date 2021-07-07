@@ -297,6 +297,8 @@ h3 {
   </section>
   </div>
 
+
+  <div class="content">
   <section class="invoice" style="page-break-before: always; padding:20px;">
 
     <div class="row">
@@ -380,6 +382,8 @@ h3 {
     
     
   </section>
+  </div>
+  
 
 
   </body>
