@@ -129,6 +129,11 @@ Route::get('/', function () {
 		Route::post('salvarInteracao', 'ServicosController@salvarInteracao')->name('interacao.store');
 
 
+		Route::get('/servico/removerLaudo/{id}', 'ServicosController@removerLaudo')->name('servico.removerLaudo');
+		Route::get('/servico/removerProtocolo/{id}', 'ServicosController@removerProtocolo')->name('servico.removerProtocolo');
+		Route::get('/servico/removerLicenca/{id}', 'ServicosController@removerLicenca')->name('servico.removerLicenca');
+
+
 		
 		Route::get('/servico/{id}/interacoes', 'ServicosController@interacoes')->name('interacoes.lista');
 

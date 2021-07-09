@@ -144,6 +144,81 @@ document.getElementById('nome').value = selem.options[selem.selectedIndex].text;
  
 });
 
+var protocolo = "{{$servico->protocolo_anexo}}";
+var laudo = "{{$servico->laudo_anexo}}";
+var licenca = "{{$servico->licenca_anexo}}";
+
+
+
+if(protocolo){
+		$("#protocolo_anexo").hide();
+	}
+	if(laudo){
+		$("#laudo_anexo").hide();
+	}
+
+	if(licenca){
+		$("#licenca_anexo").hide();
+	}
+
+
+
+
+$( "#removerProtocolo" ).click(function() {
+		
+		$("#protocolo_anexo").show();
+		$("#btnProtocolo").hide();
+		$("#removerProtocolo").hide();
+		
+		$.ajax({
+            url: '{{url('admin/servico/removerProtocolo',$servico->id)}}',
+            method: 'GET',
+            success: function(data) {
+
+              console.log("Protocolo Removido");
+            },
+            })
+		$("#removerProtocolo").after("<p class=danger>Protocolo Removido</p>");
+
+		
+	});
+
+	$( "#removerLaudo" ).click(function() {
+		$("#laudo_anexo").show();
+		$("#btnLaudo").hide();
+		$("#removerLaudo").hide();
+		
+		$.ajax({
+            url: '{{url('admin/servico/removerLaudo',$servico->id)}}',
+            method: 'GET',
+            success: function(data) {
+
+              console.log("Laudo Removido");
+            },
+            })
+		$("#removerLaudo").after("<p class=danger>Laudo Removido</p>");
+
+		
+	});
+
+	$( "#removerLicenca" ).click(function() {
+		$("#licenca_anexo").show();
+		$("#btnLicenca").hide();
+		$("#removerLicenca").hide();
+		
+		$.ajax({
+            url: '{{url('admin/servico/removerLicenca',$servico->id)}}',
+            method: 'GET',
+            success: function(data) {
+
+              console.log("Licenca Removido");
+            },
+            })
+		$("#removerLicenca").after("<p class=danger>Licenca Removido</p>");
+
+		
+	});
+
 
 </script>
 

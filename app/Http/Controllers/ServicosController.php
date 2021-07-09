@@ -1017,4 +1017,28 @@ class ServicosController extends Controller
 
         return $unidadesList;
     }
+
+
+    public function removerProtocolo($id)
+    {
+        $servico = Servico::find($id);
+        $servico->protocolo_anexo = null;
+        $servico->save();
+    }
+
+    public function removerLicenca($id)
+    {
+        $servico = Servico::find($id);
+        $servico->licenca_anexo = null;
+        $servico->save();
+    }
+
+    public function removerLaudo($id)
+    {
+        $servico = Servico::find($id);
+        $servico->laudo_anexo = null;
+        $servico->save();
+    }
+
+    
 }
