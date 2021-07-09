@@ -12,6 +12,8 @@ use App\Models\ReembolsoTaxa;
 
 
 use PDFMerger;
+use ZipArchive;
+use File;
 
 use Dompdf\Dompdf;
 use PDF;
@@ -307,6 +309,7 @@ class ReembolsoController extends Controller
 
     }
 
+    
     public function download($id)
     {
         
@@ -334,6 +337,7 @@ class ReembolsoController extends Controller
         $reembolsoR->save(public_path('uploads/ReembolsoTemp.pdf'));
 
         $reembolso = Reembolso::with('taxas')->find($id);
+
         $pdf = new PDFMerger();
 
         
@@ -436,14 +440,105 @@ class ReembolsoController extends Controller
             
        }
 
-
-
-       
     
       // Merge the files and retrieve its PDF binary content
       $pdf->merge('browser', "".utf8_decode($reembolso->empresa->nomeFantasia)." Relatorio Reembolso ".$reembolso->nome.".pdf");
        
-      
+    }
+
+    public function downloadZip($id)
+    {
+        $this->createRelatorioFolder($id);
+
+        $rPath = public_path('uploads/reembolsos/'.$id);
+        $reembolso = Reembolso::with('taxas.taxa.unidade')->find($id);
+
+        $zip_file = $rPath."/".utf8_decode($reembolso->empresa->nomeFantasia)." - Relatorio Reembolso -".$reembolso->nome.".zip";
+        $zip = new \ZipArchive();
+        $zip->open($zip_file, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+        
+        
+        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($rPath));
+        foreach ($files as $name => $file)
+        {
+            // We're skipping all subfolders
+            if (!$file->isDir()) {
+                $filePath     = $file->getRealPath();
+        
+                // extracting filename with substr/strlen
+                $relativePath = substr($filePath, strlen($rPath) + 1);
+        
+                $zip->addFile($filePath, $relativePath);
+            }
+        }
+        $zip->close();
+        return response()->download($zip_file);
+
+
 
     }
+
+
+    public function createRelatorioFolder($id)
+    {   
+
+        $path = public_path('uploads/');
+        $rPath = public_path('uploads/reembolsos/'.$id);
+
+        //check if folder exists
+
+        if($rPath)
+        {
+
+            $this->createFolder($id);
+           
+        }
+
+        $reembolso = Reembolso::with('taxas.taxa.unidade')->find($id);
+            $empresa = Empresa::find($reembolso->empresa_id);
+            $reembolsoR = \PDF::loadview('admin.reembolso.pdf',[
+                'empresa'=>$empresa,
+                'reembolsoItens'=>$reembolso->taxas,
+                'descricao'=>$reembolso->nome,
+                'obs'=>$reembolso->obs,
+                'data'=>$reembolso->created_at,
+                'totalReembolso'=>$reembolso->valorTotal,
+                ]);
+        
+        
+        
+            $reembolsoR->save($rPath.'/Reembolso - '.$reembolso->nome.'.pdf');
+
+        
+
+        foreach($reembolso->taxas as $key => $t)
+        {
+            $taxa = Taxa::find($t->taxa_id);
+
+            if($taxa->comprovante)
+            {   
+                $extension = pathinfo(public_path("uploads/".$taxa->comprovante), PATHINFO_EXTENSION);
+                $compr = File::copy($path.$taxa->comprovante, $path.'/reembolsos/'.$id.'/'.$key.'C.'.$extension);
+            }
+            if($taxa->boleto)
+            {   
+                $extension = pathinfo(public_path("uploads/".$taxa->boleto), PATHINFO_EXTENSION);
+                $compr = File::copy($path.$taxa->boleto, $path.'/reembolsos/'.$id.'/'.$key.'B.'.$extension);
+            }
+
+        }
+
+        
+                    
+    }
+
+
+    private function createFolder($id)
+    {
+        $path = public_path('uploads/reembolsos/'.$id);
+        File::makeDirectory($path, $mode = 0777, true, true);
+    }
+
+
+    
 }

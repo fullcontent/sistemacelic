@@ -230,19 +230,21 @@ h3 {
         <table class="table table-bordered">
           <thead>
           <tr>
+            <th>Item</th>
             <th>Cod.</th>
-			  	<th>Unidade</th>
-				<th>Serviço</th>
-				<th>Taxa</th>
-				<th>Solicitante</th>
-				<th>Valor</th>
-				<th>Vcto.</th>
-				<th>Pgto.</th>	
+            <th>Unidade</th>
+            <th>Serviço</th>
+            <th>Taxa</th>
+            <th>Solicitante</th>
+            <th>Valor</th>
+            <th>Vcto.</th>
+            <th>Pgto.</th>	
           </tr>
           </thead>
           <tbody>
-              @foreach($reembolsoItens as $s)
+              @foreach($reembolsoItens as $key => $s)
               <tr>
+                <td>{{$key}}</td>
                 <td>{{$s->taxa->unidade->codigo}}</td>
 								<td>{{$s->taxa->unidade->nomeFantasia}}</td>
 								<td>{{$s->taxa->servico->nome}}</td>
@@ -274,25 +276,6 @@ h3 {
       <!-- /.col -->
     </div>
 
-
-    <div class="row">
-    <div class="assinatura">
-    <div class="col-xs-8" style="margin-top: 100px;">
-        <p>__________________________________________________________________</p>
-        <p><b>CASTRO EMPRESARIAL - CONSULTORIA E LEGALIZAÇÃO IMOBILIÁRIA
-        </b></p>
-        <p>CNPJ: 27.352.308/0001-52
-        </p>
-
-      </div>
-    </div>
-   
-    </div>
-    
-    
-
-    
-    
     
   </section>
   </div>
