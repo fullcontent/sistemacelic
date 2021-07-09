@@ -25,7 +25,7 @@
       			<div class="box-footer">
       			<a href="{{route('servicos.show', $taxa->servico_id)}}" class="btn btn-default">Voltar</a>
                 
-                <button type="submit" class="btn btn-info" id="submitBtn">Editar</button>
+                <button type="submit" class="btn btn-info" id="submitBtn"><i class="fa fa-save"></i> SALVAR</button>
               	</div>
     	
     
