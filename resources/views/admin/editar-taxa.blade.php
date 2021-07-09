@@ -25,7 +25,7 @@
       			<div class="box-footer">
       			<a href="{{route('servicos.show', $taxa->servico_id)}}" class="btn btn-default">Voltar</a>
                 
-                <button type="submit" class="btn btn-info">Editar</button>
+                <button type="submit" class="btn btn-info" id="submitBtn">Editar</button>
               	</div>
     	
     
@@ -40,16 +40,18 @@
 	
 	$(document).ready(function() {
 
-		$("#emissao").datepicker();
-		$("#vencimento").datepicker();	
-		$("#pagamento").datepicker();  	 	
-		$("#valor").mask('000.000.000.000.000,00', {reverse: true});
-		$("#pagamento").prop('disabled',true).val(null);
+		
 
   	
 		var comprovante = "{{$taxa->comprovante}}";
 		var pagamento = "{{$taxa->pagamento}}";
 		var boleto = "{{$taxa->boleto}}";
+
+		$("#emissao").datepicker();
+		$("#vencimento").datepicker();	
+		$("#pagamento").datepicker();  	 	
+		$("#valor").mask('000.000.000.000.000,00', {reverse: true});
+		$("#pagamento").prop('disabled',true).val();
 		
 		var btnComprovante = $("#comprovante").val();
 		var btnBoleto = $("#boleto").val();
@@ -124,7 +126,16 @@
             },
             })
 		$("#removerBoleto").after("<p class=danger>Boleto Removido</p>");
-	});	
+	});
+
+
+	$("#submitBtn").click(function(){
+
+		$("#pagamento").prop('disabled',false);
+		
+
+	});
+
 	  	
  	
 });

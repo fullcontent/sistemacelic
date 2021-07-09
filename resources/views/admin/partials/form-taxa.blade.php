@@ -73,7 +73,7 @@
         {!! Form::file('boleto', null, ['class'=>'form-control','id'=>'boleto']) !!}
 
         @unless ( empty($taxa->boleto) )
-        <a href="{{ url("storage/$taxa->boleto") }}" class="form-control btn btn-warning" target="_blank" id="btnBoleto">Ver Boleto</a>
+        <a href="{{ url("uploads/$taxa->boleto") }}" class="form-control btn btn-warning" target="_blank" id="btnBoleto">Ver Boleto</a>
         <span><a href="#" class="btn btn-xs btn-danger" alt="Remover Boleto" id="removerBoleto">X</a></span>
         
        
@@ -86,7 +86,7 @@
         {!! Form::label('comprovante', 'Comprovante', array('class'=>'control-label')) !!}
         {!! Form::file('comprovante', null, ['class'=>'form-control','id'=>'comprovante']) !!}
         @unless ( empty($taxa->comprovante) )
-        <a href="{{ url("storage/$taxa->comprovante") }}" class="form-control btn btn-warning" target="_blank" id="btnComprovante">Ver Comprovante</a>
+        <a href="{{ url("uploads/$taxa->comprovante") }}" class="form-control btn btn-warning" target="_blank" id="btnComprovante">Ver Comprovante</a>
         <span><a href="#" class="btn btn-xs btn-danger" alt="Remover Comprovante" id="removerComprovante">X</a></span>
      
         @endunless
