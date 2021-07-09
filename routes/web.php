@@ -53,6 +53,11 @@ Route::get('/', function () {
 		Route::post('/faturamento/step4','FaturamentoController@step4')->name('faturamento.step4');
 
 
+
+		Route::get('/faturamento/servicosFinalizados','FaturamentoController@getAllServicesFinished');
+
+		Route::get('/faturamento/servicosErro','FaturamentoController@getErrors');
+
 		
 		Route::get('/reembolsos', 'ReembolsoController@index')->name('reembolsos.index');
 		Route::get('/reembolso/show/{id}', 'ReembolsoController@show')->name('reembolso.show');
@@ -64,6 +69,7 @@ Route::get('/', function () {
 		Route::post('/reembolso/step4','ReembolsoController@step4')->name('reembolso.step4');
 
 		Route::get('/reembolso/{id}/download','ReembolsoController@download')->name('reembolso.download');
+		Route::get('/reembolso/{id}/downloadZip','ReembolsoController@downloadZip')->name('reembolso.downloadZip');
 
 
 		Route::get('/empresa/{empresa}/unidades','EmpresasController@unidades')->name('empresa.unidades');
