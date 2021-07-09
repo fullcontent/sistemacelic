@@ -84,6 +84,7 @@ class PendenciasController extends Controller
         return view('admin.cadastro-pendencia')
                 ->with([
                     'servico'=> $servico,
+                    'servico_id'=>$servico_id,
                     'responsaveis'=>$responsaveis,
                 ]);
     }
