@@ -153,7 +153,7 @@
 
               <a href="{{route('servicos.edit', $servico->id)}}" class="btn btn-info pull-right"><span class="glyphicon glyphicon-pencil"></span> Editar</a>
               
-              {!! Form::open(['route'=>'faturamento.step3','id'=>'cadastroFaturamento']) !!}
+              {!! Form::open(['route'=>'faturamento.step3','id'=>'cadastroFaturamento', 'target'=>'_blank']) !!}
 
               {!! Form::hidden('servicos[]',$servico->id) !!}
               {!! Form::hidden('empresa_id',$servico->unidade->empresa_id) !!}
