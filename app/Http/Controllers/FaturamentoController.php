@@ -79,8 +79,14 @@ class FaturamentoController extends Controller
         {
 
             $empresa = Empresa::whereHas('servicosFaturar')->with('servicosFaturar')->find($e);
-            $s = $empresa->servicosFaturar->pluck('id');
-            $s2 = $s2->merge($s);
+
+            if($empresa)
+            {
+                $s = $empresa->servicosFaturar->pluck('id');
+                $s2 = $s2->merge($s);
+            }
+            
+            
         }
 
 
