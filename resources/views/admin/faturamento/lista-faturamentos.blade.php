@@ -24,7 +24,7 @@
 				<tr>
                 </thead>
                 <tbody>
-				@foreach($faturamentos as $f)
+				@foreach($faturamentos->sortByDesc('id') as $f)
 
 				<tr>
 				<td><a href="{{route('faturamento.show',$f->id)}}">{{$f->nome}}</a></td>
