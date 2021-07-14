@@ -8,6 +8,8 @@ use App\Models\Servico;
 use App\Models\Faturamento;
 use Illuminate\Http\Request;
 use App\Models\FaturamentoServico;
+use App\Models\ServicoFinanceiro;
+use App\Models\ServicoFinalizado;
 use DB;
 
 
@@ -85,9 +87,10 @@ class FaturamentoController extends Controller
         
         $servicosFaturar = Servico::with('financeiro')
                             ->orWhereIn('id', $s2)
-                            ->whereHas('finalizado', function($q) use ($start_date, $end_date){
-                                return $q->whereBetween('created_at', [$start_date,$end_date]);
-                            })                                             
+                            ->whereHas('servicoFinalizado', function($q) use ($start_date, $end_date){
+                                return $q->whereBetween('finalizado', [$start_date,$end_date]);
+                            })
+                                                                                      
                             ->get();
               
                             
@@ -520,18 +523,67 @@ class FaturamentoController extends Controller
 
     public function getAllServicesFinished()
     {
-        $servicosFaturar = Servico::whereHas('finalizado')->with('finalizado')->take(500)->get();
+        
+        $servicoFinalizado = Servico::whereHas('servicoFinalizado')->pluck('id');
 
-        $servicos = [];
+        // dd($servicoFinalizado);
+
+
+        
+        
+        $servicosFaturar = Servico::whereHas('servicoFinalizado')->get();
+
+
+        dd($servicosFaturar);
 
         foreach($servicosFaturar as $s)
         {
             
-             array_push($servicos, ['servico_id' => $s->id, 'finalizado' => \Carbon\Carbon::parse($s->finalizado->created_at)->toDateTimeString()]);
+            
+            
+            if(!ServicoFinalizado::where('servico_id',$s->id)->first())
+            {
+                $servico = new ServicoFinalizado;
+                $servico->servico_id = $s->id;
+                $servico->finalizado = $s->finalizado->created_at;
+                $servico->save();
+   
+                dump("Adicionado ".$s->id);
+            }
+            else{
+                dump("JA FOI ".$s->id);
+            }
+
+            
            
         }
 
-        dump($servicos);
+        
+        
+
+
+    }
+
+
+    public function getErrors()
+    {
+        $servicos = ServicoFinanceiro::where('status','faturado')->get();
+
+        foreach($servicos as $s)
+        {
+
+            if($s->valorAberto == $s->valorFaturado)
+            {
+                // $s->valorAberto = 0;
+                // $s->valorFaturar = 0;
+                // $s->save();
+                
+                dump($s->servico_id);
+            }
+
+        }
+
+        
     }
 
 
