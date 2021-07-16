@@ -537,10 +537,10 @@ class FaturamentoController extends Controller
 
         
         
-        $servicosFaturar = Servico::whereHas('servicoFinalizado')->get();
+        $servicosFaturar = Servico::whereNotIn('id',$servicoFinalizado)->whereHas('finalizado')->get();
 
 
-        dd($servicosFaturar);
+        // dd($servicosFaturar);
 
         foreach($servicosFaturar as $s)
         {
