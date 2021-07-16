@@ -21,7 +21,7 @@
 				  <th>Total</th>
 				  <th>NF</th>
 				  <th>Actions</th>
-				<tr>
+				</tr>
                 </thead>
                 <tbody>
 				@foreach($faturamentos->sortByDesc('id') as $f)
@@ -41,8 +41,7 @@
 					@endif
 
 				</td>
-				<td><a href="{{route('faturamento.destroy',$f->id)}}" class="confirmation"> <i class="glyphicon glyphicon-trash
-					"></i></a></td>
+				<td><a href="{{route('faturamento.destroy',$f->id)}}" class="confirmation"> <i class="glyphicon glyphicon-trash"></i></a></td>
 				</tr>
 
 				@endforeach
@@ -106,7 +105,7 @@
 		      "searching": true,
 		      "ordering": true,
 		      "info": false,
-		      "autoWidth": false,
+		      "autoWidth": true,
 		       "language": {
                 "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
             }           
