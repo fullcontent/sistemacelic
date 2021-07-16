@@ -37,7 +37,7 @@ class UnidadesController extends Controller
         
         $access = UserAccess::where('user_id',Auth::id())->whereNull('unidade_id')->pluck('empresa_id');
 
-        $unidades = Unidade::with('servicos')->whereIn('empresa_id',$access)->get();
+        $unidades = Unidade::with('servicos','empresa')->whereIn('empresa_id',$access)->get();
 
         return view('admin.lista-unidades')->with('unidades',$unidades);
     }
