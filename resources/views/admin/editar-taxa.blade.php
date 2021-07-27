@@ -46,6 +46,7 @@
 		var comprovante = "{{$taxa->comprovante}}";
 		var pagamento = "{{$taxa->pagamento}}";
 		var boleto = "{{$taxa->boleto}}";
+		
 
 		$("#emissao").datepicker();
 		$("#vencimento").datepicker();	
@@ -56,7 +57,7 @@
 		var btnComprovante = $("#comprovante").val();
 		var btnBoleto = $("#boleto").val();
 
-	
+			
 	
 	if(boleto){
 		$("#boleto").hide();
@@ -69,10 +70,23 @@
 		$("#situacao").prop('readonly',true).val('{{$taxa->situacao}}');
 		$("#comprovante").hide();
     }
+
+	if(!comprovante){
+		console.log("nao tem comprovante");
+		$("#situacao option[value='pago']").remove();
+		$("#pagamento").prop('disabled',true).val(null);
+
+	}
+
+
+	console.log(pagamento);
+	
 	
 	
 	$( "#comprovante" ).change(function() {
   		$("#pagamento").prop('disabled',false);
+
+		$("#situacao").append('<option value="pago">Pago</option>'); 
   		$("#situacao").val('pago');
 		$("#pagamento").attr("required", "true");
 		
@@ -110,6 +124,9 @@
             })
 		$("#removerComprovante").after("<p class=danger>Comprovante Removido</p>");
 
+		$("#situacao option[value='pago']").remove();
+		$("#pagamento").prop('disabled',true).val(null);
+
 		
 	});
 
@@ -133,7 +150,6 @@
 
 		$("#pagamento").prop('disabled',false);
 		
-
 	});
 
 	  	
