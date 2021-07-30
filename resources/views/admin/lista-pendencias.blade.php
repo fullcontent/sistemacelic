@@ -22,6 +22,7 @@
                 <table id="lista-pendencias" class="table table-bordered table-hover">
                   <thead>
                   <tr>
+                    <th>Empresa</th>
                     <th>Cod.</th>
                     <th>Unidade</th>
                     <th>Serviço</th>
@@ -32,6 +33,7 @@
                   <tbody>
                     @foreach($pendencias->where('status','pendente') as $p)
                   <tr>
+                  <td><a href="{{route('empresas.show',$p->servico['unidade']['empresa']['id'])}}">{{$p->servico['unidade']['empresa']['nomeFantasia']}}</a></td>
                     <td><a href="{{route('servicos.show',$p->servico_id)}}">{{$p->servico['unidade']['codigo']}}</a></td>
                     <td><a href="{{route('servicos.show',$p->servico_id)}}">{{$p->servico['unidade']['nomeFantasia']}}</a></td>
                     <td><a href="{{route('servicos.show',$p->servico_id)}}">{{$p->servico['nome']}}</a></td>
