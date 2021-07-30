@@ -24,7 +24,7 @@
                    @foreach($dados->arquivos as $a)
                    <tr>
                    	<td>{{$a->nome}}</td>
-                     <td>{{$a->user['privileges']}}</td>
+                     <td>{{$a->user['privileges'] ?? ''}}</td>
                    	<td><a href="{{ route('arquivo.download',$a->id) }}" class="btn btn-xs btn-default" target="_blank">Download</a></td>
                     <td><a href="{{route('arquivo.delete',$a->id)}}" onclick="return confirm('Tem certeza que deseja excluir o arquivo?');"><i class="fa fa-trash"></i></a></td>
                    </tr>
