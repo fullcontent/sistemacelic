@@ -33,7 +33,7 @@
                     <td><a href="{{route('servicos.show',$p->servico_id)}}">{{$p->servico['unidade']['nomeFantasia']}}</a></td>
                     <td><a href="{{route('servicos.show',$p->servico_id)}}">{{$p->servico['nome']}}</a></td>
                     <td><a href="{{route('servicos.show',$p->servico_id)}}">{{$p->pendencia}}</a></td>
-                    <td><a href="{{route('servicos.show',$p->servico_id)}}">{{\Carbon\Carbon::parse($p->vencimento)->format('d/m/Y')}}</a></td>
+                    <td><a href="{{route('servicos.show',$p->servico_id)}}"><span style="display:none;">{{$p->vencimento}}</span>{{\Carbon\Carbon::parse($p->vencimento)->format('d/m/Y')}}</a></td>
                   </tr>
                     @endforeach
                   
