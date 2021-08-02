@@ -315,11 +315,8 @@ class ReembolsoController extends Controller
         
         $reembolso = Reembolso::with('taxas.taxa.unidade')->find($id);
         $empresa = Empresa::find($reembolso->empresa_id);
-
-        
-       
-
-
+      
+      
         // $reembolsoR = \PDF::loadHTML('<h1>Test</h1>');
 
         $reembolsoR = \PDF::loadview('admin.reembolso.pdf',[
@@ -329,12 +326,17 @@ class ReembolsoController extends Controller
             'obs'=>$reembolso->obs,
             'data'=>$reembolso->created_at,
             'totalReembolso'=>$reembolso->valorTotal,
-            ]);
+            ])->setPaper('a4', 'portrait');
+            
+        
 
-              
         
 
         $reembolsoR->save(public_path('uploads/ReembolsoTemp.pdf'));
+
+        return response()->file(public_path('uploads/ReembolsoTemp.pdf'));
+
+
 
         $reembolso = Reembolso::with('taxas')->find($id);
 
