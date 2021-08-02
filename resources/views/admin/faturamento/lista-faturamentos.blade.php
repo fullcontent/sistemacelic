@@ -29,7 +29,7 @@
 				<tr>
 				<td><a href="{{route('faturamento.show',$f->id)}}">{{$f->nome}}</a></td>
 				<td>{{$f->empresa->nomeFantasia}}</td>
-				<td>{{ \Carbon\Carbon::parse($f->created_at)->format('d/m/Y')}}</td>
+				<td><span style="display:none;">{{$f->created_at}}</span>{{ \Carbon\Carbon::parse($f->created_at)->format('d/m/Y')}}</td>
 				<td>R$ {{number_format($f->valorTotal,2,'.',',')}}</td>
 				<td>
 					@if(!$f->nf)
