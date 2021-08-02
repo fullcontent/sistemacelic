@@ -33,11 +33,15 @@
 				<td>R$ {{number_format($f->valorTotal,2,'.',',')}}</td>
 				<td>
 					@if(!$f->nf)
-					<button type="button" class="btn btn-warning btn-xs cadastroNF"data-toggle="modal" data-target="#cadastroNF" data-ID='{{$f->id}}' data-cliente='{{$f->empresa->nomeFantasia}}' data-nome='{{$f->nome}}'>
+					<button type="button" class="btn btn-warning btn-xs cadastroNF" data-toggle="modal" data-target="#cadastroNF" data-ID='{{$f->id}}' data-cliente='{{$f->empresa->nomeFantasia}}' data-nome='{{$f->nome}}'>
 						<span class="glyphicon glyphicon-plus-sign"></span> Cadastrar
 					  </button>
 					@else
-					{{$f->nf}}
+					
+					<button type="button" class="btn btn-default btn-xs editNF" data-toggle="modal" data-target="#editNF" data-ID='{{$f->id}}' data-cliente='{{$f->empresa->nomeFantasia}}' data-nome='{{$f->nome}}' data-nf="{{$f->nf}}">
+						<span class="glyphicon glyphicon-plus-sign"></span> {{$f->nf}}
+					  </button>
+
 					@endif
 
 				</td>
@@ -88,6 +92,47 @@
 				</div>
 				<!-- /.modal-dialog -->
 			  </div>
+			
+			  <div class="modal fade" id="editNF">
+				<div class="modal-dialog">
+				  <div class="modal-content">
+					<div class="modal-header">
+					  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">×</span></button>
+					  <h4 class="modal-title">Editar NF</h4>
+					</div>
+					<div class="modal-body">
+					  
+						{!! Form::open(['route'=>'faturamento.editNF']) !!}
+						{!! Form::hidden('faturamentoID', null, ['class'=>'form-control','id'=>'faturamentoID']) !!}
+						
+						<div class="form-group">
+						{!! Form::label('faturamentoNome', 'Faturamento', array('class'=>'control-label')) !!}
+						{!! Form::text('faturamentoNome', null, ['class'=>'form-control','disabled'=>true,'id'=>'faturamentoNome']) !!}
+						</div>
+						<div class="form-group">
+						{!! Form::label('faturamentoCliente', 'Cliente', array('class'=>'control-label')) !!}
+						{!! Form::text('faturamentoCliente', null, ['class'=>'form-control','disabled'=>true,'id'=>'faturamentoCliente']) !!}
+						</div>
+						<div class="form-group">
+						{!! Form::label('nf', 'N.F.', array('class'=>'control-label')) !!}
+						{!! Form::text('nf', null, ['class'=>'form-control', 'id'=>'faturamentoNF']) !!}
+						</div>
+
+					</div>
+					<div class="modal-footer">
+					  <button type="button" class="btn pull-left" data-dismiss="modal">Close</button>
+					  <button type="submit" class="btn btn-info">Editar</button>
+	  
+					</div>
+					{!! Form::close() !!}
+				  </div>
+				  <!-- /.modal-content -->
+				</div>
+				<!-- /.modal-dialog -->
+			  </div>
+
+			  
 
 @endsection
 
@@ -122,19 +167,40 @@ $(document).on("click", ".cadastroNF", function () {
      var faturamentoID = $(this).data('id');
 	 var faturamentoCliente = $(this).data('cliente');
 	 var faturamentoNome = $(this).data('nome');
+	
 
 
      $(".modal-body #faturamentoID").val( faturamentoID );
 	 $(".modal-body #faturamentoCliente").val( faturamentoCliente );
 	 $(".modal-body #faturamentoNome").val( faturamentoNome );
 
+	 $(".modal-body #faturamentoNF").val(null);
+
 	 $('#cadastroNF').on('shown.bs.modal', function () {
-    $('.modal-body #faturamentoNF').focus();
-})  
-
-
-     
+   	 $('.modal-body #faturamentoNF').focus();
+	}); 
+    
 });			
+
+$(document).on("click", ".editNF", function () {
+
+
+	 var faturamentoID = $(this).data('id');
+	 var faturamentoCliente = $(this).data('cliente');
+	 var faturamentoNome = $(this).data('nome');
+	 var faturamentoNF = $(this).data('nf');
+
+
+     $(".modal-body #faturamentoID").val( faturamentoID );
+	 $(".modal-body #faturamentoCliente").val( faturamentoCliente );
+	 $(".modal-body #faturamentoNome").val( faturamentoNome );
+	 $(".modal-body #faturamentoNF").val( faturamentoNF );
+
+	 $('#editNF').on('shown.bs.modal', function () {
+   	 $('.modal-body #faturamentoNF').focus();
+	}); 
+});
+
 			
 </script>
   @stop
