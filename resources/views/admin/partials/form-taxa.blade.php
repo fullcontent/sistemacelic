@@ -45,14 +45,22 @@
       <div class="col-md-3">
         <div class="form-group">
         {!! Form::label('emissao', 'Emissão', array('class'=>'control-label')) !!}
+        @if(Route::is('taxas.show'))
+        {!! Form::text('emissao', \Carbon\Carbon::parse($taxa->emissao)->format('d/m/Y'), ['class'=>'form-control','id'=>'emissao','data-date-format'=>'dd/mm/yyyy']) !!}
+        @else
         {!! Form::text('emissao', null, ['class'=>'form-control','id'=>'emissao','data-date-format'=>'dd/mm/yyyy']) !!}
+        @endif
+
         </div>
       </div>
       <div class="col-md-3">
         <div class="form-group">
         {!! Form::label('vencimento', 'Vencimento', array('class'=>'control-label')) !!}
+        @if(Route::is('taxas.show'))
+        {!! Form::text('vencimento', \Carbon\Carbon::parse($taxa->vencimento)->format('d/m/Y'), ['class'=>'form-control','id'=>'vencimento','data-date-format'=>'dd/mm/yyyy']) !!}
+        @else
         {!! Form::text('vencimento', null, ['class'=>'form-control','id'=>'vencimento','data-date-format'=>'dd/mm/yyyy']) !!}
-        </div>
+        @endif        </div>
       </div>
       <div class="col-md-4">
         <div class="form-group">

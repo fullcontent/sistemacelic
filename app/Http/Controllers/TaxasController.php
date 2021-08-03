@@ -133,9 +133,9 @@ class TaxasController extends Controller
         $taxa = Taxa::find($id);
         $servicos = Servico::pluck('os','id')->toArray();
 
-        $taxa->emissao = Carbon::parse($taxa->emissao)->format('d/m/Y');
-        $taxa->vencimento = Carbon::parse($taxa->vencimento)->format('d/m/Y');
-        $taxa->pagamento = Carbon::parse($taxa->pagamento)->format('d/m/Y');
+        // $taxa->emissao = Carbon::parse($taxa->emissao)->format('d/m/Y');
+        // $taxa->vencimento = Carbon::parse($taxa->vencimento)->format('d/m/Y');
+        // $taxa->pagamento = Carbon::parse($taxa->pagamento)->format('d/m/Y');
 
 
         return view('admin.editar-taxa')->with(['taxa'=>$taxa,'servicos'=>$servicos]);
