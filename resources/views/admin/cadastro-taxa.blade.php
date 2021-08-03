@@ -21,7 +21,7 @@
       			<div class="box-footer">
       			
                 
-                <button type="submit" class="btn btn-info">Cadastrar</button>
+                <button type="submit" class="btn btn-info"><i class="fa fa-save"></i> SALVAR</button>
               	</div>
     	
     

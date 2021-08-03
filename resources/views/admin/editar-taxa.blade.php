@@ -25,7 +25,7 @@
       			<div class="box-footer">
       			<a href="{{route('servicos.show', $taxa->servico_id)}}" class="btn btn-default">Voltar</a>
                 
-                <button type="submit" class="btn btn-info">Editar</button>
+                <button type="submit" class="btn btn-info" id="submitBtn"><i class="fa fa-save"></i> SALVAR</button>
               	</div>
     	
     
@@ -40,21 +40,24 @@
 	
 	$(document).ready(function() {
 
-		$("#emissao").datepicker();
-		$("#vencimento").datepicker();	
-		$("#pagamento").datepicker();  	 	
-		$("#valor").mask('000.000.000.000.000,00', {reverse: true});
-		$("#pagamento").prop('disabled',true).val(null);
+		
 
   	
 		var comprovante = "{{$taxa->comprovante}}";
 		var pagamento = "{{$taxa->pagamento}}";
 		var boleto = "{{$taxa->boleto}}";
 		
+
+		$("#emissao").datepicker();
+		$("#vencimento").datepicker();	
+		$("#pagamento").datepicker();  	 	
+		$("#valor").mask('000.000.000.000.000,00', {reverse: true});
+		$("#pagamento").prop('disabled',true).val();
+		
 		var btnComprovante = $("#comprovante").val();
 		var btnBoleto = $("#boleto").val();
 
-	
+			
 	
 	if(boleto){
 		$("#boleto").hide();
@@ -67,10 +70,23 @@
 		$("#situacao").prop('readonly',true).val('{{$taxa->situacao}}');
 		$("#comprovante").hide();
     }
+
+	if(!comprovante){
+		console.log("nao tem comprovante");
+		$("#situacao option[value='pago']").remove();
+		$("#pagamento").prop('disabled',true).val(null);
+
+	}
+
+
+	console.log(pagamento);
+	
 	
 	
 	$( "#comprovante" ).change(function() {
   		$("#pagamento").prop('disabled',false);
+
+		$("#situacao").append('<option value="pago">Pago</option>'); 
   		$("#situacao").val('pago');
 		$("#pagamento").attr("required", "true");
 		
@@ -108,6 +124,9 @@
             })
 		$("#removerComprovante").after("<p class=danger>Comprovante Removido</p>");
 
+		$("#situacao option[value='pago']").remove();
+		$("#pagamento").prop('disabled',true).val(null);
+
 		
 	});
 
@@ -124,7 +143,15 @@
             },
             })
 		$("#removerBoleto").after("<p class=danger>Boleto Removido</p>");
-	});	
+	});
+
+
+	$("#submitBtn").click(function(){
+
+		$("#pagamento").prop('disabled',false);
+		
+	});
+
 	  	
  	
 });

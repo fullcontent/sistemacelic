@@ -6,11 +6,13 @@
   <title>Reembolso</title>
   
   <style>
-    
+      
     body {
-    font-family: 'Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif;
+    font-family: Arial,sans-serif;
     font-weight: 400;
     font-size: 12px;
+    margin: 0;
+
     }
     
 .row {
@@ -42,13 +44,15 @@ img {
 .invoice {
     position: relative;
     background: #fff;
-    border: 1px solid #f4f4f4;
+    /* border: 1px solid #f4f4f4; */
     padding: 0px;
     margin: 10px 10px;
 }
 article, aside, details, figcaption, figure, footer, header, hgroup, main, menu, nav, section, summary {
     display: block;
 }
+
+
 
 .page-header>small {
     color: #666;
@@ -192,122 +196,29 @@ h3 {
 }
 .empresa{
     display:block;
-    
     clear:both;
     
 }
+
 
   </style>
 </head>
   <body>
   
 
-<div class="content">
-<section class="invoice">
-    <!-- title row -->
-    <div class="row">
-      <div class="col-xs-12">
-        <h2 class="page-header">
-          <img src="http://sistemacelic.net/img/logoCastro.png" alt="" width="300">
-          <small class="pull-right">Data: {{date('d/m/Y')}}</small>
-        </h2>
-      </div>
-      <!-- /.col -->
-    </div>
-    <!-- info row -->
-    <div class="row invoice-info">
-      <div class="col-sm-6">
-        <p><b>Reembolso </b>{{$descricao}}</p>
-        <p><b>Referência: </b>{{$obs}}</p>
-      </div>
-      
-    </div>
-    <!-- /.row -->
-
-    <!-- Table row -->
-    <div class="row">
-      <div class="col-xs-12 table-responsive">
-        <table class="table table-bordered">
-          <thead>
-          <tr>
-            <th>Cod.</th>
-			  	<th>Unidade</th>
-				<th>Serviço</th>
-				<th>Taxa</th>
-				<th>Solicitante</th>
-				<th>Valor</th>
-				<th>Vcto.</th>
-				<th>Pgto.</th>	
-          </tr>
-          </thead>
-          <tbody>
-              @foreach($reembolsoItens as $s)
-              <tr>
-                <td>{{$s->taxa->unidade->codigo}}</td>
-								<td>{{$s->taxa->unidade->nomeFantasia}}</td>
-								<td>{{$s->taxa->servico->nome}}</td>
-								<td>{{$s->taxa->nome}}</td>
-								<td>{{$s->taxa->servico->solicitante}}</td>
-								<td>R$ {{number_format($s->taxa->valor,2,'.',',')}}</td>
-								<td>{{ \Carbon\Carbon::parse($s->vencimento)->format('d/m/Y')}}</td>
-								<td>{{ \Carbon\Carbon::parse($s->pagamento)->format('d/m/Y')}}</td>
-              </tr>
-              @endforeach
-          </tbody>
-          
-        </table>
-      </div>
-      <!-- /.col -->
-    </div>
-    <!-- /.row -->
-
-    <div class="row">
-     
-      <div class="total">
-      
-      
-      <div class="col-xs-12">
-      <p class="pull-right lead"><b>Total: </b>R$ {{number_format($totalReembolso,2,'.',',')}}</p>
-
-      </div>
-      </div>
-      <!-- /.col -->
-    </div>
-
-
-    <div class="row">
-    <div class="assinatura">
-    <div class="col-xs-8" style="margin-top: 100px;">
-        <p>__________________________________________________________________</p>
-        <p><b>CASTRO EMPRESARIAL - CONSULTORIA E LEGALIZAÇÃO IMOBILIÁRIA
-        </b></p>
-        <p>CNPJ: 27.352.308/0001-52
-        </p>
-
-      </div>
-    </div>
-   
-    </div>
-    
-    
-
-    
-    
-    
-  </section>
-  </div>
-
-  <section class="invoice" style="page-break-before: always; padding:20px;">
+  <div class="content">
+  <section class="invoice">
 
     <div class="row">
       <div class="col-xs-12">
         
           <img src="http://sistemacelic.net/img/logoCastro.png" alt="" width="300">
-          <small class="pull-right">Data: {{date('d/m/Y')}}</small>
+         
         
       </div>
       <div class="col-xs-12 text-right" style="line-height: 10px;">
-        <p>Rua novecentos e Um, 400 | Sala 203</p>
+      
+        <p>Rua novecentos e Um, 400 | Sala 405</p>
         <p>Balneário Camboriú | Santa Catarina | CEP: 88.330-725</p>
         <p>Telefone: 47 3334-2927</p>
         <p>contato@castroli.com.br | www.castroli.com.br</p>
@@ -334,11 +245,11 @@ h3 {
         
       <div class="col-xs-6 text-left" style="line-height: 10px;">
 
-        <p style="margin-bottom: 20px">Bal. Camboriú, {{$data}}</p>
+        <p style="margin-bottom: 20px; padding-top:20px;">Bal. Camboriú, {{ \Carbon\Carbon::parse($data)->isoFormat("D, MMMM, YYYY") }}</p>
       
-        <p>{{$empresa->nomeFantasia}}</p>
-        <p>{{$empresa->endereco}}</p>
-        <p>{{$empresa->bairro}}</p>
+        <p>{{$empresa->razaoSocial}}</p>
+        <p>{{$empresa->endereco}},{{$empresa->numero}}</p>
+        <p>{{$empresa->bairro}} {{$empresa->cidade}}/{{$empresa->uf}}</p>
         <p>{{$empresa->cep}}</p>
         <p>{{$empresa->telefone}}</p>
 
@@ -349,18 +260,19 @@ h3 {
     <div class="row">
         <div class="text-center">
           <h3>RECIBO</h3>
-          <p style="padding: 20px">Recebemos da {{$empresa->razaoSocial}} a importância de R$ {{number_format($totalReembolso,2,'.',',')}} referente ao pagamento de taxas para o processo de legalização, conforme demonstrativo comprovante em anexo.</p>
+          <p style="padding: 20px; text-align:justify-all;">Recebemos da {{$empresa->razaoSocial}} a importância de R$ {{number_format($totalReembolso,2,'.',',')}} referente ao pagamento de taxas para o processo de legalização, conforme demonstrativo comprovante em anexo.</p>
         </div>
 
     </div>
 
-    <div class="row">
+    <div class="row" style="padding-top:20px;">
       <div class="col-xs-12 text-left">
-        <p>CAIXA ECONÔMICA FEDERAL</p>
-        <p><b>Agência: </b>0921</p>
-        <p><b>Conta corrente: </b>6992-4</p>
-        <p><b>Castro Empresarial Serviços Administrativos LTDA ME</p>
-        <p><b>CNPJ: </b>27.352.308/0001-52</p>
+        <p>CHAVE PIX: 27352308000152</p>
+        <p>Caixa Econômica Federal</p>
+        <p>Agência: 0921</p>
+        <p>Conta corrente: 6992-4</p>
+        <p>Castro Empresarial Serviços Administrativos LTDA ME</p>
+        <p>CNPJ: 27.352.308/0001-52</p>
       </div>
     </div>
 
@@ -368,8 +280,8 @@ h3 {
     <div class="assinatura">
     <div class="col-xs-8" style="margin-top: 100px;">
       <p>__________________________________________________________________</p>
-      <p><b>CASTRO EMPRESARIAL - CONSULTORIA E LEGALIZAÇÃO IMOBILIÁRIA
-      </b></p>
+      <p>Castro Empresarial - Consultoria e Legalização Imobiliária
+      </p>
       <p>CNPJ: 27.352.308/0001-52
       </p>
 
@@ -380,6 +292,92 @@ h3 {
     
     
   </section>
+  </div>
+
+
+
+<div class="content">
+<section class="invoice" style="page-break-before: always; padding:0px;">
+    <!-- title row -->
+    <div class="row">
+      <div class="col-xs-12">
+        <h2 class="page-header">
+          <img src="http://sistemacelic.net/img/logoCastro.png" alt="" width="300">
+          <small class="pull-right">Data: {{date('d/m/Y')}}</small>
+        </h2>
+      </div>
+      <!-- /.col -->
+    </div>
+
+    
+    <!-- info row -->
+    <div class="row invoice-info">
+    <h3 class="text-center">Demonstrativo de taxas pagas</h3>
+      <div class="col-sm-6">
+        <p>Reembolso {{$descricao}}</p>
+        <p>Referência: {{$obs}}</p>
+      </div>
+      
+    </div>
+    <!-- /.row -->
+
+    <!-- Table row -->
+    <div class="row" style="padding:0px;">
+      <div class="col-xs-12 table-responsive">
+        <table class="table table-bordered">
+          <thead>
+          <tr>
+            <th>#</th>
+            <th>Cod.</th>
+            <th>Unidade</th>
+            <th>Serviço</th>
+            <th>Taxa</th>
+            <th>Solicitante</th>
+            <th width="13%">Valor</th>
+            <th>Vcto.</th>
+            <th>Pgto.</th>
+            
+          </tr>
+          </thead>
+          <tbody style="font-size: 11px;">
+              @foreach($reembolsoItens as $key => $s)
+              <tr>
+                <td>{{$key+1}}</td>
+                <td>{{$s->taxa->unidade->codigo}}</td>
+								<td>{{$s->taxa->unidade->nomeFantasia}}</td>
+								<td>{{$s->taxa->servico->nome}}</td>
+								<td>{{$s->taxa->nome}}</td>
+								<td>{{$s->taxa->servico->solicitante}}</td>
+								<td>R$ {{number_format($s->taxa->valor,2,'.',',')}}</td>
+								<td>{{ \Carbon\Carbon::parse($s->taxa->vencimento)->format('d/m/Y')}}</td>
+								<td>{{ \Carbon\Carbon::parse($s->taxa->pagamento)->format('d/m/Y')}}</td>
+              </tr>
+              @endforeach
+          </tbody>
+          
+        </table>
+      </div>
+      <!-- /.col -->
+    </div>
+    <!-- /.row -->
+
+    <div class="row">
+     
+      <div class="total">
+      
+      
+      <div class="col-xs-12">
+      <p class="pull-right lead">Total: R$ {{number_format($totalReembolso,2,'.',',')}}</p>
+
+      </div>
+      </div>
+      <!-- /.col -->
+    </div>
+
+    
+  </section>
+  </div>
+
 
 
   </body>

@@ -154,6 +154,8 @@
 		
 		{!! Form::label('protocolo_numero', 'N. Protocolo', array('class'=>'control-label')) !!}
 		{!! Form::text('protocolo_numero', null, ['class'=>'form-control','id'=>'protocolo_numero']) !!}
+
+		
 		
 	</div>
 </div>
@@ -180,7 +182,8 @@
 
 		@unless ( empty($servico->protocolo_anexo) )
     		
-    		<a href="{{ url("storage/$servico->protocolo_anexo") }}" class="btn btn-xs btn-warning" target="_blank">Ver Protocolo</a>
+    		<a href="{{ url("uploads/$servico->protocolo_anexo") }}" class="btn btn-block btn-xs btn-warning" target="_blank" id="btnProtocolo">Ver Protocolo</a>
+			<a href="#" class="btn btn-xs btn-danger" alt="Remover Protocolo" id="removerProtocolo">X</a>
 		@endunless
 		
 	</div>
@@ -225,7 +228,8 @@
 
 		@unless ( empty($servico->laudo_anexo) )
     		
-    		<a href="{{ url("storage/$servico->laudo_anexo") }}" class="btn btn-xs btn-warning" target="_blank">Ver laudo</a>
+    		<a href="{{ url("uploads/$servico->laudo_anexo") }}" class="btn btn-block btn-xs btn-warning" target="_blank" id="btnLaudo">Ver Laudo</a>
+			<a href="#" class="btn btn-xs btn-danger" alt="Remover Laudo" id="removerLaudo">X</a>
 		@endunless
 		
 	</div>
@@ -325,7 +329,8 @@
 		{!! Form::file('licenca_anexo', null, ['class'=>'form-control','id'=>'licenca_anexo']) !!}
 		@unless ( empty($servico->licenca_anexo) )
     		
-    		<a href="{{ url("storage/$servico->licenca_anexo") }}" class="btn btn-xs btn-warning" target="_blank">Ver Licença</a>
+    		<a href="{{ url("uploads/$servico->licenca_anexo") }}" class="btn btn-block btn-xs btn-warning" target="_blank" id="btnLicenca">Ver Licença</a>
+			<a href="#" class="btn btn-xs btn-danger" alt="Remover Licenca" id="removerLicenca">X</a>
 		@endunless
 	</div>
 </div>

@@ -55,7 +55,7 @@ class AdminController extends Controller
             
     		$pendencias = Pendencia::with('servico','unidade')
                             ->where('responsavel_id', Auth::id())
-                            ->orWhereIn('pendencias.servico_id',$servicos)
+                            // ->orWhereIn('pendencias.servico_id',$servicos)
                             ->where('status','pendente')
             				->get();
            

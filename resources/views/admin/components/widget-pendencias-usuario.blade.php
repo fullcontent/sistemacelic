@@ -3,7 +3,7 @@
         
         <div class="box box-warning">
             <div class="box-header with-border">
-              <h3 class="box-title">Minhas Pendências</h3>
+              <h3 class="box-title">Todas Pendências</h3>
 
               <div class="box-tools pull-right">
                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -17,6 +17,7 @@
                 <table id="lista-pendencias" class="table table-bordered table-hover">
                   <thead>
                   <tr>
+                    <th>Empresa</th>
                     <th>Cod.</th>
                     <th>Unidade</th>
                     <th>Serviço</th>
@@ -27,11 +28,12 @@
                   <tbody>
                     @foreach($pendencias->where('status','pendente') as $p)
                   <tr>
+                    <td><a href="{{route('empresas.show',$p->servico['unidade']['empresa']['id'])}}">{{$p->servico['unidade']['empresa']['nomeFantasia']}}</a></td>
                     <td><a href="{{route('servicos.show',$p->servico_id)}}">{{$p->servico['unidade']['codigo']}}</a></td>
                     <td><a href="{{route('servicos.show',$p->servico_id)}}">{{$p->servico['unidade']['nomeFantasia']}}</a></td>
                     <td><a href="{{route('servicos.show',$p->servico_id)}}">{{$p->servico['nome']}}</a></td>
                     <td><a href="{{route('servicos.show',$p->servico_id)}}">{{$p->pendencia}}</a></td>
-                    <td><a href="{{route('servicos.show',$p->servico_id)}}">{{\Carbon\Carbon::parse($p->vencimento)->format('d/m/Y')}}</a></td>
+                    <td><a href="{{route('servicos.show',$p->servico_id)}}"><span style="display:none;">{{$p->vencimento}}</span>  {{\Carbon\Carbon::parse($p->vencimento)->format('d/m/Y')}}</a></td>
                   </tr>
                     @endforeach
                   

@@ -20,20 +20,21 @@
                   <!-- checkbox -->
                   <input type="checkbox" data-id="{{$pendencia->id}}" @if($pendencia->status == 'concluido') checked="" @endif>
                   <!-- todo text -->
-                  <span class="text">{{$pendencia->pendencia}}</span>
+                  <span class="text"><a href="{{route('pendencia.edit',$pendencia->id)}}">{{$pendencia->pendencia}}</a></span>
 
                   @switch($pendencia->vencimento)
                         
                         @case($pendencia->vencimento > date('Y-m-d'))
-                            <span class="label label-success">{{ \Carbon\Carbon::parse($pendencia->vencimento)->format('d/m/Y')}}</span>
+                            <span id="dataPendencia" class="label label-success">{{ \Carbon\Carbon::parse($pendencia->vencimento)->format('d/m/Y')}}</span>
+                            
                         @break
 
                         @case($pendencia->vencimento < date('Y-m-d'))
-                            <span class="label label-danger">{{ \Carbon\Carbon::parse($pendencia->vencimento)->format('d/m/Y')}}</span>
+                            <span id="dataPendencia"  class="label label-danger">{{ \Carbon\Carbon::parse($pendencia->vencimento)->format('d/m/Y')}}</span>
                         @break
 
                         @case($pendencia->vencimento == date('Y-m-d'))
-                            <span class="label label-warning">{{ \Carbon\Carbon::parse($pendencia->vencimento)->format('d/m/Y')}}</span>
+                            <span id="dataPendencia"  class="label label-warning">{{ \Carbon\Carbon::parse($pendencia->vencimento)->format('d/m/Y')}}</span>
                         @break
 
 
@@ -70,7 +71,7 @@
           </div>
 
 
-          <div class="modal fade" id="cadastro-arquivo">
+        <div class="modal fade" id="cadastro-arquivo">
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
@@ -171,11 +172,7 @@ $('#full').mentionsInput({
         
           callback.call(this, responseData);        
       });
-    }
-
-
-
-    
+    }    
 
 });
 
@@ -203,7 +200,11 @@ $('.responder').click(function () {
 
 });
 
-  
+$( "#dataPendencia" ).datepicker({
+      showOn: "button",
+        buttonText: "day"
+    });
+
 
 
 

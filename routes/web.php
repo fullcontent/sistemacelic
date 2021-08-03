@@ -46,12 +46,19 @@ Route::get('/', function () {
 
 		Route::post('/faturamento/addNF','FaturamentoController@addNF')->name('faturamento.addNF');
 
+		Route::post('/faturamento/editNF','FaturamentoController@update')->name('faturamento.editNF');
+
 
 		Route::get('/faturamento/create','FaturamentoController@create')->name('faturamento.create');
 		Route::post('/faturamento/step2','FaturamentoController@step2')->name('faturamento.step2');
 		Route::post('/faturamento/step3','FaturamentoController@step3')->name('faturamento.step3');
 		Route::post('/faturamento/step4','FaturamentoController@step4')->name('faturamento.step4');
 
+
+
+		Route::get('/faturamento/servicosFinalizados','FaturamentoController@getAllServicesFinished');
+
+		Route::get('/faturamento/servicosErro','FaturamentoController@getErrors');
 
 		
 		Route::get('/reembolsos', 'ReembolsoController@index')->name('reembolsos.index');
@@ -64,6 +71,7 @@ Route::get('/', function () {
 		Route::post('/reembolso/step4','ReembolsoController@step4')->name('reembolso.step4');
 
 		Route::get('/reembolso/{id}/download','ReembolsoController@download')->name('reembolso.download');
+		Route::get('/reembolso/{id}/downloadZip','ReembolsoController@downloadZip')->name('reembolso.downloadZip');
 
 
 		Route::get('/empresa/{empresa}/unidades','EmpresasController@unidades')->name('empresa.unidades');
@@ -121,6 +129,11 @@ Route::get('/', function () {
 
 
 		Route::post('salvarInteracao', 'ServicosController@salvarInteracao')->name('interacao.store');
+
+
+		Route::get('/servico/removerLaudo/{id}', 'ServicosController@removerLaudo')->name('servico.removerLaudo');
+		Route::get('/servico/removerProtocolo/{id}', 'ServicosController@removerProtocolo')->name('servico.removerProtocolo');
+		Route::get('/servico/removerLicenca/{id}', 'ServicosController@removerLicenca')->name('servico.removerLicenca');
 
 
 		

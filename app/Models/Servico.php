@@ -66,10 +66,17 @@ class Servico extends Model
     {
         return $this->hasOne('App\Models\ServicoFinanceiro','servico_id');
     }
-
+    
     public function finalizado()
     {
     	return $this->hasOne('App\Models\Historico')->where('observacoes','like','Alterou situacao para "finalizado"');
+    }
+    
+
+
+    public function servicoFinalizado()
+    {
+    	return $this->hasOne('App\Models\ServicoFinalizado');
     }
 
     

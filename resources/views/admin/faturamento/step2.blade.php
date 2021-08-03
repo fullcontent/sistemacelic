@@ -62,10 +62,10 @@
 			</thead>
 			<tbody>
 
-							@foreach($servicosFaturar as $value => $s)
+							@foreach($servicosFaturar->sortBy('servicoFinalizado.finalizado') as $value => $s)
 							<tr>
 								<td>{{ Form::checkbox('servicos[]', $s->id,null,['class'=>'checkbox'])}}</td>
-								<td>{{ \Carbon\Carbon::parse($s->finalizado->created_at)->format('d/m/Y')}}</td>	
+								<td>{{ \Carbon\Carbon::parse($s->servicoFinalizado->finalizado)->format('d/m/Y')}}</td>	
 								<td>{{$s->unidade->codigo}}</td>
 								<td>{{$s->unidade->nomeFantasia}}</td>
 								<td>{{$s->unidade->cidade}}</td>

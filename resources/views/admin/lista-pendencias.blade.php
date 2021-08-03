@@ -22,6 +22,7 @@
                 <table id="lista-pendencias" class="table table-bordered table-hover">
                   <thead>
                   <tr>
+                    <th>Empresa</th>
                     <th>Cod.</th>
                     <th>Unidade</th>
                     <th>Serviço</th>
@@ -32,11 +33,12 @@
                   <tbody>
                     @foreach($pendencias->where('status','pendente') as $p)
                   <tr>
+                  <td><a href="{{route('empresas.show',$p->servico['unidade']['empresa']['id'])}}">{{$p->servico['unidade']['empresa']['nomeFantasia']}}</a></td>
                     <td><a href="{{route('servicos.show',$p->servico_id)}}">{{$p->servico['unidade']['codigo']}}</a></td>
                     <td><a href="{{route('servicos.show',$p->servico_id)}}">{{$p->servico['unidade']['nomeFantasia']}}</a></td>
                     <td><a href="{{route('servicos.show',$p->servico_id)}}">{{$p->servico['nome']}}</a></td>
                     <td><a href="{{route('servicos.show',$p->servico_id)}}">{{$p->pendencia}}</a></td>
-                    <td><a href="{{route('servicos.show',$p->servico_id)}}">
+                    <td><span style="display:none;">{{$p->vencimento}}</span><a href="{{route('servicos.show',$p->servico_id)}}">
                     @switch($p->vencimento)
                         
                         @case($p->vencimento > date('Y-m-d'))
@@ -81,3 +83,26 @@
 
 @endsection
 
+@section('js')
+
+
+<script src="http://cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"></script>
+<script>
+		$(function () {
+		    $('#lista-pendencias').DataTable({
+		      "paging": true,
+		      "lengthChange": false,
+		      "searching": true,
+		      "ordering": true,
+		      "info": false,
+		      "autoWidth": true,
+		       "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
+            }           
+  });
+s
+     
+});			
+			
+</script>
+  @stop

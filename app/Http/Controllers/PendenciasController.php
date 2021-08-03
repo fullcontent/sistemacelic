@@ -54,8 +54,8 @@ class PendenciasController extends Controller
         $servicos = Servico::where('responsavel_id',Auth::id())->pluck('id');
             
     		$pendencias = Pendencia::with('servico','unidade')
-                            ->where('responsavel_id', Auth::id())
-                            ->orWhereIn('pendencias.servico_id',$servicos)
+                            ->where('responsavel_id', '!=', Auth::id())
+                            ->whereIn('servico_id',$servicos)
             				->get();
 
             $pendencias = $pendencias->where('status','pendente');
@@ -65,6 +65,8 @@ class PendenciasController extends Controller
                                 'pendencias'=>$pendencias,
                                 'title'=>'Outras pendências',
                             ]);
+
+        // return count($pendencias);
 
 
     }
@@ -84,6 +86,7 @@ class PendenciasController extends Controller
         return view('admin.cadastro-pendencia')
                 ->with([
                     'servico'=> $servico,
+                    'servico_id'=>$servico_id,
                     'responsaveis'=>$responsaveis,
                 ]);
     }

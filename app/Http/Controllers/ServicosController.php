@@ -17,6 +17,8 @@ use App\Models\ServicoLpu;
 
 
 use App\Models\ServicoFinanceiro;
+use App\Models\ServicoFinalizado;
+
 
 use App\Notifications\UserMentioned;
 use App\Mail\UsuarioMencionado;
@@ -872,9 +874,9 @@ class ServicosController extends Controller
             
             $servico->licenca_validade = '2059-12-31';
         }
-        
 
-       
+           
+     
         $servico->save();
 
         
@@ -883,16 +885,33 @@ class ServicosController extends Controller
             $changes = $servico->getChanges();
             unset($changes['updated_at']);
 
-
              foreach ($changes as $value => $key) {
                  
                     $history = new Historico();
                     $history->servico_id = $servico->id;
-                        $history->user_id = Auth::id();
+                    $history->user_id = Auth::id();
                     $history->observacoes = 'Alterou '.$value.' para "'.$key.'"';
                     $history->save();
+
+
+                    //Update Servico Finalizado
+
+                    if($history->observacoes == 'Alterou situacao para "finalizado"')
+                    {   
+                        if(!ServicoFinalizado::where('servico_id',$servico->id)->first())
+                        {
+                            $this->finalizarServico($servico->id);
+                        }
+                        
+                    }
+
+                    if($history->observacoes == 'Alterou situacao para "andamento"')
+                    {
+                        $mS = ServicoFinalizado::where('servico_id',$servico->id)->delete();
+                        
+                    }
              }
-            }
+        }
 
       
 
@@ -1017,4 +1036,37 @@ class ServicosController extends Controller
 
         return $unidadesList;
     }
+
+
+    public function removerProtocolo($id)
+    {
+        $servico = Servico::find($id);
+        $servico->protocolo_anexo = null;
+        $servico->save();
+    }
+
+    public function removerLicenca($id)
+    {
+        $servico = Servico::find($id);
+        $servico->licenca_anexo = null;
+        $servico->save();
+    }
+
+    public function removerLaudo($id)
+    {
+        $servico = Servico::find($id);
+        $servico->laudo_anexo = null;
+        $servico->save();
+    }
+
+
+    public function finalizarServico($id)
+    {
+        $servico = new ServicoFinalizado;
+        $servico->servico_id = $id;
+        $servico->finalizado = date('Y-m-d');
+        $servico->save();
+    }
+
+    
 }

@@ -51,9 +51,9 @@
 				<table id="lista-unidades" class="table table-bordered table-hover">
                 <thead>
                 <tr>
-                 
-				<th>Nome Fantasia</th>
-				  <th>Cod.</th>
+                <th>Empresa</th>
+				<th>Cod.</th>
+                  <th>Nome Fantasia</th>
                   
                   <th>CNPJ</th>
 				  <th>Endereço</th>
@@ -68,10 +68,10 @@
 				@foreach($unidades as $unidade)
                 	<tr>
 
-	              
-	              	
+	              	<td>{{$unidade->empresa->nomeFantasia}}</td>
+					<td>{{$unidade->codigo}}</td>
 	              	<td><a href="{{route('unidades.show', $unidade->id)}}">{{$unidade->nomeFantasia}}</a></td>
-					  <td>{{$unidade->codigo}}</td>
+					  
 	              	<td>{{$unidade->cnpj}}</td>
 					  <td>{{$unidade->endereco}}</td>
 					  <td>{{$unidade->bairro}}</td>
