@@ -18,7 +18,7 @@
 
 				<div class="box-footer">
                 <a href="{{route('servicos.show',$servico->id)}}" class="btn btn-default"><i class="fa fa-chevron-left"></i> Voltar</a>
-                <button type="submit" class="btn btn-info"><i class="fa fa-save"></i> SALVAR</button> 
+                <button type="submit" class="btn btn-info"><i class="fa fa-save"></i> Salvar</button> 
               	</div>
     
 	{!! Form::close() !!}
