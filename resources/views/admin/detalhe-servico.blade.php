@@ -30,7 +30,7 @@
 
     <div class="box box-info">
             <div class="box-header with-border">
-              <h3 class="box-title">Detalhes do serviço {{$servico->os}}</h3>
+              <h3 class="box-title">Detalhes do serviço {{$servico->os}} @if($servico->servicoPrincipal) <small class="label pull-right bg-red">S</small>@endif</h3>
 
               <div class="box-tools pull-right">
                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -154,6 +154,9 @@
 
               <a href="{{route('servicos.edit', $servico->id)}}" class="btn btn-info pull-right"><span class="glyphicon glyphicon-pencil"></span> Editar</a>
               
+              @if(!$servico->servicoPrincipal)
+              <a href="{{route('servicos.create', ['id'=>$servico->unidade_id,'t'=>substr($route, 0,7),'tipoServico'=>'nRenovaveis','servico_principal'=>$servico->id])}}" class="btn btn-warning pull-right"><span class="glyphicon glyphicon-plus"></span> SubServiço</a>
+              @endif
               {!! Form::open(['route'=>'faturamento.step3','id'=>'cadastroFaturamento', 'target'=>'_blank']) !!}
 
               {!! Form::hidden('servicos[]',$servico->id) !!}
@@ -171,7 +174,22 @@
 
 
 
-  
+@if(count($servico->subServicos))
+
+<div class="col-md-12">
+  Sub Serviços
+</div>
+
+@endif
+
+@if($servico->servicoPrincipal)
+
+<div class="col-md-12">
+Servico Principal
+</div>
+
+
+@endif
 
 
 

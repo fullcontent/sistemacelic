@@ -339,13 +339,21 @@ class ServicosController extends Controller
     {
         //
 
+        
         $tipo = $request->t;
         $tipoServico = $request->tipoServico;
     
         $id = $request->id;
         $users = User::where('privileges','=','admin')->pluck('name','id')->toArray();
 
+        $servico = null;
+        $servicoPrincipal=null;
         
+        
+        if(isset($request->servicoPrincipal))
+        {
+            $servicoPrincipal = $request->servicoPrincipal;
+        }
 
         switch ($tipo) {
             case 'unidade':
@@ -407,12 +415,7 @@ class ServicosController extends Controller
             
         }
 
-        $servico = null;
-
-
-
-           
-         
+        
 
 
         return view('admin.cadastro-servico')
@@ -424,6 +427,7 @@ class ServicosController extends Controller
                     'servico'=>$servico,
                     'servico_lpu'=>$servico_lpu,
                     'tipoServico'=>$tipoServico,
+                    'servicoPrincipal'=>$servicoPrincipal,
                     
                     
                 ]);
@@ -467,6 +471,8 @@ class ServicosController extends Controller
         
 
         $servico->laudo_numero = $request->laudo_numero;
+
+        
 
         
         if($request->protocolo_emissao)
@@ -561,6 +567,10 @@ class ServicosController extends Controller
             $servico->unidade_id = $request->empresa_id;
         }
         
+
+        $servico->servicoPrincipal = $request->servicoPrincipal;
+
+
               
         $servico->save();
         
@@ -618,9 +628,9 @@ class ServicosController extends Controller
     public function show($id)
     {
         //
-        $servico = Servico::find($id);
+        $servico = Servico::with('servicoPrincipal')->find($id);
 
-       
+        
             
         //Check if is empresa or unidade
 
@@ -879,7 +889,7 @@ class ServicosController extends Controller
             $servico->licenca_validade = '2059-12-31';
         }
 
-           
+        
      
         $servico->save();
 
