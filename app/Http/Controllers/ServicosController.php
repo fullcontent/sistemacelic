@@ -459,6 +459,8 @@ class ServicosController extends Controller
         $servico->protocolo_numero  =   $request->protocolo_numero;
         
         $servico->observacoes   = $request->observacoes;
+        $servico->escopo   = $request->escopo;
+        $servico->proposta   = $request->proposta;
         $servico->solicitante = $request->solicitante;
         $servico->servico_lpu = $request->servico_lpu;
         $servico->tipoLicenca = $request->tipoLicenca;
@@ -772,6 +774,8 @@ class ServicosController extends Controller
         $servico->laudo_numero = $request->laudo_numero;
 
         $servico->observacoes   = $request->observacoes;
+        $servico->escopo   = $request->escopo;
+        $servico->proposta   = $request->proposta;
         $servico->solicitante = $request->solicitante;
         $servico->servico_lpu = $request->servico_lpu;
         $servico->tipoLicenca = $request->tipoLicenca;

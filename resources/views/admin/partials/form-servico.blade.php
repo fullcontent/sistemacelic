@@ -268,6 +268,12 @@
 				{!! Form::text('valorAberto', $servico->financeiro->valorAberto, ['class'=>'form-control','id'=>'valorAberto']) !!}
 					</div>
 				</div>
+				<div class="col-md-2">
+					<div class="form-group">
+				{!! Form::label('proposta', 'Proposta', array('class'=>'control-label')) !!}
+				{!! Form::text('proposta', $servico->proposta, ['class'=>'form-control','id'=>'proposta']) !!}
+					</div>
+				</div>
 				@endif
 			
 		
@@ -283,6 +289,16 @@
 		
 		{!! Form::label('observacoes', 'Observações', array('class'=>'control-label')) !!}
 		{!! Form::textarea('observacoes', null, ['class'=>'form-control','id'=>'observacoes']) !!}
+		
+	</div>
+</div>
+
+<div class="col-md-12">
+	
+	<div class="form-group">
+		
+		{!! Form::label('escopo', 'Escopo', array('class'=>'control-label')) !!}
+		{!! Form::textarea('escopo', null, ['class'=>'form-control','id'=>'escopo']) !!}
 		
 	</div>
 </div>

@@ -86,6 +86,7 @@
 
 	              		@endswitch</p>
                   <p><b>Ordem de serviço: </b>{{$servico->os}}</p>
+                  <p><b>Proposta: </b>{{$servico->proposta}}</p>
                   <p><b>Nome: </b>{{$servico->nome}}</p>
                   <p><b>Responsável: </b>{{$servico->responsavel->name}}</p>
                   <p><b>Solicitante: </b>{{$servico->solicitante}}</p>
@@ -148,7 +149,7 @@
                   <p><b>N. do Laudo </b> {{$servico->laudo_numero }}</p>
                   <p><b>Laudo: </b> <a href="{{ route('servico.downloadFile', ['servico_id'=> $servico->id,'tipo'=>'laudo']) }}" class="btn btn-xs btn-warning" target="_blank"><i class="fa fa-file"></i> Ver Laudo</a></p>
                   @endunless
-
+                  <p><b>Escopo: </b>{{$servico->escopo}}</p>
                 </div>
 
               <a href="{{route('servicos.edit', $servico->id)}}" class="btn btn-info pull-right"><span class="glyphicon glyphicon-pencil"></span> Editar</a>
