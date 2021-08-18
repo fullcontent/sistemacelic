@@ -54,6 +54,8 @@ Route::get('/', function () {
 		Route::post('/faturamento/step3','FaturamentoController@step3')->name('faturamento.step3');
 		Route::post('/faturamento/step4','FaturamentoController@step4')->name('faturamento.step4');
 
+		Route::post('/faturamento/step2','FaturamentoController@faturarServicoSub')->name('faturamento.faturarServicoSub');
+
 
 
 		Route::get('/faturamento/servicosFinalizados','FaturamentoController@getAllServicesFinished');

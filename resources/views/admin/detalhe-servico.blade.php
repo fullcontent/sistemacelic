@@ -163,6 +163,22 @@
               @if(!$servico->servicoPrincipal)
               <a href="{{route('servicos.create', ['id'=>$servico->unidade_id,'t'=>substr($route, 0,7),'tipoServico'=>'nRenovaveis','servico_principal'=>$servico->id])}}" class="btn btn-warning pull-right"><span class="glyphicon glyphicon-plus"></span> SubServiço</a>
               @endif
+              
+              @if(count($servico->subServicos))
+
+              {!! Form::open(['route'=>'faturamento.faturarServicoSub','id'=>'cadastroFaturamento', 'target'=>'_blank']) !!}
+
+                {!! Form::hidden('servicos[]',$servico->id) !!}
+
+                
+                {!! Form::hidden('empresa_id',$servico->unidade->empresa_id) !!}
+
+                <button type="submit" class="btn btn-danger pull-right"><i class="fa fa-barcode"></i> Faturar</button>
+
+                {!! Form::close() !!}
+
+              @else
+              
               {!! Form::open(['route'=>'faturamento.step3','id'=>'cadastroFaturamento', 'target'=>'_blank']) !!}
 
               {!! Form::hidden('servicos[]',$servico->id) !!}
@@ -171,6 +187,10 @@
               <button type="submit" class="btn btn-danger pull-right"><i class="fa fa-barcode"></i> Faturar</button>
             
               {!! Form::close() !!}
+
+              @endif
+              
+              
 
             </div>
             <!-- /.box-body -->
