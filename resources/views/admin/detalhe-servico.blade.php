@@ -22,12 +22,18 @@
 </div>
 
 
+@if($servico->servicoPrincipal)
 
 <div class="col-md-12">
-    
-    
-   
+@include('admin.components.widget-servicoPrincipal')
+</div>
 
+
+@endif
+
+
+<div class="col-md-12">
+  
     <div class="box box-info">
             <div class="box-header with-border">
               <h3 class="box-title">Detalhes do serviço {{$servico->os}} @if($servico->servicoPrincipal) <small class="label pull-right bg-red">S</small>@endif</h3>
@@ -177,20 +183,10 @@
 @if(count($servico->subServicos))
 
 <div class="col-md-12">
-  Sub Serviços
+    @include('admin.components.widget-subServicos')
 </div>
 
 @endif
-
-@if($servico->servicoPrincipal)
-
-<div class="col-md-12">
-Servico Principal
-</div>
-
-
-@endif
-
 
 
 
