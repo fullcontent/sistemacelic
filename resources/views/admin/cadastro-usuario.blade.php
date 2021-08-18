@@ -16,7 +16,7 @@
 
 	<div class="box-footer">
                 <a href="{{route('usuarios.index')}}" class="btn btn-default">Voltar</a>
-                <button type="submit" class="btn btn-info"><i class="fa fa-save"></i> SALVAR</button>
+                <button type="submit" class="btn btn-info"><i class="fa fa-save"></i> Salvar</button>
               	</div>
 
 	{!! Form::close() !!}

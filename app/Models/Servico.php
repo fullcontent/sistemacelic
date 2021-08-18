@@ -79,6 +79,18 @@ class Servico extends Model
     	return $this->hasOne('App\Models\ServicoFinalizado');
     }
 
+
+    public function subServicos()
+    {
+        return $this->hasMany('App\Models\Servico','servicoPrincipal');
+    }
+
+    
+    public function servicoPrincipal()
+    {
+        return $this->belongsTo('App\Models\Servico', 'servicoPrincipal');
+    }
+
     
 
 }

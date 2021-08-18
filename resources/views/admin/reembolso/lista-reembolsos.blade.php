@@ -28,7 +28,7 @@
 				<tr>
 					<td><a href="{{route('reembolso.show',$r->id)}}">{{$r->nome}}</a></td>
 					<td>{{$r->empresa->nomeFantasia}}</td>
-					<td>{{ \Carbon\Carbon::parse($r->created_at)->format('d/m/Y')}}</td>
+					<td><span style="display:none;">{{$r->created_at}}</span>{{ \Carbon\Carbon::parse($r->created_at)->format('d/m/Y')}}</td>
 					<td>R$ {{number_format($r->valorTotal,2,'.',',')}}</td>
 					<td>
 					<a href="{{route('reembolso.download',$r->id)}}" type="button" class="btn btn-success btn-xs" target="_blank">PDF</a> 

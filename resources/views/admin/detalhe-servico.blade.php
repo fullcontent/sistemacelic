@@ -30,7 +30,7 @@
 
     <div class="box box-info">
             <div class="box-header with-border">
-              <h3 class="box-title">Detalhes do serviço {{$servico->os}}</h3>
+              <h3 class="box-title">Detalhes do serviço {{$servico->os}} @if($servico->servicoPrincipal) <small class="label pull-right bg-red">S</small>@endif</h3>
 
               <div class="box-tools pull-right">
                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -86,6 +86,7 @@
 
 	              		@endswitch</p>
                   <p><b>Ordem de serviço: </b>{{$servico->os}}</p>
+                  <p><b>Proposta: </b>{{$servico->proposta}}</p>
                   <p><b>Nome: </b>{{$servico->nome}}</p>
                   <p><b>Responsável: </b>{{$servico->responsavel->name}}</p>
                   <p><b>Solicitante: </b>{{$servico->solicitante}}</p>
@@ -148,11 +149,14 @@
                   <p><b>N. do Laudo </b> {{$servico->laudo_numero }}</p>
                   <p><b>Laudo: </b> <a href="{{ route('servico.downloadFile', ['servico_id'=> $servico->id,'tipo'=>'laudo']) }}" class="btn btn-xs btn-warning" target="_blank"><i class="fa fa-file"></i> Ver Laudo</a></p>
                   @endunless
-
+                  <p><b>Escopo: </b>{{$servico->escopo}}</p>
                 </div>
 
               <a href="{{route('servicos.edit', $servico->id)}}" class="btn btn-info pull-right"><span class="glyphicon glyphicon-pencil"></span> Editar</a>
               
+              @if(!$servico->servicoPrincipal)
+              <a href="{{route('servicos.create', ['id'=>$servico->unidade_id,'t'=>substr($route, 0,7),'tipoServico'=>'nRenovaveis','servico_principal'=>$servico->id])}}" class="btn btn-warning pull-right"><span class="glyphicon glyphicon-plus"></span> SubServiço</a>
+              @endif
               {!! Form::open(['route'=>'faturamento.step3','id'=>'cadastroFaturamento', 'target'=>'_blank']) !!}
 
               {!! Form::hidden('servicos[]',$servico->id) !!}
@@ -170,7 +174,22 @@
 
 
 
-  
+@if(count($servico->subServicos))
+
+<div class="col-md-12">
+  Sub Serviços
+</div>
+
+@endif
+
+@if($servico->servicoPrincipal)
+
+<div class="col-md-12">
+Servico Principal
+</div>
+
+
+@endif
 
 
 

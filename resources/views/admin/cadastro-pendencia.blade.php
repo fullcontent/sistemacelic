@@ -20,7 +20,7 @@
 					
       			<div class="box-footer">
 				<a href="{{route('servicos.show', $servico_id)}}" class="btn btn-default">Voltar</a>
-                <button type="submit" class="btn btn-info">Cadastrar</button>
+                <button type="submit" class="btn btn-info"> Salvar</button>
               	</div>
     	
     

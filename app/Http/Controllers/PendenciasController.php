@@ -248,4 +248,24 @@ class PendenciasController extends Controller
 
         
     }
+
+    public function unPriority($id)
+    {
+        $pendencia = Pendencia::find($id);
+        $pendencia->prioridade = 0;
+        $pendencia->save();
+    }
+
+    public function priority($id)
+    {
+        $pendencia = Pendencia::find($id);
+        $pendencia->prioridade = 1;
+        $pendencia->save();
+
+        $history = new Historico();
+                    $history->servico_id = $pendencia->servico_id;
+                    $history->user_id = Auth::id();
+                    $history->observacoes = 'Marcou a pendência '.$pendencia->pendencia.' como prioridade.';
+                    $history->save();
+    }
 }

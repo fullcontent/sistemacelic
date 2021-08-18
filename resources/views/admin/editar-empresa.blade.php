@@ -18,7 +18,7 @@
 
 				<div class="box-footer">
                 <button type="submit" class="btn btn-default">Voltar</button>
-                <button type="submit" class="btn btn-info"><i class="fa fa-save"></i> SALVAR</button>
+                <button type="submit" class="btn btn-info"><i class="fa fa-save"></i> Salvar</button>
               	</div>
     	
     

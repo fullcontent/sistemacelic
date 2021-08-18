@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 class Taxa extends Model
 {
     //
+    protected $dates = ['pagamento','vencimento']; 
+  
 
     public function servico()
     {

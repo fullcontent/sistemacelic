@@ -315,11 +315,8 @@ class ReembolsoController extends Controller
         
         $reembolso = Reembolso::with('taxas.taxa.unidade')->find($id);
         $empresa = Empresa::find($reembolso->empresa_id);
-
-        
-       
-
-
+      
+      
         // $reembolsoR = \PDF::loadHTML('<h1>Test</h1>');
 
         $reembolsoR = \PDF::loadview('admin.reembolso.pdf',[
@@ -329,12 +326,17 @@ class ReembolsoController extends Controller
             'obs'=>$reembolso->obs,
             'data'=>$reembolso->created_at,
             'totalReembolso'=>$reembolso->valorTotal,
-            ]);
+            ])->setPaper('a4', 'portrait');
+            
+        
 
-              
         
 
         $reembolsoR->save(public_path('uploads/ReembolsoTemp.pdf'));
+
+        return response()->file(public_path('uploads/ReembolsoTemp.pdf'));
+
+
 
         $reembolso = Reembolso::with('taxas')->find($id);
 
@@ -447,7 +449,10 @@ class ReembolsoController extends Controller
     }
 
     public function downloadZip($id)
-    {
+    {   
+
+        //check if exists
+
         $this->createRelatorioFolder($id);
 
         $rPath = public_path('uploads/reembolsos/'.$id);
@@ -459,19 +464,35 @@ class ReembolsoController extends Controller
         
         
         $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($rPath));
+        
+        
+        
         foreach ($files as $name => $file)
-        {
-            // We're skipping all subfolders
-            if (!$file->isDir()) {
-                $filePath     = $file->getRealPath();
-        
-                // extracting filename with substr/strlen
-                $relativePath = substr($filePath, strlen($rPath) + 1);
-        
-                $zip->addFile($filePath, $relativePath);
+        {   
+
+            $extension = pathinfo($file->getRealPath(), PATHINFO_EXTENSION);
+
+            if($extension != "zip")
+            {
+                // We're skipping all subfolders
+                if (!$file->isDir()) {
+                    $filePath     = $file->getRealPath();
+
+                    // extracting filename with substr/strlen
+                    $relativePath = substr($filePath, strlen($rPath) + 1);
+
+                    $zip->addFile($filePath, $relativePath);
+                }
             }
+            
+            
+
+
         }
+
+        
         $zip->close();
+
         return response()->download($zip_file);
 
 
@@ -514,16 +535,16 @@ class ReembolsoController extends Controller
         foreach($reembolso->taxas as $key => $t)
         {
             $taxa = Taxa::find($t->taxa_id);
-
+            $key = $key+1;
             if($taxa->comprovante)
             {   
                 $extension = pathinfo(public_path("uploads/".$taxa->comprovante), PATHINFO_EXTENSION);
-                $compr = File::copy($path.$taxa->comprovante, $path.'/reembolsos/'.$id.'/'.$key.'C.'.$extension);
+                $compr = File::copy($path.$taxa->comprovante, $path.'/reembolsos/'.$id.'/Item '.$key.' - Comprovante.'.$extension);
             }
             if($taxa->boleto)
             {   
                 $extension = pathinfo(public_path("uploads/".$taxa->boleto), PATHINFO_EXTENSION);
-                $compr = File::copy($path.$taxa->boleto, $path.'/reembolsos/'.$id.'/'.$key.'B.'.$extension);
+                $compr = File::copy($path.$taxa->boleto, $path.'/reembolsos/'.$id.'/Item '.$key.' - Boleto.'.$extension);
             }
 
         }
@@ -537,6 +558,8 @@ class ReembolsoController extends Controller
     {
         $path = public_path('uploads/reembolsos/'.$id);
         File::makeDirectory($path, $mode = 0777, true, true);
+        
+
     }
 
 

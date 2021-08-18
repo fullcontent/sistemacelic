@@ -46,6 +46,8 @@ Route::get('/', function () {
 
 		Route::post('/faturamento/addNF','FaturamentoController@addNF')->name('faturamento.addNF');
 
+		Route::post('/faturamento/editNF','FaturamentoController@update')->name('faturamento.editNF');
+
 
 		Route::get('/faturamento/create','FaturamentoController@create')->name('faturamento.create');
 		Route::post('/faturamento/step2','FaturamentoController@step2')->name('faturamento.step2');
@@ -92,6 +94,12 @@ Route::get('/', function () {
 
 		Route::get('/pendencia/done/{id}', 'PendenciasController@done')->name('pendencia.done');
 		Route::get('/pendencia/undone/{id}', 'PendenciasController@undone')->name('pendencia.undone');
+
+		Route::get('/pendencia/priority/{id}', 'PendenciasController@priority')->name('pendencia.priority');
+		Route::get('/pendencia/unPriority/{id}', 'PendenciasController@unPriority')->name('pendencia.unPriority');
+
+
+
 		Route::get('/pendencia/create/{servico_id}', 'PendenciasController@create')->name('pendencia.create');
 		Route::get('/pendencia/delete/{id}', 'PendenciasController@delete')->name('pendencia.delete');
 		

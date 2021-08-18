@@ -16,7 +16,18 @@
                 @foreach($pendencias->where('status','pendente') as $pendencia)
                 <li @if($pendencia->status == 'concluido') class='done' @endif @if($pendencia->responsavel_id == Auth::id()) style="color:red;" @endif>
                   <!-- drag handle -->
-                  
+                  @if($pendencia->prioridade == 1)
+                      <span style="display:none;">{{$pendencia->prioridade}}</span>
+                      
+                      <i class="fa fa-exclamation priorize" style="color:red" data-prioridadeID="{{$pendencia->id}}"></i>
+                      
+                      @else
+                      <span style="display:none;">{{$pendencia->prioridade}}</span>
+                      
+                      <i class="priorize" style="color:red" data-prioridadeID="{{$pendencia->id}}"></i>
+                              
+                      
+                      @endif
                   <!-- checkbox -->
                   <input type="checkbox" data-id="{{$pendencia->id}}" @if($pendencia->status == 'concluido') checked="" @endif>
                   <!-- todo text -->
@@ -52,6 +63,7 @@
                   
                   <!-- General tools such as edit or delete-->
                   <div class="tools">
+                  <a href="#" onClick="priorize({{$pendencia->id}})"><i class="fa fa-exclamation"></i></a>
                     <a href="{{route('pendencia.edit',$pendencia->id)}}"><i class="fa fa-edit"></i></a>
                     <a href="{{route('pendencia.delete',$pendencia->id)}}" onclick="return confirm('Tem certeza que deseja excluir a pendência?');"><i class="fa fa-trash"></i></a>
                     
@@ -196,17 +208,31 @@ $('.responder').click(function () {
 
   });
 
- 
+
+
+
+
+
 
 });
 
-$( "#dataPendencia" ).datepicker({
-      showOn: "button",
-        buttonText: "day"
-    });
+function priorize(id)
+{
 
+  var pendenciaID = id;
+  
+  $.ajax({
+            url: '{{url('admin/pendencia/priority')}}/'+pendenciaID+'',
+            method: 'GET',
+            success: function(data) {
 
-
+              $(this).data('status', data.completed);      
+              
+              $("[data-prioridadeID="+pendenciaID+"]").attr("class","fa fa-exclamation");
+              },
+            })
+ 
+}
 
 
 
