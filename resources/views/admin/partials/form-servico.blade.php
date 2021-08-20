@@ -12,7 +12,7 @@
 		
 		@if(Route::is('servicos.create'))
 		
-		
+		{!! Form::hidden('servicoPrincipal', $servicoPrincipal ?? '') !!}
 		
 		{!! Form::select('tipo', array(
 			'licencaOperacao' => 'Licenças de Operação',

@@ -161,7 +161,7 @@
               <a href="{{route('servicos.edit', $servico->id)}}" class="btn btn-info pull-right"><span class="glyphicon glyphicon-pencil"></span> Editar</a>
               
               @if(!$servico->servicoPrincipal)
-              <a href="{{route('servicos.create', ['id'=>$servico->unidade_id,'t'=>substr($route, 0,7),'tipoServico'=>'nRenovaveis','servico_principal'=>$servico->id])}}" class="btn btn-warning pull-right"><span class="glyphicon glyphicon-plus"></span> SubServiço</a>
+              <a href="{{route('servicos.create', ['id'=>$servico->unidade_id,'t'=>substr($route, 0,7),'tipoServico'=>'nRenovaveis','servicoPrincipal'=>$servico->id])}}" class="btn btn-warning pull-right"><span class="glyphicon glyphicon-plus"></span> SubServiço</a>
               @endif
               
               @if(count($servico->subServicos))
