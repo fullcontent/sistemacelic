@@ -177,6 +177,19 @@
 
                 {!! Form::close() !!}
 
+                @elseif($servico->servicoPrincipal)
+
+                {!! Form::open(['route'=>'faturamento.faturarServicoSub','id'=>'cadastroFaturamento', 'target'=>'_blank']) !!}
+  
+                  {!! Form::hidden('servicos[]',$servico->id) !!}
+  
+                  
+                  {!! Form::hidden('empresa_id',$servico->unidade->empresa_id) !!}
+  
+                  <button type="submit" class="btn btn-danger pull-right"><i class="fa fa-barcode"></i> Faturar</button>
+  
+                  {!! Form::close() !!}
+
               @else
               
               {!! Form::open(['route'=>'faturamento.step3','id'=>'cadastroFaturamento', 'target'=>'_blank']) !!}
