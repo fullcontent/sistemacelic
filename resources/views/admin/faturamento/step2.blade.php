@@ -12,7 +12,7 @@
 				<h3 class="box-title">Resutado da busca: </h3>
 			</div>
 			<div class="box-body">
-				<p><b>Período: </b>{{$periodo[0]}} a {{$periodo[1]}}</p>
+				<p><b>Período: </b>{{$periodo[0] ?? ''}} a {{$periodo[1] ?? ''}}</p>
 			<p><b>Empresa(s): </b>
 				<ul>
 					@foreach($empresas as $e)

@@ -8,9 +8,9 @@ class ServicoFinalizado extends Model
 {
     //
 
-    protected $dates = ['finalizado']; 
+    protected $dates = ['finalizado'];
 
-    
+
     public function servico()
     {
     	return $this->belongsTo('App\Models\Servico');

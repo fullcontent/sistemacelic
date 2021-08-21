@@ -109,6 +109,7 @@ class FaturamentoController extends Controller
             ]);
 
     }
+    
 
     public function step3(Request $request)
     {   
@@ -199,6 +200,61 @@ class FaturamentoController extends Controller
             'descricao'=>$request->descricao,
             'obs'=>$request->obs,
         ]);
+
+    }
+
+
+    public function faturarServicoSub(Request $request)
+    {
+        
+
+                      
+        $servico = Servico::whereIn('id',$request->servicos)->first();
+        
+
+        
+        if($servico->servicoPrincipal != null)
+        {
+            dump("esse servico é sub");
+            $subServicos = Servico::where('servicoPrincipal',$servico->servicoPrincipal)
+                                    ->orWhere('id',$servico->servicoPrincipal)
+                                    ->pluck('id');
+
+        }
+        else{
+            dump("esse servico é principal");
+            $subServicos = Servico::whereIn('id',$servico->subServicos->pluck('id'))
+                                    ->pluck('id');
+        }
+
+
+
+        
+
+
+        
+        
+        
+        
+        $servicosFaturar = Servico::with('financeiro')
+                                    ->whereIn('id',$subServicos)
+                                    ->orWhere('id',$servico->id)
+                                    ->whereHas('servicoFinalizado')
+                                    ->get();       
+
+
+
+
+                
+        
+        $empresas = Empresa::where('id',$request->empresa_id)->get();
+                
+        
+        return view('admin.faturamento.step2')->with([
+                'servicosFaturar'=>$servicosFaturar,
+                'empresas'=>$empresas,
+                
+            ]);
 
     }
 
