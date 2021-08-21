@@ -254,6 +254,12 @@
 
 					</div>
 				</div>
+				<div class="col-md-2">
+					<div class="form-group">
+				{!! Form::label('proposta', 'Proposta', array('class'=>'control-label')) !!}
+				{!! Form::text('proposta', $servico->proposta, ['class'=>'form-control','id'=>'proposta']) !!}
+					</div>
+				</div>
 				@else
 
 				<div class="col-md-2">
