@@ -107,6 +107,7 @@ Route::get('/', function () {
 		
 		Route::get('/pendencias/minhas', 'PendenciasController@minhas')->name('pendencias.minhas');
 		Route::get('/pendencias/outras', 'PendenciasController@outras')->name('pendencias.outras');
+		Route::get('/pendencias/vinculadas', 'PendenciasController@vinculadas')->name('pendencias.vinculadas');
 
 
 		Route::get('/taxa/delete/{id}', 'TaxasController@delete')->name('taxas.delete');

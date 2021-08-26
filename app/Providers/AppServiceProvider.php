@@ -142,6 +142,11 @@ class AppServiceProvider extends ServiceProvider
                                 'url'  =>  route('pendencias.outras'),
                                 'icon'  =>  'fa fa-child',
                                 ],
+                                [
+                                    'text' => 'Pendências Vinculadas',
+                                    'url'  =>  route('pendencias.vinculadas'),
+                                    'icon'  =>  'fa fa-link',
+                                    ],
                                                                 
                                 ]
                                 ]

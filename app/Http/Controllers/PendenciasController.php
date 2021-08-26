@@ -37,6 +37,7 @@ class PendenciasController extends Controller
         
         $pendencias = Pendencia::where('responsavel_id',Auth::id())
                      ->where('status','pendente')
+                     ->whereDoesntHave('vinculo')
                     ->get();
         
                     return view('admin.lista-pendencias')
@@ -67,6 +68,23 @@ class PendenciasController extends Controller
                             ]);
 
         // return count($pendencias);
+
+
+    }
+
+    public function vinculadas()
+    {
+        
+        $pendencias = Pendencia::where('responsavel_id',Auth::id())
+                     ->where('status','pendente')
+                     ->whereHas('vinculo')
+                    ->get();
+        
+                    return view('admin.lista-pendencias')
+                    ->with([
+                        'pendencias'=>$pendencias,
+                        'title'=>'Pendências Vinculadas',
+                    ]);
 
 
     }
