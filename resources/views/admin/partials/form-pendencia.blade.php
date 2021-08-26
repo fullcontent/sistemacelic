@@ -15,7 +15,7 @@
         </div>
       </div>
 
-      <div class="col-md-3">
+      <div class="col-md-2">
         <div class="form-group">
           
           {!! Form::label('vinculo', 'Vinculado a OS', array('class'=>'control-label')) !!}
@@ -23,12 +23,12 @@
           @if(!$pendencia->vinculo)
          
           {!! Form::select('vinculo', $vinculo, null,['class'=>'form-control','id'=>'vinculo']) !!}
-          <a href="#" class="link"  id="removerVinculo" onClick="removerVinculo({{$pendencia->id}})">Remover</a>
+          <a href="#"  id="removerVinculo" onClick="removerVinculo({{$pendencia->id}})">Remover</a>
           
           @else
          
           {!! Form::select('vinculo', $vinculo, null,['class'=>'form-control','id'=>'vinculo']) !!}
-          <a href="#" class="link" id="removerVinculo" onClick="removerVinculo({{$pendencia->id}})">Remover</a>
+          <a href="#" id="removerVinculo" onClick="removerVinculo({{$pendencia->id}})">Remover</a>
           @endif
          
         </div>
@@ -100,7 +100,17 @@
 	$(document).ready(function() {
 
 
+    var vinculo = {!! $pendencia->vinculo !!}
+
+    console.log(vinculo);
     
+
+    if(!vinculo)
+    {
+      $('#vinculo').select2();
+      $('#vinculo').val(null).trigger('change');
+    }
+
     
      
 
@@ -145,7 +155,7 @@ function removerVinculo(id)
                 success: function(data) {
 
                   $(this).data('status', data.completed);    
-                 
+                  console.log({!!json_encode($vinculo)!!}); 
                   
                   $('#vinculo').select2();
                                     
