@@ -97,45 +97,59 @@
 	
 	$(document).ready(function() {
 
-
     var vinculo = {!! $pendencia->vinculo !!}
 
     console.log(vinculo);
-    
-
-    if(!vinculo)
+   
+   
+  if(!vinculo)
     {
       $('#vinculo').select2();
       $('#vinculo').val(null).trigger('change');
     }
 
 
+    $( "#removerVinculo" ).click(function() {
+     $('#vinculo').val(null).trigger('change');
+   });
+
+
     $('#responsavel_id').select2();
     
-
-    $( "#removerVinculo" ).click(function() {
-     
-      $('#vinculo').val(null).trigger('change');
-    });
-
-
     
 
+        
+    
 
-    // Get users 'today' date
-var Today = new Date();
+});
+</script>
+@endif
 
-  	$("#vencimento").datepicker({
+@if(Route::is('pendencia.create'))
+<script>
+   $(document).ready(function() {
+    $('#vinculo').select2();
+    $('#vinculo').val(null).trigger('change');
+   });
+</script>
+@endif
+
+<script>
+  $(document).ready(function() {
+             
+    var Today = new Date();
+
+    $("#vencimento").datepicker({
       defaultDate:Today,
       showButtonPanel:true,
       todayHighlight: true,
 
-    });
-    
-
 });
 
-function removerVinculo(id)
+
+  });
+
+  function removerVinculo(id)
     {
       console.log("RemoverVinculo")
       var pendenciaID = id;
@@ -154,24 +168,5 @@ function removerVinculo(id)
                 })
     
     }
-
-</script>
-@endif
-<script>
-  $(document).ready(function() {
-    $('#vinculo').select2();
-      
-
-
-       // Get users 'today' date
-var Today = new Date();
-
-$("#vencimento").datepicker({
-  defaultDate:Today,
-  showButtonPanel:true,
-  todayHighlight: true,
-
-});
-  });
 </script>
 @stop
