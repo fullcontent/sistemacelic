@@ -79,8 +79,15 @@ class PendenciasController extends Controller
     public function create($servico_id)
     {
         //
+        $s = Servico::find($servico_id);
+
         $servico = Servico::where('id',$servico_id)->pluck('os','id')->toArray();
         $responsaveis = User::pluck('name','id')->toArray();
+
+        $vinculo = Servico::where('unidade_id',$s->unidade->id)
+                            ->where('situacao','andamento')
+                            ->pluck('os','id')
+                            ->toArray();
       
         
         return view('admin.cadastro-pendencia')
@@ -88,6 +95,7 @@ class PendenciasController extends Controller
                     'servico'=> $servico,
                     'servico_id'=>$servico_id,
                     'responsaveis'=>$responsaveis,
+                    'vinculo'=>$vinculo,
                 ]);
     }
 
@@ -101,6 +109,7 @@ class PendenciasController extends Controller
     {
         //
 
+      
         $pendencia = new Pendencia;
 
         $pendencia->created_by = Auth::id();
@@ -111,7 +120,7 @@ class PendenciasController extends Controller
         $pendencia->responsavel_id = $request->responsavel_id;
         $pendencia->status = $request->status;
         $pendencia->observacoes = $request->observacoes;
-
+        $pendencia->vinculo = $request->vinculo;
 
         
         $pendencia->save();
@@ -148,14 +157,23 @@ class PendenciasController extends Controller
 
         $servico = Servico::where('id',$pendencia->servico_id)->pluck('os','id')->toArray();
 
+
+        $vinculo = Servico::where('unidade_id',$pendencia->servico->unidade->id)
+                            ->where('situacao','andamento')
+                            ->pluck('os','id')
+                            ->toArray();
+
+
         $responsaveis = User::pluck('name','id')->toArray();
 
 
+        
         return view('admin.editar-pendencia')->with(
             [
                 'pendencia'=>$pendencia,
                 'servico'=>$servico,
                 'responsaveis'=>$responsaveis,
+                'vinculo'=>$vinculo,
             ]
         );
     }
@@ -181,6 +199,7 @@ class PendenciasController extends Controller
         $pendencia->responsavel_id = $request->responsavel_id;
         $pendencia->status = $request->status;
         $pendencia->observacoes = $request->observacoes;
+        $pendencia->vinculo = $request->vinculo;
 
 
         $pendencia->save();
@@ -267,5 +286,11 @@ class PendenciasController extends Controller
                     $history->user_id = Auth::id();
                     $history->observacoes = 'Marcou a pendência '.$pendencia->pendencia.' como prioridade.';
                     $history->save();
+    }
+    public function removerVinculo($id)
+    {
+        $pendencia = Pendencia::find($id);
+        $pendencia->vinculo = null;
+        $pendencia->save();
     }
 }

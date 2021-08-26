@@ -99,7 +99,7 @@ Route::get('/', function () {
 
 		Route::get('/pendencia/priority/{id}', 'PendenciasController@priority')->name('pendencia.priority');
 		Route::get('/pendencia/unPriority/{id}', 'PendenciasController@unPriority')->name('pendencia.unPriority');
-
+		Route::get('/pendencia/removerVinculo/{id}', 'PendenciasController@removerVinculo')->name('pendencia.removerVinculo');
 
 
 		Route::get('/pendencia/create/{servico_id}', 'PendenciasController@create')->name('pendencia.create');

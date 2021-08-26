@@ -1,13 +1,36 @@
 <div class="box-body">
   
+@if($errors->any())
+    {!! implode('', $errors->all('<div class="callout callout-danger">:message</div>')) !!}
+@endif
+
+
       <div class="col-md-3">
         <div class="form-group">
           
           {!! Form::label('servico_id', 'Ordem de serviço', array('class'=>'control-label')) !!}
-
-          
+        
           {!! Form::select('servico_id', $servico, null,['class'=>'form-control','id'=>'servico_id']) !!}
           
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="form-group">
+          
+          {!! Form::label('vinculo', 'Vinculado a OS', array('class'=>'control-label')) !!}
+        
+          @if(!$pendencia->vinculo)
+         
+          {!! Form::select('vinculo', $vinculo, null,['class'=>'form-control','id'=>'vinculo']) !!}
+          <a href="#" class="link"  id="removerVinculo" onClick="removerVinculo({{$pendencia->id}})">Remover</a>
+          
+          @else
+         
+          {!! Form::select('vinculo', $vinculo, null,['class'=>'form-control','id'=>'vinculo']) !!}
+          <a href="#" class="link" id="removerVinculo" onClick="removerVinculo({{$pendencia->id}})">Remover</a>
+          @endif
+         
         </div>
       </div>
 
@@ -70,10 +93,28 @@
 
 
 @section('js')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
 	
 	$(document).ready(function() {
+
+
+    
+    
+     
+
+    $('#responsavel_id').select2();
+    
+
+    $( "#removerVinculo" ).click(function() {
+     
+      $('#vinculo').val(null).trigger('change');
+    });
+
+
+    
+
 
     // Get users 'today' date
 var Today = new Date();
@@ -93,6 +134,25 @@ var Today = new Date();
  
 });
 
+function removerVinculo(id)
+    {
+      console.log("RemoverVinculo")
+      var pendenciaID = id;
+      
+      $.ajax({
+                url: '{{url('admin/pendencia/removerVinculo')}}/'+pendenciaID+'',
+                method: 'GET',
+                success: function(data) {
+
+                  $(this).data('status', data.completed);    
+                 
+                  
+                  $('#vinculo').select2();
+                                    
+                  },
+                })
+    
+    }
 
 </script>
 
