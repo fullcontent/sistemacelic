@@ -20,16 +20,13 @@
           
           {!! Form::label('vinculo', 'Vinculado a OS', array('class'=>'control-label')) !!}
         
-          @if(!$pendencia->vinculo)
-         
+                 
           {!! Form::select('vinculo', $vinculo, null,['class'=>'form-control','id'=>'vinculo']) !!}
-          <a href="#"  id="removerVinculo" onClick="removerVinculo({{$pendencia->id}})">Remover</a>
           
-          @else
-         
-          {!! Form::select('vinculo', $vinculo, null,['class'=>'form-control','id'=>'vinculo']) !!}
-          <a href="#" id="removerVinculo" onClick="removerVinculo({{$pendencia->id}})">Remover</a>
+          @if(!Route::is('pendencia.create'))
+          <a href="#" id="removerVinculo" onClick="removerVinculo({{$pendencia->id}})" class="link">Remover</a>
           @endif
+
          
         </div>
       </div>
@@ -95,6 +92,7 @@
 @section('js')
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
+@if(!Route::is('pendencia.create'))
 <script>
 	
 	$(document).ready(function() {
@@ -111,8 +109,6 @@
       $('#vinculo').val(null).trigger('change');
     }
 
-    
-     
 
     $('#responsavel_id').select2();
     
@@ -137,11 +133,6 @@ var Today = new Date();
     });
     
 
-  
-
-   	
-	  	
- 
 });
 
 function removerVinculo(id)
@@ -165,5 +156,22 @@ function removerVinculo(id)
     }
 
 </script>
+@endif
+<script>
+  $(document).ready(function() {
+    $('#vinculo').select2();
+      
 
+
+       // Get users 'today' date
+var Today = new Date();
+
+$("#vencimento").datepicker({
+  defaultDate:Today,
+  showButtonPanel:true,
+  todayHighlight: true,
+
+});
+  });
+</script>
 @stop

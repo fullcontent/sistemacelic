@@ -13,6 +13,8 @@ use App\Models\Servico;
 use App\Models\Unidade;
 use App\Models\Historico;
 use App\Models\ServicoLpu;
+use App\Models\Pendencia;
+
 
 
 
@@ -917,6 +919,8 @@ class ServicosController extends Controller
                         if(!ServicoFinalizado::where('servico_id',$servico->id)->first())
                         {
                             $this->finalizarServico($servico->id);
+
+                            $this->removerVinculo($servico->vinculos);
                         }
                         
                     }
@@ -1082,6 +1086,22 @@ class ServicosController extends Controller
         $servico->servico_id = $id;
         $servico->finalizado = date('Y-m-d');
         $servico->save();
+    }
+
+    public function removerVinculo($vinculos)
+    {
+       
+        foreach($vinculos as $p)
+        {   
+
+            $pendencia = Pendencia::find($p->id);
+            $pendencia->vinculo = null;
+            $pendencia->vencimento = date('Y-m-d');
+            $pendencia->save();
+           
+        }
+        
+        
     }
 
     
