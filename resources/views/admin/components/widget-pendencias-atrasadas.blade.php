@@ -119,7 +119,7 @@ $('#lista-pendencias-usuario').DataTable({
 		      "lengthChange": false,
 		      "searching": true,
 		      "ordering": true,
-		      "info": false,
+		      "info": true,
 		      "autoWidth": true,
 		       "language": {
                 "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
@@ -131,7 +131,7 @@ $('#lista-pendencias-usuario').DataTable({
 		      "lengthChange": false,
 		      "searching": true,
 		      "ordering": true,
-		      "info": false,
+		      "info": true,
 		      "autoWidth": true,
 		       "language": {
                 "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
