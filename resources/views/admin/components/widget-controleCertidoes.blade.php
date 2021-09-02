@@ -25,7 +25,7 @@
                     @foreach($servicos->where('tipo','controleCertidoes')->where('situacao','!=','arquivado') as $servico)
                   <tr>
                     
-                    <td><a href="{{route('servicos.show',$servico->id)}}">{{$servico->os}} | {{$servico->nome}}</a></td>
+                    <td><a href="{{route('servicos.show',$servico->id)}}">{{$servico->os}} | {{$servico->nome}}</a> @if($servico->servicoPrincipal) <small class="label bg-red">S</small>@endif</td>
                     <td>
                       @switch($servico->situacao)
 
