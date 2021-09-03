@@ -159,7 +159,18 @@ function removerVinculo(id)
 @endif
 <script>
   $(document).ready(function() {
-    $('#vinculo').select2();
+    $('#vinculo').select2({
+      allowClear: true,
+    placeholder: {
+      id: "",
+      placeholder: "Leave blank to ..."
+    },
+    minimumResultsForSearch: -1,
+    width: 100,
+    templateResult: hideSelected,
+
+    });
+    $('#vinculo').val(null).trigger('change');
       
 
 
@@ -173,5 +184,11 @@ $("#vencimento").datepicker({
 
 });
   });
+
+  function hideSelected(value) {
+  if (value && !value.selected) {
+    return $('<span>' + value.text + '</span>');
+  }
+}
 </script>
 @stop
