@@ -15,21 +15,7 @@
         </div>
       </div>
 
-      <div class="col-md-2">
-        <div class="form-group">
-          
-          {!! Form::label('vinculo', 'Vinculado a OS', array('class'=>'control-label')) !!}
-        
-                 
-          {!! Form::select('vinculo', $vinculo, null,['class'=>'form-control','id'=>'vinculo']) !!}
-          
-          @if(!Route::is('pendencia.create'))
-          <a href="#" id="removerVinculo" onClick="removerVinculo({{$pendencia->id}})" class="link">Remover</a>
-          @endif
-
-         
-        </div>
-      </div>
+     
 
       <div class="col-md-6">
         <div class="form-group">
@@ -72,6 +58,40 @@
         </div>
       </div>
 
+      
+      <div class="col-md-6" id="vinculos">
+        <label for="vinculo" class="control-label">Vínculo</label>
+        <div class="input-group control-group after-add-more">  
+          {!! Form::select('vinculo', $vinculo, null,['class'=>'form-control','id'=>'vinculo','name'=>'vinculo[]']) !!}
+          <div class="input-group-btn">   
+            <button class="btn btn-success add-more" type="button"><i class="glyphicon glyphicon-plus"></i> Adicionar</button>  
+          </div>  
+        </div> 
+        
+        <div class="copy hide">  
+          <div class="control-group input-group" style="margin-top:10px">  
+            {!! Form::select('vinculo', $vinculo, null,['class'=>'form-control','id'=>'vinculo_copy','name'=>'vinculo[]']) !!}
+            <div class="input-group-btn">   
+              <button class="btn btn-danger remove" type="button"><i class="glyphicon glyphicon-remove"></i> Remover</button>  
+            </div>  
+          </div>  
+        </div>
+        
+        @if(!Route::is('pendencia.create'))
+          @foreach($vinculos as $key => $v)
+          <div class="control-group input-group" style="margin-top:10px">  
+            {!! Form::select('vinculo', $vinculo, $key,['class'=>'form-control','id'=>'vinculo','name'=>'vinculo[]']) !!}
+            <div class="input-group-btn">   
+              <button class="btn btn-danger remove" type="button" onClick="removerVinculo({{$pendencia->id}},{{$key}})"><i class="glyphicon glyphicon-remove"></i> Remover</button>  
+            </div>  
+          </div>  
+
+          @endforeach
+        @endif
+  
+      </div>
+
+
       <div class="col-md-12">
         <div class="form-group">
            {!! Form::label('observacoes', 'Observações', array('class'=>'control-label')) !!}
@@ -79,11 +99,7 @@
         </div>
       </div>
      
-
-     
-      
-
-          
+   
 
 </div>
 
@@ -92,97 +108,28 @@
 @section('js')
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-@if(!Route::is('pendencia.create'))
 <script>
-	
-	$(document).ready(function() {
-
-
-    var vinculo = {!! $pendencia->vinculo !!}
-
-    console.log(vinculo);
+$(document).ready(function() {
     
-
-    if(!vinculo)
-    {
-      $('#vinculo').select2();
-      $('#vinculo').val(null).trigger('change');
-    }
-
-
-    $('#responsavel_id').select2();
-    
-
-    $( "#removerVinculo" ).click(function() {
-     
-      $('#vinculo').val(null).trigger('change');
-    });
-
-
-    
-
-
-    // Get users 'today' date
-var Today = new Date();
-
-  	$("#vencimento").datepicker({
-      defaultDate:Today,
-      showButtonPanel:true,
-      todayHighlight: true,
-
-    });
-    
-
-});
-
-function removerVinculo(id)
-    {
-      console.log("RemoverVinculo")
-      var pendenciaID = id;
-      
-      $.ajax({
-                url: '{{url('admin/pendencia/removerVinculo')}}/'+pendenciaID+'',
-                method: 'GET',
-                success: function(data) {
-
-                  $(this).data('status', data.completed);    
-                  console.log({!!json_encode($vinculo)!!}); 
-                  
-                  $('#vinculo').select2();
-                                    
-                  },
-                })
-    
-    }
-
-</script>
-@endif
-<script>
-  $(document).ready(function() {
     $('#vinculo').select2({
-      allowClear: true,
-    placeholder: {
-      id: "",
-      placeholder: "Leave blank to ..."
-    },
+    placeholder: "Selecione um serviço",
+    allowClear: true,
     minimumResultsForSearch: -1,
-    width: 100,
     templateResult: hideSelected,
-
     });
-    $('#vinculo').val(null).trigger('change');
-      
+    $('#vinculo').val(null).change();
+    $('#vinculo_copy').val(null).change();
+    
+   
 
-
-       // Get users 'today' date
 var Today = new Date();
 
-$("#vencimento").datepicker({
-  defaultDate:Today,
-  showButtonPanel:true,
-  todayHighlight: true,
+      $("#vencimento").datepicker({
+        defaultDate:Today,
+        showButtonPanel:true,
+        todayHighlight: true,
 
-});
+      });
   });
 
   function hideSelected(value) {
@@ -190,5 +137,55 @@ $("#vencimento").datepicker({
     return $('<span>' + value.text + '</span>');
   }
 }
+
+$(".add-more").click(function(){   
+          var html = $(".copy").html(); 
+          console.log(html);
+          $(".after-add-more").after(html);
+          $('#vinculo_copy').select2({
+              placeholder: "Selecione um serviço",
+              allowClear: true,
+              minimumResultsForSearch: -1,
+              templateResult: hideSelected,
+              });
+          $('#vinculo_copy').val(null).change(); 
+      });  
+  
+$("body").on("click",".remove",function(){   
+    $(this).parents(".control-group").remove();
+    
+});
+
+
 </script>
+
+@if(!Route::is('pendencia.create'))
+<script>
+ function removerVinculo(id,servico)
+{
+
+  var pendenciaID = id;
+  var servicoID = servico;
+
+  $.ajax({
+            url: '{{url('admin/pendencia/removerVinculo')}}/'+pendenciaID+'/'+servicoID+'',
+            method: 'GET',
+            success: function(data) {
+
+              $(this).data('status', data.completed);      
+              
+              console.log("Removeu Vinculo");
+              },
+            })
+  
+$('#vinculo').on('select2:select', function (e) {
+    var data = e.params.data;
+    console.log(data);
+});
+ 
+}
+</script>
+@endif
+
+
 @stop
