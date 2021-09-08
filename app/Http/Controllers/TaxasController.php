@@ -103,6 +103,8 @@ class TaxasController extends Controller
             }
 
         $taxa->reembolso = $request->reembolso;
+
+        $taxa->observacoes  = $request->observacoes;
         
         
         $taxa->save();
