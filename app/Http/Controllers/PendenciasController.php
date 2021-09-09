@@ -75,7 +75,7 @@ class PendenciasController extends Controller
         
         $pendencias = Pendencia::where('responsavel_id',Auth::id())
                      ->where('status','pendente')
-                     ->whereHas('vinculo')
+                     ->whereHas('vinculos')
                     ->get();
         
                     return view('admin.lista-pendencias')
