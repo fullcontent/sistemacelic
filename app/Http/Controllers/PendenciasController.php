@@ -145,18 +145,21 @@ class PendenciasController extends Controller
         // $pendencia->vinculo = $request->vinculo;
 
 
-        
-        
+               
         $pendencia->save();
 
-        foreach($request->vinculo as $v)
+        if($request->vinculo)
         {
-            $vinculo = new PendenciasVinculos;
-            $vinculo->servico_id = $v;
-            $vinculo->pendencia_id = $pendencia->id;
-            $vinculo->save();
+            foreach($request->vinculo as $v)
+            {
+                $vinculo = new PendenciasVinculos;
+                $vinculo->servico_id = $v;
+                $vinculo->pendencia_id = $pendencia->id;
+                $vinculo->save();
+            }
+    
         }
-
+        
         return redirect(route('servicos.show',$pendencia->servico_id));
 
    }
@@ -240,14 +243,17 @@ class PendenciasController extends Controller
 
         $pendencia->save();
 
-
-        foreach($request->vinculo as $v)
+        if($request->vinculo)
         {
-            $vinculo = new PendenciasVinculos;
-            $vinculo->servico_id = $v;
-            $vinculo->pendencia_id = $pendencia->id;
-            $vinculo->save();
+            foreach($request->vinculo as $v)
+            {
+                $vinculo = new PendenciasVinculos;
+                $vinculo->servico_id = $v;
+                $vinculo->pendencia_id = $pendencia->id;
+                $vinculo->save();
+            }
         }
+        
 
         //Save Interation
 
