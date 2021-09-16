@@ -83,7 +83,14 @@
 							@foreach($servicosFaturar as $value => $s)
 							<tr>
 								<td>{{ Form::checkbox('servicos[]', $s->id,null,['class'=>'checkbox'])}}</td>
-								<td>Andamento</td>	
+								
+								@if(isset($s->servicoFinalizado->finalizado))
+								<td>{{ \Carbon\Carbon::parse($s->servicoFinalizado->finalizado)->format('d/m/Y')}}</td>
+								@else	
+								<td>Andamento</td>
+								@endif
+								
+								
 								<td>{{$s->unidade->codigo}}</td>
 								<td>{{$s->unidade->nomeFantasia}}</td>
 								<td>{{$s->unidade->cidade}}</td>
