@@ -215,31 +215,23 @@ class FaturamentoController extends Controller
         
         if($servico->servicoPrincipal != null)
         {
-            dump("esse servico é sub");
+            // dump("esse servico é sub");
             $subServicos = Servico::where('servicoPrincipal',$servico->servicoPrincipal)
                                     ->orWhere('id',$servico->servicoPrincipal)
                                     ->pluck('id');
 
         }
         else{
-            dump("esse servico é principal");
+            // dump("esse servico é principal");
             $subServicos = Servico::whereIn('id',$servico->subServicos->pluck('id'))
                                     ->pluck('id');
         }
-
-
-
-        
-
-
-        
-        
         
         
         $servicosFaturar = Servico::with('financeiro')
                                     ->whereIn('id',$subServicos)
                                     ->orWhere('id',$servico->id)
-                                    ->whereHas('servicoFinalizado')
+                                    // ->whereHas('servicoFinalizado')
                                     ->get();       
 
 

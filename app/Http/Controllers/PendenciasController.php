@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Pendencia;
+use App\Models\PendenciasVinculos;
 use App\Models\Historico;
 use App\Models\Servico;
 use App\User;
@@ -46,7 +47,6 @@ class PendenciasController extends Controller
                         'title'=>'Minhas pendências',
                     ]);
 
-
     }
 
     public function outras()
@@ -67,9 +67,7 @@ class PendenciasController extends Controller
                                 'title'=>'Outras pendências',
                             ]);
 
-        // return count($pendencias);
-
-
+       
     }
 
     public function vinculadas()
@@ -77,7 +75,7 @@ class PendenciasController extends Controller
         
         $pendencias = Pendencia::where('responsavel_id',Auth::id())
                      ->where('status','pendente')
-                     ->whereHas('vinculo')
+                     ->whereHas('vinculos')
                     ->get();
         
                     return view('admin.lista-pendencias')
@@ -125,24 +123,43 @@ class PendenciasController extends Controller
      */
     public function store(Request $request)
     {
-        //
+       
 
-      
+         
         $pendencia = new Pendencia;
 
         $pendencia->created_by = Auth::id();
         $pendencia->servico_id = $request->servico_id;
         $pendencia->pendencia  = $request->pendencia;
-        $pendencia->vencimento = Carbon::createFromFormat('d/m/Y', $request->vencimento)->toDateString(); 
+        
+        if($request->vencimento){
+            $pendencia->vencimento = Carbon::createFromFormat('d/m/Y', $request->vencimento)->toDateString(); 
+        }
+        
+        
+        
         $pendencia->responsavel_tipo = $request->responsavel_tipo;
         $pendencia->responsavel_id = $request->responsavel_id;
         $pendencia->status = $request->status;
         $pendencia->observacoes = $request->observacoes;
-        $pendencia->vinculo = $request->vinculo;
+        // $pendencia->vinculo = $request->vinculo;
 
-        
+
+               
         $pendencia->save();
 
+        if($request->vinculo)
+        {
+            foreach($request->vinculo as $v)
+            {
+                $vinculo = new PendenciasVinculos;
+                $vinculo->servico_id = $v;
+                $vinculo->pendencia_id = $pendencia->id;
+                $vinculo->save();
+            }
+    
+        }
+        
         return redirect(route('servicos.show',$pendencia->servico_id));
 
    }
@@ -185,6 +202,9 @@ class PendenciasController extends Controller
         $responsaveis = User::pluck('name','id')->toArray();
 
 
+        $vinculos = $pendencia->vinculos->pluck('os','id');
+
+        
         
         return view('admin.editar-pendencia')->with(
             [
@@ -192,6 +212,7 @@ class PendenciasController extends Controller
                 'servico'=>$servico,
                 'responsaveis'=>$responsaveis,
                 'vinculo'=>$vinculo,
+                'vinculos'=>$vinculos,
             ]
         );
     }
@@ -217,14 +238,26 @@ class PendenciasController extends Controller
         $pendencia->responsavel_id = $request->responsavel_id;
         $pendencia->status = $request->status;
         $pendencia->observacoes = $request->observacoes;
-        $pendencia->vinculo = $request->vinculo;
+        // $pendencia->vinculo = $request->vinculo;
 
 
         $pendencia->save();
 
+        if($request->vinculo)
+        {
+            foreach($request->vinculo as $v)
+            {
+                $vinculo = new PendenciasVinculos;
+                $vinculo->servico_id = $v;
+                $vinculo->pendencia_id = $pendencia->id;
+                $vinculo->save();
+            }
+        }
+        
+
         //Save Interation
 
-        if (!$pendencia->wasRecentlyCreated) {
+        if(!$pendencia->wasRecentlyCreated) {
             
             $changes = $pendencia->getChanges();
             unset($changes['updated_at']);
@@ -305,10 +338,10 @@ class PendenciasController extends Controller
                     $history->observacoes = 'Marcou a pendência '.$pendencia->pendencia.' como prioridade.';
                     $history->save();
     }
-    public function removerVinculo($id)
+    
+    public function removerVinculo($id,$servico_id)
     {
-        $pendencia = Pendencia::find($id);
-        $pendencia->vinculo = null;
-        $pendencia->save();
+        $vinculo = PendenciasVinculos::where('servico_id',$servico_id)->where('pendencia_id',$id)->delete();
+    
     }
 }

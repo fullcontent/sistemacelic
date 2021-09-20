@@ -61,7 +61,7 @@
 				
 			</thead>
 			<tbody>
-
+							@if(isset($servicosFaturar->servicoFinalizado))
 							@foreach($servicosFaturar->sortBy('servicoFinalizado.finalizado') as $value => $s)
 							<tr>
 								<td>{{ Form::checkbox('servicos[]', $s->id,null,['class'=>'checkbox'])}}</td>
@@ -78,6 +78,33 @@
 
 							</tr>
 							@endforeach
+							
+							@else
+							@foreach($servicosFaturar as $value => $s)
+							<tr>
+								<td>{{ Form::checkbox('servicos[]', $s->id,null,['class'=>'checkbox'])}}</td>
+								
+								@if(isset($s->servicoFinalizado->finalizado))
+								<td>{{ \Carbon\Carbon::parse($s->servicoFinalizado->finalizado)->format('d/m/Y')}}</td>
+								@else	
+								<td>Andamento</td>
+								@endif
+								
+								
+								<td>{{$s->unidade->codigo}}</td>
+								<td>{{$s->unidade->nomeFantasia}}</td>
+								<td>{{$s->unidade->cidade}}</td>
+								<td>@php echo App\Http\Controllers\FaturamentoController::formatCnpjCpf($s->unidade->cnpj); @endphp</td>
+								<td>{{$s->nome}}</td>
+								<td>R$ {{number_format($s->financeiro['valorTotal'],2,'.',',')}}</td>
+								
+								<td>R$ {{number_format($s->financeiro['valorAberto'],2,'.',',')}}</td>
+								
+
+							</tr>
+							@endforeach
+
+							@endif
 						
 							
 			</tbody>

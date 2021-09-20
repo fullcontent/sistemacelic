@@ -15,21 +15,7 @@
         </div>
       </div>
 
-      <div class="col-md-2">
-        <div class="form-group">
-          
-          {!! Form::label('vinculo', 'Vinculado a OS', array('class'=>'control-label')) !!}
-        
-                 
-          {!! Form::select('vinculo', $vinculo, null,['class'=>'form-control','id'=>'vinculo']) !!}
-          
-          @if(!Route::is('pendencia.create'))
-          <a href="#" id="removerVinculo" onClick="removerVinculo({{$pendencia->id}})" class="link">Remover</a>
-          @endif
-
-         
-        </div>
-      </div>
+     
 
       <div class="col-md-6">
         <div class="form-group">
@@ -72,6 +58,40 @@
         </div>
       </div>
 
+      
+      <div class="col-md-6" id="vinculos">
+        <label for="vinculo" class="control-label">Vínculo</label>
+        <div class="input-group control-group after-add-more">  
+          {!! Form::select('vinculo', $vinculo, null,['class'=>'form-control','id'=>'vinculo','name'=>'vinculo[]']) !!}
+          <div class="input-group-btn">   
+            <button class="btn btn-success add-more" type="button"><i class="glyphicon glyphicon-plus"></i> Adicionar</button>  
+          </div>  
+        </div> 
+        
+        <div class="copy hide">  
+          <div class="control-group input-group" style="margin-top:10px">  
+            {!! Form::select('vinculo', $vinculo, null,['class'=>'form-control','id'=>'vinculo_copy','name'=>'vinculo[]']) !!}
+            <div class="input-group-btn">   
+              <button class="btn btn-danger remove" type="button"><i class="glyphicon glyphicon-remove"></i> Remover</button>  
+            </div>  
+          </div>  
+        </div>
+        
+        @if(!Route::is('pendencia.create'))
+          @foreach($vinculos as $key => $v)
+          <div class="control-group input-group" style="margin-top:10px">  
+            {!! Form::select('vinculo', $vinculo, $key,['class'=>'form-control','id'=>'vinculo','name'=>'vinculo[]']) !!}
+            <div class="input-group-btn">   
+              <button class="btn btn-danger remove" type="button" onClick="removerVinculo({{$pendencia->id}},{{$key}})"><i class="glyphicon glyphicon-remove"></i> Remover</button>  
+            </div>  
+          </div>  
+
+          @endforeach
+        @endif
+  
+      </div>
+
+
       <div class="col-md-12">
         <div class="form-group">
            {!! Form::label('observacoes', 'Observações', array('class'=>'control-label')) !!}
@@ -79,11 +99,7 @@
         </div>
       </div>
      
-
-     
-      
-
-          
+   
 
 </div>
 
@@ -92,7 +108,6 @@
 @section('js')
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-@if(!Route::is('pendencia.create'))
 <script>
 	
 	$(document).ready(function() {
@@ -117,6 +132,7 @@
     $('#responsavel_id').select2();
     
     
+   
 
         
     
@@ -169,4 +185,7 @@
     
     }
 </script>
+@endif
+
+
 @stop
