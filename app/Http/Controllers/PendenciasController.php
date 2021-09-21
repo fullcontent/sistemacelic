@@ -233,7 +233,14 @@ class PendenciasController extends Controller
         $pendencia->created_by = Auth::id();
         $pendencia->servico_id = $request->servico_id;
         $pendencia->pendencia  = $request->pendencia;
-        $pendencia->vencimento = Carbon::createFromFormat('d/m/Y', $request->vencimento)->toDateString(); 
+
+        if($request->vencimento)
+        {
+            $pendencia->vencimento = Carbon::createFromFormat('d/m/Y', $request->vencimento)->toDateString();
+        }
+         
+
+
         $pendencia->responsavel_tipo = $request->responsavel_tipo;
         $pendencia->responsavel_id = $request->responsavel_id;
         $pendencia->status = $request->status;

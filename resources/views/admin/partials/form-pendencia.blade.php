@@ -108,84 +108,98 @@
 @section('js')
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
+@if(Route::is('pendencia.edit'))
 <script>
-	
-	$(document).ready(function() {
-
-    var vinculo = {!! $pendencia->vinculo !!}
-
-    console.log(vinculo);
-   
-   
-  if(!vinculo)
-    {
-      $('#vinculo').select2();
-      $('#vinculo').val(null).trigger('change');
-    }
-
-
-    $( "#removerVinculo" ).click(function() {
-     $('#vinculo').val(null).trigger('change');
-   });
-
-
-    $('#responsavel_id').select2();
-    
-    
-   
-
-        
-    
-
-});
-</script>
-@endif
-
-@if(Route::is('pendencia.create'))
-<script>
-   $(document).ready(function() {
-    $('#vinculo').select2();
-    $('#vinculo').val(null).trigger('change');
-   });
+var vinculo = {!! $pendencia->vinculos !!}
+console.log(vinculo.length);
+if(vinculo.length != 0)
+  {
+    $('#vencimento').prop('disabled',true);
+    $('#vencimento').val(null);
+  }
 </script>
 @endif
 
 <script>
-  $(document).ready(function() {
-             
-    var Today = new Date();
+  
+$(document).ready(function() {
+    
+    $('#vinculo').select2({
+    placeholder: "Selecione um serviço",
+    allowClear: true,
+    minimumResultsForSearch: -1,
+    templateResult: hideSelected,
+    });
+    $('#vinculo').val(null).change();
+    $('#vinculo_copy').val(null).change();
 
-    $("#vencimento").datepicker({
-      defaultDate:Today,
-      showButtonPanel:true,
-      todayHighlight: true,
+    $('#vinculo').change(function(e){
+      $('#vencimento').prop('disabled',true);
+      $('#vencimento').val(null);
+    });
 
-});
+var Today = new Date();
 
+      $("#vencimento").datepicker({
+        defaultDate:Today,
+        showButtonPanel:true,
+        todayHighlight: true,
 
+      });
   });
 
-  function removerVinculo(id)
-    {
-      console.log("RemoverVinculo")
-      var pendenciaID = id;
-      
-      $.ajax({
-                url: '{{url('admin/pendencia/removerVinculo')}}/'+pendenciaID+'',
-                method: 'GET',
-                success: function(data) {
+  function hideSelected(value) {
+  if (value && !value.selected) {
+    return $('<span>' + value.text + '</span>');
+  }
+}
 
-                  $(this).data('status', data.completed);    
-                  console.log({!!json_encode($vinculo)!!}); 
-                  
-                  $('#vinculo').select2();
-                                    
-                  },
-                })
+$(".add-more").click(function(){   
+          var html = $(".copy").html(); 
+          
+          $(".after-add-more").after(html);
+          $('#vinculo_copy').select2({
+              placeholder: "Selecione um serviço",
+              allowClear: true,
+              minimumResultsForSearch: -1,
+              templateResult: hideSelected,
+              });
+          $('#vinculo_copy').val(null).change(); 
+      });  
+  
+$("body").on("click",".remove",function(){   
+    $(this).parents(".control-group").remove();  
     
-    }
+});
+
 </script>
-@endif
+
+<script>
+  
+ function removerVinculo(id,servico)
+{
+
+  var pendenciaID = id;
+  var servicoID = servico;
+
+  $.ajax({
+            url: '{{url('admin/pendencia/removerVinculo')}}/'+pendenciaID+'/'+servicoID+'',
+            method: 'GET',
+            success: function(data) {
+
+              $(this).data('status', data.completed);      
+              
+              console.log("Removeu Vinculo");
+              },
+            })
+  
+$('#vinculo').on('select2:select', function (e) {
+    var data = e.params.data;
+    console.log(data);
+});
+ 
+}
+</script>
 
 
 @stop

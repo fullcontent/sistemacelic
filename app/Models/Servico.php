@@ -91,9 +91,14 @@ class Servico extends Model
         return $this->belongsTo('App\Models\Servico', 'servicoPrincipal');
     }
 
-    public function vinculos()
+    public function vinculo()
     {
         return $this->hasMany('App\Models\Pendencia', 'vinculo');
+    }
+
+    public function vinculos()
+    {
+        return $this->hasMany('App\Models\PendenciasVinculos');
     }
 
     

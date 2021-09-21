@@ -14,6 +14,7 @@ use App\Models\Unidade;
 use App\Models\Historico;
 use App\Models\ServicoLpu;
 use App\Models\Pendencia;
+use App\Models\PendenciasVinculos;
 
 
 
@@ -634,6 +635,8 @@ class ServicosController extends Controller
         //
         $servico = Servico::with('servicoPrincipal')->find($id);
 
+
+        
         
             
         //Check if is empresa or unidade
@@ -919,7 +922,6 @@ class ServicosController extends Controller
                         if(!ServicoFinalizado::where('servico_id',$servico->id)->first())
                         {
                             $this->finalizarServico($servico->id);
-
                             $this->removerVinculo($servico->vinculos);
                         }
                         
@@ -1091,16 +1093,20 @@ class ServicosController extends Controller
     public function removerVinculo($vinculos)
     {
        
-        foreach($vinculos as $p)
-        {   
+       
+       //find pendencia
 
-            $pendencia = Pendencia::find($p->id);
-            $pendencia->vinculo = null;
-            $pendencia->vencimento = date('Y-m-d');
-            $pendencia->save();
-           
-        }
-        
+       foreach($vinculos as $v)
+       {
+           $pendencia = Pendencia::find($v->pendencia_id);
+           $pendencia->vencimento = date('Y-m-d');
+           $pendencia->save();
+
+           //remove vinculo
+
+           $pendencia_vinculo = PendenciasVinculos::where('id',$v->id)->delete();
+       }
+               
         
     }
 
