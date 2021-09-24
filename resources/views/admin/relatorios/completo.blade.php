@@ -36,6 +36,7 @@
             <th>Validade da licença</th>
             <th>Valor Total</th>
             <th>Valor em Aberto</th>
+            <th>Finalizado</th>
             
           </tr>
           </thead>
@@ -79,7 +80,8 @@
                     <td>{{ \Carbon\Carbon::parse($s->licenca_validade)->format('d/m/Y')}}</td>
                     
                     <td>{{$s->financeiro->valorTotal ?? '0'}}</td>
-                    <td>{{$s->financeiro->valorAberto ?? '0'}}</td> 
+                    <td>{{$s->financeiro->valorAberto ?? '0'}}</td>
+                    <td>@if(isset($s->servicoFinalizado)){{ \Carbon\Carbon::parse($s->servicoFinalizado->finalizado)->format('d/m/Y') ?? 'N/A'}}@endif</td>
 
                 </tr>
 
