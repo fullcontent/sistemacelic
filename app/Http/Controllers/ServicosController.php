@@ -325,6 +325,7 @@ class ServicosController extends Controller
         $history->servico_id = $servico->id;
         $history->user_id = Auth::id();
         $history->observacoes = "Serviço ".$servico->id." não renovado.";
+        $history->created_at = Carbon::now('america/sao_paulo');
         $history->save();
 
 
@@ -610,6 +611,7 @@ class ServicosController extends Controller
         $history->servico_id = $servico->id;
         $history->user_id = Auth::id();
         $history->observacoes = "Serviço ".$servico->id." cadastrado.";
+        $history->created_at = Carbon::now('america/sao_paulo');
         $history->save();
 
         
@@ -912,6 +914,7 @@ class ServicosController extends Controller
                     $history->servico_id = $servico->id;
                     $history->user_id = Auth::id();
                     $history->observacoes = 'Alterou '.$value.' para "'.$key.'"';
+                    $history->created_at = Carbon::now('america/sao_paulo');
                     $history->save();
 
 
