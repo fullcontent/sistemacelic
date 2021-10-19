@@ -94,7 +94,8 @@
                   
                 </ul>
               </li>
-              <li class="footer"><a href="#">Todas as notificações</a></li>
+              
+              <li class="footer"><a href="{{route('clearMentions')}}">Limpar notificações</a></li>
             </ul>
           </li>
           

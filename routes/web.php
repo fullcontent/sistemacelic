@@ -239,3 +239,9 @@ Route::get('clearNotifications', function(){
 	auth()->user()->notifications()->delete();
 	return redirect()->back();
 })->name('clearNotifications');
+
+Route::get('clearMentions', function(){
+
+	auth()->user()->notifications()->where('type','App\Notifications\UserMentioned')->delete();
+	return redirect()->back();
+})->name('clearMentions');
