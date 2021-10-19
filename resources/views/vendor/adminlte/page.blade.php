@@ -127,7 +127,8 @@
                   
                 </ul>
               </li>
-              <li class="footer"><a href="#">Todas as notificações</a></li>
+              @if(auth()->user()->unreadNotifications->count())<li class="footer"><a href="{{route('clearNotifications')}}">Limpar notificações</a></li>@endif
+              
             </ul>
           </li>
           
@@ -208,7 +209,7 @@
             <section class="content-header">
 
                 @yield('content_header')
-                 {{Breadcrumbs::render()}}
+                
 
             </section>
 
