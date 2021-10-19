@@ -29,7 +29,7 @@
             <div class="inner">
               <h3>{{count($finalizados)}}</h3>
 
-              <p>Serviços Finalizados</p>
+              <p>Serviços finalizados</p>
             </div>
             <div class="icon">
               <i class="ion ion-stats-bars"></i>
