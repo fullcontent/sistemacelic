@@ -224,11 +224,16 @@ $( "#removerProtocolo" ).click(function() {
 
 		if(user_id > 4)
 		{
+		
 
-		document.getElementById('situacao').disabled = true;
-			$(document).on('submit','form',function(){
-				document.getElementById('situacao').disabled = false;
-			});
+		if(document.getElementById('situacao').value == 'finalizado')
+		{
+			document.getElementById('situacao').disabled = true;
+				$(document).on('submit','form',function(){
+					document.getElementById('situacao').disabled = false;
+				});
+		}
+		
 		}
 
 
