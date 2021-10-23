@@ -228,16 +228,23 @@ class ServicosController extends Controller
         if($servico->unidade_id)
         {
 
-            $initial = substr($servico->os, 0,2);
+           $string = $servico->os;
 
-            
-            $lastOS = Servico::where('os','like', '%'.$initial.'%')->orderBy('os','DESC')->pluck('os')->first();
+            $lastOS = Servico::where('os','like', '%'.$string.'%')->orderBy('os','DESC')->pluck('os')->first();
+            $count = strlen($string);
+            $i = 0;
+            while( $i < $count ) {
+                if( ctype_digit($string[$i]) ) {
+                    // echo "First digit found at position $i.";
+                    $os = substr($lastOS, 0, $i);
+                    $number = substr($lastOS, $i, 4);
+                    $number = $number + 1;
+                    $os .= $number;
+                }
+                $i++;
+                }
+                   
 
-            $number = substr($lastOS, 2,4);
-            $number = str_pad($number+1, 4, "000", STR_PAD_LEFT);
-
-            $os = substr($lastOS, 0,2);
-            $os .= $number;
 
         }
 
@@ -258,6 +265,7 @@ class ServicosController extends Controller
 
         $newService->situacao = 'andamento';
         $newService->os = $os;
+
 
         $newService->save();
 
@@ -1113,5 +1121,22 @@ class ServicosController extends Controller
         
     }
 
+
+    public function findFirstNum($myString) {
+
+        $slength = strlen($myString);
+    
+        for ($index = 0;  $index < $slength; $index++)
+        {
+            $char = substr($myString, $index, 1);
+    
+            if (is_numeric($char))
+            {
+                return $index;
+            }
+        }
+    
+        return 0;  //no numbers found
+    }
     
 }
