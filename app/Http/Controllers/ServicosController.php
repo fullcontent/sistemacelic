@@ -1006,7 +1006,7 @@ class ServicosController extends Controller
 
 
          //Notify users
-         $mentions = preg_match_all('[\B@\w+\s\w+]', $request->observacoes, $users);
+         $mentions = preg_match_all('[\B@[a-zA-Z\wÀ-ú]+\s\w+]', $request->observacoes, $users);
         
 
          if($mentions > 0)
