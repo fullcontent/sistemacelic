@@ -90,6 +90,10 @@
 								<button type="button" class="btn btn-xs btn-gray">Stand By</button>
 	              				@break
 
+                        @case('nRenovado')
+								<button type="button" class="btn btn-xs btn-default">Não renovado</button>
+	              				@break
+
 	              		@endswitch</p>
                   <p><b>Ordem de serviço: </b>{{$servico->os}}</p>
                   <p><b>Proposta: </b>{{$servico->proposta}}</p>
@@ -161,7 +165,7 @@
               <a href="{{route('servicos.edit', $servico->id)}}" class="btn btn-info pull-right"><span class="glyphicon glyphicon-pencil"></span> Editar</a>
               
               @if(!$servico->servicoPrincipal)
-              <a href="{{route('servicos.create', ['id'=>$servico->unidade_id,'t'=>substr($route, 0,7),'tipoServico'=>'nRenovaveis','servico_principal'=>$servico->id])}}" class="btn btn-warning pull-right"><span class="glyphicon glyphicon-plus"></span> SubServiço</a>
+              <a href="{{route('servicos.create', ['id'=>$servico->unidade_id,'t'=>substr($route, 0,7),'tipoServico'=>'nRenovaveis','servicoPrincipal'=>$servico->id])}}" class="btn btn-warning pull-right"><span class="glyphicon glyphicon-plus"></span> SubServiço</a>
               @endif
               
               @if(count($servico->subServicos))
@@ -176,6 +180,19 @@
                 <button type="submit" class="btn btn-danger pull-right"><i class="fa fa-barcode"></i> Faturar</button>
 
                 {!! Form::close() !!}
+
+                @elseif($servico->servicoPrincipal)
+
+                {!! Form::open(['route'=>'faturamento.faturarServicoSub','id'=>'cadastroFaturamento', 'target'=>'_blank']) !!}
+  
+                  {!! Form::hidden('servicos[]',$servico->id) !!}
+  
+                  
+                  {!! Form::hidden('empresa_id',$servico->unidade->empresa_id) !!}
+  
+                  <button type="submit" class="btn btn-danger pull-right"><i class="fa fa-barcode"></i> Faturar</button>
+  
+                  {!! Form::close() !!}
 
               @else
               

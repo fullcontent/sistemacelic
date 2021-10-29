@@ -12,7 +12,7 @@
 		
 		@if(Route::is('servicos.create'))
 		
-		
+		{!! Form::hidden('servicoPrincipal', $servicoPrincipal ?? '') !!}
 		
 		{!! Form::select('tipo', array(
 			'licencaOperacao' => 'Licenças de Operação',
@@ -68,7 +68,8 @@
 				'andamento' => 'Andamento',
 				'finalizado' => 'Finalizado',
 				'arquivado'=>'Arquivado',
-				'standBy'=>'Stand By'
+				'standBy'=>'Stand By',
+				'nRenovado'=>'Não renovado',
 				), null, ['class'=>'form-control'])!!}
 
 		@endif
