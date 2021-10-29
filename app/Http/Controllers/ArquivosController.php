@@ -256,7 +256,7 @@ class ArquivosController extends Controller
         $arquivo = $tipo.' '.$servico->unidade->codigo.' - '.$servico->unidade->nomeFantasia.' - '.$servico->nome.'.'.$extension;
 
                        
-        return response()->download(public_path('uploads/'.$filename.''),$arquivo);
+        return response()->file(public_path('uploads/'.$filename.''));
 
     }
 

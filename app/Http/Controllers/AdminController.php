@@ -33,7 +33,7 @@ class AdminController extends Controller
     			
 		
 		
-        // return $this->pendencias();
+        // dd($this->pendencias()->id);
 		
 		return view('admin.dashboard')
 					->with([

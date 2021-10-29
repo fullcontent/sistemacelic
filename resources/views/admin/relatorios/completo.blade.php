@@ -32,6 +32,7 @@
             <th>N° Protocolo</th>
             <th>Emissao Protocolo</th>
             <th>Tipo Licença</th>
+            <th>Proposta</th>
             <th>Emissão da licença</th>
             <th>Validade da licença</th>
             <th>Valor Total</th>
@@ -74,7 +75,8 @@
                     <td>{{$s->protocolo_numero}}</td>
                     <td>{{ \Carbon\Carbon::parse($s->protocolo_emissao)->format('d/m/Y')}}</td>
 
-                    <td>{{$s->tipoLicenca}}</td>  
+                    <td>{{$s->tipoLicenca}}</td>
+                    <td>{{$s->proposta}}</td> 
                     <td>{{ \Carbon\Carbon::parse($s->licenca_emissao)->format('d/m/Y')}}</td>
                     <td>{{ \Carbon\Carbon::parse($s->licenca_validade)->format('d/m/Y')}}</td>
                     

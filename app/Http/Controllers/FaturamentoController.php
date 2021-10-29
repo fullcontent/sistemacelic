@@ -217,12 +217,14 @@ class FaturamentoController extends Controller
                             ->where('id',$request->servicos)
                             ->orWhereIn('id', $subServicos)
                             ->whereHas('servicoFinalizado')
-                                                                                      
                             ->get();
 
                           
               
         $empresas = Empresa::where('id',$request->empresa_id)->get();
+
+
+        return $subServicos;
                 
         
         return view('admin.faturamento.step2')->with([

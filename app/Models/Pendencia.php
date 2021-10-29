@@ -23,5 +23,9 @@ class Pendencia extends Model
     	return $this->hasOneThrough('App\Models\Unidade','App\Models\Servico','unidade_id','id','servico_id','unidade_id');
     }
     
+    public function vinculo()
+    {
+        return $this->belongsTo('App\Models\Servico','vinculo_os');
+    }
         
 }

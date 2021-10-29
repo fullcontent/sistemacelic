@@ -208,7 +208,7 @@
             <section class="content-header">
 
                 @yield('content_header')
-                 {{Breadcrumbs::render()}}
+                 
 
             </section>
 
