@@ -57,6 +57,7 @@ class AdminController extends Controller
                             ->where('responsavel_id', Auth::id())
                             // ->orWhereIn('pendencias.servico_id',$servicos)
                             ->where('status','pendente')
+                            ->whereDoesntHave('vinculos')
             				->get();
            
         	

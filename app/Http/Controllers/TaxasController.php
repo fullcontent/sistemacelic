@@ -56,10 +56,16 @@ class TaxasController extends Controller
         $taxa->nome  = $request->nome;
         $taxa->servico_id = $request->servico_id;
         
-
-        $taxa->emissao = Carbon::createFromFormat('d/m/Y', $request->emissao)->toDateString(); 
+        if($request->emissao)
+        {
+            $taxa->emissao = Carbon::createFromFormat('d/m/Y', $request->emissao)->toDateString(); 
+        }
+       
+        if($request->vencimento)
+        {
+            $taxa->vencimento = Carbon::createFromFormat('d/m/Y', $request->vencimento)->toDateString();
+        }
         
-        $taxa->vencimento = Carbon::createFromFormat('d/m/Y', $request->vencimento)->toDateString();
         
         if($request->pagamento)
         {
@@ -103,6 +109,8 @@ class TaxasController extends Controller
             }
 
         $taxa->reembolso = $request->reembolso;
+
+        $taxa->observacoes  = $request->observacoes;
         
         
         $taxa->save();
@@ -114,6 +122,7 @@ class TaxasController extends Controller
         $history->servico_id = $request->servico_id;
         $history->user_id = Auth::id();
         $history->observacoes = "Taxa ".$taxa->nome." cadastrada.";
+        $history->created_at = Carbon::now('america/sao_paulo');
         $history->save();
 
         
@@ -175,7 +184,13 @@ class TaxasController extends Controller
 
 
         $taxa->nome  = $request->nome;
-        $taxa->emissao = Carbon::createFromFormat('d/m/Y', $request->emissao)->toDateString(); 
+        
+        
+        if($request->emissao)
+        {
+            $taxa->emissao = Carbon::createFromFormat('d/m/Y', $request->emissao)->toDateString(); 
+        }
+      
         
 
         if($request->pagamento)
@@ -189,7 +204,15 @@ class TaxasController extends Controller
         {
              $taxa->pagamento = Carbon::createFromFormat('d/m/Y', $request->pagamento)->toDateString();
         }
-        $taxa->vencimento = Carbon::createFromFormat('d/m/Y', $request->vencimento)->toDateString(); 
+
+        if($request->vencimento)
+        {
+            $taxa->vencimento = Carbon::createFromFormat('d/m/Y', $request->vencimento)->toDateString(); 
+        }
+        
+        
+        
+        
         $taxa->valor =  str_replace (',', '.', str_replace ('.', '', $request->valor));
         $taxa->observacoes = $request->observacoes;
         // $taxa->boleto   =   $request->boleto;
@@ -263,6 +286,7 @@ class TaxasController extends Controller
         $history->servico_id = $servico->id;
         $history->user_id = Auth::id();
         $history->observacoes = "Taxa ".$servico->id." cadastrado.";
+        $history->created_at = Carbon::now('america/sao_paulo');
         $history->save();
 
     }

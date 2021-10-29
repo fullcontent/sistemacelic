@@ -19,7 +19,7 @@
                   @if($pendencia->prioridade == 1)
                       <span style="display:none;">{{$pendencia->prioridade}}</span>
                       
-                      <i class="fa fa-exclamation priorize" style="color:red" data-prioridadeID="{{$pendencia->id}}"></i>
+                      <i class="fa fa-exclamation priorize" style="color:red" data-prioridadeID="{{$pendencia->id}}" onClick="unPriorize({{$pendencia->id}})"></i>
                       
                       @else
                       <span style="display:none;">{{$pendencia->prioridade}}</span>
@@ -229,6 +229,27 @@ function priorize(id)
               $(this).data('status', data.completed);      
               
               $("[data-prioridadeID="+pendenciaID+"]").attr("class","fa fa-exclamation");
+              },
+            })
+ 
+}
+
+function unPriorize(id)
+{
+
+  var pendenciaID = id;
+  
+  $.ajax({
+            url: '{{url('admin/pendencia/unPriority')}}/'+pendenciaID+'',
+            method: 'GET',
+            success: function(data) {
+
+              $(this).data('status', data.completed);      
+              
+              $("[data-prioridadeID="+pendenciaID+"]").removeAttr("class","fa fa-exclamation");
+
+
+              console.log("Removeu Prioridade");
               },
             })
  

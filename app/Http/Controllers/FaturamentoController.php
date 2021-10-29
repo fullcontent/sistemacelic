@@ -207,20 +207,38 @@ class FaturamentoController extends Controller
     public function faturarServicoSub(Request $request)
     {
         
-       
-        $subServicos = Servico::with('subServicos')->find($request->servicos)->pluck('subServicos');
+
+                      
+        $servico = Servico::whereIn('id',$request->servicos)->first();
         
+
+        
+        if($servico->servicoPrincipal != null)
+        {
+            // dump("esse servico é sub");
+            $subServicos = Servico::where('servicoPrincipal',$servico->servicoPrincipal)
+                                    ->orWhere('id',$servico->servicoPrincipal)
+                                    ->pluck('id');
+
+        }
+        else{
+            // dump("esse servico é principal");
+            $subServicos = Servico::whereIn('id',$servico->subServicos->pluck('id'))
+                                    ->pluck('id');
+        }
+        
+        
+        $servicosFaturar = Servico::with('financeiro')
+                                    ->whereIn('id',$subServicos)
+                                    ->orWhere('id',$servico->id)
+                                    // ->whereHas('servicoFinalizado')
+                                    ->get();       
+
+
 
 
                 
-        $servicosFaturar = Servico::with('financeiro')
-                            ->where('id',$request->servicos)
-                            ->orWhereIn('id', $subServicos)
-                            ->whereHas('servicoFinalizado')
-                            ->get();
-
-                          
-              
+        
         $empresas = Empresa::where('id',$request->empresa_id)->get();
 
 

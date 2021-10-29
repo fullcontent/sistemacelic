@@ -49,7 +49,7 @@
 							@default
 								
 						@endswitch</td>
-					<td>{{$servico->os}}</td>
+					<td>{{$servico->os}}@if($servico->servicoPrincipal) <small class="label bg-red">S</small>@endif</td>
 					 
 	              	
 	              	<td><a href="{{route('servicos.show', $servico->id)}}">{{$servico->nome}}</a></td>
@@ -155,7 +155,7 @@
 		      "searching": true,
 		      "ordering": true,
 		      "info": true,
-		      "autoWidth": false,
+		      "autoWidth": true,
 		       "language": {
                 "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
             }           

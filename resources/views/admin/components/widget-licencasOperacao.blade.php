@@ -18,6 +18,7 @@
                     <th>Serviço</th>
                     <th>Status</th>
                     <th></th>
+                    <th></th>
                   
                   </tr>
                   </thead>
@@ -25,7 +26,7 @@
                     @foreach($servicos->where('tipo','licencaOperacao')->where('situacao','!=','arquivado') as $servico)
                   <tr>
                     
-                    <td><a href="{{route('servicos.show',$servico->id)}}">{{$servico->os}} | {{$servico->nome}}</a></td>
+                    <td><a href="{{route('servicos.show',$servico->id)}}">{{$servico->os}} | {{$servico->nome}}</a> @if($servico->servicoPrincipal) <small class="label bg-red">S</small>@endif</td>
                     <td>
                       @switch($servico->situacao)
 
@@ -60,6 +61,7 @@
 
                     @endswitch
                     </td>
+                    <td>@if($servico->licenca_anexo) <a href="{{ route('servico.downloadFile', ['servico_id'=> $servico->id,'tipo'=>'licenca']) }}" class="btn btn-xs btn-warning" target="_blank">Ver Licença</a> @endif</td>
                     <td><a href="{{route('servico.delete', $servico->id)}}" class="confirmation danger" alt="Excluir serviço"> <i class="glyphicon glyphicon-trash
 "></i></a></td>
                     

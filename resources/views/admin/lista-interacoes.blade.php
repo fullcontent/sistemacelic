@@ -45,7 +45,7 @@
                     <i class="{{$label}}"></i>
                     
                     <div class="timeline-item">
-                      <span class="time"><i class="fa fa-clock"></i> {{\Carbon\Carbon::parse($historico->created_at)->format('d/m/Y h:m')}}</span>
+                      <span class="time"><i class="fa fa-clock"></i> {{\Carbon\Carbon::parse($historico->created_at)->format('d/m/Y H:m')}}</span>
                       <h3 class="timeline-header"><a href="#">{{$historico->user->name}}</a></h3>
 
                       <div class="timeline-body">

@@ -22,6 +22,23 @@ class Pendencia extends Model
     {
     	return $this->hasOneThrough('App\Models\Unidade','App\Models\Servico','unidade_id','id','servico_id','unidade_id');
     }
+
+    public function vinculo()
+    {
+        return $this->belongsTo('App\Models\Servico','vinculo');
+    }
+
+    public function vinculos()
+    {
+        return $this->hasManyThrough(
+            'App\Models\Servico',
+            'App\Models\PendenciasVinculos',
+            'pendencia_id',
+            'id',
+            'id',
+            'servico_id'       
+        );
+    }
     
     public function vinculo()
     {

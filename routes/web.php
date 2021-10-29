@@ -54,7 +54,7 @@ Route::get('/', function () {
 		Route::post('/faturamento/step3','FaturamentoController@step3')->name('faturamento.step3');
 		Route::post('/faturamento/step4','FaturamentoController@step4')->name('faturamento.step4');
 
-		Route::post('/faturamento/faturarServico','FaturamentoController@faturarServicoSub')->name('faturamento.faturarServicoSub');
+		Route::post('/faturamento/faturarServicos','FaturamentoController@faturarServicoSub')->name('faturamento.faturarServicoSub');
 
 
 
@@ -99,7 +99,8 @@ Route::get('/', function () {
 
 		Route::get('/pendencia/priority/{id}', 'PendenciasController@priority')->name('pendencia.priority');
 		Route::get('/pendencia/unPriority/{id}', 'PendenciasController@unPriority')->name('pendencia.unPriority');
-
+		
+		Route::get('/pendencia/removerVinculo/{id}/{servico_id}', 'PendenciasController@removerVinculo')->name('pendencia.removerVinculo');
 
 
 		Route::get('/pendencia/create/{servico_id}', 'PendenciasController@create')->name('pendencia.create');
@@ -107,6 +108,7 @@ Route::get('/', function () {
 		
 		Route::get('/pendencias/minhas', 'PendenciasController@minhas')->name('pendencias.minhas');
 		Route::get('/pendencias/outras', 'PendenciasController@outras')->name('pendencias.outras');
+		Route::get('/pendencias/vinculadas', 'PendenciasController@vinculadas')->name('pendencias.vinculadas');
 
 
 		Route::get('/taxa/delete/{id}', 'TaxasController@delete')->name('taxas.delete');
@@ -237,3 +239,9 @@ Route::get('clearNotifications', function(){
 	auth()->user()->notifications()->delete();
 	return redirect()->back();
 })->name('clearNotifications');
+
+Route::get('clearMentions', function(){
+
+	auth()->user()->notifications()->where('type','App\Notifications\UserMentioned')->delete();
+	return redirect()->back();
+})->name('clearMentions');
