@@ -63,6 +63,7 @@
 				'finalizado' => 'Finalizado',
 				'arquivado'=>'Arquivado'
 				), null, ['class'=>'form-control'])!!}
+				
 		@else
 		{!! Form::select('situacao', array(
 				'andamento' => 'Andamento',
