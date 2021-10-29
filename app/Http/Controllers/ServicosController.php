@@ -160,6 +160,23 @@ class ServicosController extends Controller
                     ->with('servicos',$servicos);
     }
 
+    public function listaNRenovados()
+    {   
+
+        
+        
+        $servicos = Servico::with('unidade','empresa','responsavel')
+                                // ->whereIn('unidade_id',$this->getUnidadesList())
+                                ->orWhere('responsavel_id',Auth::id())
+                                ->get();
+       
+        $servicos = $servicos->where('situacao','=','nRenovado');
+        
+
+        return view('admin.lista-servicos')
+                    ->with('servicos',$servicos);
+    }
+
     public function listaVencidos()
     {   
 

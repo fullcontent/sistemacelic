@@ -125,6 +125,7 @@ Route::get('/', function () {
 		Route::get('/servico/inativos/', 'ServicosController@listaInativo')->name('servico.inativo');
 		Route::get('/servico/lista/', 'ServicosController@lista')->name('servico.lista');
 		Route::get('/servico/arquivados/', 'ServicosController@listaArquivados')->name('servico.arquivado');
+		Route::get('/servico/nRenovados/', 'ServicosController@listaNrenovados')->name('servico.nRenovado');
 
 		Route::get('/servico/renovar/{id}', 'ServicosController@renovar')->name('servico.renovar');
 		Route::get('/servico/desconsiderar/{id}', 'ServicosController@desconsiderar')->name('servico.desconsiderar');

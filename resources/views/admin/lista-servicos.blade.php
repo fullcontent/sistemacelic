@@ -115,6 +115,10 @@
 								<button type="button" class="btn btn-xs btn-gray">Stand By</button>
 	              				@break
 
+								  @case('nRenovado')
+								<button type="button" class="btn btn-xs btn-default">Não renovado</button>
+	              				@break
+
 	              		@endswitch
 
 					@if (\Request::is('admin/servico/vencer'))  
