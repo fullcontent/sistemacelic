@@ -288,6 +288,7 @@ class ArquivosController extends Controller
         $history->servico_id = $servico->id;
         $history->user_id = Auth::id();
         $history->observacoes = "Anexou documento ".$pendencia->pendencia." ";
+        $history->created_at = Carbon::now('america/sao_paulo');
         $history->save();
 
     }

@@ -40,5 +40,9 @@ class Pendencia extends Model
         );
     }
     
+    public function vinculo()
+    {
+        return $this->belongsTo('App\Models\Servico','vinculo_os');
+    }
         
 }

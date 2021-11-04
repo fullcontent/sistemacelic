@@ -160,6 +160,23 @@ class ServicosController extends Controller
                     ->with('servicos',$servicos);
     }
 
+    public function listaNRenovados()
+    {   
+
+        
+        
+        $servicos = Servico::with('unidade','empresa','responsavel')
+                                // ->whereIn('unidade_id',$this->getUnidadesList())
+                                ->orWhere('responsavel_id',Auth::id())
+                                ->get();
+       
+        $servicos = $servicos->where('situacao','=','nRenovado');
+        
+
+        return view('admin.lista-servicos')
+                    ->with('servicos',$servicos);
+    }
+
     public function listaVencidos()
     {   
 
@@ -228,16 +245,23 @@ class ServicosController extends Controller
         if($servico->unidade_id)
         {
 
-            $initial = substr($servico->os, 0,2);
+           $string = $servico->os;
 
-            
-            $lastOS = Servico::where('os','like', '%'.$initial.'%')->orderBy('os','DESC')->pluck('os')->first();
+            $lastOS = Servico::where('os','like', '%'.$string.'%')->orderBy('os','DESC')->pluck('os')->first();
+            $count = strlen($string);
+            $i = 0;
+            while( $i < $count ) {
+                if( ctype_digit($string[$i]) ) {
+                    // echo "First digit found at position $i.";
+                    $os = substr($lastOS, 0, $i);
+                    $number = substr($lastOS, $i, 4);
+                    $number = $number + 1;
+                    $os .= $number;
+                }
+                $i++;
+                }
+                   
 
-            $number = substr($lastOS, 2,4);
-            $number = str_pad($number+1, 4, "000", STR_PAD_LEFT);
-
-            $os = substr($lastOS, 0,2);
-            $os .= $number;
 
         }
 
@@ -258,6 +282,7 @@ class ServicosController extends Controller
 
         $newService->situacao = 'andamento';
         $newService->os = $os;
+
 
         $newService->save();
 
@@ -325,6 +350,7 @@ class ServicosController extends Controller
         $history->servico_id = $servico->id;
         $history->user_id = Auth::id();
         $history->observacoes = "Serviço ".$servico->id." não renovado.";
+        $history->created_at = Carbon::now('america/sao_paulo');
         $history->save();
 
 
@@ -610,6 +636,7 @@ class ServicosController extends Controller
         $history->servico_id = $servico->id;
         $history->user_id = Auth::id();
         $history->observacoes = "Serviço ".$servico->id." cadastrado.";
+        $history->created_at = Carbon::now('america/sao_paulo');
         $history->save();
 
         
@@ -912,6 +939,7 @@ class ServicosController extends Controller
                     $history->servico_id = $servico->id;
                     $history->user_id = Auth::id();
                     $history->observacoes = 'Alterou '.$value.' para "'.$key.'"';
+                    $history->created_at = Carbon::now('america/sao_paulo');
                     $history->save();
 
 
@@ -995,7 +1023,7 @@ class ServicosController extends Controller
 
 
          //Notify users
-         $mentions = preg_match_all('[\B@\w+\s\w+]', $request->observacoes, $users);
+         $mentions = preg_match_all('[\B@[a-zA-Z\wÀ-ú]+\s\w+]', $request->observacoes, $users);
         
 
          if($mentions > 0)
@@ -1110,5 +1138,22 @@ class ServicosController extends Controller
         
     }
 
+
+    public function findFirstNum($myString) {
+
+        $slength = strlen($myString);
+    
+        for ($index = 0;  $index < $slength; $index++)
+        {
+            $char = substr($myString, $index, 1);
+    
+            if (is_numeric($char))
+            {
+                return $index;
+            }
+        }
+    
+        return 0;  //no numbers found
+    }
     
 }

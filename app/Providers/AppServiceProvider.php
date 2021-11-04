@@ -100,6 +100,11 @@ class AppServiceProvider extends ServiceProvider
                             'icon'  =>  'glyphicon glyphicon-time text-yellow',
                             ],
                             [
+                                'text' => 'Não renovados',
+                                'url'  =>  route('servico.nRenovado'),
+                                'icon'  =>  'glyphicon glyphicon-remove text-yellow',
+                                ],
+                            [
                             'text' => 'Finalizados',
                             'url'  =>  route('servico.finalizado'),
                             'icon'  =>  'glyphicon glyphicon-ok-sign text-green',

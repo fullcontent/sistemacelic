@@ -122,6 +122,7 @@ class TaxasController extends Controller
         $history->servico_id = $request->servico_id;
         $history->user_id = Auth::id();
         $history->observacoes = "Taxa ".$taxa->nome." cadastrada.";
+        $history->created_at = Carbon::now('america/sao_paulo');
         $history->save();
 
         
@@ -285,6 +286,7 @@ class TaxasController extends Controller
         $history->servico_id = $servico->id;
         $history->user_id = Auth::id();
         $history->observacoes = "Taxa ".$servico->id." cadastrado.";
+        $history->created_at = Carbon::now('america/sao_paulo');
         $history->save();
 
     }

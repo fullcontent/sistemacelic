@@ -63,12 +63,14 @@
 				
 				
 				), null, ['class'=>'form-control'])!!}
+				
 		@else
 		{!! Form::select('situacao', array(
 				'andamento' => 'Andamento',
 				'finalizado' => 'Finalizado',
 				'arquivado'=>'Arquivado',
-				'standBy'=>'Stand By'
+				'standBy'=>'Stand By',
+				'nRenovado'=>'Não renovado',
 				), null, ['class'=>'form-control'])!!}
 
 		@endif

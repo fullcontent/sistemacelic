@@ -90,6 +90,11 @@
 								<button type="button" class="btn btn-xs btn-gray">Stand By</button>
 	              				@break
 
+                        @case('nRenovado')
+								<button type="button" class="btn btn-xs btn-default">Não renovado</button>
+	              				@break
+
+                        
 	              		@endswitch</p>
                   <p><b>Ordem de serviço: </b>{{$servico->os}}</p>
                   <p><b>Proposta: </b>{{$servico->proposta}}</p>

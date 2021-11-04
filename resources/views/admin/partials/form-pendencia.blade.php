@@ -62,7 +62,7 @@
       <div class="col-md-6" id="vinculos">
         <label for="vinculo" class="control-label">Vínculo</label>
         <div class="input-group control-group after-add-more">  
-          {!! Form::select('vinculo', $vinculo, null,['class'=>'form-control','id'=>'vinculo','name'=>'vinculo[]']) !!}
+          {!! Form::select('vinculo', $vinculo, 1,['class'=>'form-control','id'=>'vinculo','name'=>'vinculo[]']) !!}
           <div class="input-group-btn">   
             <button class="btn btn-success add-more" type="button"><i class="glyphicon glyphicon-plus"></i> Adicionar</button>  
           </div>  
@@ -117,18 +117,24 @@ if(vinculo.length != 0)
     $('#vencimento').prop('disabled',true);
     $('#vencimento').val(null);
   }
+
+
 </script>
 @endif
 
 <script>
   
 $(document).ready(function() {
+
+  
+
     
     $('#vinculo').select2({
     placeholder: "Selecione um serviço",
     allowClear: true,
-    minimumResultsForSearch: -1,
+    minimumResultsForSearch: Infinity,
     templateResult: hideSelected,
+    
     });
     $('#vinculo').val(null).change();
     $('#vinculo_copy').val(null).change();
@@ -149,8 +155,10 @@ var Today = new Date();
   });
 
   function hideSelected(value) {
+    console.log(value.text);
   if (value && !value.selected) {
     return $('<span>' + value.text + '</span>');
+    
   }
 }
 

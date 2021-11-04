@@ -178,7 +178,7 @@ $( "#removerProtocolo" ).click(function() {
               console.log("Protocolo Removido");
             },
             })
-		$("#removerProtocolo").after("<p class=danger>Protocolo Removido</p>");
+		$("#removerProtocolo").after("<p class=danger>Protocolo removido</p>");
 
 		
 	});
@@ -196,7 +196,7 @@ $( "#removerProtocolo" ).click(function() {
               console.log("Laudo Removido");
             },
             })
-		$("#removerLaudo").after("<p class=danger>Laudo Removido</p>");
+		$("#removerLaudo").after("<p class=danger>Laudo removido</p>");
 
 		
 	});
@@ -214,12 +214,31 @@ $( "#removerProtocolo" ).click(function() {
               console.log("Licenca Removido");
             },
             })
-		$("#removerLicenca").after("<p class=danger>Licenca Removido</p>");
+		$("#removerLicenca").after("<p class=danger>Licenca removida</p>");
 
 		
 	});
 
 
+	var user_id = {{Auth::id()}};
+
+		if(user_id > 4)
+		{
+		
+
+		if(document.getElementById('situacao').value == 'finalizado')
+		{
+			document.getElementById('situacao').disabled = true;
+				$(document).on('submit','form',function(){
+					document.getElementById('situacao').disabled = false;
+				});
+		}
+		
+		}
+
+
 </script>
+
+
 
 @stop
