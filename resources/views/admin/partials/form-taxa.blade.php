@@ -60,7 +60,8 @@
         {!! Form::text('vencimento', \Carbon\Carbon::parse($taxa->vencimento)->format('d/m/Y'), ['class'=>'form-control','id'=>'vencimento','data-date-format'=>'dd/mm/yyyy']) !!}
         @else
         {!! Form::text('vencimento', null, ['class'=>'form-control','id'=>'vencimento','data-date-format'=>'dd/mm/yyyy']) !!}
-        @endif        </div>
+        @endif        
+        </div>
       </div>
       <div class="col-md-4">
         <div class="form-group">
@@ -104,7 +105,11 @@
       <div class="col-md-4">
         <div class="form-group">
         {!! Form::label('pagamento', 'Data de Pagamento', array('class'=>'control-label')) !!}  
-        {!! Form::text('pagamento', null, ['class'=>'form-control','id'=>'pagamento','data-date-format'=>'dd/mm/yyyy']) !!}    
+          @if(Route::is('taxas.show'))
+          {!! Form::text('pagamento', \Carbon\Carbon::parse($taxa->pagamento)->format('d/m/Y'), ['class'=>'form-control','id'=>'pagamento','data-date-format'=>'dd/mm/yyyy']) !!}
+          @else
+          {!! Form::text('pagamento', null, ['class'=>'form-control','id'=>'pagamento','data-date-format'=>'dd/mm/yyyy']) !!}
+          @endif 
         </div>
       </div>
 

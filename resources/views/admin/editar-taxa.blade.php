@@ -44,7 +44,7 @@
 
   	
 		var comprovante = "{{$taxa->comprovante}}";
-		var pagamento = "{{$taxa->pagamento}}";
+		var pagamento = "{{\Carbon\Carbon::parse($taxa->pagamento)->format('d/m/Y')}}";
 		var boleto = "{{$taxa->boleto}}";
 		
 

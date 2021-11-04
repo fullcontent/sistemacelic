@@ -115,7 +115,7 @@ $servicos = $servicos->where('situacao','=','andamento')
     public function relatorioCompleto()
     {
         
-        $servicos = Servico::with('unidade','responsavel','financeiro')->whereNotIn('responsavel_id',[1])->get();
+        $servicos = Servico::with('unidade','responsavel','financeiro','servicoFinalizado')->whereNotIn('responsavel_id',[1])->get();
 
         // dump($servicos);
 
