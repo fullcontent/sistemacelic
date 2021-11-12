@@ -132,7 +132,7 @@ $(document).ready(function() {
     $('#vinculo').select2({
     placeholder: "Selecione um serviço",
     allowClear: true,
-    minimumResultsForSearch: Infinity,
+    minimumResultsForSearch: -1,
     templateResult: hideSelected,
     
     });
@@ -156,7 +156,8 @@ var Today = new Date();
 
   function hideSelected(value) {
     console.log(value.text);
-  if (value && !value.selected) {
+    
+    if (value) {
     return $('<span>' + value.text + '</span>');
     
   }
