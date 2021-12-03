@@ -11,14 +11,14 @@
 	<div class="box box-primary">
 	
 	
-	{!! Form::model($servico,['route'=>['servicos.update', $servico->id],'method'=>'put','enctype'=>'multipart/form-data']) !!}
+	{!! Form::model($servico,['route'=>['servicos.update', $servico->id],'method'=>'put','enctype'=>'multipart/form-data','id'=>'editServico']) !!}
 
 
 	@include('admin.partials.form-servico')
 
 				<div class="box-footer">
                 <a href="{{route('servicos.show',$servico->id)}}" class="btn btn-default"><i class="fa fa-chevron-left"></i> Voltar</a>
-                <button type="submit" class="btn btn-info"><i class="fa fa-save"></i> Salvar</button> 
+                <button type="" class="btn btn-info"><i class="fa fa-save"></i> Salvar</button> 
               	</div>
     
 	{!! Form::close() !!}
@@ -27,6 +27,7 @@
 
 
 @section('js')
+<script src="http://jqueryvalidation.org/files/dist/jquery.validate.js"></script>
 
 <script>
 	
@@ -38,8 +39,6 @@
   	$("#laudo_emissao").datepicker();
 
   		
-	
-
 
 			var len = document.getElementById("servico_lpu").length;
 
@@ -235,6 +234,38 @@ $( "#removerProtocolo" ).click(function() {
 		}
 		
 		}
+
+		var validator = $("#editServico").validate({
+    rules: { 
+        valorTotal: {
+            required:true,              
+            number: true,
+            notEqual: '0'
+        }
+    }, 
+    messages: { 
+        valorTotal: {
+            required: "Insira um valor válido",               
+            number:"Please enter numbers only",
+            notEqual:"Valor total não pode ser 0"
+        }
+    },
+    submitHandler: function() {  
+        form.submit();
+    }
+});
+jQuery.validator.addMethod("notEqual", function (value, element, param) { // Adding rules for Amount(Not equal to zero)
+    return this.optional(element) || value != '0';
+});
+
+
+	if($("#valorTotal").val() == 0)
+	{	
+		$("#valorAberto").parent().remove();
+		$("#valorAberto").remove();
+
+
+	}
 
 
 </script>

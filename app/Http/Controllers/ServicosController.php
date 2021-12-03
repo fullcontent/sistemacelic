@@ -260,7 +260,7 @@ class ServicosController extends Controller
                 }
                 $i++;
                 }
-                   
+                
 
 
         }
@@ -330,7 +330,7 @@ class ServicosController extends Controller
 
 
 
-        return redirect()->route('servicos.show',$newService->id);
+        return redirect()->route('servicos.edit',$newService->id);
         
 
     }
@@ -804,7 +804,14 @@ class ServicosController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    {
+    {   
+        $request->validate([
+            'solicitante' => 'required',
+            'valorTotal' => 'required',           
+            
+        ]);
+
+
         //
         $servico = Servico::find($id);
         $servico->tipo  =   $request->tipo;
