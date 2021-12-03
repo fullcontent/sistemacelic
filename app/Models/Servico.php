@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class Servico extends Model
 {
     //
+    protected $hidden = [
+        'laravel_through_key'
+    ];
+
+
     public function unidade()
     {
     	return $this->belongsTo('App\Models\Unidade','unidade_id');
@@ -99,6 +104,18 @@ class Servico extends Model
     public function vinculos()
     {
         return $this->hasMany('App\Models\PendenciasVinculos');
+    }
+
+    public function faturamento()
+    {
+        return $this->hasOneThrough(
+            Faturamento::class,
+            FaturamentoServico::class,
+            'servico_id', // Foreign key on the faturamentoServico table...
+            'id', // Foreign key on the faturamento table...
+            'id', // Local key on the Servico table...
+            'faturamento_id' // Local key on the FaturamentoServico table...
+        );
     }
 
     
