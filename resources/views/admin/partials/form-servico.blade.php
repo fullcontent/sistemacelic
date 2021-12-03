@@ -273,8 +273,8 @@
 				</div>	
 				<div class="col-md-2">
 					<div class="form-group">
-				{!! Form::label('valorAberto', 'Valor em Aberto', array('class'=>'control-label')) !!}
-				{!! Form::text('valorAberto', $servico->financeiro->valorAberto, ['class'=>'form-control','id'=>'valorAberto']) !!}
+						{!! Form::label('valorAberto', 'Valor em Aberto', array('class'=>'control-label')) !!}
+						{!! Form::text('valorAberto', $servico->financeiro->valorAberto, ['class'=>'form-control','id'=>'valorAberto']) !!}
 					</div>
 				</div>
 				<div class="col-md-2">
@@ -283,6 +283,21 @@
 				{!! Form::text('proposta', $servico->proposta, ['class'=>'form-control','id'=>'proposta']) !!}
 					</div>
 				</div>
+
+				
+						@if($servico->faturamento)
+						<div class="col-md-12">
+							<div class="form-group">
+						
+								<div class="alert alert-success alert-dismissible">
+									<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+									<h4><i class="icon fa fa-check"></i> Esse serviço já foi faturado!</h4>
+									<a class="btn btn-warning" href="{{route('faturamento.show', $servico->faturamento->id)}}" target="_blank"><i class="fa fa-file"></i> <span>Acessar relatório</span> </a>
+								</div>
+							</div>
+						</div>
+						@endif
+					
 				@endif
 			
 		
