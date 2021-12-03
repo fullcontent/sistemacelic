@@ -20,6 +20,7 @@
                   <th>Data</th>
 				  <th>Total</th>
 				  <th>NF</th>
+				  <th></th>
 				  <th>Actions</th>
 				</tr>
                 </thead>
@@ -45,6 +46,7 @@
 					@endif
 
 				</td>
+				<td style="display:none">{{$f->servicos}}{{$f->obs}}</td>
 				<td><a href="{{route('faturamento.destroy',$f->id)}}" class="confirmation"> <i class="glyphicon glyphicon-trash"></i></a></td>
 				</tr>
 

@@ -25,9 +25,11 @@ class FaturamentoController extends Controller
     public function index()
     {
        $faturamentos = Faturamento::query()
-       ->select('id','valorTotal','created_at','nf','nome','empresa_id')
+       ->select('id','valorTotal','created_at','nf','nome','empresa_id','obs')
          ->with(['empresa' => function($query) {
             $query->select('id','nomeFantasia');
+        },'servicos' => function($query){
+            $query->select('proposta');
         }])
         ->get();
 
