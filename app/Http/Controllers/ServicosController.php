@@ -393,16 +393,19 @@ class ServicosController extends Controller
                     $os = substr($a[0], 0, 1);
                     $os .= substr($a[1], 0, 1); 
 
-                    $lastOS = Servico::where('os','like','%'.$os.'0%')->orderBy('os','DESC')->pluck('os')->first();
+                    $lastOS = Servico::where('os','like','%'.$os.'%')->orderBy('os','DESC')->pluck('os')->first();
 
                     if(!$lastOS)
                     {
                         $number = "0001";
+                        
 
                     }
                     else {
+
                         $number = substr($lastOS, 2,4);
-                        $number = str_pad($number+1, 4, "000", STR_PAD_LEFT);
+                        $number = str_pad($number+1, 4, "000", STR_PAD_LEFT);    
+                                                      
                         
                     }
 
