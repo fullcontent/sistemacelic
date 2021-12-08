@@ -244,7 +244,7 @@ class FaturamentoController extends Controller
         $empresas = Empresa::where('id',$request->empresa_id)->get();
 
 
-        return $subServicos;
+        // return $subServicos;
                 
         
         return view('admin.faturamento.step2')->with([
