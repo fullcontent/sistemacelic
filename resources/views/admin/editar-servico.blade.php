@@ -268,6 +268,12 @@ jQuery.validator.addMethod("notEqual", function (value, element, param) { // Add
 	}
 
 
+	$('#valorTotal').keyup(function() {
+    $('#valorAberto').val($(this).val());
+});
+
+
+
 </script>
 
 
