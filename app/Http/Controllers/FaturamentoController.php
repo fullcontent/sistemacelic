@@ -54,7 +54,10 @@ class FaturamentoController extends Controller
 
         $empresas = Empresa::all()->pluck('nomeFantasia','id');
 
-        return view('admin.faturamento.step1')->with(compact('empresas',$empresas));
+        $propostas = [];
+
+        
+        return view('admin.faturamento.step1')->with(['empresas'=>$empresas,'propostas'=>$propostas]);
 
     }
 
@@ -91,14 +94,14 @@ class FaturamentoController extends Controller
             
         }
 
-
+        // dump($request->propostas);
         
         $servicosFaturar = Servico::with('financeiro')
                             ->orWhereIn('id', $s2)
                             ->whereHas('servicoFinalizado', function($q) use ($start_date, $end_date){
                                 return $q->whereBetween('finalizado', [$start_date,$end_date]);
                             })
-                                                                                      
+                            ->orWhereIn('proposta',$request->propostas)                                                                                     
                             ->get();
               
                             
@@ -108,6 +111,7 @@ class FaturamentoController extends Controller
                 'servicosFaturar'=>$servicosFaturar,
                 'empresas'=>$empresas,
                 'periodo'=>$periodo,
+                'propostas'=>$request->propostas,
             ]);
 
     }
@@ -650,6 +654,29 @@ class FaturamentoController extends Controller
         }
 
         
+    }
+
+
+    public function getPropostas($id)
+    {
+                $id = explode(',',$id);
+            
+            $empresas = \App\Models\Empresa::whereIn('id',$id)->whereHas('propostas')->with('propostas')->get();
+
+            $propostas = [];
+            foreach($empresas as $i)
+            {
+                foreach($i->propostas as $key => $j)
+                {
+                    $propostas[$key] = $j['proposta'];
+                }
+            }
+
+            $data =\App\Models\Servico::whereIn('proposta',$propostas)->distinct('proposta')->pluck('proposta');
+
+            
+
+        return response()->json(['data' => $data]);	
     }
 
 

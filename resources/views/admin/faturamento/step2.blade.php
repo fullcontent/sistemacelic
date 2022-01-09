@@ -21,6 +21,13 @@
 					@endforeach
 					
 				</ul></p>
+			<p><b>Proposta(s): </b>
+			<ul>
+				@foreach($propostas as $p)
+				<li>{{$p}}</li>
+				@endforeach
+			</ul>
+			</p>
 			</div>
 			
 		</div>
@@ -50,6 +57,7 @@
 				<th></th>
 				<th>Finalizado</th>
 				<th>Cód.</th>
+				<th>Proposta</th>
 				<th>Loja</th>
 				<th>Cidade</th>
 				<th>CNPJ</th>
@@ -92,6 +100,7 @@
 								
 								
 								<td>{{$s->unidade->codigo}}</td>
+								<td>{{$s->proposta}}</td>
 								<td>{{$s->unidade->nomeFantasia}}</td>
 								<td>{{$s->unidade->cidade}}</td>
 								<td>@php echo App\Http\Controllers\FaturamentoController::formatCnpjCpf($s->unidade->cnpj); @endphp</td>

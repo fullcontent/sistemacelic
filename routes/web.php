@@ -61,6 +61,8 @@ Route::get('/', function () {
 		Route::get('/faturamento/servicosFinalizados','FaturamentoController@getAllServicesFinished');
 
 		Route::get('/faturamento/servicosErro','FaturamentoController@getErrors');
+		Route::get('/faturamento/getPropostas/{id}','FaturamentoController@getPropostas');
+
 
 		
 		Route::get('/reembolsos', 'ReembolsoController@index')->name('reembolsos.index');
@@ -194,25 +196,26 @@ Route::get('/relatorios',function(){
 
 	});
 
-Route::get('/teste', function() {
+Route::get('admin/teste/{id}', function($id) {
 
-		
-	$user = \App\User::find(1);
-	$servico = \App\Models\Servico::find(1022);
+	$id = explode(',',$id);
+	
+	$empresas = \App\Models\Empresa::whereIn('id',$id)->whereHas('propostas')->with('propostas')->get();
 
-	if($user->privileges == 'admin')
-                    {
-                        $route = 'servicos.show';
-                    }
-                    elseif($user->privileges == 'cliente')
-                    {
-                        $route = 'cliente.servico.show';
-                    }
+	$propostas = [];
+	foreach($empresas as $i)
+	{
+		foreach($i->propostas as $key => $j)
+		{
+			$propostas[$key] = $j['proposta'];
+		}
+	}
 
+	$data =\App\Models\Servico::whereIn('proposta',$propostas)->distinct('proposta')->pluck('proposta');
 
-	$sendmail = \Mail::to($user)->send(new \App\Mail\UsuarioMencionado($servico, $route));
+	
 
-	dump($sendmail);
+  return response()->json(['data' => $data]);	
 
 });
 

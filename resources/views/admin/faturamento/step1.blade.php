@@ -27,11 +27,16 @@
 	
 	</div>
 
-	<div class="col-md-6">
+	<div class="col-md-4">
 
 		{!! Form::label('periodo', 'Selecione o periodo:', array('class'=>'control-label')) !!}
 		{{Form::text('periodo', null, ['class'=>'form-control','id'=>'periodo'])}}
 
+	</div>
+
+	<div class="col-md-2">
+	{!! Form::label('proposta', 'Propostas:', array('class'=>'control-label')) !!}
+	{{ Form::select('propostas[]', $propostas, null,['multiple'=>'multiple','class'=>'form-control','id'=>'propostas']) }}
 	</div>
 	
 </div>
@@ -76,6 +81,38 @@ $("#selectAll").click(function(){
 		
 	});
 
+	$('#empresas').change(function () {
+
+
+		var id = $(this).val();
+			 console.log(id);
+	 
+
+             $('#propostas').find('option').remove();
+
+             $.ajax({
+                url:'{{ url('admin/faturamento/getPropostas') }}/'+id,
+                type:'get',
+                dataType:'json',
+                success:function (response) {
+                    var len = 0;
+                    if (response.data != null) {
+                        len = response.data.length;
+                    }
+
+                    if (len>0) {
+                        for (var i = 0; i<len; i++) {
+                             var id = response.data[i].val;
+                             var proposta = response.data[i].proposta;
+
+                             var option = "<option value='"+response.data[i]+"'>"+response.data[i]+"</option>"; 
+
+                             $("#propostas").append(option);
+                        }
+                    }
+                }
+             })
+           });
 
 </script>
 @endsection
