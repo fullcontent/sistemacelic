@@ -21,6 +21,7 @@
 					@endforeach
 					
 				</ul></p>
+			@if($propostas)
 			<p><b>Proposta(s): </b>
 			<ul>
 				@foreach($propostas as $p)
@@ -28,6 +29,7 @@
 				@endforeach
 			</ul>
 			</p>
+			@endif
 			</div>
 			
 		</div>
