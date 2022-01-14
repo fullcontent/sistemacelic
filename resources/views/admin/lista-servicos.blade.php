@@ -13,7 +13,7 @@
 				<table id="lista-servicos" class="table table-bordered table-hover">
                 <thead>
                 <tr>
-                  <th>Tipo</th>
+                  <th>Cliente</th>
 				  <th>OS</th>
                   <th>Serviço</th>
 				  <th>Venc. Licença</th>
@@ -30,25 +30,11 @@
 				@foreach($servicos as $servico)
                 	
                 	<tr>
-						<td>@switch($servico->tipo)
-							@case('nRenovaveis')
-							Licenças/Projetos não renováveis
-								@break
-							@case('licencaOperacao')
-								Licença de Operação
-								@break
-							@case('controleCertidoes')
-								Certidões
-								@break
-							@case('controleTaxas')
-								Taxas
-								@break
-						  @case('facilitiesRealEstate')
-							  Facilities/Real Estate
-								@break
-							@default
-								
-						@endswitch</td>
+						<?php
+						$tmp = \App\Models\Empresa::find($servico->unidade->empresa_id);
+						?>
+						
+						<td>{{ $tmp->nomeFantasia }}</td>
 					<td>{{$servico->os}}@if($servico->servicoPrincipal) <small class="label bg-red">S</small>@endif</td>
 					 
 	              	
