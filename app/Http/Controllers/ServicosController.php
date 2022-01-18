@@ -1001,6 +1001,8 @@ class ServicosController extends Controller
         $servico = Servico::find($id);
         $servico->pendencias()->delete();
         $servico->taxas()->delete();
+        $servico->vinculos()->delete();
+        $servico->servicoFinalizado()->delete();
         $servico->delete();
 
 
