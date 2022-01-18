@@ -261,8 +261,7 @@ jQuery.validator.addMethod("notEqual", function (value, element, param) { // Add
 
 	if($("#valorTotal").val() == 0)
 	{	
-		$("#valorAberto").parent().remove();
-		$("#valorAberto").remove();
+		
 
 
 	}
