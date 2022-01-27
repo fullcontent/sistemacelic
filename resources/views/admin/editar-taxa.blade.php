@@ -46,12 +46,19 @@
 		var comprovante = "{{$taxa->comprovante}}";
 		var pagamento = "{{\Carbon\Carbon::parse($taxa->pagamento)->format('d/m/Y')}}";
 		var boleto = "{{$taxa->boleto}}";
+		var valor = "{{$taxa->valor}}";
 		
 
 		$("#emissao").datepicker();
 		$("#vencimento").datepicker();	
-		$("#pagamento").datepicker();  	 	
-		$("#valor").mask('000.000.000.000.000,00', {reverse: true});
+		$("#pagamento").datepicker();
+
+		if(!valor){
+			$("#valor").mask('000.000.000.000.000,00', {reverse: true});
+		}
+	
+		
+		
 		$("#pagamento").prop('disabled',true).val();
 		
 		var btnComprovante = $("#comprovante").val();
