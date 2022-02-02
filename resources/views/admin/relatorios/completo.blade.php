@@ -38,6 +38,7 @@
             <th>Valor Total</th>
             <th>Valor em Aberto</th>
             <th>Finalizado</th>
+            <th>Criação</th>
             
           </tr>
           </thead>
@@ -84,6 +85,7 @@
                     <td>{{$s->financeiro->valorTotal ?? '0'}}</td>
                     <td>{{$s->financeiro->valorAberto ?? '0'}}</td>
                     <td>@if(isset($s->servicoFinalizado)){{ \Carbon\Carbon::parse($s->servicoFinalizado->finalizado)->format('d/m/Y') ?? 'N/A'}}@endif</td>
+                    <td>{{ \Carbon\Carbon::parse($s->created_at)->format('d/m/Y') ?? 'N/A'}}</td>
 
                 </tr>
 
