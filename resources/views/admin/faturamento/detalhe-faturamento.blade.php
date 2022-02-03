@@ -8,7 +8,7 @@
     <div class="row">
       <div class="col-xs-12">
         <h2 class="page-header">
-          <img src="{{asset('img/logoCastro.png')}}" alt="" width="300">
+          <img src="http://sistemacelic.net/img/logoCastro.png" alt="" width="300">
           <small class="pull-right">Data: {{$data}}</small>
         </h2>
       </div>
