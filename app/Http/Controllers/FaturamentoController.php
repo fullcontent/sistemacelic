@@ -97,7 +97,7 @@ class FaturamentoController extends Controller
         
         if($request->propostas)
         {
-            $servicosFaturar = Servico::with('financeiro')
+            $servicosFaturar = Servico::with('financeiro','faturado')
             
             ->orWhereIn('id', $s2)
             ->whereHas('servicoFinalizado', function($q) use ($start_date, $end_date){
@@ -108,7 +108,7 @@ class FaturamentoController extends Controller
             ->get();
         }
         else{
-            $servicosFaturar = Servico::with('financeiro')
+            $servicosFaturar = Servico::with('financeiro','faturado')
             ->orWhereIn('id', $s2)
             ->whereHas('servicoFinalizado', function($q) use ($start_date, $end_date){
                 return $q->whereBetween('finalizado', [$start_date,$end_date]);
@@ -117,9 +117,9 @@ class FaturamentoController extends Controller
             ->get();
         }
         
-        
-              
-        // return $servicosFaturar;                 
+
+             
+                           
         
         
         return view('admin.faturamento.step2')->with([

@@ -67,6 +67,7 @@
 				<th>Total</th>
 				
 				<th>Em Aberto</th>
+				<th>Faturado em</th>
 				
 				
 			</thead>
@@ -110,7 +111,12 @@
 								<td>R$ {{number_format($s->financeiro['valorTotal'],2,'.',',')}}</td>
 								
 								<td>R$ {{number_format($s->financeiro['valorAberto'],2,'.',',')}}</td>
+								<td>
+								@if($s->faturado)
 								
+								{{\Carbon\Carbon::parse($s->faturado->created_at)->format('d/m/Y')}}
+								@endif
+								</td>
 
 							</tr>
 							@endforeach

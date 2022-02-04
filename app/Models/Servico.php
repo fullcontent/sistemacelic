@@ -118,6 +118,11 @@ class Servico extends Model
         );
     }
 
+    public function faturado()
+    {
+        return $this->hasOne('App\Models\FaturamentoServico');
+    }
+
     
 
 }
