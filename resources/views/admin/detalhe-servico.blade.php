@@ -36,7 +36,7 @@
   
     <div class="box box-info">
             <div class="box-header with-border">
-              <h3 class="box-title">Detalhes do serviço {{$servico->os}} @if($servico->servicoPrincipal) <small class="label pull-right bg-red">S</small>@endif</h3>
+              <h3 class="box-title"><b>Detalhes do serviço {{$servico->nome}} @if($servico->servicoPrincipal) <small class="label pull-right bg-red">S</small>@endif</b></h3>
 
               <div class="box-tools pull-right">
                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -48,6 +48,7 @@
             <div class="box-body">
                 
                 <div class="col-sm-6">
+                <p><b>Nome: </b>{{$servico->nome}}</p>
                   <p><b>Situação: </b>
                   @switch($servico->situacao)
 
@@ -98,7 +99,7 @@
 	              		@endswitch</p>
                   <p><b>Ordem de serviço: </b>{{$servico->os}}</p>
                   <p><b>Proposta: </b>{{$servico->proposta}}</p>
-                  <p><b>Nome: </b>{{$servico->nome}}</p>
+                  
                   <p><b>Responsável: </b>{{$servico->responsavel->name}}</p>
                   <p><b>Solicitante: </b>{{$servico->solicitante}}</p>
                   <p><b>Início do processo: </b>{{\Carbon\Carbon::parse($servico->created_at)->format('d/m/Y')}}</p>
