@@ -413,7 +413,7 @@ class ServicosController extends Controller
 
                     $os .= $number;
 
-                    $servico_lpu = ServicoLpu::where('empresa_id',$u->empresa->id)->pluck('documento','id')->toArray();
+                    // $servico_lpu = ServicoLpu::where('empresa_id',$u->empresa->id)->pluck('documento','id')->toArray();
 
 
                 break;
@@ -440,7 +440,7 @@ class ServicosController extends Controller
 
                     $os .= $number;
 
-                    $servico_lpu = ServicoLpu::where('empresa_id',$u->id)->pluck('documento','id')->toArray();
+                    // $servico_lpu = ServicoLpu::where('empresa_id',$u->id)->pluck('documento','id')->toArray();
 
                 break;
             
@@ -457,7 +457,7 @@ class ServicosController extends Controller
                     'users'=>$users,
                     'os' => $os,
                     'servico'=>$servico,
-                    'servico_lpu'=>$servico_lpu,
+                    // 'servico_lpu'=>$servico_lpu,
                     'tipoServico'=>$tipoServico,
                     'servicoPrincipal'=>$servicoPrincipal,
                     
@@ -727,9 +727,9 @@ class ServicosController extends Controller
                 
         $users = User::where('privileges','=','admin')->pluck('name','id')->toArray();
 
-        $servico_lpu = ServicoLpu::where('empresa_id',$servico->unidade->empresa->id)->pluck('documento','id')->toArray();
+        // $servico_lpu = ServicoLpu::where('empresa_id',$servico->unidade->empresa->id)->pluck('documento','id')->toArray();
 
-        
+        $servico_lpu = null;
 
         //Check if is empresa or unidade
 
@@ -792,7 +792,7 @@ class ServicosController extends Controller
                         'dados'=>$dados,
                         'route'=>$route,
                         'users'=>$users,
-                        'servico_lpu'=>$servico_lpu,
+                        // 'servico_lpu'=>$servico_lpu,
                         'financeiro'=>$servico->financeiro,
                         'ps'=>$servico->tipo,
                                                 
@@ -846,6 +846,23 @@ class ServicosController extends Controller
 
         
         $financeiro->save();
+
+       
+        if(!$financeiro->wasRecentlyCreated)
+                    {   
+                        $changes = $financeiro->getChanges();
+                        
+                        foreach ($changes as $value => $key) {
+
+                           
+                            $history = new Historico();
+                            $history->servico_id = $servico->id;
+                            $history->user_id = Auth::id();
+                            $history->observacoes = 'Alterou '.$value.' para R$'.$key.'';
+                            $history->created_at = Carbon::now('america/sao_paulo');
+                            $history->save();
+                        }
+                    }
 
 
 
@@ -970,8 +987,14 @@ class ServicosController extends Controller
                         $mS = ServicoFinalizado::where('servico_id',$servico->id)->delete();
                         
                     }
+
+                    
              }
         }
+
+
+          
+        
 
       
 

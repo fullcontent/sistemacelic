@@ -119,7 +119,7 @@
 	<div class="form-group">
 		
 		{!! Form::label('servico_lpu', 'LPU', array('class'=>'control-label')) !!}
-		{!! Form::select('servico_lpu',$servico_lpu, null, ['class'=>'form-control','id'=>'servico_lpu']) !!}
+		
 		
 	</div>
 </div>
