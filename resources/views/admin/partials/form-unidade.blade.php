@@ -266,6 +266,18 @@
 
 
             </div>
+            <div class="col-md-3">
+                
+                <div class="form-group">
+                    
+                    {!! Form::label('areaTerreno', 'Área do terreno', array('class'=>'control-label')) !!}
+                    {!! Form::text('areaTerreno', null, ['class'=>'form-control input-group','id'=>'areaTerreno']) !!}
+                    
+                   
+                </div>
+
+
+            </div>
 </div>
 
 @section('js')
