@@ -42,42 +42,7 @@
 
   	$("#os").val("{!! $os !!}");  	
 	
-	  var len = document.getElementById("servico_lpu").length;
-
-if(len)
-		{
-			// get reference to select element
-		var sel = document.getElementById('servico_lpu');
-
-		// create new option element
-		var opt = document.createElement('option');
-
-		// create text node to add to option element (opt)
-		opt.appendChild( document.createTextNode('Selecione o tipo de serviço') );
-
-		// set value property of opt
-		opt.value = '0';
-
-		opt.selected = true; 
-
-		// add opt to end of select box (sel)
-		sel.appendChild(opt);
-		}
-else
-		{
-		var sel = document.getElementById('servico_lpu');
-
-		// create new option element
-		var opt = document.createElement('option');
-
-		// create text node to add to option element (opt)
-		opt.appendChild( document.createTextNode('Essa empresa não possui LPU') );
-		sel.disabled = true;
-		opt.selected = true;
-		opt.value = '0';
-		sel.appendChild(opt);
-
-		}
+	 
 
 			
 
