@@ -64,6 +64,19 @@ Route::get('/', function () {
 		Route::get('/faturamento/getPropostas/{id}','FaturamentoController@getPropostas');
 
 
+
+		
+		Route::resource('/proposta','PropostasController');
+		
+		Route::get('/proposta/removerServico/{id}','PropostasController@removerServico');	
+		
+		
+		Route::get('/proposta/analisar/{id}','PropostasController@analisar');
+
+		Route::get('/proposta/recusar/{id}','PropostasController@recusar');
+		Route::get('/proposta/aprovar/{id}','PropostasController@aprovar');
+
+
 		
 		Route::get('/reembolsos', 'ReembolsoController@index')->name('reembolsos.index');
 		Route::get('/reembolso/show/{id}', 'ReembolsoController@show')->name('reembolso.show');
@@ -134,6 +147,8 @@ Route::get('/', function () {
 
 		Route::get('/servico/download/{tipo}/{servico_id}', 'ArquivosController@downloadFile')->name('servico.downloadFile');
 
+		Route::get('/servico/download/{file}', 'ArquivosController@downloadBoleto')->name('servico.downloadBoleto');
+
 
 		Route::get('/arquivo/download/{id}', 'ArquivosController@download')->name('arquivo.download');
 		
@@ -196,26 +211,25 @@ Route::get('/relatorios',function(){
 
 	});
 
-Route::get('admin/teste/{id}', function($id) {
+Route::get('admin/teste',function(){
 
-	$id = explode(',',$id);
-	
-	$empresas = \App\Models\Empresa::whereIn('id',$id)->whereHas('propostas')->with('propostas')->get();
-
-	$propostas = [];
-	foreach($empresas as $i)
-	{
-		foreach($i->propostas as $key => $j)
-		{
-			$propostas[$key] = $j['proposta'];
+		if($pdo = DB::connection('mysql')->getPdo()){
+			dump("Server Hostinger OK");
 		}
-	}
-
-	$data =\App\Models\Servico::whereIn('proposta',$propostas)->distinct('proposta')->pluck('proposta');
-
+		else{
+			dump("Server Hostinger OFF");	
+		}
+		if($pdo = DB::connection('mysql2')->getPdo()){
+			dump("Server Locaweb OK");
+		}
+		else{
+			dump("Server Locaweb OFF");
+		}
+				
+		
+	
 	
 
-  return response()->json(['data' => $data]);	
 
 });
 
@@ -249,3 +263,13 @@ Route::get('clearMentions', function(){
 	auth()->user()->notifications()->where('type','App\Notifications\UserMentioned')->delete();
 	return redirect()->back();
 })->name('clearMentions');
+
+
+
+// APIS ROUTES
+
+
+Route::get('api/unidades/get', 'ApiController@getUnidades');
+Route::get('api/responsaveis/get', 'ApiController@getResponsaveis');
+Route::get('api/servicosLpu/get', 'ApiController@getServicosLpu');
+Route::get('api/servicosLpu/find', 'ApiController@getServicoLpuById');
