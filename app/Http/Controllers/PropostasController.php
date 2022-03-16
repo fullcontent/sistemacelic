@@ -37,7 +37,7 @@ class PropostasController extends Controller
      */
     public function create()
     {   
-        $ultimaProposta = Proposta::pluck('proposta')->first();
+        $ultimaProposta = Proposta::pluck('id')->first();
 
         return view('admin.proposta.step1')->with('ultimaProposta',$ultimaProposta);
     }
@@ -68,9 +68,7 @@ class PropostasController extends Controller
     {   
     
      
-        $lastOS = Proposta::pluck('proposta')->first();
-
-
+        
         $proposta = new Proposta;
 
         $proposta->unidade_id = $request->unidade_id;
@@ -107,6 +105,8 @@ class PropostasController extends Controller
                 $propostaServico->posicao = $key;
     
                 $propostaServico->proposta_id = $proposta->id;
+
+                $propostaServico->servicoLpu_id = $s['id'];
     
                 $propostaServico->save();
     
@@ -124,6 +124,7 @@ class PropostasController extends Controller
                     $propostaServicoSub->servico = $s['nome'];
                     $propostaServicoSub->escopo = $s['escopo'];
                     $propostaServicoSub->valor = $s['valor'];
+                    $propostaServicoSub->servicoLpu_id = $s['id'];
                     $propostaServicoSub->posicao = substr($key,-1);
                     $propostaServicoSub->servicoPrincipal = $propostaServico->id;
 
@@ -264,8 +265,8 @@ class PropostasController extends Controller
     {
 
         $proposta = Proposta::find($id);
-        // $proposta->status = "Aprovada";
-        // $proposta->save();
+        $proposta->status = "Aprovada";
+        $proposta->save();
 
         $servicos = array();
 

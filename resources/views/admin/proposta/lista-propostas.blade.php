@@ -53,14 +53,14 @@
 					</td>
 					<td>
 						@if($p->status == 'Em análise')
-						<a href="" class="btn btn-success btn-xs aprovar" data-id="{{$p->id}}"><i class="fa fa-check"></i> Aprovar</a>
+						<a href="" class="btn btn-success btn-xs aprovar" data-id="{{$p->id ?? ''}}"><i class="fa fa-check"></i> Aprovar</a>
 						@endif
 
 						@if($p->status == 'Em análise')
 						<a href="" class="btn btn-warning btn-xs recusar" data-id="{{$p->id}}"><i class="glyphicon glyphicon-thumbs-down"></i></a>
 						@endif
 
-
+						
 						<a href="{{route('removerProposta', $p->id)}}" class="btn btn-danger btn-xs confirmation"> <i class="glyphicon glyphicon-trash"></i></a>
 				
 				</td>

@@ -312,7 +312,7 @@ $(".adicionar").click(function (e) {
                 $.each(data, function (key, value) {
                     var html = '<tr id='+count+'>' +
                         '<td><span>' + count + '</span></td>' +
-                        '<td><input type="text" class="form-control" name="servico[' + count + '][nome]" value="' + value.nome + '"></input></td>' +
+                        '<td><input type="hidden" name="servico[' + count + '][id]" value="' + value.id + '"></input><input type="text" class="form-control" name="servico[' + count + '][nome]" value="' + value.nome + '"></input></td>' +
                         '<td><textarea class="form-control" name="servico[' + count + '][escopo]" style="width:950px;height:90px">' + value.escopo + '</textarea></td>' +
                         '<td><input type="text" class="form-control" name="servico[' + count + '][valor]" value="' + value.valor + '"></input></td>' +
                         '<td><button class="btn btn-xs btn-danger remove" type="button"><i class="glyphicon glyphicon-remove"></i></button></td>' +
@@ -383,7 +383,7 @@ $(".adicionarSub").click(function (e) {
                 $.each(data, function (key, value) {
                     var html = '<tr id=' + last + '.' + c +'>' +
                         '<td><span>' + last + '.' + c +'</span></td>' +
-                        '<td><input type="text" class="form-control" name="servico[' + last + '.' + c +'][nome]" value="' + value.nome + '"></input></td>' +
+                        '<td><input type="hidden" name="servico[' + last + '.' + c +'][id]" value="' + value.id + '"></input><input type="text" class="form-control" name="servico[' + last + '.' + c +'][nome]" value="' + value.nome + '"></input></td>' +
                         '<td><textarea class="form-control" name="servico[' + last + '.' + c +'][escopo]" style="width:950px;height:90px">' + value.escopo + '</textarea></td>' +
                         '<td><input type="text" class="form-control" name="servico[' + last + '.' + c +'][valor]" value="' + value.valor + '"></input></td>' +
                         '<td><button class="btn btn-xs btn-danger removeSub" type="button"><i class="glyphicon glyphicon-remove"></i></button></td>' +
