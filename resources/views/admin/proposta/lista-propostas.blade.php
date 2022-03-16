@@ -32,7 +32,7 @@
 					<td>R$ {{number_format($p->servicos->sum('valor'),2)}}</td>
 					<td>
 						@if($p->status == 'Revisando')
-							<a href="" class="btn btn-default btn-xs status" data-id="{{$p->id}}">{{$p->status}}</a> 
+							<a href="#" class="btn btn-default btn-xs status" data-id="{{$p->id}}">{{$p->status}}</a> 
 							<a href="#" data-id="{{$p->id}}" class="btn btn-info btn-xs analisar"><i class="glyphicon glyphicon-send"></i></a>
 
 						@elseif($p->status == 'Em análise')
@@ -46,7 +46,11 @@
 						
 						@endif
 					</td>
-					<td>Em aberto</td>
+					<td>
+						
+						
+
+					</td>
 					<td>
 						@if($p->status == 'Em análise')
 						<a href="" class="btn btn-success btn-xs aprovar" data-id="{{$p->id}}"><i class="fa fa-check"></i> Aprovar</a>
@@ -57,7 +61,7 @@
 						@endif
 
 
-						<a href="{{route('proposta.destroy', $p->id)}}" class="btn btn-danger btn-xs confirmation"> <i class="glyphicon glyphicon-trash"></i></a>
+						<a href="{{route('removerProposta', $p->id)}}" class="btn btn-danger btn-xs confirmation"> <i class="glyphicon glyphicon-trash"></i></a>
 				
 				</td>
 				</tr>
@@ -104,7 +108,8 @@
 var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');			
 			
 $(function() {
-    $('.analisar').click(function() {        
+    $('.analisar').click(function(e) {   
+		e.preventDefault();     
 		
         var proposta_id = $(this).data('id');
 		var currentRow=$(this).closest("tr");
@@ -138,27 +143,44 @@ $(function() {
   })		
 
 $(function() {
-    $('.aprovar').click(function() {        
+    $('.aprovar').click(function(e) {        
 		
+		e.preventDefault();
+		
+		if(confirm("Gostaria de criar os serviços automaticamente?")){
+        	var s = 1;
+		}
+		else{
+			var s = 0;
+		}
+
         var proposta_id = $(this).data('id');
 		var currentRow=$(this).closest("tr");
 		var status=currentRow.find("td:eq(3)"); 
+		var actions=currentRow.find("td:eq(5)");
          
-		console.log(status);
+		// console.log(status);
 
         $.ajax({
             type: "GET",
-            url: "/admin/proposta/aprovar/"+proposta_id+"",
+            url: "/admin/proposta/aprovar/"+proposta_id+"/"+s+"",
+			datatType : 'JSON',
             data: {
 				id: proposta_id,
-				_token: CSRF_TOKEN
+				_token: CSRF_TOKEN,
+				s: s,
 				},
             success: function(data){
-              console.log(data.success)
+              
+				console.log(data)		  
 			  
-			  
+			  status.empty();
+			  status.append('<a href="#" class="btn btn-success btn-xs">Aprovada</a>');
+			  actions.empty();
+			  actions.append('<a href="{{route("removerProposta", $p->id)}}" class="btn btn-danger btn-xs confirmation"> <i class="glyphicon glyphicon-trash"></i></a>');
 
-			  status.append('<a href="#" class="btn btn-success btn-xs">Aprovada</a>');  
+			 
+
 
             },
 			error: function (result) {
@@ -169,11 +191,15 @@ $(function() {
   })	
 
   $(function() {
-    $('.recusar').click(function() {        
+    $('.recusar').click(function(e) {        
 		
+		e.preventDefault(); 
+
+
         var proposta_id = $(this).data('id');
 		var currentRow=$(this).closest("tr");
-		var status=currentRow.find("td:eq(3)"); 
+		var status=currentRow.find("td:eq(3)");
+		var actions=currentRow.find("td:eq(5)"); 
          
 		console.log(status);
 
@@ -185,10 +211,14 @@ $(function() {
 				_token: CSRF_TOKEN
 				},
             success: function(data){
+
               console.log(data.success)
 			  	  
 			  status.empty();
-			  status.append('<a href="#" class="btn btn-danger btn-xs">Recusada</a>');  
+			  status.append('<a href="#" class="btn btn-danger btn-xs">Recusada</a>'); 
+			  
+			  actions.empty();
+			  actions.append('<a href="{{route("removerProposta", $p->id)}}" class="btn btn-danger btn-xs confirmation"> <i class="glyphicon glyphicon-trash"></i></a>')
 
             },
 			error: function (result) {

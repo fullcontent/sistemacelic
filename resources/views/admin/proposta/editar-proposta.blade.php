@@ -44,7 +44,7 @@
     <div class="row">
 
         <div class="col-xs-12 table-responsive servicos">
-            <table class="table table-striped">
+            <table class="table table-striped" id="servicos">
                 <thead>
                     <tr>
                         <th>Item</th>
@@ -55,30 +55,52 @@
                     </tr>
                 </thead>
                 <tbody>
+                @php $index=0 @endphp
                 @foreach($proposta->servicos as $key => $s)
-                    <tr>
+                    <tr id="{{$index}}">
                     <td>
-                        @if($s->servicoPrincipal)
-                        {{$key}}.{{$s->posicao}}
-                        @else
-                        {{$key+1}}
+                        @if(!$s->servicoPrincipal)
+                         @php $index++ @endphp
                         @endif
+                        
+                        
+
+                        @if($s->servicoPrincipal)
+                
+                        {{$index}}.{{$s->posicao}}
+
+                        @else
+
+                            {{$index}}
+                        @endif
+
+                        
+                        
                     </td>
                     <td>
                         <p><b>{{$s->servico}}</b> </p>
                         <p>{{$s->escopo}}</p>
                     </td>
                     
-                    <td>R$ {{number_format($s->valor,2)}}</td>
+                    <td class="valor" id="{{$index}}">R$ {{number_format($s->valor,2)}}</td>
                     <td>
                         @if($proposta->status == 'Revisando')
-                        <button class="btn btn-xs btn-danger remove no-print" type="button" data-id="{{$s->id}}"><i class="glyphicon glyphicon-remove"></i></button>
+                        <button class="btn btn-xs btn-danger remove no-print" type="button" data-id="{{$s->id}}" data-index="{{$index}}"><i class="glyphicon glyphicon-remove"></i></button>
                         @endif
                     </td>
                     </tr>
+
+                   
                     
 
                 @endforeach
+                <tr>
+                           <td></td>
+                           <td align="right" style="font-weight:bold;"> Total: </td>
+                           <td><span id="total" style="font-weight:bold;"></span></td>
+                           <td></td>
+                        </tr>
+
                 </tbody>
             </table>
         </div>
@@ -135,6 +157,105 @@
 
 <script>
 
+function calculaTotal(){
+    
+    var valorCalculado = 0;
+
+    $(".valor").each(function () {
+        valorCalculado += parseFloat($(this).text().replace(',', '').slice(3, 10));
+    });
+
+    $("#total").text(parseFloat(valorCalculado).toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+    }));
+
+}
+
+
+function calculaSubTotal(){
+    
+    var subTotal = 0;
+    var sum=0;
+    
+    
+    $( ".valor" ).each(function(i, value) {
+       $('td[id^='+i+']').each(function(k, v){
+        sum += parseFloat($(this).text().replace(',','').slice(3,10));
+
+        if(k === $('td[id^='+i+']').length -1){
+            var subtotal = parseFloat(sum).toLocaleString("pt-BR", { style: "currency" , currency:"BRL"});
+            sum=0;
+            
+            
+           
+        }
+        
+        });
+    });
+}
+
+
+
+$(function(){
+
+var valorCalculado = 0;
+
+$( ".valor" ).each(function() {
+  valorCalculado += parseFloat($( this ).text().replace(',','').slice(3,10));
+});
+
+$("#total").text(parseFloat(valorCalculado).toLocaleString("pt-BR", { style: "currency" , currency:"BRL"}));
+
+
+});
+
+
+$(function(){
+
+    var itens = [];
+    var subTotal = 0;
+    var index = "{{$index}}";
+    var sum=0;
+    
+    
+    $( ".valor" ).each(function(i, value) {
+    
+       itens.push(this.id);
+             
+
+       $('td[id^='+i+']').each(function(k, v){
+        sum += parseFloat($(this).text().replace(',','').slice(3,10));
+
+        //    console.log($('td[id^='+i+']')) 
+
+        if(k === $('td[id^='+i+']').length -1){
+            var subtotal = parseFloat(sum).toLocaleString("pt-BR", { style: "currency" , currency:"BRL"});
+            sum=0;
+
+            var html = '<tr><td></td><td align="right" style="font-weight:bold;">SubTotal</td><td style="font-weight:bold;"><span class="subTotal" id='+i+'>'+subtotal+'</span></td><td></td></tr>';
+            
+             $(this).parents('tr').after(html);
+
+             
+
+
+             
+
+            
+             
+        }
+        
+        });
+    });
+
+})
+
+
+    
+
+
+
 var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
 
 $(".remove").click(function (e) {
@@ -157,6 +278,8 @@ $(".remove").click(function (e) {
             success: function (data) {
                 
                 console.log("Removido")
+                calculaTotal();
+                calculaSubTotal();
 
                 
             },

@@ -13,7 +13,13 @@ class PropostaServico extends Model
 
     public function servicoLpu()
         {
-        	return $this->hasMany('App\Models\ServicoLpu');
+        	return $this->belongsTo('App\Models\ServicoLpu','servicoLpu_id');
         }
+    
+    public function faturado()
+    {
+        return $this->hasOneThrough('App\Models\ServicoFinanceiro', 'App\Models\Servico','propostaServico_id');
+    }
+   
     
 }

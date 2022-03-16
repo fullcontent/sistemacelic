@@ -74,7 +74,9 @@ Route::get('/', function () {
 		Route::get('/proposta/analisar/{id}','PropostasController@analisar');
 
 		Route::get('/proposta/recusar/{id}','PropostasController@recusar');
-		Route::get('/proposta/aprovar/{id}','PropostasController@aprovar');
+		Route::get('/proposta/aprovar/{id}/{s}','PropostasController@aprovar');
+
+		Route::get('/proposta/remover/{id}', 'PropostasController@removerProposta')->name('removerProposta');
 
 
 		
