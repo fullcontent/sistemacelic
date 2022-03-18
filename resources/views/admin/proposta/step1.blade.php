@@ -11,13 +11,15 @@
 <div class="box box-primary">
 
     <div class="box-header with-border">
-        <h3 class="box-title">Proposta N°: {{$ultimaProposta+1}}</h3>
+        <h3 class="box-title">Proposta {{$ultimaProposta}}</h3>
     </div>
     @if($errors->any())
     {!! implode('', $errors->all('<div class="alert alert-danger alert-dismissible">:message</div>')) !!}
     @endif
 
     {!! Form::open(['route'=>'proposta.store','id'=>'cadastroProposta','method'=>'post']) !!}
+
+    {!! Form::hidden('proposta_id', $ultimaProposta, ['class'=>'form-control']) !!}
 
     <div class="box-body">
 
