@@ -37,7 +37,10 @@ class PropostasController extends Controller
      */
     public function create()
     {   
-        $ultimaProposta = Proposta::pluck('id')->first();
+
+        
+        $u = Proposta::pluck('id')->last();
+        $ultimaProposta = 1000+$u+1;
 
         return view('admin.proposta.step1')->with('ultimaProposta',$ultimaProposta);
     }
@@ -66,13 +69,18 @@ class PropostasController extends Controller
 
     public function store(Request $request)
     {   
-    
+        
+
+       
      
         
         $proposta = new Proposta;
 
+        $proposta->id = $request->proposta_id;
+
         $proposta->unidade_id = $request->unidade_id;
         $proposta->status = "Revisando";
+
 
         
 
