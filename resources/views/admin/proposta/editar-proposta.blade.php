@@ -27,7 +27,7 @@
     <div class="row invoice-info">
         <div class="col-xs-12">
             <p><b>Cliente: </b><span>{{$proposta->empresa->nomeFantasia}}</span></p>
-            <p><b>CNPJ: </b><span>{{$proposta->empresa->cnpj}}</span></p>
+            <p><b>CNPJ: </b><span>{{$proposta->unidade->cnpj}}</span></p>
             <p><b>Unidade: </b><span>{{$proposta->unidade->nomeFantasia}}</span></p>
             <p><b>Endereço: </b><span>{{$proposta->unidade->endereco}},{{$proposta->unidade->numero}} - {{$proposta->unidade->bairro}} {{$proposta->unidade->cidade}}/{{$proposta->unidade->uf}}</span></p>
         </div>
