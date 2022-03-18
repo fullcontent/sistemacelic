@@ -40,7 +40,7 @@ class PropostasController extends Controller
 
         
         $u = Proposta::pluck('id')->last();
-        $ultimaProposta = 1000+$u+1;
+        $ultimaProposta = $u+1;
 
         return view('admin.proposta.step1')->with('ultimaProposta',$ultimaProposta);
     }
