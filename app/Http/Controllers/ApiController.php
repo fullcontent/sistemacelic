@@ -61,16 +61,16 @@ class ApiController extends Controller
       $search = $request->search;
 
       if($search == ''){
-         $servicos = ServicoLpu::orderby('nomeCelic','asc')->select('id','nomeCelic','processo')->get();
+         $servicos = ServicoLpu::orderby('nome','asc')->select('id','nome','processo')->get();
       }else{
-         $servicos = ServicoLpu::orderby('nomeCelic','asc')->select('id','nomeCelic','processo')->where('nomeCelic', 'like', '%' .$search . '%')->get();
+         $servicos = ServicoLpu::orderby('nome','asc')->select('id','nome','processo')->where('nome', 'like', '%' .$search . '%')->get();
       }
 
       $response = array();
       foreach($servicos as $u){
          $response[] = array(
               "id"=>$u->id,
-              "text"=>$u->nomeCelic." - ".$u->processo,
+              "text"=>$u->nome." - ".$u->processo,
               
          );
       }
