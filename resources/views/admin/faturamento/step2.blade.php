@@ -64,6 +64,7 @@
 				<th>Cidade</th>
 				<th>CNPJ</th>
 				<th>Serviço</th>
+				<th>Solicitante</th>
 				<th>Total</th>
 				
 				<th>Em Aberto</th>
@@ -82,6 +83,7 @@
 								<td>{{$s->unidade->cidade}}</td>
 								<td>@php echo App\Http\Controllers\FaturamentoController::formatCnpjCpf($s->unidade->cnpj); @endphp</td>
 								<td>{{$s->nome}}</td>
+								<td>{{$s->solicitante}}</td>
 								<td>R$ {{number_format($s->financeiro['valorTotal'],2,'.',',')}}</td>
 								
 								<td>R$ {{number_format($s->financeiro['valorAberto'],2,'.',',')}}</td>
@@ -108,6 +110,7 @@
 								<td>{{$s->unidade->cidade}}</td>
 								<td>@php echo App\Http\Controllers\FaturamentoController::formatCnpjCpf($s->unidade->cnpj); @endphp</td>
 								<td>{{$s->nome}}</td>
+								<td>{{$s->solicitante}}</td>
 								<td>R$ {{number_format($s->financeiro['valorTotal'],2,'.',',')}}</td>
 								
 								<td>R$ {{number_format($s->financeiro['valorAberto'],2,'.',',')}}</td>
