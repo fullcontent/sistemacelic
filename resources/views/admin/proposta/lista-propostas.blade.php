@@ -49,15 +49,15 @@
 					<td>
 					@switch(count($p->servicosFaturados))
 						@case(0)
-							<span class="btn btn-default btn-xs aprovar">Em aberto</span>
+							<span class="btn btn-default btn-xs">Em aberto</span>
 						@break
 
 						@case(count($p->servicosFaturados) > count($p->servicosCriados))
-						<span class="btn btn-success btn-xs aprovar">Parcial</span>
+						<span class="btn btn-success btn-xs">Parcial</span>
 						@break
 
 						@case(count($p->servicosFaturados) == count($p->servicosCriados))
-						<span class="btn btn-success btn-xs aprovar">Faturado</span>
+						<span class="btn btn-success btn-xs">Faturado</span>
 						@break
 
 					@endswitch
