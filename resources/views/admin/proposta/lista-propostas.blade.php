@@ -47,9 +47,20 @@
 						@endif
 					</td>
 					<td>
-						
-						
+					@switch(count($p->servicosFaturados))
+						@case(0)
+							<span class="btn btn-default btn-xs aprovar">Em aberto</span>
+						@break
 
+						@case(count($p->servicosFaturados) > count($p->servicosCriados))
+						<span class="btn btn-success btn-xs aprovar">Parcial</span>
+						@break
+
+						@case(count($p->servicosFaturados) == count($p->servicosCriados))
+						<span class="btn btn-success btn-xs aprovar">Faturado</span>
+						@break
+
+					@endswitch
 					</td>
 					<td>
 						@if($p->status == 'Em análise')

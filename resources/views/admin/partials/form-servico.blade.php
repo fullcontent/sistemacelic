@@ -279,8 +279,15 @@
 				</div>
 				<div class="col-md-2">
 					<div class="form-group">
-				{!! Form::label('proposta', 'Proposta', array('class'=>'control-label')) !!}
-				{!! Form::text('proposta', $servico->proposta, ['class'=>'form-control','id'=>'proposta']) !!}
+					{!! Form::label('proposta', 'Proposta', array('class'=>'control-label')) !!}
+
+					@if($servico->proposta_id)
+						<p><a href="{{route('proposta.edit',$servico->proposta_id)}}" class="btn btn-info btn-xs">Ver proposta</a></p>
+					@else
+					
+					{!! Form::text('proposta', $servico->proposta, ['class'=>'form-control','id'=>'proposta']) !!}
+					@endif
+				
 					</div>
 				</div>
 

@@ -18,7 +18,7 @@
         <div class="col-xs-12">
             <h2 class="page-header text-center">
                 
-            Proposta Comercial N°{{$proposta->id}}
+            Proposta Comercial {{$proposta->id}}
             </h2>
         </div>
 
@@ -78,7 +78,12 @@
                         
                     </td>
                     <td>
-                        <p><b>{{$s->servico}}</b> </p>
+                        <p>
+                            <b>{{$s->servico}}</b>
+                            @if($s->servicoCriado)
+                               <a href="{{route('servicos.show',$s->servicoCriado->id)}}" class="btn btn-xs btn-success">{{$s->servicoCriado->os}}</a>
+                            @endif
+                        </p>
                         <p>{{$s->escopo}}</p>
                     </td>
                     

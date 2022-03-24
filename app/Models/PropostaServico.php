@@ -18,7 +18,12 @@ class PropostaServico extends Model
     
     public function faturado()
     {
-        return $this->hasOneThrough('App\Models\ServicoFinanceiro', 'App\Models\Servico','propostaServico_id');
+        return $this->hasOneThrough('App\Models\ServicoFinanceiro', 'App\Models\Servico','propostaServico_id')->where('valorFaturado','=','valorTotal');
+    }
+
+    public function servicoCriado()
+    {
+        return $this->hasOne('App\Models\Servico','propostaServico_id');
     }
    
     

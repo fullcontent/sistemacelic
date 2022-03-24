@@ -21,5 +21,9 @@ class Proposta extends Model
         return $this->belongsTo('App\Models\Unidade');
     }
 
+    public function servicosFaturados()
+    {
+        return $this->hasManyThrough('App\Models\Servico','App\Models\PropostaServico','proposta_id','propostaServico_id')->whereHas('faturamento');
+    }
     
 }

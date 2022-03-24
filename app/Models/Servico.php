@@ -123,6 +123,11 @@ class Servico extends Model
         return $this->hasOne('App\Models\FaturamentoServico');
     }
 
+    public function proposta()
+    {
+        return $this->belongsTo('App\Models\Proposta', 'proposta_id');
+    }
+
     
 
 }
