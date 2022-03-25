@@ -243,7 +243,19 @@ class PropostasController extends Controller
         
          $servico = PropostaServico::find($id);
 
-         $servico->delete();
+        //  dump($servico->servicoCriado->financeiro);
+         
+        //Remover PropostaServico
+        $servico->delete();
+        //Remover Servico
+        $servico->servicoCriado->delete();
+        //Remover Pendencias
+        $servico->servicoCriado->pendencias->delete();
+        //Remover Financeiro
+        $servico->servicoCriado->financeiro->delete();
+
+        //Remover PropostaServico
+        $servico->delete();
                 
     }
 
