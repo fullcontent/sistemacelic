@@ -89,9 +89,9 @@
                     
                     <td class="valor" id="{{$index}}">R$ {{number_format($s->valor,2)}}</td>
                     <td>
-                        @if($proposta->status == 'Revisando')
-                        <button class="btn btn-xs btn-danger remove no-print" type="button" data-id="{{$s->id}}" data-index="{{$index}}"><i class="glyphicon glyphicon-remove"></i></button>
-                        @endif
+                        
+                        <button class="btn btn-xs btn-danger remove no-print" type="button" data-id="{{$s->id}}" data-servicoID="{{$s->servicoCriado->id ?? ''}}" data-index="{{$index}}"><i class="glyphicon glyphicon-remove"></i></button>
+                       
                     </td>
                     </tr>
 
@@ -264,35 +264,47 @@ $(function(){
 var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
 
 $(".remove").click(function (e) {
-    e.preventDefault();
+        
+        e.preventDefault();
 
 
         var servico = $(this).data('id');
-
+        var servicoID = $(this).data('servicoid');
+        
+        
         $(this).parents("tr").remove();
-            
+        
+        if(servicoID)
+        {
+            if(confirm("Isso vai remover o servico que já foi criado"))
+            {
+                    $.ajax({
+                type: "get",
+                url: "/admin/proposta/removerServico/"+servico+"",
+                data: {
+                    id: servico, // < note use of 'this' here
+                    _token: CSRF_TOKEN
+                },
+                success: function (data) {
+                    
+                    console.log("Removido")
+                    calculaTotal();
+                    calculaSubTotal();
 
-
-        $.ajax({
-            type: "get",
-            url: "/admin/proposta/removerServico/"+servico+"",
-            data: {
-                id: servico, // < note use of 'this' here
-                _token: CSRF_TOKEN
-            },
-            success: function (data) {
-                
-                console.log("Removido")
-                calculaTotal();
-                calculaSubTotal();
-
-                
-            },
-            error: function (result) {
-                alert('Erro ao remover');
+                    
+                },
+                error: function (result) {
+                    alert('Erro ao remover');
+                }
+            });
+            } 
+            else{
+                console.log("nao remover")
             }
-        });
-  
+        }
+
+
+       
     
 
 
