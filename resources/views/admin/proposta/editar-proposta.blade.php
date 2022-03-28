@@ -10,9 +10,12 @@
 
 
 
+
 @section('content')
 
-<section class="invoice" style="">
+adicionar
+
+<section class="invoice">
 
     <div class="row">
         <div class="col-xs-12">

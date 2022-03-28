@@ -76,7 +76,7 @@ class PropostasController extends Controller
         
         $proposta = new Proposta;
 
-        $proposta->id = $request->proposta_id;
+        // $proposta->id = $request->proposta_id;
 
         $proposta->unidade_id = $request->unidade_id;
         $proposta->status = "Revisando";
@@ -114,6 +114,8 @@ class PropostasController extends Controller
     
                 $propostaServico->proposta_id = $proposta->id;
 
+                $propostaServico->responsavel_id = $s['responsavel_id'];
+
                 $propostaServico->servicoLpu_id = $s['id'];
     
                 $propostaServico->save();
@@ -137,6 +139,9 @@ class PropostasController extends Controller
                     $propostaServicoSub->servicoPrincipal = $propostaServico->id;
 
                     $propostaServicoSub->proposta_id = $proposta->id;
+
+                    $propostaServicoSub->responsavel_id = $s['responsavel_id'];
+
 
                     $propostaServicoSub->save();
 
@@ -254,8 +259,7 @@ class PropostasController extends Controller
         //Remover Financeiro
         $servico->servicoCriado->financeiro->delete();
 
-        //Remover PropostaServico
-        $servico->delete();
+        
                 
     }
 

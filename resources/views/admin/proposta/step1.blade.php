@@ -69,6 +69,7 @@
                         <th>#</th>
                         <th>Serviço</th> 
                         <th>Escopo</th>
+                        <th width="20%">Responsável</th>
                         <th>Valor Unitário</th>
                         <th></th>  
                                             
@@ -315,7 +316,8 @@ $(".adicionar").click(function (e) {
                     var html = '<tr id='+count+'>' +
                         '<td><span>' + count + '</span></td>' +
                         '<td><input type="hidden" name="servico[' + count + '][id]" value="' + value.id + '"></input><input type="text" class="form-control" name="servico[' + count + '][nome]" value="' + value.nome + '"></input></td>' +
-                        '<td><textarea class="form-control" name="servico[' + count + '][escopo]" style="width:950px;height:90px">' + value.escopo + '</textarea></td>' +
+                        '<td><textarea class="form-control" name="servico[' + count + '][escopo]" style="width:650px;height:90px">' + value.escopo + '</textarea></td>' +
+                        '<td><select class="form-control responsavel" name="servico[' + count + '][responsavel_id]"></select></td>' +
                         '<td><input type="text" class="form-control" name="servico[' + count + '][valor]" value="' + value.valor + '"></input></td>' +
                         '<td><button class="btn btn-xs btn-danger remove" type="button"><i class="glyphicon glyphicon-remove"></i></button></td>' +
                         '</tr>';
@@ -323,6 +325,30 @@ $(".adicionar").click(function (e) {
                     $('.servicos tbody').append(html);
                     $('.servicos').show();
                     $('.servicosLpu').val(null).change();
+
+                        $(".responsavel").select2({
+                        placeholder: 'Quem será responsável por esse serviço?',
+                        allowClear: true,
+                        ajax: {
+                            url: "/api/responsaveis/get",
+                            type: "get",
+                            dataType: 'json',
+                            delay: 250,
+                            data: function (params) {
+                                return {
+                                    _token: CSRF_TOKEN,
+                                    search: params.term // search term
+                                };
+                            },
+                            processResults: function (response) {
+                                return {
+                                    results: response
+                                };
+                                
+                            },
+                            cache: true
+                        }
+                    });
 
 
 
@@ -386,7 +412,8 @@ $(".adicionarSub").click(function (e) {
                     var html = '<tr id=' + last + '.' + c +'>' +
                         '<td><span>' + last + '.' + c +'</span></td>' +
                         '<td><input type="hidden" name="servico[' + last + '.' + c +'][id]" value="' + value.id + '"></input><input type="text" class="form-control" name="servico[' + last + '.' + c +'][nome]" value="' + value.nome + '"></input></td>' +
-                        '<td><textarea class="form-control" name="servico[' + last + '.' + c +'][escopo]" style="width:950px;height:90px">' + value.escopo + '</textarea></td>' +
+                        '<td><textarea class="form-control" name="servico[' + last + '.' + c +'][escopo]" style="width:6    50px;height:90px">' + value.escopo + '</textarea></td>' +
+                        '<td><select class="form-control responsavel" name="servico[' + last + '.' + c +'][responsavel_id]"></select></td>' +
                         '<td><input type="text" class="form-control" name="servico[' + last + '.' + c +'][valor]" value="' + value.valor + '"></input></td>' +
                         '<td><button class="btn btn-xs btn-danger removeSub" type="button"><i class="glyphicon glyphicon-remove"></i></button></td>' +
                         '</tr>';
@@ -394,7 +421,29 @@ $(".adicionarSub").click(function (e) {
                     $('.servicos tbody').append(html);
                     $('.servicos').show();
                     $('.servicosLpu').val(null).change();
-
+                    $(".responsavel").select2({
+                        placeholder: 'Quem será responsável por esse serviço?',
+                        allowClear: true,
+                        ajax: {
+                            url: "/api/responsaveis/get",
+                            type: "get",
+                            dataType: 'json',
+                            delay: 250,
+                            data: function (params) {
+                                return {
+                                    _token: CSRF_TOKEN,
+                                    search: params.term // search term
+                                };
+                            },
+                            processResults: function (response) {
+                                return {
+                                    results: response
+                                };
+                                
+                            },
+                            cache: true
+                        }
+                    });
 
 
                 })
