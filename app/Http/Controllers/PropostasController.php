@@ -25,7 +25,7 @@ class PropostasController extends Controller
     public function index()
     {   
 
-        $propostas = Proposta::all();
+        $propostas = Proposta::orderBy('created_at','DESC')->get();
 
         return view('admin.proposta.lista-propostas')->with('propostas',$propostas);
     }
@@ -70,32 +70,45 @@ class PropostasController extends Controller
     public function store(Request $request)
     {   
         
+        
+               
 
-       
+        if($request->proposta_id)
+        {
+            $proposta = Proposta::find($request->proposta_id);
+            
+
+        }
+
+        else{
+
+            $proposta = new Proposta;
+
+            // $proposta->id = $request->proposta_id;
+    
+            $proposta->unidade_id = $request->unidade_id;
+            $proposta->status = "Revisando";
+    
+    
+            
+    
+            $unidade = Unidade::find($request->unidade_id);
+            $proposta->empresa_id = $unidade->empresa_id;
+    
+            $proposta->responsavel_id = $request->responsavel_id;
+            $proposta->solicitante = $request->solicitante;
+    
+            $proposta->documentos = $request->documentos;
+            $proposta->condicoesGerais = $request->condicoesGerais;
+            $proposta->condicoesPagamento = $request->condicoesPagamento;
+            $proposta->dadosPagamento = $request->dadosPagamento;
+    
+            $proposta->save();
+
+        }
      
         
-        $proposta = new Proposta;
-
-        // $proposta->id = $request->proposta_id;
-
-        $proposta->unidade_id = $request->unidade_id;
-        $proposta->status = "Revisando";
-
-
         
-
-        $unidade = Unidade::find($request->unidade_id);
-        $proposta->empresa_id = $unidade->empresa_id;
-
-        $proposta->responsavel_id = $request->responsavel_id;
-        $proposta->solicitante = $request->solicitante;
-
-        $proposta->documentos = $request->documentos;
-        $proposta->condicoesGerais = $request->condicoesGerais;
-        $proposta->condicoesPagamento = $request->condicoesPagamento;
-        $proposta->dadosPagamento = $request->dadosPagamento;
-
-        $proposta->save();
 
         // dump($proposta);
         
@@ -229,17 +242,39 @@ class PropostasController extends Controller
 
     public function removerProposta($id)
     {
-        return "Deletendo";
-        // $proposta = Proposta::find($id);
-        // $proposta->delete();
+        
+        $proposta = Proposta::find($id);
+        
+        
+        //Verificar se já foram criados os serviços
+        if($proposta->servicos)
+        {
+            foreach($proposta->servicos as $s)
+            {   
 
-        // foreach($proposta->servicos as $s)
-        // {
-        //     $servico = PropostaServico::find($s->id);
-        //     $servico->delete();
-        // }
+                //Arquivar servico
+                if($s->servicoCriado)
+                {
+                    // dump("Servico ja criado - ".$s->servicoCriado->os."");
+                    // dump($s->servicoCriado->financeiro);
 
-        // return route('admin.proposta.index');
+
+                    $servico = Servico::find($s->servicoCriado->id);
+
+                    $servico->situacao = "arquivado";
+                    $servico->save();
+                    // dump($servico);
+                }
+            }
+        }
+
+        $proposta->status = "Arquivada";
+        $proposta->save();
+
+        // dump($proposta);
+        
+
+
     }
 
 
@@ -248,16 +283,36 @@ class PropostasController extends Controller
         
          $servico = PropostaServico::find($id);
 
-        //  dump($servico->servicoCriado->financeiro);
+        if($servico->financeiro)
+        {
+            $servico->servicoCriado->financeiro->delete();
+        }
+
+        if($servico->servicoCriado)
+        {
+
+            if($servico->servicoCriado->pendencias)
+                {
+                    $servico->servicoCriado->pendencias->delete();
+                }
+
+        $servico->servicoCriado->delete();
+
+        }
+
+        
+
+        $servico->delete();
          
         //Remover PropostaServico
-        $servico->delete();
-        //Remover Servico
-        $servico->servicoCriado->delete();
-        //Remover Pendencias
-        $servico->servicoCriado->pendencias->delete();
-        //Remover Financeiro
-        $servico->servicoCriado->financeiro->delete();
+        
+        // $servico->delete();
+        // //Remover Servico
+        // $servico->servicoCriado->delete();
+        // //Remover Pendencias
+        // $servico->servicoCriado->pendencias->delete();
+        // //Remover Financeiro
+        // $servico->servicoCriado->financeiro->delete();
 
         
                 

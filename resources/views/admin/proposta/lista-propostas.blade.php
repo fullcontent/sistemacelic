@@ -12,7 +12,7 @@
 						<i class="fa fa-plus"></i> Cadastrar
 					 </a>
 				</div>
-				<table id="lista-propostas" class="table table-bordered table-hover">
+				<table id="lista-propostas" class="table table-bordered table-hover" data-page-length="25"> 
                 <thead>
                 <tr>
                   <th>#</th>
@@ -43,6 +43,8 @@
 						
 						@elseif($p->status == 'Recusada')
 							<a href="#" class="btn btn-danger btn-xs">Recusada</a>
+						@elseif($p->status == 'Arquivada')
+							<a href="#" class="btn btn-default btn-xs">Arquivada</a>
 						
 						@endif
 					</td>
@@ -71,9 +73,9 @@
 						<a href="" class="btn btn-warning btn-xs recusar" data-id="{{$p->id}}"><i class="glyphicon glyphicon-thumbs-down"></i></a>
 						@endif
 
-						
-						<a href="{{route('removerProposta', $p->id)}}" class="btn btn-danger btn-xs confirmation"> <i class="glyphicon glyphicon-trash"></i></a>
-				
+						@if(!$p->status == "Arquivada")
+						<a href="{{route('removerProposta', $p->id)}}" class="btn btn-danger btn-xs confirmation" data-id="{{$p->id}}"> <i class="glyphicon glyphicon-trash"></i></a>
+						@endif
 				</td>
 				</tr>
 				
@@ -102,16 +104,46 @@
 		    $('#lista-propostas').DataTable({
 		      "paging": true,
 		      "lengthChange": false,
+			  
 		      "searching": true,
-		      "ordering": true,
+		      "ordering": false,
 		      "info": false,
 		      "autoWidth": true,
 		       "language": {
                 "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
             }           
   });
-  $('.confirmation').on('click', function () {
-        		return confirm('Você deseja excluir a proposta?');
+  $('.confirmation').on('click', function (e) {
+						
+						var currentRow=$(this).closest("tr");
+						var proposta_id = $(this).data('id');
+						var status=currentRow.find("td:eq(3)");
+						e.preventDefault();  
+        				if (confirm('Você deseja excluir a proposta?')) {
+        				   
+        				    $.ajax({
+        				        type: "GET",
+        				        url: "/admin/proposta/remover/" + proposta_id + "",
+        				        data: {
+        				            id: proposta_id,
+        				            _token: CSRF_TOKEN
+        				        },
+        				        success: function (data) {
+        				            console.log("Removido"+proposta_id+"")
+									$('a[data-id='+proposta_id+']').remove();
+									status.empty();
+									status.append('<a href="#" class="btn btn-default btn-xs">Arquivada</a>');
+
+        				            
+
+        				        },
+        				        error: function (result) {
+        				            console.log(result)
+        				        }
+        				    });
+        				};
+
+
     			});
 		     
 		    });
