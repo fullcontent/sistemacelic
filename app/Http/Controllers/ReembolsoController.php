@@ -52,7 +52,7 @@ class ReembolsoController extends Controller
     public function create()
     {
       
-        $empresas = Empresa::all()->pluck('nomeFantasia','id');
+        $empresas = Empresa::orderBy('nomeFantasia')->pluck('nomeFantasia','id');
 
         return view('admin.reembolso.step1')->with(compact('empresas',$empresas));
         
