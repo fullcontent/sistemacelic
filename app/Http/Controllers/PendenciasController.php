@@ -38,7 +38,7 @@ class PendenciasController extends Controller
         
         $pendencias = Pendencia::where('responsavel_id',Auth::id())
                      ->where('status','pendente')
-                     ->whereDoesntHave('vinculo')
+                    //  ->whereDoesntHave('vinculo')
                     ->get();
         
                     return view('admin.lista-pendencias')
@@ -98,7 +98,7 @@ class PendenciasController extends Controller
         $s = Servico::find($servico_id);
 
         $servico = Servico::where('id',$servico_id)->pluck('os','id')->toArray();
-        $responsaveis = User::pluck('name','id')->toArray();
+        $responsaveis = User::orderBy('name')->pluck('name','id')->toArray();
 
         $vinculo = Servico::where('unidade_id',$s->unidade->id)
                             ->where('situacao','andamento')
@@ -122,7 +122,13 @@ class PendenciasController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
+    {   
+
+        $request->validate([
+            'pendencia' => 'required',
+            // 'vencimento'=>'required',
+                       
+        ]);
        
 
          
@@ -199,7 +205,8 @@ class PendenciasController extends Controller
                             ->toArray();
 
 
-        $responsaveis = User::pluck('name','id')->toArray();
+        $responsaveis = User::orderBy('name')->pluck('name','id')->toArray();
+        
 
 
         $vinculos = $pendencia->vinculos->pluck('os','id');
