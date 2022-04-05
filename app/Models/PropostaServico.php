@@ -25,6 +25,11 @@ class PropostaServico extends Model
     {
         return $this->hasOne('App\Models\Servico','propostaServico_id');
     }
+
+    public function servicoP()
+    {
+        return $this->hasOne('App\Models\PropostaServico','servicoPrincipal');
+    }
    
     
 }

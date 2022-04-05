@@ -14,6 +14,8 @@ use App\Models\ServicoFinanceiro;
 use App\Models\Pendencia;
 use Carbon\Carbon;
 use Auth;
+use Dompdf\Dompdf;
+
 
 class PropostasController extends Controller
 {
@@ -471,5 +473,25 @@ class PropostasController extends Controller
 
                     return $os;
     }
+
+
+    public function printPDF($id) {
+
+    
+        $proposta = Proposta::find($id);
+
+        $pdf = \PDF::loadView('admin.proposta.pdf',['proposta'=>$proposta])->stream("Proposta - ".$proposta->empresa->nomeFantasia." - ".$proposta->id.".pdf");
+
+
+        // dd($proposta->servicos);
+
+        return $pdf;
+
+      
+    // return view('admin.proposta.pdf',['proposta'=>$proposta]);
+
 }
+}
+
+
 

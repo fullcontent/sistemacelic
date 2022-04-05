@@ -65,6 +65,7 @@
 					@endswitch
 					</td>
 					<td>
+					<a href="{{route('propostaPDF', $p->id)}}" class="btn btn-info btn-xs" target="_blank"> <i class="glyphicon glyphicon-file"></i>PDF</a>
 						@if($p->status == 'Em análise')
 						<a href="" class="btn btn-success btn-xs aprovar" data-id="{{$p->id ?? ''}}"><i class="fa fa-check"></i> Aprovar</a>
 						@endif
@@ -73,8 +74,9 @@
 						<a href="" class="btn btn-warning btn-xs recusar" data-id="{{$p->id}}"><i class="glyphicon glyphicon-thumbs-down"></i></a>
 						@endif
 
-						@if(!$p->status == "Arquivada")
+						@if($p->status != "Arquivada")
 						<a href="{{route('removerProposta', $p->id)}}" class="btn btn-danger btn-xs confirmation" data-id="{{$p->id}}"> <i class="glyphicon glyphicon-trash"></i></a>
+						
 						@endif
 				</td>
 				</tr>

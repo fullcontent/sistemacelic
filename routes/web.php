@@ -78,6 +78,8 @@ Route::get('/', function () {
 
 		Route::get('/proposta/remover/{id}', 'PropostasController@removerProposta')->name('removerProposta');
 
+		Route::get('/proposta/pdf/{id}','PropostasController@printPDF')->name('propostaPDF');
+
 
 		
 		Route::get('/reembolsos', 'ReembolsoController@index')->name('reembolsos.index');
@@ -172,11 +174,8 @@ Route::get('/', function () {
 
 		Route::get('/users/list','UsersController@usersList')->name('users.list');
 
-		Route::get('/relatorios',function(){
-
-			return view('admin.relatorio');
-
-		});
+		Route::get('/relatorios','DashboardController@getLicencasVigentes');
+		Route::get('/mapa','DashboardController@getOurClientsLocation');
 		
 
 	});

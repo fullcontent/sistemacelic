@@ -28,7 +28,7 @@
 </button>
 @endif
 
-<div class="pull-right">
+<div class="pull-right no-print">
 @if($proposta->status == 'Revisando')
 							<a href="#" class="btn btn-default  status" data-id="{{$proposta->id}}">{{$proposta->status}}</a> 
 							<a href="#" data-id="{{$proposta->id}}" class="btn btn-info  analisar"><i class="glyphicon glyphicon-send"></i></a>
@@ -114,7 +114,7 @@
       <div class="col-xs-12">
         <h2 class="text-center">
             
-            <img src="{{asset('img/headerCastro.png')}}" class="img-responsive">
+            <img src="http://sistemacelic.net/img/headerCastro.png" class="img-responsive">
             
           
         </h2>
@@ -254,7 +254,7 @@
     <footer>
     <div class="col-xs-12">
         <h2 class="text-center">
-            <img src="{{asset('img/footerCastro.png')}}" class="img-responsive"></h2>
+            <img src="http://sistemacelic.net/img/footerCastro.png" class="img-responsive"></h2>
         </div>
     </footer>
 
@@ -338,41 +338,40 @@ $("#total").text(parseFloat(valorCalculado).toLocaleString("pt-BR", { style: "cu
 });
 
 
-$(function(){
+$(function () {
 
     var itens = [];
     var subTotal = 0;
     var index = "{{$index}}";
-    var sum=0;
-    
-    
-    $( ".valor" ).each(function(i, value) {
-    
-       itens.push(this.id);
-             
-
-       $('td[id^='+i+']').each(function(k, v){
-        sum += parseFloat($(this).text().replace(',','').slice(3,10));
-
-        //    console.log($('td[id^='+i+']')) 
-
-        if(k === $('td[id^='+i+']').length -1){
-            var subtotal = parseFloat(sum).toLocaleString("pt-BR", { style: "currency" , currency:"BRL"});
-            sum=0;
-
-            var html = '<tr><td></td><td align="right" style="font-weight:bold;">SubTotal</td><td style="font-weight:bold;"><span class="subTotal" id='+i+'>'+subtotal+'</span></td><td></td></tr>';
-            
-             $(this).parents('tr').after(html);
-
-             
+    var sum = 0;
 
 
-             
+    $(".valor").each(function (i, value) {
 
-            
-             
-        }
-        
+        itens.push(this.id);
+
+
+        $('td[id^=' + i + ']').each(function (k, v) {
+            sum += parseFloat($(this).text().replace(',', '').slice(3, 10));
+
+            //    console.log($('td[id^='+i+']')) 
+
+            if (k === $('td[id^=' + i + ']').length - 1) {
+                var subtotal = parseFloat(sum).toLocaleString("pt-BR", {
+                    style: "currency",
+                    currency: "BRL"
+                });
+                sum = 0;
+
+                var html = '<tr><td></td><td align="right" style="font-weight:bold;">SubTotal</td><td style="font-weight:bold;"><span class="subTotal" id=' + i + '>' + subtotal + '</span></td><td></td></tr>';
+
+                $(this).parents('tr').after(html);
+
+
+
+
+            }
+
         });
     });
 
@@ -671,6 +670,10 @@ $(".adicionarSub").click(function (e) {
     @page {
     size: A4;
     margin: 11mm 17mm 17mm 17mm;
+    }
+
+    .pagenum:after {
+    content: counter(page);
     }
        
     @media print {
