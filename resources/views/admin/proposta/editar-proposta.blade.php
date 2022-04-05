@@ -18,13 +18,11 @@
 @section('content')
 
 
-<button class="btn btn-large    btn-default no-print" type="button" onClick="window.print()">
-      Gerar PDF
-</button>
+<a href="{{route('propostaPDF', $proposta->id)}}" class="btn btn-info" target="_blank"> <i class="glyphicon glyphicon-file"></i>Gerar PDF</a>
 
 @if($proposta->status != "Arquivada")
 <button type="button" class="btn btn-default no-print" data-toggle="modal" data-target="#adicionar-servico">
-<i class="fa fa-plus"></i> Adicionar
+<i class="fa fa-plus"></i> Adicionar Serviço
 </button>
 @endif
 
