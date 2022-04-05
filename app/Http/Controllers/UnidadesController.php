@@ -103,6 +103,7 @@ class UnidadesController extends Controller
             $empresa->email         = $request->email;
             $empresa->matriculaRI   = $request->matriculaRI;
             $empresa->area          = $request->area;
+            $empresa->areaTerreno   = $request->areaTerreno;
             $empresa->tipoImovel    = $request->tipoImovel;
 
             $empresa->save();
@@ -260,6 +261,7 @@ class UnidadesController extends Controller
             $empresa->email         = $request->email;
             $empresa->matriculaRI   = $request->matriculaRI;
             $empresa->area          = $request->area;
+            $empresa->areaTerreno   = $request->areaTerreno;
             $empresa->tipoImovel    = $request->tipoImovel;
 
             $empresa->save();
