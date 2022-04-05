@@ -52,7 +52,7 @@ class FaturamentoController extends Controller
     public function create()
     {
 
-        $empresas = Empresa::all()->pluck('nomeFantasia','id');
+        $empresas = Empresa::orderBy('nomeFantasia')->pluck('nomeFantasia','id');
 
         $propostas = [];
 

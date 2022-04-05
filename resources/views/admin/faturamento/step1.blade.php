@@ -100,6 +100,8 @@ $("#selectAll").click(function(){
                         len = response.data.length;
                     }
 
+					response.data.sort(function(a, b){return a-b});
+
                     if (len>0) {
                         for (var i = 0; i<len; i++) {
                              var id = response.data[i].val;
