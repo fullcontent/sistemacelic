@@ -164,7 +164,7 @@
 
 var documentos = "<ul><li>Projeto preventivo aprovado pelo CBMPE</li><li>Licença Ambiental</li></ul>";
 var condicoesGerais = "<p>Todos os custos envolvidos no processo, tais como: taxas, emolumentos, entre outras, serão de responsabilidade do contratante.</p><p>Prazo para elaboração do protocolo: 20 dias</p><p>Prazo da proposta: 15 dias</p>";
-var condicoesPagamento = "<p>100% na entrega dos documentos.</p>";
+var condicoesPagamento = "<p>Faturamento individual conforme finalização de cada item.</p>";
 var dadosPagamento = "<p>Chave PIX: CNPJ 27.352.308/0001-52</p><p>Caixa Econômica Federal</p><p>Agencia: 0921 - Conta Corrente PJ: 6992-4</p><p>Castro Empresarial Serviços Administrativos LTDA-ME</p><p>CNPJ: 27.352.308/0001-52</p>";
 var c = 0;
 
