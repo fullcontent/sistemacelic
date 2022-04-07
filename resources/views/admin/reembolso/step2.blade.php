@@ -47,7 +47,7 @@
 	
 	<div class="col-md-12">
 	
-		<table class="table table-hover">
+		<table class="table table-hover" id="lista-servicos">
 			<thead>
 				
 				<th></th>
@@ -154,6 +154,18 @@
             alert ("Essa taxa ja está dentro de um relatório de reembolso.");
         }
     });
+
+	$('#lista-servicos').DataTable({
+		      "paging": false,
+		      "lengthChange": false,
+		      "searching": true,
+		      "ordering": true,
+		      "info": false,
+		      "autoWidth": false,
+		       "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
+            }           
+  });
 
 </script>
 
