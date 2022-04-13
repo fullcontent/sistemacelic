@@ -27,7 +27,7 @@ class PropostasController extends Controller
     public function index()
     {   
 
-        $propostas = Proposta::orderBy('created_at','DESC')->get();
+        $propostas = Proposta::whereNotIn('empresa_id',[16])->orderBy('created_at','DESC')->get();
 
         return view('admin.proposta.lista-propostas')->with('propostas',$propostas);
     }
@@ -201,6 +201,7 @@ class PropostasController extends Controller
     {   
         
         $proposta = Proposta::with('servicos')->find($id);
+        $this->reOrderServices($proposta->id); //Reordenar indice dos servicos da proposta
           
 
         return view('admin.proposta.editar-proposta')->with(['proposta'=>$proposta]);
@@ -372,6 +373,8 @@ class PropostasController extends Controller
                 $servico->escopo = $s->escopo;
                 $servico->propostaServico_id = $s->id;
                 $servico->proposta_id = $proposta->id;
+                $servico->proposta = $proposta->id;
+
                 
                 if($s->servicoPrincipal)
                 {
@@ -477,20 +480,36 @@ class PropostasController extends Controller
 
     public function printPDF($id) {
 
-    
+    $proposta = Proposta::find($id);
+    $this->reOrderServices($proposta->id); //Reordenar indice dos servicos da proposta
+
+
+    $pdf = \PDF::loadView('admin.proposta.pdf', ['proposta' => $proposta])->stream("Proposta - ".$proposta->empresa->nomeFantasia." - ".$proposta->id.".pdf ");
+    return $pdf;
+
+    // return view('admin.proposta.pdf', ['proposta' => $proposta]);
+
+    }
+
+    public function reOrderServices($id)
+    {
         $proposta = Proposta::find($id);
 
-        $pdf = \PDF::loadView('admin.proposta.pdf',['proposta'=>$proposta])->stream("Proposta - ".$proposta->empresa->nomeFantasia." - ".$proposta->id.".pdf");
+        foreach($proposta->servicos->where('servicoPrincipal')->groupBy('servicoPrincipal') as $key =>$s)
+        {
+            foreach($s as $k => $c)
+            {
+                // dump($k);
+                $serv = PropostaServico::find($c->id);
+                $serv->posicao = $k+1;
+                $serv->save();
+            }
+            
+        }
 
 
-        // dd($proposta->servicos);
+    }
 
-        return $pdf;
-
-      
-    // return view('admin.proposta.pdf',['proposta'=>$proposta]);
-
-}
 }
 
 
