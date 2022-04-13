@@ -54,7 +54,7 @@
 							<span class="btn btn-default btn-xs">Em aberto</span>
 						@break
 
-						@case(count($p->servicosFaturados) > count($p->servicosCriados))
+						@case(count($p->servicosFaturados) < count($p->servicosCriados))
 						<span class="btn btn-success btn-xs">Parcial</span>
 						@break
 
