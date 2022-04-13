@@ -51,13 +51,13 @@ tfoot { display:table-footer-group }
 
             table, th 
             {
-                margin-top: 50px;
+                margin-top: 25px;
             }
 
             main {
                 
 
-                margin-top: 50px;
+                margin-top: 25px;
                
 
             }
@@ -171,6 +171,7 @@ tfoot { display:table-footer-group }
                         <p style="text-align:left;">
                             <b>{{$s->servico}}</b>
                             
+                            
                         </p>
                         <p style="text-align:left;">{{$s->escopo}}</p>
                     </td>
@@ -179,7 +180,7 @@ tfoot { display:table-footer-group }
                     
                     </tr>
                 
-                @if(!$s->servicoP)
+                @if(count($proposta->servicos->where('servicoPrincipal')) <= $key+1)
                     <tr>
                         <td></td>
                         <td style="font-weight:bold; text-align:right;">SubTotal</td>

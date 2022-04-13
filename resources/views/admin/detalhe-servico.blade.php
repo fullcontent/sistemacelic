@@ -99,7 +99,7 @@
 	              		@endswitch</p>
                   <p><b>Ordem de serviço: </b>{{$servico->os}}</p>
                   <p><b>Proposta: </b>@if($servico->proposta_id)
-					      <a href="{{route('proposta.edit',$servico->proposta_id)}}" class="btn btn-info btn-xs">Ver proposta</a>@else{{$servico->proposta}}@endif</p>
+					      <a href="{{route('proposta.edit',$servico->proposta_id)}}" class="btn btn-info btn-xs">{{$servico->proposta_id}}</a>@else{{$servico->proposta}}@endif</p>
                   
                   <p><b>Responsável: </b>{{$servico->responsavel->name}}</p>
                   <p><b>Solicitante: </b>{{$servico->solicitante}}</p>

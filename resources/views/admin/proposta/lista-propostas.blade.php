@@ -105,10 +105,10 @@
 		$(function () {
 		    $('#lista-propostas').DataTable({
 		      "paging": true,
-		      "lengthChange": false,
+		      "lengthChange": true,
 			  
 		      "searching": true,
-		      "ordering": false,
+		      "ordering": true,
 		      "info": false,
 		      "autoWidth": true,
 		       "language": {

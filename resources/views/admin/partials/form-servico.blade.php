@@ -282,7 +282,7 @@
 					{!! Form::label('proposta', 'Proposta', array('class'=>'control-label')) !!}
 
 					@if($servico->proposta_id)
-						<p><a href="{{route('proposta.edit',$servico->proposta_id)}}" class="btn btn-info btn-xs">Ver proposta</a></p>
+						<p><a href="{{route('proposta.edit',$servico->proposta_id)}}" class="btn btn-info btn-xs">{{$servico->proposta_id}}</a></p>
 					@else
 					
 					{!! Form::text('proposta', $servico->proposta, ['class'=>'form-control','id'=>'proposta']) !!}

@@ -25,6 +25,13 @@ class Proposta extends Model
     {
         return $this->hasManyThrough('App\Models\Servico','App\Models\PropostaServico','proposta_id','propostaServico_id')->whereHas('faturamento');
     }
+
+    public function servicosCriados()
+    {
+        return $this->hasManyThrough('App\Models\Servico','App\Models\PropostaServico','proposta_id','propostaServico_id');
+    }
+
+
     
     public function valorTotal()
         {
