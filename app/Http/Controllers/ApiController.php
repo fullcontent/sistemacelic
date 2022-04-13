@@ -83,13 +83,13 @@ class ApiController extends Controller
 
       
       
-      $servico = ServicoLpu::orderby('nome','asc')->select('id','nome','escopo','valor')->find($request->id);
+      $servico = ServicoLpu::orderby('nome','asc')->select('id','nomeCelic','escopo','valor')->find($request->id);
 
 
       $response = array();
       $response[] = array(
               "id"=>$servico->id,
-              "nome"=>$servico->nome,
+              "nome"=>$servico->nomeCelic,
               "escopo"=>$servico->escopo,
               "valor"=>$servico->valor,
               
