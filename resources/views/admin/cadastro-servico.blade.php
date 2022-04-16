@@ -35,16 +35,20 @@
 	
 	$(document).ready(function() {
 
+		$("#solicitante").select2({
+            placeholder: 'Quem é o solicitante?',
+            allowClear: true,
+        });
+
+        $("#solicitante").val('').trigger('change');
+
   	$("#protocolo_emissao").datepicker();
   	$("#licenca_emissao").datepicker();
   	$("#licenca_validade").datepicker();
   	$("#laudo_emissao").datepicker();
 
   	$("#os").val("{!! $os !!}");  	
-	
-	 
-
-			
+				
 
 		document.getElementById('tipoLicenca').onchange = function()
 		{

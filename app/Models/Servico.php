@@ -128,6 +128,11 @@ class Servico extends Model
         return $this->belongsTo('App\Models\Proposta', 'proposta_id');
     }
 
+    public function solicitanteServico()
+    {
+        return $this->hasOne('App\Models\Solicitante','id','solicitante');
+    }
+
     
 
 }

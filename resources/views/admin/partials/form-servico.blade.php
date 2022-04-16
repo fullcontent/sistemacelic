@@ -140,12 +140,22 @@
 
 <div class="col-md-12">
 	
-	<div class="form-group">
+	<div class="input-group input-group-sm form-group">
 		
 		{!! Form::label('solicitante', 'Solicitante', array('class'=>'control-label')) !!}
-		{!! Form::text('solicitante', null, ['class'=>'form-control','id'=>'solicitante']) !!}
+		
+		@if(Route::is('servicos.create'))
+		{!! Form::select('solicitante',$solicitantes ,null, ['class'=>'form-control','id'=>'solicitante']) !!}
+		@else
+		{!! Form::select('solicitante',$solicitantes,null, ['class'=>'form-control','id'=>'solicitante']) !!}
+		@endif
+		<span class="input-group-btn" style="vertical-align: bottom;">
+			<a href="{{route('solicitantes.create')}}" class="btn btn-warning" target="_blank">Novo Solicitante</a>
+		</span>
 		
 	</div>
+
+	
 </div>
 
 <div class="col-md-12">
@@ -386,13 +396,6 @@
 
 
 
-
-
-
-
-
-
-		
 
 
 </div>

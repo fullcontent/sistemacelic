@@ -72,7 +72,8 @@ class AppServiceProvider extends ServiceProvider
                             [
                             'text' => 'Empresas',
                             'url' =>  ''.Auth::user()->privileges.'/empresas',
-                            'icon' => 'glyphicon glyphicon-briefcase'
+                            'icon' => 'glyphicon glyphicon-briefcase',
+                            
                             ],
                             [
                             'text' => 'Unidades',
@@ -172,6 +173,11 @@ class AppServiceProvider extends ServiceProvider
                                     'text' => 'Usuários',
                                     'url'  =>  ''.Auth::user()->privileges.'/usuarios',
                                     'icon' => 'fa fa-users'
+                                    ],
+                                    [
+                                        'text'=>'Solicitantes',
+                                        'url' => ''.Auth::user()->privileges.'/solicitantes',
+                                        'icon' => 'glyphicon glyphicon-user'
                                     ],
                                     [
                                         'text' => 'Listagem geral dos serviços',

@@ -36,6 +36,10 @@ Route::get('/', function () {
 		Route::resource('/taxas','TaxasController');
 		Route::resource('/pendencia','PendenciasController');
 		Route::resource('/arquivo','ArquivosController');
+
+		Route::resource('/solicitantes','SolicitantesController');
+
+		Route::get('/solicitantes/delete/{id}', 'SolicitantesController@destroy')->name('solicitantes.destroy');
 		
 
 		
@@ -274,3 +278,19 @@ Route::get('api/unidades/get', 'ApiController@getUnidades');
 Route::get('api/responsaveis/get', 'ApiController@getResponsaveis');
 Route::get('api/servicosLpu/get', 'ApiController@getServicosLpu');
 Route::get('api/servicosLpu/find', 'ApiController@getServicoLpuById');
+
+
+
+//Test Routes
+
+Route::get('solicitantes', function(){
+
+	$solicitantes = \App\Models\Solicitante::get();
+
+	foreach($solicitantes as $s)
+	{
+		dump($s->empresa);
+	}
+
+
+});

@@ -102,7 +102,20 @@
 					      <a href="{{route('proposta.edit',$servico->proposta_id)}}" class="btn btn-info btn-xs">{{$servico->proposta_id}}</a>@else{{$servico->proposta}}@endif</p>
                   
                   <p><b>Responsável: </b>{{$servico->responsavel->name}}</p>
-                  <p><b>Solicitante: </b>{{$servico->solicitante}}</p>
+
+                  <p><b>Solicitante: </b>
+                    
+                    @if($servico->solicitanteServico)
+                    
+                        {{$servico->solicitanteServico->nome}}
+
+                    @else
+
+                    {{$servico->solicitante}}
+
+                    @endif
+                  </p>
+
                   <p><b>Início do processo: </b>{{\Carbon\Carbon::parse($servico->created_at)->format('d/m/Y')}}</p>
                   
                   @unless ( empty($servico->protocolo_numero) )
