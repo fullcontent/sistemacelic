@@ -114,15 +114,14 @@ class SolicitantesController extends Controller
         $solicitante = Solicitante::find($id);
 
 
-        if($solicitante->isDirty())
-        {
+        
             $solicitante->nome = $request->nome;
             $solicitante->email = $request->email;
             $solicitante->telefone = $request->telefone;
             $solicitante->departamento = $request->departamento;
 
             $solicitante->save();
-        }
+     
         
         $oldEmpresas = $solicitante->empresas->pluck('id')->toArray();
         $newEmpresas = $request->empresas;
