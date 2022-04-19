@@ -11,8 +11,18 @@ class Solicitante extends Model
     	return $this->hasMany('App\Models\Servico','solicitante','nome');
     }
 
-    public function empresa()
+    
+    public function empresas()
     {
-        return $this->belongsTo('App\Models\Empresa');
+        return $this->hasManyThrough(
+            'App\Models\Empresa',
+            'App\Models\SolicitanteEmpresa',
+            'solicitante_id', 
+            'id', 
+            'id', 
+            'empresa_id' 
+        );
     }
+
+    
 }

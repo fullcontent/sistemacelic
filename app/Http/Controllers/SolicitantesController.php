@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Solicitante;
+use App\Models\SolicitanteEmpresa;
 use App\Models\Empresa;
 
 
@@ -16,7 +17,9 @@ class SolicitantesController extends Controller
      */
     public function index()
     {
-        $solicitantes = Solicitante::all();
+        $solicitantes = Solicitante::with('empresas')->get();
+
+       
 
         return view('admin.solicitantes.lista')->with('solicitantes',$solicitantes);
     }
@@ -51,9 +54,20 @@ class SolicitantesController extends Controller
         $solicitante->email = $request->email;
         $solicitante->telefone = $request->telefone;
         $solicitante->departamento = $request->departamento;
-        $solicitante->empresa_id = $request->empresa_id;
-
         $solicitante->save();
+        
+        foreach($request->empresas as $s)
+        {
+            $solicEmp = new SolicitanteEmpresa;
+            $solicEmp->empresa_id = $s;
+            $solicEmp->solicitante_id = $solicitante->id;
+            $solicEmp->save();
+           
+
+        }
+        
+
+        
 
         // return $request->all();
 
@@ -83,8 +97,8 @@ class SolicitantesController extends Controller
     {
         $solicitante = Solicitante::find($id);
         $empresas = Empresa::orderBy('nomeFantasia')->pluck('nomeFantasia','id');
-
-
+        
+        
         return view('admin.solicitantes.editar')->with(['empresas'=>$empresas,'solicitante'=>$solicitante]);
     }
 
@@ -99,15 +113,65 @@ class SolicitantesController extends Controller
     {
         $solicitante = Solicitante::find($id);
 
-        $solicitante->nome = $request->nome;
-        $solicitante->email = $request->email;
-        $solicitante->telefone = $request->telefone;
-        $solicitante->departamento = $request->departamento;
-        $solicitante->empresa_id = $request->empresa_id;
 
-        $solicitante->save();
+        if($solicitante->isDirty())
+        {
+            $solicitante->nome = $request->nome;
+            $solicitante->email = $request->email;
+            $solicitante->telefone = $request->telefone;
+            $solicitante->departamento = $request->departamento;
 
-        // return $request->all();
+            $solicitante->save();
+        }
+        
+        $oldEmpresas = $solicitante->empresas->pluck('id')->toArray();
+        $newEmpresas = $request->empresas;
+
+        if($newEmpresas)
+                {
+                    if($oldEmpresas != $newEmpresas)
+                    {   
+                    //    dump("diferente");
+                                                                     
+                       if($oldEmpresas < $newEmpresas)
+                       {
+                            // dump("adicionou");
+                                        
+                            $nE = array_diff($newEmpresas,$oldEmpresas);
+                            
+                            foreach($nE as $n)
+                            {
+                                $ss = new SolicitanteEmpresa();
+                                $ss->empresa_id = $n;
+                                $ss->solicitante_id = $solicitante->id;
+                                $ss->save();
+                            }
+            
+            
+                       }
+                       if($oldEmpresas > $newEmpresas)
+                       {
+                            // dump("removeu");
+                            
+                                        
+                            $nE = array_diff($oldEmpresas,$newEmpresas);
+                            foreach($nE as $n)
+                            {
+                               $ss = SolicitanteEmpresa::where('solicitante_id',$solicitante->id)->where('empresa_id',$n)->delete();
+                            }
+                       }
+                       
+                    }
+                }
+            else{
+
+                // dump("removeu Tudo");
+
+                foreach($solicitante->empresas as $e){
+                    $ss = SolicitanteEmpresa::where('solicitante_id',$solicitante->id)->where('empresa_id',$e->id)->delete();
+                }
+            }
+
 
         return redirect()->route('solicitantes.index');
 

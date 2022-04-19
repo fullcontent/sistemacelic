@@ -14,7 +14,7 @@
 
 			<thead>
 				<td>Nome</td>
-				<td>Empresa</td>
+				<td>Empresa(s)</td>
 				<td>Departamento</td>
 				<td>Email</td>
                 <td>Telefone</td>
@@ -26,7 +26,11 @@
             @foreach($solicitantes->unique('nome') as $s)
                 <tr>
                     <td>{{$s->nome}}</td>
-                    <td>{{$s->empresa->nomeFantasia}}</td>
+                    <td>
+						@foreach($s->empresas as $e)
+							<span class="btn btn-info btn-xs">{{$e->nomeFantasia}}</span>
+						@endforeach
+					</td>
                     <td>{{$s->departamento}}</td>
                     <td>{{$s->email}}</td>
                     <td>{{$s->telefone}}</td>

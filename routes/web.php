@@ -294,3 +294,19 @@ Route::get('solicitantes', function(){
 
 
 });
+
+
+
+//Get all solicitantes from servicos
+
+Route::get('solicitantes/todos', function(){
+
+	$solicitantes = \App\Models\Servico::orderBy('solicitante')->get()->groupBy('solicitante');
+
+
+	dump($solicitantes);
+	
+
+	
+
+});

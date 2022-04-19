@@ -14,6 +14,7 @@ use App\Models\Unidade;
 use App\Models\Historico;
 use App\Models\ServicoLpu;
 use App\Models\Pendencia;
+use App\Models\Solicitante;
 use App\Models\PendenciasVinculos;
 
 
@@ -373,7 +374,7 @@ class ServicosController extends Controller
         $tipoServico = $request->tipoServico;
     
         $id = $request->id;
-        $users = User::where('privileges','=','admin')->pluck('name','id')->toArray();
+        $users = User::where('privileges','=','admin')->orderBy('name')->pluck('name','id')->toArray();
 
         $servico = null;
         $servicoPrincipal=null;
@@ -447,7 +448,10 @@ class ServicosController extends Controller
             
         }
 
-        
+
+        $solicitantes = Solicitante::whereHas('empresas',function($q) use($u){
+            $q->where('empresa_id', '=', $u->empresa_id);
+        })->orderBy('nome')->get()->pluck('nome','id');   
 
 
         return view('admin.cadastro-servico')
@@ -460,6 +464,7 @@ class ServicosController extends Controller
                     // 'servico_lpu'=>$servico_lpu,
                     'tipoServico'=>$tipoServico,
                     'servicoPrincipal'=>$servicoPrincipal,
+                    'solicitantes'=>$solicitantes,
                     
                     
                 ]);
@@ -666,9 +671,7 @@ class ServicosController extends Controller
         $servico = Servico::with('servicoPrincipal')->find($id);
 
 
-        
-        
-            
+                   
         //Check if is empresa or unidade
 
         if($servico->unidade_id){
@@ -785,6 +788,11 @@ class ServicosController extends Controller
         
        }
        
+       $solicitantes = Solicitante::whereHas('empresas',function($q) use($servico){
+        $q->where('empresa_id', '=', $servico->unidade->empresa_id);
+    })->orderBy('nome')->get()->pluck('nome','id');   
+       
+       
         
         return view('admin.editar-servico')
                     ->with([
@@ -795,6 +803,7 @@ class ServicosController extends Controller
                         // 'servico_lpu'=>$servico_lpu,
                         'financeiro'=>$servico->financeiro,
                         'ps'=>$servico->tipo,
+                        'solicitantes'=>$solicitantes,
                                                 
                     ]);
     }

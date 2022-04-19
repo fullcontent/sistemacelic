@@ -19,8 +19,7 @@
             <div class="form-group">
               
               {!! Form::label('empresa_id', 'Empresa', array('class'=>'control-label')) !!}
-              
-              {!! Form::select('empresa_id', $empresas, null, ['class'=>'form-control empresas']) !!}
+              {!! Form::select('empresa_id', $empresas, null, ['class'=>'form-control empresas','name'=>'empresas[]']) !!}
     
             </div>
     
@@ -90,6 +89,7 @@
         $(".empresas").select2({
             placeholder: 'Selecione a empresa',
             allowClear: true,
+            multiple: true,
         });
 
         $(".empresas").val('').trigger('change');

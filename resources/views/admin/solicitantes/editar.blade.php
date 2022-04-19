@@ -20,7 +20,7 @@
               
               {!! Form::label('empresa_id', 'Empresa', array('class'=>'control-label')) !!}
               
-              {!! Form::select('empresa_id', $empresas, $solicitante->empresa_id, ['class'=>'form-control empresas']) !!}
+              {!! Form::select('empresa_id', $empresas, null, ['class'=>'form-control empresas','name'=>'empresas[]']) !!}
     
             </div>
     
@@ -90,10 +90,20 @@
         $(".empresas").select2({
             placeholder: 'Selecione a empresa',
             allowClear: true,
+            multiple: true,
         });
+    
+    $(".empresas").val('').trigger('change');
+    
+    var solicitanteEmpresas = {!! json_encode($solicitante->empresas->toArray()) !!};
 
-        $(".empresas").val({{$solicitante->empresa_id}}).trigger('change');
+	
+	$.each(solicitanteEmpresas, function (index, value) {
 
+       	var newOption = new Option(value.nomeFantasia, value.id, false, true);
+		$('.empresas').append(newOption).trigger('change');
+       	
+    });
 
 	  	
  
