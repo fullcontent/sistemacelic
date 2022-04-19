@@ -306,7 +306,27 @@ Route::get('solicitantes/todos', function(){
 
 	dump($solicitantes);
 	
+});
 
-	
+
+Route::get('repararHistorico', function () {
+
+		$historico = \App\Models\Historico::with('servico')->where('user_id',null)->get();
+		
+		dump($historico);
+
+
+		foreach($historico as $h)
+		{
+			$serv = \App\Models\Servico::where('id',$h->servico_id)->get();
+
+			foreach($serv as $s)
+			{
+				$hist = \App\Models\Historico::find($h->id);
+				$hist->user_id = $s->responsavel->id;
+				$hist->save();
+			}
+						
+		}
 
 });
