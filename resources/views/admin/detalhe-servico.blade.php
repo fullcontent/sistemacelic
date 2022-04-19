@@ -103,17 +103,18 @@
                   
                   <p><b>Responsável: </b>{{$servico->responsavel->name}}</p>
 
-                  <p><b>Solicitante: </b>
-                    
-                    @if($servico->solicitanteServico)
-                    
+                  @if($servico->solicitanteServico)
+                      <p><b>Solicitante (novo): </b>
                         {{$servico->solicitanteServico->nome}}
 
                     @else
-
+                    <p><b>Solicitante: </b>
                     {{$servico->solicitante}}
 
                     @endif
+                 
+                    
+                    
                   </p>
 
                   <p><b>Início do processo: </b>{{\Carbon\Carbon::parse($servico->created_at)->format('d/m/Y')}}</p>

@@ -147,7 +147,7 @@
 		@if(Route::is('servicos.create'))
 		{!! Form::select('solicitante',$solicitantes ,null, ['class'=>'form-control','id'=>'solicitante']) !!}
 		@else
-		{!! Form::select('solicitante',$solicitantes,null, ['class'=>'form-control','id'=>'solicitante']) !!}
+		{!! Form::select('solicitante',$solicitantes, null, ['class'=>'form-control','id'=>'solicitante']) !!}
 		@endif
 		<span class="input-group-btn" style="vertical-align: bottom;">
 			<a href="{{route('solicitantes.create')}}" class="btn btn-warning" target="_blank">Novo Solicitante</a>
