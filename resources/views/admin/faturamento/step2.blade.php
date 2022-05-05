@@ -83,7 +83,16 @@
 								<td>{{$s->unidade->cidade}}</td>
 								<td>@php echo App\Http\Controllers\FaturamentoController::formatCnpjCpf($s->unidade->cnpj); @endphp</td>
 								<td>{{$s->nome}}</td>
-								<td>{{$s->solicitante}}</td>
+								<td>
+									@if($servico->solicitanteServico)
+                     
+                        {{$servico->solicitanteServico->nome}}
+
+                    @else
+                   
+                    {{$servico->solicitante}}
+
+                    @endif</td>
 								<td>R$ {{number_format($s->financeiro['valorTotal'],2,'.',',')}}</td>
 								
 								<td>R$ {{number_format($s->financeiro['valorAberto'],2,'.',',')}}</td>
