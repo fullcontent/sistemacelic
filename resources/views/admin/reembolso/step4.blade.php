@@ -47,7 +47,11 @@
 								<td>{{$s->unidade->nomeFantasia}}</td>
 								<td>{{$s->servico->nome}}</td>
 								<td>{{$s->nome}}</td>
-								<td>{{$s->servico->solicitante}}</td>
+								<td>@if(!is_numeric($s->servico->solicitante))
+                  {{$s->servico->solicitante}}
+                  @else
+                  {{\App\Models\Solicitante::where('id',$s->servico->solicitante)->value('nome')}}
+                  @endif</td>
 								<td>R$ {{number_format($s->valor,2,'.',',')}}</td>
 								<td>{{ \Carbon\Carbon::parse($s->vencimento)->format('d/m/Y')}}</td>
 								<td>{{ \Carbon\Carbon::parse($s->pagamento)->format('d/m/Y')}}</td>
