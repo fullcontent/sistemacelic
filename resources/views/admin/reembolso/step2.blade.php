@@ -77,7 +77,7 @@
 						@if(!is_numeric($s->servico->solicitante))
 						{{$s->servico->solicitante}}
 						@else
-						{{\App\Models\Solicitante::find($s->servico->solicitante)->value('nome')}}
+						{{\App\Models\Solicitante::where('id',$s->servico->solicitante)->value('nome')}}
 						@endif
 					</td>
 					<td>R$ {{number_format($s->valor,2,'.',',')}}</td>
