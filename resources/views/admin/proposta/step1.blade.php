@@ -35,7 +35,8 @@
             <div class="form-group">
 
                 {!! Form::label('solicitante', 'Solicitante: ', array('class'=>'control-label')) !!}
-                {!! Form::text('solicitante', null, ['class'=>'form-control','id'=>'solicitante']) !!}
+
+               {!! Form::select('solicitante',$solicitantes,null, ['class'=>'form-control','id'=>'solicitante']) !!}
 
             </div>
 
@@ -159,6 +160,12 @@
 
 <script>
 
+$("#solicitante").select2({
+            placeholder: 'Quem é o solicitante?',
+            allowClear: true,
+        });
+
+        $("#solicitante").val('').trigger('change');
 
 
 
