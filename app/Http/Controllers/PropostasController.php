@@ -12,6 +12,7 @@ use App\Models\ServicoLpu;
 use App\Models\Historico;
 use App\Models\ServicoFinanceiro;
 use App\Models\Pendencia;
+use App\Models\Solicitante;
 use Carbon\Carbon;
 use Auth;
 use Dompdf\Dompdf;
@@ -44,7 +45,14 @@ class PropostasController extends Controller
         $u = Proposta::pluck('id')->last();
         $ultimaProposta = $u+1;
 
-        return view('admin.proposta.step1')->with('ultimaProposta',$ultimaProposta);
+        $solicitantes = Solicitante::orderBy('nome')->get()->unique('nome')->pluck('nome','id');
+
+
+        return view('admin.proposta.step1')->with(
+            [
+                'ultimaProposta'=>$ultimaProposta,
+                'solicitantes'=>$solicitantes,
+            ]);
     }
 
     /**
