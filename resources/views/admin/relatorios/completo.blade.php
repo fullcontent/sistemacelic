@@ -72,7 +72,11 @@
                     <td>{{$s->responsavel->name}}</td>
                     <td>{{$s->nome}}</td>
                     
-                    <td>{{$s->solicitante}}</td>
+                    <td>@if(!is_numeric($s->solicitante))
+                      {{$s->solicitante}}
+                      @else
+                      {{\App\Models\Solicitante::where('id',$s->solicitante)->value('nome')}}
+                      @endif</td>
 
                     <td>{{$s->protocolo_numero}}</td>
                     <td>{{ \Carbon\Carbon::parse($s->protocolo_emissao)->format('d/m/Y')}}</td>
