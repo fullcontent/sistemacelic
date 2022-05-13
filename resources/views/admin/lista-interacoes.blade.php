@@ -49,8 +49,22 @@
                       <h3 class="timeline-header"><a href="#">{{$historico->user->name}}</a></h3>
 
                       <div class="timeline-body">
-                  			{{$historico->observacoes}}
-                	  </div>
+                        @if(str_contains($historico->observacoes, 'Alterou solicitante'))
+                          @php
+                              $id = preg_replace('/[^0-9]/', '', $historico->observacoes);  
+                              $solicitante = \App\Models\Solicitante::where('id',$id)->value('nome');
+                              echo "Alterou solicitante para ".$solicitante;
+                          @endphp
+                        @elseif(str_contains($historico->observacoes, 'Alterou responsavel_id'))
+                          @php
+                              $id = preg_replace('/[^0-9]/', '', $historico->observacoes);  
+                              $solicitante = \App\User::where('id',$id)->value('name');
+                              echo "Alterou responsável para ".$solicitante;
+                          @endphp
+
+                        @else
+                        {{$historico->observacoes}}
+                        @endif                	  </div>
                     </div>
                   </li>
                   <!-- END timeline item -->
