@@ -82,7 +82,12 @@
                     <td>{{ \Carbon\Carbon::parse($s->protocolo_emissao)->format('d/m/Y')}}</td>
 
                     <td>{{$s->tipoLicenca}}</td>
-                    <td>{{$s->proposta}}</td> 
+                    <td>@if($s->proposta_id)
+                        {{$s->proposta_id}}
+                        @else
+                        {{$s->proposta}}
+                        @endif
+                    </td> 
                     <td>{{ \Carbon\Carbon::parse($s->licenca_emissao)->format('d/m/Y')}}</td>
                     <td>{{ \Carbon\Carbon::parse($s->licenca_validade)->format('d/m/Y')}}</td>
                     
