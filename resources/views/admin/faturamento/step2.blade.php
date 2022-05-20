@@ -21,6 +21,8 @@
 					@endforeach
 					
 				</ul></p>
+		
+		@if(isset($propostas))
 			@if($propostas)
 			<p><b>Proposta(s): </b>
 			<ul>
@@ -30,6 +32,7 @@
 			</ul>
 			</p>
 			@endif
+		@endif
 			</div>
 			
 		</div>
@@ -84,13 +87,13 @@
 								<td>@php echo App\Http\Controllers\FaturamentoController::formatCnpjCpf($s->unidade->cnpj); @endphp</td>
 								<td>{{$s->nome}}</td>
 								<td>
-									@if($servico->solicitanteServico)
+									@if($s->solicitanteServico)
                      
-                        {{$servico->solicitanteServico->nome}}
+                        {{$s->solicitanteServico->nome}}
 
                     @else
                    
-                    {{$servico->solicitante}}
+                    {{$s->solicitante}}
 
                     @endif</td>
 								<td>R$ {{number_format($s->financeiro['valorTotal'],2,'.',',')}}</td>
@@ -119,7 +122,15 @@
 								<td>{{$s->unidade->cidade}}</td>
 								<td>@php echo App\Http\Controllers\FaturamentoController::formatCnpjCpf($s->unidade->cnpj); @endphp</td>
 								<td>{{$s->nome}}</td>
-								<td>{{$s->solicitante}}</td>
+								<td>@if($s->solicitanteServico)
+                     
+									{{$s->solicitanteServico->nome}}
+			
+								@else
+							   
+								{{$s->solicitante}}
+			
+								@endif</td>
 								<td>R$ {{number_format($s->financeiro['valorTotal'],2,'.',',')}}</td>
 								
 								<td>R$ {{number_format($s->financeiro['valorAberto'],2,'.',',')}}</td>
