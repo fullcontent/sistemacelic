@@ -130,6 +130,11 @@ class AppServiceProvider extends ServiceProvider
                             'url'  =>  route('servico.inativo'),
                             'icon'  =>  'glyphicon glyphicon-ban-circle text-red',
                             ],
+                            [
+                                'text' => 'Relatório Completo de Serviços',
+                                'url'  =>  ''.Auth::user()->privileges.'/relatorio',
+                                'icon'  =>  'glyphicon glyphicon glyphicon-th-list',
+                            ]
                             
                             ]
                         ],
@@ -160,7 +165,8 @@ class AppServiceProvider extends ServiceProvider
                             'text' => 'Propostas',
                             'url' => ''.Auth::user()->privileges.'/proposta',
                             'icon' => 'fa fa-newspaper',
-                            ]
+                            ],
+                            
 
 
                             );
@@ -193,12 +199,8 @@ class AppServiceProvider extends ServiceProvider
                                         'text' => 'Reembolsos',
                                         'url'  =>  ''.Auth::user()->privileges.'/reembolsos',
                                         'icon'  =>  'glyphicon glyphicon glyphicon-usd',
-                                    ],
-                                    [
-                                        'text' => 'Relatório Completo de Serviços',
-                                        'url'  =>  ''.Auth::user()->privileges.'/relatorio',
-                                        'icon'  =>  'glyphicon glyphicon glyphicon-th-list',
                                     ]
+                                    
                                 );
                             }
                             
