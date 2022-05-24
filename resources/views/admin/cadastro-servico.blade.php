@@ -42,6 +42,48 @@
 
         $("#solicitante").val('').trigger('change');
 
+		
+		
+		$("#corresponsavel").select2({
+            placeholder: 'Algum co-responsável?',
+            allowClear: true,
+        });
+
+        $("#corresponsavel").val('').trigger('change');
+
+
+		$("#responsavel").select2({
+            placeholder: 'Quem é o responsável?',
+            allowClear: true,
+        });
+
+		$("#responsavel").val('').trigger('change');
+
+		
+		$("#cadastroServico").on("submit", function(){
+
+			var responsavel_id = $("#responsavel").val();
+			var corresponsavel_id = $("#corresponsavel").val();
+
+
+			if(responsavel_id == corresponsavel_id)
+			{	
+				alert("Co-Responsável não pode ser igual ao responsável!");
+				$( "#corresponsavel" ).focus();
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+
+
+
+		
+		})
+
+
+
   	$("#protocolo_emissao").datepicker();
   	$("#licenca_emissao").datepicker();
   	$("#licenca_validade").datepicker();

@@ -498,6 +498,7 @@ class ServicosController extends Controller
         $servico->nome  =   $request->nome;
         $servico->situacao  =  $request->situacao;
         $servico->responsavel_id = $request->responsavel_id;
+        $servico->coresponsavel_id = $request->coresponsavel_id;
                
         $servico->protocolo_numero  =   $request->protocolo_numero;
         
@@ -831,6 +832,7 @@ class ServicosController extends Controller
         $servico->nome  =   $request->nome;
         $servico->situacao  =  $request->situacao;
         $servico->responsavel_id = $request->responsavel_id;
+        $servico->coresponsavel_id = $request->coresponsavel_id;
 
         
         $servico->protocolo_numero  =   $request->protocolo_numero;
