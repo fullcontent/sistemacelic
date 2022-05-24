@@ -117,7 +117,13 @@
 								
 								
 								<td>{{$s->unidade->codigo}}</td>
-								<td>{{$s->proposta}}</td>
+								<td> 
+									@if($s->proposta_id)
+									{{$s->proposta_id}}
+									@else
+									{{$s->proposta}}
+									@endif
+								</td>
 								<td>{{$s->unidade->nomeFantasia}}</td>
 								<td>{{$s->unidade->cidade}}</td>
 								<td>@php echo App\Http\Controllers\FaturamentoController::formatCnpjCpf($s->unidade->cnpj); @endphp</td>
