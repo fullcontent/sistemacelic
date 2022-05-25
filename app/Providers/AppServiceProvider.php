@@ -129,11 +129,6 @@ class AppServiceProvider extends ServiceProvider
                             'text' => 'Unid. inativas',
                             'url'  =>  route('servico.inativo'),
                             'icon'  =>  'glyphicon glyphicon-ban-circle text-red',
-                            ],
-                            [
-                                'text' => 'Relatório Completo de Serviços',
-                                'url'  =>  ''.Auth::user()->privileges.'/relatorio',
-                                'icon'  =>  'glyphicon glyphicon glyphicon-th-list',
                             ]
                             
                             ]
@@ -172,6 +167,43 @@ class AppServiceProvider extends ServiceProvider
                             );
 
                             if(Auth::id() <= 3)
+                            {
+                                $event->menu->add(
+                                    ['header'=> 'Administração'],
+                                    [
+                                    'text' => 'Usuários',
+                                    'url'  =>  ''.Auth::user()->privileges.'/usuarios',
+                                    'icon' => 'fa fa-users'
+                                    ],
+                                    [
+                                        'text'=>'Solicitantes',
+                                        'url' => ''.Auth::user()->privileges.'/solicitantes',
+                                        'icon' => 'glyphicon glyphicon-user'
+                                    ],
+                                    [
+                                        'text' => 'Listagem geral dos serviços',
+                                        'url'  =>  ''.Auth::user()->privileges.'/servicos',
+                                        'icon'  =>  'glyphicon glyphicon-th-list',
+                                    ],
+                                    [
+                                        'text' => 'Faturamentos',
+                                        'url'  =>  ''.Auth::user()->privileges.'/faturamentos',
+                                        'icon'  =>  'glyphicon glyphicon glyphicon-barcode',
+                                    ],
+                                    [
+                                        'text' => 'Reembolsos',
+                                        'url'  =>  ''.Auth::user()->privileges.'/reembolsos',
+                                        'icon'  =>  'glyphicon glyphicon glyphicon-usd',
+                                    ],
+                                    [
+                                        'text' => 'Relatório Completo de Serviços',
+                                        'url'  =>  ''.Auth::user()->privileges.'/relatorio',
+                                        'icon'  =>  'glyphicon glyphicon glyphicon-th-list',
+                                    ]
+                                    
+                                );
+                            }
+                            elseif(Auth::id() != 15 || Auth::id() != 21 || Auth::id() != 14 || Auth::id() != 8 || Auth::id() != 27)
                             {
                                 $event->menu->add(
                                     ['header'=> 'Administração'],
