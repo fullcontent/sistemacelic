@@ -82,6 +82,7 @@ class PropostasController extends Controller
         
         
                
+        // dd($request->all());
 
         if($request->proposta_id)
         {
@@ -105,7 +106,7 @@ class PropostasController extends Controller
             $unidade = Unidade::find($request->unidade_id);
             $proposta->empresa_id = $unidade->empresa_id;
     
-            $proposta->responsavel_id = $request->responsavel_id;
+            // $proposta->responsavel_id = $request->responsavel_id;
             $proposta->solicitante = $request->solicitante;
     
             $proposta->documentos = $request->documentos;
