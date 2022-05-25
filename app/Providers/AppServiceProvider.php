@@ -208,29 +208,9 @@ class AppServiceProvider extends ServiceProvider
                                 $event->menu->add(
                                     ['header'=> 'Administração'],
                                     [
-                                    'text' => 'Usuários',
-                                    'url'  =>  ''.Auth::user()->privileges.'/usuarios',
-                                    'icon' => 'fa fa-users'
-                                    ],
-                                    [
-                                        'text'=>'Solicitantes',
-                                        'url' => ''.Auth::user()->privileges.'/solicitantes',
-                                        'icon' => 'glyphicon glyphicon-user'
-                                    ],
-                                    [
-                                        'text' => 'Listagem geral dos serviços',
-                                        'url'  =>  ''.Auth::user()->privileges.'/servicos',
-                                        'icon'  =>  'glyphicon glyphicon-th-list',
-                                    ],
-                                    [
-                                        'text' => 'Faturamentos',
-                                        'url'  =>  ''.Auth::user()->privileges.'/faturamentos',
-                                        'icon'  =>  'glyphicon glyphicon glyphicon-barcode',
-                                    ],
-                                    [
-                                        'text' => 'Reembolsos',
-                                        'url'  =>  ''.Auth::user()->privileges.'/reembolsos',
-                                        'icon'  =>  'glyphicon glyphicon glyphicon-usd',
+                                        'text' => 'Relatório Completo de Serviços',
+                                        'url'  =>  ''.Auth::user()->privileges.'/relatorio',
+                                        'icon'  =>  'glyphicon glyphicon glyphicon-th-list',
                                     ]
                                     
                                 );
