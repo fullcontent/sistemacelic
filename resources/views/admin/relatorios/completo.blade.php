@@ -27,6 +27,7 @@
             <th>Ordem de Serviço</th>
             <th>Situação</th>
             <th>Responsável</th>
+            <th>Co-Responsável</th>
             <th>Nome</th>
             <th>Solicitante</th>
             <th>N° Protocolo</th>
@@ -70,6 +71,7 @@
                     <td>{{$s->os}}</td>
                     <td>{{$s->situacao}}</td>
                     <td>{{$s->responsavel->name}}</td>
+                    <td>{{$s->coresponsavel->name ?? ''}}</td>
                     <td>{{$s->nome}}</td>
                     
                     <td>@if(!is_numeric($s->solicitante))
