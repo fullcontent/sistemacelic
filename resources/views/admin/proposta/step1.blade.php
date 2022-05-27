@@ -42,14 +42,7 @@
 
         </div>
 
-        <div class="col-md-6">
-            <div class="form-group">
-                {!! Form::label('responsavel_id', 'Responsável:', array('class'=>'control-label')) !!}
-                {!! Form::select('responsavel_id', [], null, ['class'=>'form-control responsaveis']) !!}
-            </div>
-
-
-        </div>
+       
 
 
 		<div class="col-md-12">
