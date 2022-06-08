@@ -225,7 +225,17 @@ class PropostasController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        
+        $proposta = Proposta::find($id);
+
+        $proposta->dadosPagamento = $request->dadosPagamento;
+        $proposta->condicoesGerais = $request->condicoesGerais;
+        $proposta->condicoesPagamento = $request->condicoesPagamento;
+        $proposta->documentos = $request->documentos;
+
+        $proposta->save();
+
+        return view('admin.proposta.editar-proposta')->with(['proposta'=>$proposta]);
     }
 
     /**
@@ -488,6 +498,7 @@ class PropostasController extends Controller
 
 
     public function printPDF($id) {
+        
 
     $proposta = Proposta::find($id);
     $this->reOrderServices($proposta->id); //Reordenar indice dos servicos da proposta
