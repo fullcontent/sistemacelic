@@ -105,6 +105,7 @@
 				
 		{!! Form::select('coresponsavel_id', $users, null, ['class'=>'form-control','id'=>'corresponsavel']) !!}
 
+
 	</div>
 </div>
 
@@ -150,7 +151,7 @@
 
 
 
-<div class="col-md-12">
+<div class="col-md-6">
 	
 	<div class="input-group input-group-sm form-group">
 		
@@ -168,6 +169,14 @@
 	</div>
 
 	
+</div>
+
+<div class="col-md-6">
+	<div class="input-group input-group-sm form-group">
+		{!! Form::label('departamento', 'Departamento', array('class'=>'control-label')) !!}
+		{!! Form::text('departamento', null, ['class'=>'form-control','id'=>'departamento']) !!}
+
+	</div>
 </div>
 
 <div class="col-md-12">

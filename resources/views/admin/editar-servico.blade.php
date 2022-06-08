@@ -45,6 +45,9 @@
 		$("#responsavel").select2({
             placeholder: 'Quem é o responsável?',
             allowClear: true,
+			sorter: function(data) {
+        return data.sort();
+    }
         });
 
 		$("#responsavel").val('{{$servico->responsavel_id}}').trigger('change');

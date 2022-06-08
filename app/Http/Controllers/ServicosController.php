@@ -506,6 +506,7 @@ class ServicosController extends Controller
         $servico->escopo   = $request->escopo;
         $servico->proposta   = $request->proposta;
         $servico->solicitante = $request->solicitante;
+        $servico->departamento = $request->departamento;
         $servico->servico_lpu = $request->servico_lpu;
         $servico->tipoLicenca = $request->tipoLicenca;
         
@@ -842,6 +843,7 @@ class ServicosController extends Controller
         $servico->escopo   = $request->escopo;
         $servico->proposta   = $request->proposta;
         $servico->solicitante = $request->solicitante;
+        $servico->departamento = $request->departamento;
         $servico->servico_lpu = $request->servico_lpu;
         $servico->tipoLicenca = $request->tipoLicenca;
 
