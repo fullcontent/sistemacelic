@@ -113,6 +113,25 @@ class PropostasController extends Controller
             $proposta->condicoesGerais = $request->condicoesGerais;
             $proposta->condicoesPagamento = $request->condicoesPagamento;
             $proposta->dadosPagamento = $request->dadosPagamento;
+
+
+
+
+            //remove class and style attributes from coppied text
+
+        $proposta->dadosPagamento = preg_replace('/(<[^>]+) style=("|\').*?("|\')/i','$1',$proposta->dadosPagamento);
+        $proposta->dadosPagamento = preg_replace('/(<[^>]+) class=("|\').*?("|\')/i','$1',$proposta->dadosPagamento);
+
+
+        $proposta->condicoesGerais = preg_replace('/(<[^>]+) style=("|\').*?("|\')/i','$1',$proposta->condicoesGerais);
+        $proposta->condicoesGerais = preg_replace('/(<[^>]+) class=("|\').*?("|\')/i','$1',$proposta->condicoesGerais);
+
+        $proposta->condicoesPagamento = preg_replace('/(<[^>]+) style=("|\').*?("|\')/i','$1',$proposta->condicoesPagamento);
+        $proposta->condicoesPagamento = preg_replace('/(<[^>]+) class=("|\').*?("|\')/i','$1',$proposta->condicoesPagamento);
+
+        $proposta->documentos = preg_replace('/(<[^>]+) style=("|\').*?("|\')/i','$1',$proposta->documentos);
+        $proposta->documentos = preg_replace('/(<[^>]+) class=("|\').*?("|\')/i','$1',$proposta->documentos);
+
     
             $proposta->save();
 
@@ -232,6 +251,27 @@ class PropostasController extends Controller
         $proposta->condicoesGerais = $request->condicoesGerais;
         $proposta->condicoesPagamento = $request->condicoesPagamento;
         $proposta->documentos = $request->documentos;
+
+
+
+        //remove class and style attributes from coppied text
+
+        $proposta->dadosPagamento = preg_replace('/(<[^>]+) style=("|\').*?("|\')/i','$1',$proposta->dadosPagamento);
+        $proposta->dadosPagamento = preg_replace('/(<[^>]+) class=("|\').*?("|\')/i','$1',$proposta->dadosPagamento);
+
+
+        $proposta->condicoesGerais = preg_replace('/(<[^>]+) style=("|\').*?("|\')/i','$1',$proposta->condicoesGerais);
+        $proposta->condicoesGerais = preg_replace('/(<[^>]+) class=("|\').*?("|\')/i','$1',$proposta->condicoesGerais);
+
+        $proposta->condicoesPagamento = preg_replace('/(<[^>]+) style=("|\').*?("|\')/i','$1',$proposta->condicoesPagamento);
+        $proposta->condicoesPagamento = preg_replace('/(<[^>]+) class=("|\').*?("|\')/i','$1',$proposta->condicoesPagamento);
+
+        $proposta->documentos = preg_replace('/(<[^>]+) style=("|\').*?("|\')/i','$1',$proposta->documentos);
+        $proposta->documentos = preg_replace('/(<[^>]+) class=("|\').*?("|\')/i','$1',$proposta->documentos);
+
+
+
+
 
         $proposta->save();
 
