@@ -67,7 +67,7 @@
         </div>
 
             
-            <div class="col-md-3">
+            <div class="col-md-2">
               
               <div class="form-group">
                   
@@ -102,12 +102,23 @@
               </div>
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-2">
                 
                 <div class="form-group">
                     
                     {!! Form::label('inscricaoImo', 'Inscrição Imobiliária', array('class'=>'control-label')) !!}
                     {!! Form::text('inscricaoImo', null, ['class'=>'form-control','id'=>'inscricaoImo']) !!}
+          
+                </div>
+
+            </div>
+
+            <div class="col-md-2">
+                
+                <div class="form-group">
+                    
+                    {!! Form::label('rip', 'RIP', array('class'=>'control-label')) !!}
+                    {!! Form::text('rip', null, ['class'=>'form-control','id'=>'rip']) !!}
           
                 </div>
 

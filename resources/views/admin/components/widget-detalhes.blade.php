@@ -23,6 +23,7 @@
 		<div class="col-md-4">
 			<p><b>Código:</b> {{$dados->codigo}}</p>
 			<p><b>Inscrição Imobiliária:</b> {{$dados->inscricaoImo}}</p>
+			<p><b>RIP:</b> {{$dados->rip}}</p>
 			<p><b>Matricula RI:</b> {{$dados->matriculaRI}}</p>
 			<p><b>Área da Loja:</b> {{$dados->area}} m2</p>
 			<p><b>Área do Terreno:</b> {{$dados->areaTerreno}} m2</p>

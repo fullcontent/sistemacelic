@@ -90,6 +90,7 @@ class UnidadesController extends Controller
             $empresa->inscricaoEst  = $request->inscricaoEst;
             $empresa->inscricaoMun  = $request->inscricaoMun;
             $empresa->inscricaoImo  = $request->inscricaoImo;
+            $empresa->rip  = $request->rip;
             $empresa->codigo        = $request->codigo;
             $empresa->endereco      = $request->endereco;
             $empresa->numero        = $request->numero;
@@ -248,6 +249,7 @@ class UnidadesController extends Controller
             $empresa->inscricaoEst  = $request->inscricaoEst;
             $empresa->inscricaoMun  = $request->inscricaoMun;
             $empresa->inscricaoImo  = $request->inscricaoImo;
+            $empresa->rip  = $request->rip;
             $empresa->codigo        = $request->codigo;
             $empresa->endereco      = $request->endereco;
             $empresa->numero        = $request->numero;

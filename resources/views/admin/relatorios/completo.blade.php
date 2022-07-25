@@ -16,6 +16,7 @@
             <th>Ins. Estadual</th>
             <th>Ins. Municipal</th>
             <th>Inscrição Imob.</th>
+            <th>RIP</th>
             <th>Matrícula RI</th>
             <th>Área da Loja</th>
             <th>Endereço</th>
@@ -58,6 +59,7 @@
                     <td>{{$s->unidade->inscricaoEst}}</td>
                     <td>{{$s->unidade->inscricaoMun}}</td>
                     <td>{{$s->unidade->inscricaoImo}}</td>
+                    <td>{{$s->unidade->rip}}</td>
                     <td>{{$s->unidade->matriculaRI}}</td>
                     <td>{{$s->unidade->area}}</td>
 
