@@ -38,6 +38,13 @@
 		</div>
 	</div>
 
+	<div class="col-md-12">
+		<div class="form-group">
+			{{ Form::label('Status', null, ['class' => 'control-label']) }}
+			{!! Form::select('active', array('1' => 'Ativo', '0' => 'Inativo'), null,['class'=>'form-control','id'=>'active']) !!}
+		</div>
+	</div>
+
 
 	<div class="col-md-12">
 		

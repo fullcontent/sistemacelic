@@ -374,7 +374,7 @@ class ServicosController extends Controller
         $tipoServico = $request->tipoServico;
     
         $id = $request->id;
-        $users = User::where('privileges','=','admin')->orderBy('name')->pluck('name','id')->toArray();
+        $users = User::where('privileges','=','admin')->where('active',1)->orderBy('name')->pluck('name','id')->toArray();
 
         $servico = null;
         $servicoPrincipal=null;
@@ -498,6 +498,7 @@ class ServicosController extends Controller
         $servico->nome  =   $request->nome;
         $servico->situacao  =  $request->situacao;
         $servico->responsavel_id = $request->responsavel_id;
+        $servico->coresponsavel_id = $request->coresponsavel_id;
                
         $servico->protocolo_numero  =   $request->protocolo_numero;
         
@@ -505,6 +506,7 @@ class ServicosController extends Controller
         $servico->escopo   = $request->escopo;
         $servico->proposta   = $request->proposta;
         $servico->solicitante = $request->solicitante;
+        $servico->departamento = $request->departamento;
         $servico->servico_lpu = $request->servico_lpu;
         $servico->tipoLicenca = $request->tipoLicenca;
         
@@ -728,7 +730,7 @@ class ServicosController extends Controller
 
         $servico = Servico::find($id);
                 
-        $users = User::where('privileges','=','admin')->pluck('name','id')->toArray();
+        $users = User::where('privileges','=','admin')->where('active',1)->orderBy('name')->pluck('name','id')->toArray();
 
         // $servico_lpu = ServicoLpu::where('empresa_id',$servico->unidade->empresa->id)->pluck('documento','id')->toArray();
 
@@ -831,6 +833,7 @@ class ServicosController extends Controller
         $servico->nome  =   $request->nome;
         $servico->situacao  =  $request->situacao;
         $servico->responsavel_id = $request->responsavel_id;
+        $servico->coresponsavel_id = $request->coresponsavel_id;
 
         
         $servico->protocolo_numero  =   $request->protocolo_numero;
@@ -840,6 +843,7 @@ class ServicosController extends Controller
         $servico->escopo   = $request->escopo;
         $servico->proposta   = $request->proposta;
         $servico->solicitante = $request->solicitante;
+        $servico->departamento = $request->departamento;
         $servico->servico_lpu = $request->servico_lpu;
         $servico->tipoLicenca = $request->tipoLicenca;
 
