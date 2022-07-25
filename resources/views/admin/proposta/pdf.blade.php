@@ -127,7 +127,7 @@ tfoot { display:table-footer-group }
                 <thead>
                     <tr>
                         <th>Item</th>
-                        <th width="75%">Serviço</th> 
+                        <th width="380">Serviço</th> 
                         
                         <th>Valor Unitário</th>
                         
@@ -183,8 +183,8 @@ tfoot { display:table-footer-group }
                 @if(count($proposta->servicos->where('servicoPrincipal')) <= $key+1)
                     <tr>
                         <td></td>
-                        <td style="font-weight:bold; text-align:right;">SubTotal</td>
-                        <td style="font-weight:bold;"><span class="subTotal" id=' + i + '>R$ {{number_format($subtotal,2)}}</span></td>
+                        <td style="font-weight:bold; text-align:right;"></td>
+                        <td style="font-weight:bold;"><span class="subTotal" id=' + i + '></span></td>
                         
                     </tr>
                 @endif   

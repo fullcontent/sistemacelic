@@ -27,7 +27,7 @@
                     @foreach($taxas ?? '' as $taxa)
                   <tr>
                     <td><a href="{{route('taxas.show',$taxa->id)}}">{{$taxa->nome}}</a></td>
-                    <td>R$ {{$taxa->valor}}</td>
+                    <td>R$ {{number_format($taxa->valor,2,",",".")}}</td>
                     <td><span class="label label-default">{{ \Carbon\Carbon::parse($taxa->vencimento)->format('d/m/Y')}}
 </span></td>
                     <td>
@@ -59,13 +59,13 @@
         
         @unless ( empty($taxa->boleto))
         
-        <a href="{{ url("uploads/$taxa->boleto") }}" class="btn btn-xs btn-warning" target="_blank"> Boleto</a>
+        <a href="{{ url("public/uploads/$taxa->boleto") }}" class="btn btn-xs btn-warning" target="_blank"> Boleto</a>
         @endunless
         
         
         @unless ( empty($taxa->comprovante) )
         
-        <a href="{{ url("uploads/$taxa->comprovante") }}" class="btn btn-xs btn-success" target="_blank" download="TAXA">Comprovante</a>
+        <a href="{{ url("public/uploads/$taxa->comprovante") }}" class="btn btn-xs btn-success" target="_blank">Comprovante</a>
         @endunless</td>
         
         <td>

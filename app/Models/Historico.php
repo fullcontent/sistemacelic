@@ -11,7 +11,7 @@ class Historico extends Model
    public function servico()
    {
    	
-   		return $this->belongsTo('App\Models\Servico');
+   		return $this->hasOne('App\Models\Servico','id','servico_id');
    }
 
 
@@ -19,4 +19,6 @@ class Historico extends Model
    {
    		return $this->belongsTo('App\User');
    }
+
+   
 }

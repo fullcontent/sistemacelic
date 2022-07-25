@@ -55,6 +55,14 @@ return [
             'visibility' => 'public',
         ],
 
+        'files' => [
+            'driver' => 'local',
+            'root' => public_path('uploads'),
+            'url' => 'files.sistemacelic.com',
+            'visibility' => 'public',
+        ],
+
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
@@ -62,6 +70,19 @@ return [
             'region' => env('AWS_DEFAULT_REGION'),
             'bucket' => env('AWS_BUCKET'),
             'url' => env('AWS_URL'),
+        ],
+        'ftp' => [
+            'driver' => 'ftp',
+            'host' => env('FTP_HOST'),
+            'username' => env('FTP_USERNAME'),
+            'password' => env('FTP_PASSWORD'),
+        
+            // Optional FTP Settings...
+            // 'port' => env('FTP_PORT', 21),
+            // 'root' => env('FTP_ROOT'),
+            'passive' => true,
+            // 'ssl' => true,
+            // 'timeout' => 30,
         ],
 
     ],

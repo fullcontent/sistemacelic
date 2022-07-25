@@ -30,12 +30,13 @@ class AdminController extends Controller
 
     public function index()
     {
-    			
-		
-		
+    		
         // dd($this->pendencias()->id);
 		
-		return view('admin.dashboard')
+		// return $this->pendencias();
+        
+        
+        return view('admin.dashboard')
 					->with([
 						'vencer'=>$this->servicosVencer(),
 						'finalizados'=>$this->servicosFinalizados(),

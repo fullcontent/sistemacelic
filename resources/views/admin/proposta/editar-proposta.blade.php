@@ -220,23 +220,30 @@
 
     </div>
 
-    
+    {!! Form::model($proposta,['route'=>['proposta.update', $proposta->id],'method'=>'put','enctype'=>'multipart/form-data','id'=>'editProposta']) !!}
     <div class="row documentos">
 
         <div class="col-xs-12">
             <p><b>Documentos a serem fornecidos: </b></p>
-            {!! $proposta->documentos !!}
+           
+            {!! Form::textarea('documentos', $proposta->documentos, ['class'=>'form-control','id'=>'documentos']) !!}
 
             <p><b>Condições gerais:</b></p>
-            {!! $proposta->condicoesGerais !!}
+           
+            {!! Form::textarea('condicoesGerais', $proposta->condicoesGerais, ['class'=>'form-control','id'=>'condicoesGerais']) !!}
             
             <p><b>Condições de pagamento:</b></p>
-            {!! $proposta->condicoesPagamento !!}
+            
+            {!! Form::textarea('condicoesPagamento', $proposta->condicoesPagamento, ['class'=>'form-control','id'=>'condicoesPagamento']) !!}
 
             <p><b>Dados para pagamento:</b></p>
-            {!! $proposta->dadosPagamento !!}
+            
+            {!! Form::textarea('dadosPagamento', $proposta->dadosPagamento, ['class'=>'form-control','id'=>'dadosPagamento']) !!}
             
         </div>
+        <button type="" class="btn btn-info"><i class="fa fa-save"></i> Salvar</button> 
+
+       {!! Form::close() !!}
 
     <div class="row">
         <div class="col-xs-12" style="overflow:hidden">
@@ -275,6 +282,8 @@
 
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script src="https://cdn.tiny.cloud/1/mdbybl5sde5aiobm264wk5r9q3cua6n3r2z6hvc7aag1ry65/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
 
 
 
@@ -376,7 +385,13 @@ $(function () {
 })
 
 
-    
+
+
+tinymce.init({
+    selector: 'textarea',
+    menubar: false,
+    toolbar: false,
+});
 
 
 

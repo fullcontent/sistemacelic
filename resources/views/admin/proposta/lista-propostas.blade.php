@@ -17,7 +17,6 @@
                 <tr>
                   <th>#</th>
 				  <th>Empresa</th>
-				  <th>Solicitante</th>
 				  <th>Total</th>
 				  <th>Status</th>
 				  <th>Faturamento</th>
@@ -30,7 +29,6 @@
 				<tr>
 					<td><a href="{{route('proposta.edit',$p->id)}}">#{{$p->id}}</a> </td>
 					<td>{{$p->empresa->nomeFantasia}}</td>
-					<td>{{$p->solicitante}}</td>
 					<td>R$ {{number_format($p->servicos->sum('valor'),2)}}</td>
 					<td>
 						@if($p->status == 'Revisando')

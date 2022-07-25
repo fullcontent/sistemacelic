@@ -69,7 +69,7 @@
     @break
 
 @endswitch</td>
-                        <td>{{$servico->responsavel->name}}</td>
+                        <td>{{$servico->responsavel->name ?? ''}}</td>
                     </tr>
                    @endforeach
                   

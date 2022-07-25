@@ -27,8 +27,10 @@
             <th>Ordem de Serviço</th>
             <th>Situação</th>
             <th>Responsável</th>
+            <th>Co-Responsável</th>
             <th>Nome</th>
             <th>Solicitante</th>
+            <th>Departamento</th>
             <th>N° Protocolo</th>
             <th>Emissao Protocolo</th>
             <th>Tipo Licença</th>
@@ -70,6 +72,7 @@
                     <td>{{$s->os}}</td>
                     <td>{{$s->situacao}}</td>
                     <td>{{$s->responsavel->name}}</td>
+                    <td>{{$s->coresponsavel->name ?? ''}}</td>
                     <td>{{$s->nome}}</td>
                     
                     <td>@if(!is_numeric($s->solicitante))
@@ -77,12 +80,17 @@
                       @else
                       {{\App\Models\Solicitante::where('id',$s->solicitante)->value('nome')}}
                       @endif</td>
-
+                    <td>{{$s->departamento}}</td>
                     <td>{{$s->protocolo_numero}}</td>
                     <td>{{ \Carbon\Carbon::parse($s->protocolo_emissao)->format('d/m/Y')}}</td>
 
                     <td>{{$s->tipoLicenca}}</td>
-                    <td>{{$s->proposta}}</td> 
+                    <td>@if($s->proposta_id)
+                        {{$s->proposta_id}}
+                        @else
+                        {{$s->proposta}}
+                        @endif
+                    </td> 
                     <td>{{ \Carbon\Carbon::parse($s->licenca_emissao)->format('d/m/Y')}}</td>
                     <td>{{ \Carbon\Carbon::parse($s->licenca_validade)->format('d/m/Y')}}</td>
                     

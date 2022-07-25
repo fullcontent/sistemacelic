@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => env('APP_URL', 'http://sistemacelic.net'),
 
     'asset_url' => env('ASSET_URL', null),
 
@@ -180,6 +180,10 @@ return [
         App\Providers\RouteServiceProvider::class,
 
         Barryvdh\Debugbar\ServiceProvider::class,
+        Barryvdh\DomPDF\ServiceProvider::class,
+
+        
+
 
 
     ],
@@ -237,6 +241,10 @@ return [
         'Html' => Collective\Html\HtmlFacade::class,
 
         'Debugbar' => Barryvdh\Debugbar\Facade::class,
+        'PDF' => Barryvdh\DomPDF\Facade::class,
+
+        
+
 
 
     ],

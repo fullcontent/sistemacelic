@@ -101,7 +101,11 @@
                   <p><b>Proposta: </b>@if($servico->proposta_id)
 					      <a href="{{route('proposta.edit',$servico->proposta_id)}}" class="btn btn-info btn-xs">{{$servico->proposta_id}}</a>@else{{$servico->proposta}}@endif</p>
                   
-                  <p><b>Responsável: </b>{{$servico->responsavel->name}}</p>
+                  <p><b>Responsável: </b>{{$servico->responsavel->name ?? ''}}</p>
+                  
+                  @if($servico->coresponsavel)
+                  <p><b>Co-Responsável: </b>{{$servico->coresponsavel->name ?? ''}}</p>
+                  @endif
 
                   @if($servico->solicitanteServico)
                       <p><b>Solicitante (novo): </b>
@@ -289,7 +293,23 @@
                     
                     <div class="timeline-item">
                       <span class="time"><i class="fa fa-clock"></i> {{\Carbon\Carbon::parse($historico->created_at)->format('d/m/Y H:m')}}</span>
-                      <h3 class="timeline-header"><a href="#">{{$historico->user->name ?? 'Robot'}}</a> {{$historico->observacoes}}</h3>
+                      <h3 class="timeline-header"><a href="#">{{$historico->user->name ?? 'Robot'}}</a>
+                        @if(str_contains($historico->observacoes, 'Alterou solicitante'))
+                          @php
+                              $id = preg_replace('/[^0-9]/', '', $historico->observacoes);  
+                              $solicitante = \App\Models\Solicitante::where('id',$id)->value('nome');
+                              echo "Alterou solicitante para ".$solicitante;
+                          @endphp
+                        @elseif(str_contains($historico->observacoes, 'Alterou responsavel_id'))
+                        @php
+                            $id = preg_replace('/[^0-9]/', '', $historico->observacoes);  
+                            $solicitante = \App\User::where('id',$id)->value('name');
+                            echo "Alterou responsável para ".$solicitante;
+                        @endphp
+                        @else
+                        {{$historico->observacoes}}
+                        @endif
+                      </h3>
 
                       
                     </div>

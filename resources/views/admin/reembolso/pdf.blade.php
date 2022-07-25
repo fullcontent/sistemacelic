@@ -287,7 +287,6 @@ h3 {
 
     </div>
     </div>
-    
     </div>
     
     
@@ -348,7 +347,11 @@ h3 {
 								<td>{{$s->taxa->unidade->nomeFantasia}}</td>
 								<td>{{$s->taxa->servico->nome}}</td>
 								<td>{{$s->taxa->nome}}</td>
-								<td>{{$s->taxa->servico->solicitante}}</td>
+								<td>@if(!is_numeric($s->taxa->servico->solicitante))
+                  {{$s->taxa->servico->solicitante}}
+                  @else
+                  {{\App\Models\Solicitante::where('id',$s->taxa->servico->solicitante)->value('nome')}}
+                  @endif</td>
 								<td>R$ {{number_format($s->taxa->valor,2,'.',',')}}</td>
 								<td>{{ \Carbon\Carbon::parse($s->taxa->vencimento)->format('d/m/Y')}}</td>
 								<td>{{ \Carbon\Carbon::parse($s->taxa->pagamento)->format('d/m/Y')}}</td>

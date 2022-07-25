@@ -38,7 +38,7 @@
 	</div>
 </div>
 
-<div class="col-md-3">
+<div class="col-md-2">
 
 
 	
@@ -77,7 +77,7 @@
 	</div>
 </div>
 
-<div class="col-md-3">
+<div class="col-md-2">
 	
 	<div class="form-group">
 		
@@ -87,9 +87,9 @@
 		  
 		  
 		  @if(Route::is('servicos.edit'))
-		  {!! Form::select('responsavel_id', $users, null, ['class'=>'form-control']) !!}
+		  {!! Form::select('responsavel_id', $users, null, ['class'=>'form-control','id'=>'responsavel']) !!}
 		  @elseif(Route::is('servicos.create'))
-		  {!! Form::select('responsavel_id', $users, Auth::id(), ['class'=>'form-control']) !!}
+		  {!! Form::select('responsavel_id', $users, Auth::id(), ['class'=>'form-control','id'=>'responsavel']) !!}
 		  @endif
 
 
@@ -97,6 +97,19 @@
 		
 	</div>
 </div>
+
+<div class="col-md-2">
+
+	<div class="form-group">
+		{!! Form::label('corresponsavel_id', 'Co-Responsável', array('class'=>'control-label')) !!}
+				
+		{!! Form::select('coresponsavel_id', $users, null, ['class'=>'form-control','id'=>'corresponsavel']) !!}
+
+
+	</div>
+</div>
+
+
 
 @switch($t ?? '')
 
@@ -138,7 +151,7 @@
 
 
 
-<div class="col-md-12">
+<div class="col-md-6">
 	
 	<div class="input-group input-group-sm form-group">
 		
@@ -156,6 +169,14 @@
 	</div>
 
 	
+</div>
+
+<div class="col-md-6">
+	<div class="input-group input-group-sm form-group">
+		{!! Form::label('departamento', 'Departamento', array('class'=>'control-label')) !!}
+		{!! Form::text('departamento', null, ['class'=>'form-control','id'=>'departamento']) !!}
+
+	</div>
 </div>
 
 <div class="col-md-12">

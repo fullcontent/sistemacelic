@@ -82,6 +82,7 @@ class PropostasController extends Controller
         
         
                
+        // dd($request->all());
 
         if($request->proposta_id)
         {
@@ -105,7 +106,7 @@ class PropostasController extends Controller
             $unidade = Unidade::find($request->unidade_id);
             $proposta->empresa_id = $unidade->empresa_id;
     
-            $proposta->responsavel_id = $request->responsavel_id;
+            // $proposta->responsavel_id = $request->responsavel_id;
             $proposta->solicitante = $request->solicitante;
     
             $proposta->documentos = $request->documentos;
@@ -224,7 +225,17 @@ class PropostasController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        
+        $proposta = Proposta::find($id);
+
+        $proposta->dadosPagamento = $request->dadosPagamento;
+        $proposta->condicoesGerais = $request->condicoesGerais;
+        $proposta->condicoesPagamento = $request->condicoesPagamento;
+        $proposta->documentos = $request->documentos;
+
+        $proposta->save();
+
+        return view('admin.proposta.editar-proposta')->with(['proposta'=>$proposta]);
     }
 
     /**
@@ -374,7 +385,7 @@ class PropostasController extends Controller
                 $servico->nome = $s->servico;
                 $servico->tipo = $s->servicoLpu->tipoServico;
                 $servico->situacao = "andamento";
-                $servico->responsavel_id = $proposta->responsavel_id;
+                $servico->responsavel_id = $s->responsavel_id;
                 $servico->empresa_id = $proposta->empresa_id;
                 $servico->unidade_id = $proposta->unidade_id;
                 $servico->solicitante = $proposta->solicitante;
@@ -432,7 +443,7 @@ class PropostasController extends Controller
 
                
                 $pendencia->responsavel_tipo = "usuario";
-                $pendencia->responsavel_id = $proposta->responsavel_id;
+                $pendencia->responsavel_id = $s->responsavel_id;
                 $pendencia->status = "pendente";
                 $pendencia->observacoes = "Pendência criada automaticamente. Lembrar de criar pendências para esse serviço.";
                 
@@ -487,6 +498,7 @@ class PropostasController extends Controller
 
 
     public function printPDF($id) {
+        
 
     $proposta = Proposta::find($id);
     $this->reOrderServices($proposta->id); //Reordenar indice dos servicos da proposta

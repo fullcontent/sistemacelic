@@ -54,7 +54,13 @@
 	              	<td>{{$servico->unidade->codigo ?? ''}}</td>
 					  <td><a href="{{$route}}">{{$empresa}}</a></td>
 					<td>{{$servico->unidade->cidade}}/{{$servico->unidade->uf}}</td>
-					<td>{{$servico->solicitante}}</td>
+					<td>
+						@if(!is_numeric($servico->solicitante))
+						{{$servico->solicitante}}
+						@else
+						{{\App\Models\Solicitante::where('id',$servico->solicitante)->value('nome')}}
+						@endif
+					</td>
 					<td>{{$servico->protocolo_numero}}</td>
 	              	<td>
 
