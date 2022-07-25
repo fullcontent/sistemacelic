@@ -129,7 +129,7 @@ class AppServiceProvider extends ServiceProvider
                             'text' => 'Unid. inativas',
                             'url'  =>  route('servico.inativo'),
                             'icon'  =>  'glyphicon glyphicon-ban-circle text-red',
-                            ],
+                            ]
                             
                             ]
                         ],
@@ -160,7 +160,8 @@ class AppServiceProvider extends ServiceProvider
                             'text' => 'Propostas',
                             'url' => ''.Auth::user()->privileges.'/proposta',
                             'icon' => 'fa fa-newspaper',
-                            ]
+                            ],
+                            
 
 
                             );
@@ -199,6 +200,19 @@ class AppServiceProvider extends ServiceProvider
                                         'url'  =>  ''.Auth::user()->privileges.'/relatorio',
                                         'icon'  =>  'glyphicon glyphicon glyphicon-th-list',
                                     ]
+                                    
+                                );
+                            }
+                            elseif(Auth::id() != 15 || Auth::id() != 21 || Auth::id() != 14 || Auth::id() != 8 || Auth::id() != 27)
+                            {
+                                $event->menu->add(
+                                    ['header'=> 'Administração'],
+                                    [
+                                        'text' => 'Relatório Completo de Serviços',
+                                        'url'  =>  ''.Auth::user()->privileges.'/relatorio',
+                                        'icon'  =>  'glyphicon glyphicon glyphicon-th-list',
+                                    ]
+                                    
                                 );
                             }
                             

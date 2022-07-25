@@ -730,7 +730,7 @@ class ServicosController extends Controller
 
         $servico = Servico::find($id);
                 
-        $users = User::where('privileges','=','admin')->where('active',1)->orderBy('name')->pluck('name','id')->toArray();
+       $users = User::where('privileges','=','admin')->where('active',1)->orderBy('name')->pluck('name','id')->toArray();
 
         // $servico_lpu = ServicoLpu::where('empresa_id',$servico->unidade->empresa->id)->pluck('documento','id')->toArray();
 
