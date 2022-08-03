@@ -205,7 +205,7 @@ class PendenciasController extends Controller
                             ->toArray();
 
 
-        $responsaveis = User::orderBy('name')->pluck('name','id')->toArray();
+        $responsaveis = User::orderBy('name')->where('active',1)->pluck('name','id')->toArray();
         
 
 
