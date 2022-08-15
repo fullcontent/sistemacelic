@@ -28,6 +28,10 @@ Route::get('/', function () {
 
 
 		Route::get('/relatorio','AdminController@relatorioCompleto');
+		Route::get('/relatorioTaxas','AdminController@relatorioTaxas');
+		Route::get('/relatorioPendencias','AdminController@relatorioPendencias');
+
+
 
 
 		Route::resource('/empresas','EmpresasController');

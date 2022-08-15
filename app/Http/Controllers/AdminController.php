@@ -126,4 +126,26 @@ $servicos = $servicos->where('situacao','=','andamento')
     }
 
 
+    public function relatorioTaxas()
+    {
+        
+        $servicos = Servico::with('unidade','responsavel','financeiro','servicoFinalizado')->whereNotIn('responsavel_id',[1])->get();
+
+        // dump($servicos);
+
+        return view('admin.relatorios.taxas')->with(['servicos'=>$servicos]);
+
+
+    }
+
+
+    public function relatorioPendencias()
+    {
+        $servicos = Servico::with('unidade','responsavel','financeiro','servicoFinalizado')->whereNotIn('responsavel_id',[1])->get();
+
+        return view('admin.relatorios.pendencias')->with(['servicos'=>$servicos]);
+    }
+
+
+
 }

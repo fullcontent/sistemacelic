@@ -199,6 +199,17 @@ class AppServiceProvider extends ServiceProvider
                                         'text' => 'Relatório Completo de Serviços',
                                         'url'  =>  ''.Auth::user()->privileges.'/relatorio',
                                         'icon'  =>  'glyphicon glyphicon glyphicon-th-list',
+                                    ],
+                                    [
+                                        'text' => 'Relatório de Pendencias',
+                                        'url'  =>  ''.Auth::user()->privileges.'/relatorioPendencias',
+                                        'icon'  =>  'glyphicon glyphicon glyphicon-th-list',
+                                    ],
+                                    [
+                                        'text' => 'Relatório de Taxas',
+                                        'url'  =>  ''.Auth::user()->privileges.'/relatorioTaxas',
+                                        'icon'  =>  'glyphicon glyphicon glyphicon-th-list',
+                                        'id'=>  'relatorioTaxas',
                                     ]
                                     
                                 );
