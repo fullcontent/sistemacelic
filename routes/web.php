@@ -27,9 +27,12 @@ Route::get('/', function () {
 		Route::get('/home', 'AdminController@index')->name('dashboard');
 
 
-		Route::get('/relatorio','AdminController@relatorioCompleto');
-		Route::get('/relatorioTaxas','AdminController@relatorioTaxas');
-		Route::get('/relatorioPendencias','AdminController@relatorioPendencias');
+		Route::get('/relatorioCompleto','AdminController@completoCSV')->name('relatorio.completo');
+		Route::get('/relatorioTaxas','AdminController@taxasCSV')->name('relatorio.taxas');
+		Route::get('/relatorioPendencias','AdminController@pendenciasCSV')->name('relatorio.pendencias');
+		Route::get('/relatorios', function () {
+			return view('admin.relatorios.index');
+		});
 
 
 
@@ -182,7 +185,6 @@ Route::get('/', function () {
 
 		Route::get('/users/list','UsersController@usersList')->name('users.list');
 
-		Route::get('/relatorios','DashboardController@getLicencasVigentes');
 		Route::get('/mapa','DashboardController@getOurClientsLocation');
 		
 

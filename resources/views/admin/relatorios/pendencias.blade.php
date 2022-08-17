@@ -7,6 +7,7 @@
   <table id="relatorio-completo" class="table table-bordered" >
           <thead>
           <tr>
+            <th>Empresa</th>
             <th>Serviço</th>
             <th>OS</th>
             <th>Código</th>
@@ -15,6 +16,8 @@
             <th>Cidade/UF</th>
            
             <th>Pendencia</th>
+            <th>Responsabilidade</th>
+            <th>Responsável</th>
             <th>Status</th>
             <th>Vencimento</th>
             
@@ -27,6 +30,7 @@
                 @foreach($s->pendencias as $p)
 
                   <tr>
+                    <td>{{$s->unidade->empresa->nomeFantasia}}</td>
                     <td>{{$s->nome}}</td>
                     <td>{{$s->os}}</td>
                     <td>{{$s->unidade->codigo}}</td>
@@ -35,6 +39,8 @@
                     <td>{{$s->unidade->cidade}}/{{$s->unidade->uf}}</td>
                     
                     <td>{{$p->pendencia}}</td>
+                    <td>{{$p->responsavel_tipo}}</td>
+                    <td>{{$p->responsavel->name ?? ''}}</td>
                     
                     <td>{{$p->status}}</td>
                     <td>{{$p->vencimento}}</td>
