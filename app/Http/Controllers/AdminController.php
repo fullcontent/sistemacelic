@@ -310,7 +310,13 @@ class AdminController extends Controller
         
         $fileName = 'Celic_RelatorioCompleto_Pendencias'.date('d-m-Y').'.csv';
         
-        $servicos = Servico::with('unidade','financeiro')->whereNotIn('responsavel_id',[1])->orderBy('id','DESC')->get();
+        $servicos = Servico::with('pendencias')
+                            ->whereNotIn('responsavel_id',[1])
+                            ->orderBy('id','DESC')
+                            ->select('id','nome','os','unidade_id')
+                            ->get();
+
+        // $servicos = Pendencia::all();
 
 
         $headers = array(
@@ -371,6 +377,8 @@ class AdminController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+
+        // return $servicos;
     
 
     }
