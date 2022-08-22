@@ -232,11 +232,13 @@ class AdminController extends Controller
 
 
     public function taxasCSV()
-    {
-        
+    {   
+
+
+             
         $fileName = 'Celic_RelatorioCompleto_Taxas'.date('d-m-Y').'.csv';
         
-        $servicos = Servico::with('unidade','financeiro')->whereNotIn('responsavel_id',[1])->orderBy('id','DESC')->get();
+        $servicos = Servico::with('unidade','financeiro')->whereNotIn('responsavel_id',[1])->orderBy('id','DESC')->take(100)->get();
 
 
         $headers = array(
@@ -272,6 +274,8 @@ class AdminController extends Controller
                 
                     
 
+
+            
                 fputcsv($file, array(
                     $s->unidade->empresa->nomeFantasia,
                     $s->nome,
@@ -283,9 +287,9 @@ class AdminController extends Controller
                     $proposta,
                     $s->financeiro->valorTotal ?? '',
                     $t->nome,
-                    \Carbon\Carbon::parse($t->emissao)->format('d/m/Y'),
-                    \Carbon\Carbon::parse($t->vencimento)->format('d/m/Y'),
-                    \Carbon\Carbon::parse($t->pagamento)->format('d/m/Y'),
+                    \Carbon\Carbon::parse($t->emissao)->translatedFormat('d-M-Y'),
+                    \Carbon\Carbon::parse($t->vencimento)->translatedFormat('d-M-Y'),
+                    \Carbon\Carbon::parse($t->pagamento)->translatedFormat('d-M-Y'),
                     $t->reembolso,
                     $t->situacao,
                     number_format($t->valor,2,",","."),
