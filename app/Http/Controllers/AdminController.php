@@ -180,7 +180,7 @@ class AdminController extends Controller
                         $finalizado = \Carbon\Carbon::parse($s->servicoFinalizado->finalizado)->format('d/m/Y');
                     }
                     else{
-                        $finalizado = 'N/A';
+                        $finalizado = '';
                     }
 
                 fputcsv($file, array(
@@ -210,15 +210,15 @@ class AdminController extends Controller
                     $s->solicitante,
                     $s->departamento,
                     $s->protocolo_numero,
-                    \Carbon\Carbon::parse($s->protocolo_emissao)->format('d/m/Y'),
+                    \Carbon\Carbon::parse($s->protocolo_emissao)->format('d/m/Y') ?? '',
                     $s->tipoLicenca,
                     $proposta,
-                    \Carbon\Carbon::parse($s->licenca_emissao)->format('d/m/Y'),
-                    \Carbon\Carbon::parse($s->licenca_validade)->format('d/m/Y'),
+                    \Carbon\Carbon::parse($s->licenca_emissao)->format('d/m/Y') ?? '',
+                    \Carbon\Carbon::parse($s->licenca_validade)->format('d/m/Y') ?? '',
                     $s->financeiro->valorTotal ?? '0',
                     $s->financeiro->valorAberto ?? '0',
                     $finalizado,
-                    \Carbon\Carbon::parse($s->created_at)->format('d/m/Y') ?? 'N/A',
+                    \Carbon\Carbon::parse($s->created_at)->format('d/m/Y') ?? '',
 
                 ));
             }
@@ -238,7 +238,7 @@ class AdminController extends Controller
              
         $fileName = 'Celic_RelatorioCompleto_Taxas'.date('d-m-Y').'.csv';
         
-        $servicos = Servico::with('unidade','financeiro')->whereNotIn('responsavel_id',[1])->orderBy('id','DESC')->take(100)->get();
+        $servicos = Servico::with('unidade','financeiro')->whereNotIn('responsavel_id',[1])->orderBy('id','DESC')->get();
 
 
         $headers = array(
