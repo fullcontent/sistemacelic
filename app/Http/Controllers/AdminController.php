@@ -288,7 +288,7 @@ class AdminController extends Controller
                     \Carbon\Carbon::parse($t->pagamento)->format('d/m/Y'),
                     $t->reembolso,
                     $t->situacao,
-                    $t->valor
+                    number_format($t->valor,2,",","."),
 
                     
                 ));
