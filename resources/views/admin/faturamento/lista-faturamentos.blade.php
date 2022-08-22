@@ -148,7 +148,8 @@
 		$(function () {
 		    $('#lista-faturamentos').DataTable({
 		      "paging": true,
-		      "lengthChange": false,
+		      "lengthChange": true,
+			  "pageLength": 100,
 		      "searching": true,
 		      "ordering": true,
 		      "info": false,
