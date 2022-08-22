@@ -50,6 +50,7 @@
 				<th>Cidade</th>
 				<th>CNPJ</th>
 				<th>Serviço</th>
+				<th>NF</th>
 				<th>Valor Total</th>
 				<th>Valor em Aberto</th>
 				<th>Valor Faturar</th>
@@ -70,6 +71,7 @@
 								   @endphp
 								</td>
 								<td>{{$s->nome}}</td>
+								<td>{{$s->faturamento->nf ?? ''}}</td>
 								<td>R$ {{number_format($s->financeiro['valorTotal'],2,'.',',')}}</td>
 								<td>R$ {{number_format($s->financeiro['valorAberto'],2,'.',',')}}</td>
 								<td>

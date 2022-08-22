@@ -22,6 +22,7 @@ use App\Models\PendenciasVinculos;
 
 use App\Models\ServicoFinanceiro;
 use App\Models\ServicoFinalizado;
+use App\Models\Faturamento;
 
 
 use App\Notifications\UserMentioned;
@@ -53,11 +54,11 @@ class ServicosController extends Controller
     {
         
        
-        $servicos = Servico::with('unidade','empresa','responsavel')
-        						// ->where('responsavel_id',Auth::id())
-        						->get();
+        $servicos = Servico::all();
 
         // $servicos = $servicos->where('unidade.status','Ativa');
+
+        // dd($servicos);
 
         return view('admin.lista-servicos')
                     ->with('servicos',$servicos);
@@ -876,7 +877,17 @@ class ServicosController extends Controller
                             $history->save();
                         }
                     }
+        
+        //Edit Faturamento
+        
 
+        if($request->nf)
+        {
+            // dump($servico->faturamento->id);
+            $faturamento = Faturamento::find($servico->faturamento->id);
+            $faturamento->nf = $request->nf;
+            $faturamento->save();
+        }
 
 
         //-----------------------------------
