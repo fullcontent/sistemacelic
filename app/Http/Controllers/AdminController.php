@@ -183,6 +183,29 @@ class AdminController extends Controller
                         $finalizado = '';
                     }
 
+                    if(isset($s->protocolo_emissao))
+                    {
+                        $protocolo_emissao = \Carbon\Carbon::parse($s->protocolo_emissao)->format('d/m/Y');
+                    }
+                    else{
+                        $protocolo_emissao = null;
+                    }
+
+                    if(isset($s->licenca_emissao))
+                    {
+                        $licenca_emissao = \Carbon\Carbon::parse($s->licenca_emissao)->format('d/m/Y');
+                    }
+                    else{
+                        $licenca_emissao = null;
+                    }
+                    if(isset($s->licenca_validade))
+                    {
+                        $licenca_validade = \Carbon\Carbon::parse($s->licenca_validade)->format('d/m/Y');
+                    }
+                    else{
+                        $licenca_validade = null;
+                    }
+
                 fputcsv($file, array(
                     $s->unidade->razaoSocial,
                     $s->unidade->codigo,
@@ -210,11 +233,11 @@ class AdminController extends Controller
                     $s->solicitante,
                     $s->departamento,
                     $s->protocolo_numero,
-                    \Carbon\Carbon::parse($s->protocolo_emissao)->format('d/m/Y') ?? '',
+                    $protocolo_emissao,
                     $s->tipoLicenca,
                     $proposta,
-                    \Carbon\Carbon::parse($s->licenca_emissao)->format('d/m/Y') ?? '',
-                    \Carbon\Carbon::parse($s->licenca_validade)->format('d/m/Y') ?? '',
+                    $licenca_emissao,
+                    $licenca_validade,
                     $s->financeiro->valorTotal ?? '0',
                     $s->financeiro->valorAberto ?? '0',
                     $finalizado,
