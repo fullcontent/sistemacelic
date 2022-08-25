@@ -36,6 +36,7 @@
             <th>CNPJ</th>
             <th>Serviço</th>
             <th>Valor</th>
+            <th>Download</th>
           </tr>
           </thead>
           <tbody>
@@ -47,6 +48,7 @@
                   <td>@php echo App\Http\Controllers\FaturamentoController::formatCnpjCpf($i->unidade->cnpj); @endphp</td>
                   <td>{{$i->nome}}</td>
                   <td>R$ {{number_format($i->financeiro->valorFaturar,2,'.',',')}}</td>
+                  <td><a href="{{ route('servico.downloadFile', ['servico_id'=> $i->servico->id,'tipo'=>'licenca']) }}" class="btn btn-xs btn-warning" target="_blank">Ver Licença</a></td>
               </tr>
               @endforeach
           </tbody>

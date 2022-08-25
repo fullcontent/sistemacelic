@@ -28,11 +28,16 @@
 
 		</div>
 
-		<div class="col-md-6">
+		<div class="col-md-5">
 
 			{!! Form::label('obs', 'Observações') !!}
 			{!! Form::text('obs', null, ['class'=>'form-control']) !!}	
 
+		</div>
+
+		<div class="col-md-1">
+			{!! Form::label('link', 'Link para documentos') !!}
+			{!! Form::checkbox('link', null, ['class'=>'form-control']) !!}	
 		</div>
 		
 		
@@ -141,6 +146,9 @@
 
   }
 	
+
+  $('#link').prop('checked', false);
+
 
 </script>
 

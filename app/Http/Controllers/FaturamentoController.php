@@ -168,6 +168,7 @@ class FaturamentoController extends Controller
 
         $faturamento = new Faturamento;
         $faturamento->empresa_id = $request->empresa_id;
+        $faturamento->link = $request->link;
         $faturamento->save();
 
 
@@ -434,6 +435,7 @@ class FaturamentoController extends Controller
             'descricao'=>$faturamento->nome,
             'obs'=>$faturamento->obs,
             'data'=>$faturamento->created_at,
+            'link'=>$faturamento->link,
         ]);
         
 

@@ -1,5 +1,18 @@
 @extends('adminlte::page')
 
+@section('css')
+
+<style>
+  @media print {
+  a::after{
+    content: " (" attr() ") ";
+  }
+}
+</style>
+
+
+  
+@endsection
 
 @section('content')
 
@@ -36,6 +49,9 @@
             <th>CNPJ</th>
             <th>Serviço</th>
             <th>Valor</th>
+            @if($link=='on')
+            <th>Download</th>
+            @endif
           </tr>
           </thead>
           <tbody>
@@ -47,6 +63,9 @@
                   <td>@php echo App\Http\Controllers\FaturamentoController::formatCnpjCpf($i->detalhes->unidade->cnpj); @endphp</td>
                   <td>{{$i->detalhes->nome}}</td>
                   <td>R$ {{number_format($i->valorFaturado,2,'.',',')}}</td>
+                  @if($link=='on')
+                  <td><a href="{{ route('servico.downloadFile', ['servico_id'=> $i->servico_id,'tipo'=>'licenca']) }}" class="btn btn-xs btn-warning" target="_blank" rel="external">Ver Licença</a></td>
+                  @endif
               </tr>
               @endforeach
           </tbody>
