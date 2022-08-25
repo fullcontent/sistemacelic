@@ -129,7 +129,7 @@ tfoot { display:table-footer-group }
                         <th>Item</th>
                         <th width="380">Serviço</th> 
                         
-                        <th>Valor Unitário</th>
+                        <th width="120">Valor Unitário</th>
                         
                     </tr>
                 </thead>

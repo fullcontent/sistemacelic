@@ -339,6 +339,22 @@ class PropostasController extends Controller
 
     }
 
+    public function editarServico(Request $request)
+    {
+        
+        $servico = PropostaServico::find($request->servico_id);
+
+        $servico->servico = $request->servico;
+        $servico->escopo = $request->escopo;
+        $servico->valor = $request->valor;
+        $servico->save();
+
+
+        return redirect(route('proposta.edit',$servico->proposta_id));
+
+
+    }
+
 
     public function removerServico($id)
     {

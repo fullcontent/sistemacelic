@@ -79,7 +79,8 @@ Route::get('/', function () {
 		
 		Route::resource('/proposta','PropostasController');
 		
-		Route::get('/proposta/removerServico/{id}','PropostasController@removerServico');	
+		Route::get('/proposta/removerServico/{id}','PropostasController@removerServico');
+		Route::post('/proposta/editarServico','PropostasController@editarServico')->name('proposta.editarServico');
 		
 		
 		Route::get('/proposta/analisar/{id}','PropostasController@analisar');

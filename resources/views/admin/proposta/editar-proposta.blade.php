@@ -105,6 +105,45 @@
 </div>
 
 
+<div class="modal fade" id="editar-servico" style="display: none;">
+    <div class="modal-dialog" style="width:80%;">
+        <div class="modal-content" >
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title">Editar serviço</h4>
+            </div>
+            <div class="modal-body">
+                {!! Form::open(['route'=>'proposta.editarServico','id'=>'editarServicoProposta','method'=>'post']) !!}
+
+                {!! Form::hidden('servico_id',null,['class'=>'form-control','id'=>'servico_id']) !!}
+
+                {!! Form::label('servico', 'Servico:', array('class'=>'control-label')) !!}
+                {!! Form::text('servico',null,['class'=>'form-control']) !!}
+
+                {!! Form::label('escopo', 'escopo:', array('class'=>'control-label')) !!}
+                {!! Form::text('escopo',null,['class'=>'form-control']) !!}
+
+                {!! Form::label('valor', 'valor:', array('class'=>'control-label')) !!}
+                {!! Form::text('valor',null,['class'=>'form-control']) !!}
+
+
+                
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+                {!! Form::close() !!}
+            </div>
+        </div>
+        
+    </div>
+
+</div>
+
+
 <section class="invoice">
 
 
@@ -199,7 +238,8 @@
                     <td>
                         
                         <button class="btn btn-xs btn-danger remove no-print" type="button" data-id="{{$s->id}}" data-servicoID="{{$s->servicoCriado->id ?? ''}}" data-index="{{$index}}"><i class="glyphicon glyphicon-remove"></i></button>
-                       
+                        <button class="btn btn-xs btn-info edit no-print" type="button" data-servico="{{$s->servico}}" data-escopo="{{$s->escopo}}" data-valor="{{$s->valor}}" data-id="{{$s->id}}" data-toggle="modal" data-target="#editar-servico"><i class="glyphicon glyphicon-edit"></i></button>
+
                     </td>
                     </tr>
 
@@ -661,6 +701,61 @@ $(".adicionarSub").click(function (e) {
 
 
 })
+
+
+$('.edit').on('click', function (event) {
+
+
+
+    var servico = $(this).data("servico")
+    var escopo = $(this).data("escopo")
+    var valor = $(this).data("valor")
+    var id = $(this).data("id")
+
+    console.log(id)
+
+
+  var modal = $('#editar-servico')
+
+  modal.find('.modal-body #servico_id').val(id)
+
+  modal.find('.modal-body input#servico').val(servico)
+  modal.find('.modal-body input#escopo').val(escopo)
+  modal.find('.modal-body input#valor').val(valor)
+
+
+  $("#editar-servico").submit(function(e){
+       
+
+        $.ajax({
+        url: '{{url("admin/proposta/editarServico")}}',
+        data: {
+                    id: id,
+                    servico: servico,
+                    valor: valor,
+                    escopo: escopo,
+                    _token: CSRF_TOKEN
+                },
+        type: "GET",
+               
+        success: function(data){
+            
+           
+
+        }, 
+        error: function(){
+              alert(" Erro ao editar serviço ");
+              
+         }
+
+        }); 
+
+        });
+  })
+
+  
+
+
 
 
 </script>
