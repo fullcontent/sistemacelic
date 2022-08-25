@@ -221,6 +221,7 @@ class FaturamentoController extends Controller
             'totalFaturamento'=>$total,
             'descricao'=>$request->descricao,
             'obs'=>$request->obs,
+            'link'=>$request->link,
         ]);
 
     }
