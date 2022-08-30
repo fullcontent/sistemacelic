@@ -114,3 +114,69 @@
      
 </div>
 @endsection
+
+
+@section('js')
+
+
+<script src="http://cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"></script>
+<script>
+    
+    
+var licencaOperacao = $("#licencaOperacao").DataTable({
+    "lengthChange":false,
+    "ordering":false,
+});
+
+licencaOperacao.column(1).search('finalizado','andamento').draw();
+
+
+
+
+var nRenovaveis = $("#nRenovaveis").DataTable({
+    "lengthChange":false,
+    "ordering":false,
+});
+
+nRenovaveis.column(1).search('finalizado','andamento').draw();
+
+
+
+    $(function () {
+        $('#lista-arquivos').DataTable({
+          "paging": false,
+          "lengthChange": false,
+          "searching": true,
+          "ordering": false,
+          "info": false,
+          "autoWidth": false,
+           "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
+            }           
+  });
+$('.confirmation').on('click', function () {
+            return confirm('Você deseja excluir o serviço?');
+          });
+         
+        });
+
+
+$("#licencasOperacao_btn").on('click', function(e){
+   
+    e.preventDefault();
+
+    licencaOperacao.state.clear();
+            licencaOperacao.column(1).search('[arquivado]+[finalizado]+[andamento]+[nRenovado]').draw();
+ 
+})
+
+$("#nRenovaveis_btn").on('click', function(e){
+   
+   e.preventDefault();
+
+   nRenovaveis.state.clear();
+    nRenovaveis.column(1).search('[arquivado]+[finalizado]+[andamento]+[nRenovado]').draw();
+
+})
+    </script>
+@stop

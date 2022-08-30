@@ -11,7 +11,7 @@
             <!-- /.box-header -->
             <div class="box-body">
               <div class="table-responsive">
-                <table class="table no-margin" id="servicos">
+                <table class="table no-margin" id="licencaOperacao">
                   <thead>
                   <tr>
                     
@@ -23,11 +23,11 @@
                   </tr>
                   </thead>
                   <tbody>
-                    @foreach($servicos->where('tipo','licencaOperacao')->where('situacao','!=','arquivado') as $servico)
+                    @foreach($servicos->where('tipo','licencaOperacao') as $servico)
                   <tr>
                     
                     <td><a href="{{route('servicos.show',$servico->id)}}">{{$servico->os}} | {{$servico->nome}}</a> @if($servico->servicoPrincipal) <small class="label bg-red">S</small>@endif</td>
-                    <td>
+                    <td data-status={{$servico->situacao}}>
                       @switch($servico->situacao)
 
                       @case('andamento')
@@ -77,15 +77,10 @@
             <!-- /.box-body -->
             <div class="box-footer clearfix">
               <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'licencaOperacao'])}}" class="btn btn-sm btn-info btn-flat pull-left"><span class="glyphicon glyphicon-plus-sign"></span> Novo Serviço</a>
-              <a href="javascript:void(0)" class="btn btn-sm btn-default btn-flat pull-right">Todas os Serviços</a>
+              
+              <button class="btn btn-sm btn-default btn-flat pull-right" id="licencasOperacao_btn">Todos os Serviços</button>
             </div>
             <!-- /.box-footer -->
           </div>
 
-<script>
-  $('.confirmation').on('click', function () {
-            return confirm('Você deseja excluir o serviço?');
-          });
-         
-       
-</script>
+

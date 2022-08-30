@@ -106,28 +106,3 @@
           </div>
 
 
-@section('js')
-
-
-<script src="http://cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"></script>
-<script>
-    $(function () {
-        $('#lista-arquivos').DataTable({
-          "paging": true,
-          "lengthChange": false,
-          "searching": true,
-          "ordering": false,
-          "info": false,
-          "autoWidth": false,
-           "language": {
-                "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
-            }           
-  });
-$('.confirmation').on('click', function () {
-            return confirm('Você deseja excluir o serviço?');
-          });
-         
-        });
-
-    </script>
-@stop
