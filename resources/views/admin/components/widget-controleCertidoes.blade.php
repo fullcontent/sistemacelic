@@ -76,10 +76,3 @@
             <!-- /.box-footer -->
           </div>
 
-<script>
-  $('.confirmation').on('click', function () {
-            return confirm('Você deseja excluir o serviço?');
-          });
-         
-       
-</script>
