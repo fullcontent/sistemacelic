@@ -46,7 +46,7 @@
 	{!! Form::hidden('empresa_id', $empresa_id) !!}
 	
 	<div class="col-md-12">
-	
+		<p><b><input type="checkbox" id="checkAll" > Selecionar Todas</b></p>
 		<table class="table table-hover" id="lista-servicos">
 			<thead>
 				
@@ -165,6 +165,13 @@
         }
     });
 
+
+	$('#checkAll').click(function () {    
+     $('input:checkbox').prop('checked', this.checked);    
+ });
+
+
+
 	$('#lista-servicos').DataTable({
 		      "paging": false,
 		      "lengthChange": false,
@@ -174,7 +181,7 @@
 		      "autoWidth": false,
 		       "language": {
                 "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
-            }           
+            },
   });
 
 </script>
