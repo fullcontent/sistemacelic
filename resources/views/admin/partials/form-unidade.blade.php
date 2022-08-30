@@ -331,15 +331,18 @@ $(document).ready(function(){
           if(response.status == 'OK') {
           
             // Agora preenchemos os campos com os valores retornados
-            $('#razaoSocial').val(response.nome);
-            $('#nomeFantasia').val(response.fantasia);
+            $('#razaoSocial').val(formatText(response.nome));
 
-            $('#endereco').val(response.logradouro);
+            
+            
+            $('#nomeFantasia').val(formatText(response.fantasia));
+
+            $('#endereco').val(formatText(response.logradouro));
             $('#numero').val(response.numero);
             $('#complemento').val(response.complemento);
             $('#cep').val(response.cep);
-            $('#bairro').val(response.bairro);
-            $('#cidade').val(response.municipio);
+            $('#bairro').val(formatText(response.bairro));
+            $('#cidade').val(formatText(response.municipio));
             $('#uf').val(response.uf);
 
 
@@ -365,6 +368,22 @@ $(document).ready(function(){
     }
   });
 });
+
+
+function formatText(text) {
+    var loweredText = text.toLowerCase();
+    var words = loweredText.split(" ");
+    for (var a = 0; a < words.length; a++) {
+        var w = words[a];
+
+        var firstLetter = w[0];
+        w = firstLetter.toUpperCase() + w.slice(1);
+
+        words[a] = w;
+    }
+    return words.join(" ");
+}
+
 </script>
 
 
