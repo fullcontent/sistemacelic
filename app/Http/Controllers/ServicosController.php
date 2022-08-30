@@ -1214,5 +1214,75 @@ class ServicosController extends Controller
     
         return 0;  //no numbers found
     }
+
+
+    public function anexarLaudo(Request $request)
+    {
+        $servico = Servico::find($request->servico_id);
+
+        if($request->laudo_emissao)
+        {
+            $servico->laudo_emissao = Carbon::createFromFormat('d/m/Y', $request->laudo_emissao)->toDateString();
+        }
+        
+        $servico->laudo_numero  =   $request->laudo_numero;
+
+       
+        // Se informou o arquivo, retorna um boolean
+        if ($request->hasFile('laudo_anexo') && $request->file('laudo_anexo')->isValid()) {
+            $nameFile = null;
+            $name = uniqid(date('HisYmd'));
+            $extension = $request->laudo_anexo->extension();
+
+            $nameFile = "{$name}.{$extension}";
+            // Faz o upload:
+            $upload = $request->laudo_anexo->storeAs('laudos', $nameFile);
+            // Se tiver funcionado o arquivo foi armazenado em storage/app/public/categories/nomedinamicoarquivo.extensao
+
+            $servico->laudo_anexo = $upload;
+
+
+        }
+
+
+        $servico->save();
+
+        return redirect()->route('servicos.show',$servico->id);
+
+    }
+    
+    public function anexarProtocolo(Request $request)
+    {
+        $servico = Servico::find($request->servico_id);
+
+        if($request->protocolo_emissao)
+        {
+            $servico->protocolo_emissao = Carbon::createFromFormat('d/m/Y', $request->protocolo_emissao)->toDateString();
+        }
+        
+        $servico->protocolo_numero  =   $request->protocolo_numero;
+
+       
+        // Se informou o arquivo, retorna um boolean
+        if ($request->hasFile('protocolo_anexo') && $request->file('protocolo_anexo')->isValid()) {
+            $nameFile = null;
+            $name = uniqid(date('HisYmd'));
+            $extension = $request->protocolo_anexo->extension();
+
+            $nameFile = "{$name}.{$extension}";
+            // Faz o upload:
+            $upload = $request->protocolo_anexo->storeAs('protocolos', $nameFile);
+            // Se tiver funcionado o arquivo foi armazenado em storage/app/public/categories/nomedinamicoarquivo.extensao
+
+            $servico->protocolo_anexo = $upload;
+
+
+        }
+
+
+        $servico->save();
+
+        return redirect()->route('servicos.show',$servico->id);
+    }
     
 }

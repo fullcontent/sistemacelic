@@ -122,10 +122,17 @@
                   </p>
 
                   <p><b>Início do processo: </b>{{\Carbon\Carbon::parse($servico->created_at)->format('d/m/Y')}}</p>
+
+                  @if(empty($servico->protocolo_numero))
+                  <p><b>Protocolo:</b> <button type="button" class="btn btn-default" data-toggle="modal"
+                    data-target="#anexar-protocolo">
+                    Anexar
+                </button></p>
+                @endif
                   
                   @unless ( empty($servico->protocolo_numero) )
                     
-                    <p><b>Emissão Protocolo: </b>{{\Carbon\Carbon::parse($servico->protocolo_emissao)->format('d/m/Y')}}</p>
+                  <p><b>Emissão Protocolo: </b>{{\Carbon\Carbon::parse($servico->protocolo_emissao)->format('d/m/Y')}}</p>
                   <p><b>Número Protocolo: </b>{{$servico->protocolo_numero}}
 
                     @unless (empty($servico->protocolo_anexo))
@@ -173,14 +180,20 @@
                   @endunless
 
                   
-                  
-                  
+                  @if(empty($servico->laudo_numero))
+                  <p><b>Laudo:</b> <button type="button" class="btn btn-default" data-toggle="modal"
+                          data-target="#anexar-laudo">
+                          Anexar
+                      </button></p>
+                  @endif
                   @unless ( empty($servico->laudo_anexo) )  
                   <p><b>Emissão do Laudo: </b>{{\Carbon\Carbon::parse($servico->laudo_emissao)->format('d/m/Y')}}</p>
                   <p><b>N. do Laudo </b> {{$servico->laudo_numero }}</p>
                   <p><b>Laudo: </b> <a href="{{ route('servico.downloadFile', ['servico_id'=> $servico->id,'tipo'=>'laudo']) }}" class="btn btn-xs btn-warning" target="_blank"><i class="fa fa-file"></i> Ver Laudo</a></p>
                   @endunless
                   <p><b>Escopo: </b>{{$servico->escopo}}</p>
+                  
+
                 </div>
 
               <a href="{{route('servicos.edit', $servico->id)}}" class="btn btn-info pull-right"><span class="glyphicon glyphicon-pencil"></span> Editar</a>
@@ -191,13 +204,15 @@
               
               @if(count($servico->subServicos))
 
+                
+
               {!! Form::open(['route'=>'faturamento.faturarServicoSub','id'=>'cadastroFaturamento', 'target'=>'_blank']) !!}
 
                 {!! Form::hidden('servicos[]',$servico->id) !!}
 
                 
                 {!! Form::hidden('empresa_id',$servico->unidade->empresa_id) !!}
-
+                
                 <button type="submit" class="btn btn-danger pull-right"><i class="fa fa-barcode"></i> Faturar</button>
 
                 {!! Form::close() !!}
@@ -210,7 +225,7 @@
   
                   
                   {!! Form::hidden('empresa_id',$servico->unidade->empresa_id) !!}
-  
+
                   <button type="submit" class="btn btn-danger pull-right"><i class="fa fa-barcode"></i> Faturar</button>
   
                   {!! Form::close() !!}
@@ -221,9 +236,24 @@
 
               {!! Form::hidden('servicos[]',$servico->id) !!}
               {!! Form::hidden('empresa_id',$servico->unidade->empresa_id) !!}
-            
-              <button type="submit" class="btn btn-danger pull-right"><i class="fa fa-barcode"></i> Faturar</button>
-            
+              
+              @if(!$servico->faturamento)
+                <button type="submit" class="btn btn-danger pull-right"><i class="fa fa-barcode"></i> Faturar</button>
+
+              @else
+
+              <div class="col-md-12">
+                <div class="form-group">
+              
+                  <div class="alert alert-success">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <h4><i class="icon fa fa-check"></i> Esse serviço já foi faturado!</h4>
+                    <a class="btn btn-warning" href="{{route('faturamento.show', $servico->faturamento->id)}}" target="_blank"><i class="fa fa-file"></i> <span>Acessar relatório</span> </a>
+                  </div>
+                </div>
+              </div>
+
+              @endif
               {!! Form::close() !!}
 
               @endif
@@ -352,6 +382,104 @@
 
 
   </div> 
+
+</div>
+
+
+<div class="modal fade" id="anexar-laudo" style="display: none;">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span></button>
+              <h4 class="modal-title">Anexar laudo {{$servico->os}}</h4>
+          </div>
+
+          {!! Form::open(['route'=>'servico.anexarLaudo','id'=>'anexarlaudo','enctype'=>'multipart/form-data']) !!}
+          <div class="modal-body">
+            
+            <div class="form-group">
+
+              {!! Form::hidden('servico_id', $servico->id) !!}
+		
+              {!! Form::label('laudo_numero', 'N. laudo', array('class'=>'control-label')) !!}
+              {!! Form::text('laudo_numero', null, ['class'=>'form-control','id'=>'laudo_numero']) !!}
+                        
+              
+            </div>
+            
+            <div class="form-group">
+		
+              {!! Form::label('laudo_emissao', 'Emissão laudo', array('class'=>'control-label')) !!}
+              {!! Form::text('laudo_emissao', null, ['class'=>'form-control','id'=>'laudo_emissao','data-date-format'=>'dd/mm/yyyy']) !!}
+              
+            </div>
+
+            <div class="form-group">
+		
+              {!! Form::label('laudo_anexo', 'Anexo laudo.', array('class'=>'control-label')) !!}
+              {!! Form::file('laudo_anexo', null, ['class'=>'form-control','id'=>'laudo_anexo']) !!}
+          
+             
+            </div>
+
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Fechar</button>
+              <button type="submit" class="btn btn-primary">Anexar</button>
+          </div>
+      </div>
+        {!! Form::close() !!}
+  </div>
+
+</div>
+
+
+<div class="modal fade" id="anexar-protocolo" style="display: none;">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span></button>
+              <h4 class="modal-title">Anexar Protocolo {{$servico->os}}</h4>
+          </div>
+
+          {!! Form::open(['route'=>'servico.anexarProtocolo','id'=>'anexarProtocolo','enctype'=>'multipart/form-data']) !!}
+          <div class="modal-body">
+            
+            <div class="form-group">
+
+              {!! Form::hidden('servico_id', $servico->id) !!}
+		
+              {!! Form::label('protocolo_numero', 'N. Protocolo', array('class'=>'control-label')) !!}
+              {!! Form::text('protocolo_numero', null, ['class'=>'form-control','id'=>'protocolo_numero']) !!}
+                        
+              
+            </div>
+            
+            <div class="form-group">
+		
+              {!! Form::label('protocolo_emissao', 'Emissão Protocolo', array('class'=>'control-label')) !!}
+              {!! Form::text('protocolo_emissao', null, ['class'=>'form-control','id'=>'protocolo_emissao','data-date-format'=>'dd/mm/yyyy']) !!}
+              
+            </div>
+
+            <div class="form-group">
+		
+              {!! Form::label('protocolo_anexo', 'Anexo Protocolo.', array('class'=>'control-label')) !!}
+              {!! Form::file('protocolo_anexo', null, ['class'=>'form-control','id'=>'protocolo_anexo']) !!}
+          
+             
+            </div>
+
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Fechar</button>
+              <button type="submit" class="btn btn-primary">Anexar</button>
+          </div>
+      </div>
+        {!! Form::close() !!}
+  </div>
 
 </div>
 

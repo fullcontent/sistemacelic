@@ -165,6 +165,9 @@ Route::get('/', function () {
 
 		Route::get('/servico/download/{file}', 'ArquivosController@downloadBoleto')->name('servico.downloadBoleto');
 
+		Route::post('/servico/anexarLaudo', 'ServicosController@anexarLaudo')->name('servico.anexarLaudo');
+		Route::post('/servico/anexarProtocolo', 'ServicosController@anexarProtocolo')->name('servico.anexarProtocolo');
+
 
 		Route::get('/arquivo/download/{id}', 'ArquivosController@download')->name('arquivo.download');
 		
