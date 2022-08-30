@@ -129,7 +129,7 @@ var licencaOperacao = $("#licencaOperacao").DataTable({
     "ordering":false,
 });
 
-licencaOperacao.column(1).search('finalizado','andamento').draw();
+licencaOperacao.column(1).search('andamento','finalizado').draw();
 
 
 
@@ -139,7 +139,7 @@ var nRenovaveis = $("#nRenovaveis").DataTable({
     "ordering":false,
 });
 
-nRenovaveis.column(1).search('finalizado','andamento').draw();
+nRenovaveis.column(1).search('andamento','finalizado').draw();
 
 
 
