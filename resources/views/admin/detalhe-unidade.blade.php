@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 @section('content_header')
-<h1>Detalhes da unidade</h1>
+<h1>Detalhes da unidade test</h1>
 @stop
 @section('content')
 @if (session()->has('success'))
@@ -119,17 +119,28 @@
 @section('js')
 
 
-<script src="http://cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"></script>
-
+<script src="http://cdn.datatables.net/plug-ins/1.12.1/i18n/Portuguese-Brasil.json"></script>
 <script>
     
     
 var licencaOperacao = $("#licencaOperacao").DataTable({
     "lengthChange":false,
     "ordering":false,
+    "paging":false,
+    searchBuilder: {
+        preDefined: {
+            criteria: [
+                {
+                    data: 'Status',
+                    condition: '!=',
+                    value: ['Arquivado']
+                }
+            ]
+        }
+    }
 });
 
-licencaOperacao.column(1).search('andamento','finalizado').draw();
+ 
 
 
 
@@ -137,9 +148,19 @@ licencaOperacao.column(1).search('andamento','finalizado').draw();
 var nRenovaveis = $("#nRenovaveis").DataTable({
     "lengthChange":false,
     "ordering":false,
+    "paging":false,
+    searchBuilder: {
+        preDefined: {
+            criteria: [
+                {
+                    data: 'Status',
+                    condition: '!=',
+                    value: ['Arquivado']
+                }
+            ]
+        }
+    }
 });
-
-nRenovaveis.column(1).search('andamento','finalizado').draw();
 
 
 
@@ -164,19 +185,20 @@ $('.confirmation').on('click', function () {
 
 $("#licencasOperacao_btn").on('click', function(e){
    
-    e.preventDefault();
+    var rebuild;
+    licencaOperacao.searchBuilder.rebuild(rebuild);
 
-    licencaOperacao.state.clear();
-            licencaOperacao.column(1).search('[arquivado]+[finalizado]+[andamento]+[nRenovado]').draw();
- 
+    
 })
+
+
+ 
+
 
 $("#nRenovaveis_btn").on('click', function(e){
    
-   e.preventDefault();
-
-   nRenovaveis.state.clear();
-    nRenovaveis.column(1).search('[arquivado]+[finalizado]+[andamento]+[nRenovado]').draw();
+    var rebuild;
+    nRenovaveis.searchBuilder.rebuild(rebuild);
 
 })
     </script>
