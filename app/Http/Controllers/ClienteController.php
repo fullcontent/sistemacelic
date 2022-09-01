@@ -42,11 +42,19 @@ class ClienteController extends Controller
         
         $user = User::find(Auth::id());
 
+        if(!count($user->empresas))
+        {
+            return view('errors.403');
+        }
+        else{
+            $servicos = $this->getServicosCliente();
+            $pendencias = $this->getPendenciasCliente();
+        }
        
     	return view ('cliente.dashboard')
                         ->with([
-                            'servicos'=>$this->getServicosCliente(),
-                            'pendencias'=>$this->getPendenciasCliente(),
+                            'servicos'=>$servicos,
+                            'pendencias'=>$pendencias,
 
 
                         ]);
@@ -140,9 +148,18 @@ class ClienteController extends Controller
     {   
         $user = User::find(Auth::id());
 
-        $servicos = $this->getServicosCliente();
+        if(count($user->empresas))
+        {
+            $servicos = $this->getServicosCliente();
+            $servicos = $servicos->where('situacao','<>','arquivado');
+        }
+
+        else
+        {
+            return view('errors.403');
+        }
+
         
-        $servicos = $servicos->where('situacao','<>','arquivado');
 
         
 
@@ -199,13 +216,20 @@ class ClienteController extends Controller
         
          $user = User::find(Auth::id());
 
+        if(count($user->empresas))
+        {
+            $servicos = $this->getServicosCliente();
+
+
+            $servicos = $servicos->where('situacao','=','andamento')
+            ->where('situacao','<>','arquivado');
+
+        }
+        else
+        {
+            return view('errors.403');
+        }
         
-         $servicos = $this->getServicosCliente();
-
-
-        $servicos = $servicos->where('situacao','=','andamento')
-                              ->where('situacao','<>','arquivado');
-
     
 
         return view('cliente.lista-servicos')
@@ -221,10 +245,21 @@ class ClienteController extends Controller
         
          $user = User::find(Auth::id());
         
-         $servicos = $this->getServicosCliente();
+        
+        if(count($user->empresas))
+        {
+            $servicos = $this->getServicosCliente();
 
-        $servicos = $servicos->where('situacao','=','finalizado')
-                            ->where('situacao','<>','arquivado');                             
+            $servicos = $servicos->where('situacao','=','finalizado')
+                                ->where('situacao','<>','arquivado');    
+        }
+
+        else
+        {
+            return view('errors.403');
+        }
+        
+                                 
 
         return view('cliente.lista-servicos')
                     ->with(
@@ -239,13 +274,26 @@ class ClienteController extends Controller
 
          $user = User::find(Auth::id());
         
-         $servicos = $this->getServicosCliente();
+         
+
+         if(count($user->empresas))
+         {
+
+            $servicos = $this->getServicosCliente();
        
 
-        $servicos = $servicos->where('unidade.status','=','Ativa')
-                        ->where('licenca_validade','>',date('Y-m-d'))
-                        ->where('tipo','licencaOperacao')
-                        ->where('situacao','<>','arquivado');
+            $servicos = $servicos->where('unidade.status','=','Ativa')
+                            ->where('licenca_validade','>',date('Y-m-d'))
+                            ->where('tipo','licencaOperacao')
+                            ->where('situacao','<>','arquivado');
+         }
+
+         else
+         {
+            return view('errors.403');
+         }
+         
+        
 
         return view('cliente.lista-servicos')
                     ->with(
@@ -260,12 +308,25 @@ class ClienteController extends Controller
         
 
         $user = User::find(Auth::id());
-        $servicos = $this->getServicosCliente();
         
-        $servicos = $servicos->where('unidade.status','=','Ativa')
-                            ->where('licenca_validade','<',date('Y-m-d'))
-                            ->where('tipo','=','licencaOperacao')
-                            ->where('situacao','<>','arquivado');
+        
+
+        if(count($user->empresas))
+        {
+            $servicos = $this->getServicosCliente();
+        
+            $servicos = $servicos->where('unidade.status','=','Ativa')
+                                ->where('licenca_validade','<',date('Y-m-d'))
+                                ->where('tipo','=','licencaOperacao')
+                                ->where('situacao','<>','arquivado');
+        }
+
+        else
+        {
+            return view('errors.403');
+        }
+        
+        
 
        
 
@@ -281,10 +342,22 @@ class ClienteController extends Controller
     public function listaVencer()
     {
          $user = User::find(Auth::id());
-         $servicos = $this->getServicosCliente();
+         
+         
+         if(count($user->empresas))
+         {
+            $servicos = $this->getServicosCliente();
 
-        $servicos = $servicos->where('licenca_validade','<',\Carbon\Carbon::today()->addDays(60))
-                            ->where('situacao','=','finalizado'); 
+            $servicos = $servicos->where('licenca_validade','<',\Carbon\Carbon::today()->addDays(60))
+                                ->where('situacao','=','finalizado'); 
+         }
+
+         else
+         {
+            return view('errors.403');
+         }
+         
+        
 
         return view('cliente.lista-servicos')
                     ->with(
@@ -297,9 +370,20 @@ class ClienteController extends Controller
     public function listaInativo()
     {
          $user = User::find(Auth::id());
-         $servicos = $this->getServicosCliente();
+        
+        
+         if(count($user->empresas))
+         {
+            $servicos = $this->getServicosCliente();
 
-        $servicos = $servicos->where('unidade.status','=','Inativa');
+            $servicos = $servicos->where('unidade.status','=','Inativa');
+         }
+
+         else
+         {
+            return view('errors.403');
+         }
+       
 
         return view('cliente.lista-servicos')
                     ->with(
@@ -376,21 +460,44 @@ class ClienteController extends Controller
     {
         $user = User::find(Auth::id());
 
-        $unidades = Unidade::where('empresa_id', $user->empresas->pluck('id'))->pluck('id');
 
-        $servicos = Servico::orWhereIn('empresa_id',$user->empresas->pluck('id'))
-                            ->orWhereIn('unidade_id', $unidades)
-                            ->get();
+        if(count($user->empresas))
+        {
 
-        return $servicos;
+            $unidades = Unidade::where('empresa_id', $user->empresas->pluck('id'))->pluck('id');
+
+            $servicos = Servico::orWhereIn('empresa_id',$user->empresas->pluck('id'))
+                                ->orWhereIn('unidade_id', $unidades)
+                                ->get();
+    
+            return $servicos;
+        }
+
+        else
+        {
+            $servicos = null;
+            return $servicos;
+        }
+        
     }
 
     public function getUnidadesCliente()
     {   
         $user = User::find(Auth::id());
-        $unidades = Unidade::where('empresa_id', $user->empresas->pluck('id'))->get();
 
-        return $unidades;
+        if(count($user->empresas))
+        {
+            $unidades = Unidade::where('empresa_id', $user->empresas->pluck('id'))->get();
+            return $unidades;
+        }
+
+        else{
+            $unidades = [];
+            return $unidades;
+        }
+        
+
+        
     }
 
     public function getPendenciasCliente()

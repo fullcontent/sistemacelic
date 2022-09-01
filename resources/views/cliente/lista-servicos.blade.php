@@ -108,7 +108,7 @@
                       @break
 
 	              		@endswitch</td>
-	              	<td>{{$servico->responsavel->name}}</td>
+	              	<td>{{$servico->responsavel->name ?? ''}}</td>
 
 					<td><a href="{{route('cliente.servico.show', $servico->id)}}" class="btn btn-xs btn-flat btn-info">Detalhes</a></td>
 	                </tr>
