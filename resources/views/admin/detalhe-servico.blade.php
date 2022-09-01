@@ -121,6 +121,8 @@
                     
                   </p>
 
+                  <p><b>Departamento:</b> {{$servico->departamento}}</p>
+
                   <p><b>Início do processo: </b>{{\Carbon\Carbon::parse($servico->created_at)->format('d/m/Y')}}</p>
 
                   @if(empty($servico->protocolo_numero))
