@@ -127,15 +127,7 @@
 
 			{!! Form::hidden('t',$t ?? '' ?? '') !!}
 
-<div class="col-md-6">
-	
-	<div class="form-group">
-		
-		{!! Form::label('servico_lpu', 'LPU', array('class'=>'control-label')) !!}
-		
-		
-	</div>
-</div>
+
 
 <div class="col-md-6">
 	
@@ -151,7 +143,7 @@
 
 
 
-<div class="col-md-6">
+<div class="col-md-4">
 	
 	<div class="input-group input-group-sm form-group">
 		
@@ -171,11 +163,20 @@
 	
 </div>
 
-<div class="col-md-6">
-	<div class="input-group input-group-sm form-group">
+<div class="col-md-2">
+	<div class="form-group">
 		{!! Form::label('departamento', 'Departamento', array('class'=>'control-label')) !!}
-		{!! Form::text('departamento', null, ['class'=>'form-control','id'=>'departamento']) !!}
 
+		{!! Form::select('departamento', array(
+				'licenciamento' => 'Licenciamento',
+				'permits' => 'Permits',
+				'regulatorio'=>'Regulatório',
+				'obras'=>'Obras',
+				'expansao'=>'Expansão',
+				'compras' => 'Compras',
+				'outros' => 'Outros'
+				), null, ['class'=>'form-control'])!!}
+		
 	</div>
 </div>
 
