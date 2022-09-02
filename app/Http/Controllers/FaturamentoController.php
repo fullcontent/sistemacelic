@@ -182,6 +182,12 @@ class FaturamentoController extends Controller
             foreach($request->faturamento as $f)
             {
                 $s = Servico::with('financeiro')->find($f['servico_id']);
+
+                if($request->nf)
+                {
+                    $s->nf = $request->nf;
+                    $s->save();
+                }
                 
                 $valorFaturar = $f['valorFaturar'];
 

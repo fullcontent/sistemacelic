@@ -168,6 +168,7 @@
 		{!! Form::label('departamento', 'Departamento', array('class'=>'control-label')) !!}
 
 		{!! Form::select('departamento', array(
+				null,
 				'licenciamento' => 'Licenciamento',
 				'permits' => 'Permits',
 				'regulatorio'=>'Regulatório',
@@ -323,15 +324,15 @@
 					</div>
 				</div>
 
-				@if($servico->faturamento)
+				
 				<div class="col-md-2">
 					<div class="form-group">
 						{!! Form::label('nf', 'NF', array('class'=>'control-label')) !!}
-						{!! Form::text('nf', $servico->faturamento->nf, ['class'=>'form-control','id'=>'nf']) !!}
+						{!! Form::text('nf', $servico->nf, ['class'=>'form-control','id'=>'nf']) !!}
 
 					</div>
 				</div>
-				@endif
+				
 
 				
 						@if($servico->faturamento)

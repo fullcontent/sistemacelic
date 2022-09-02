@@ -53,7 +53,7 @@
                   @if($link=='on')
                   <td>
                     @if($i->licenca_anexo)
-                    <a href="{{ route('servico.downloadFile', ['servico_id'=> $i->servico_id,'tipo'=>'licenca']) }}" class="btn btn-xs btn-warning" target="_blank" rel="external">Ver Licença</a>
+                    <a href="{{ route('servico.downloadFile', ['servico_id'=> $i->id,'tipo'=>'licenca']) }}" class="btn btn-xs btn-warning" target="_blank" rel="external">Ver Licença</a>
                     @else
                     Não há documentos 
                     @endif

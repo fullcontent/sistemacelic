@@ -19,9 +19,9 @@
 				  <th>Cliente</th>
                   <th>Data</th>
 				  <th>Total</th>
-				  <th>NF</th>
-				  <th></th>
+				  
 				  <th>Actions</th>
+				  <th></th>
 				</tr>
                 </thead>
                 <tbody>
@@ -32,20 +32,7 @@
 				<td>{{$f->empresa->nomeFantasia}}</td>
 				<td><span style="display:none;">{{$f->created_at}}</span>{{ \Carbon\Carbon::parse($f->created_at)->format('d/m/Y')}}</td>
 				<td>R$ {{number_format($f->valorTotal,2,'.',',')}}</td>
-				<td>
-					@if(!$f->nf)
-					<button type="button" class="btn btn-warning btn-xs cadastroNF" data-toggle="modal" data-target="#cadastroNF" data-ID='{{$f->id}}' data-cliente='{{$f->empresa->nomeFantasia}}' data-nome='{{$f->nome}}'>
-						<span class="glyphicon glyphicon-plus-sign"></span> Cadastrar
-					  </button>
-					@else
-					
-					<button type="button" class="btn btn-default btn-xs editNF" data-toggle="modal" data-target="#editNF" data-ID='{{$f->id}}' data-cliente='{{$f->empresa->nomeFantasia}}' data-nome='{{$f->nome}}' data-nf="{{$f->nf}}">
-						<span class="glyphicon glyphicon-plus-sign"></span> {{$f->nf}}
-					  </button>
-
-					@endif
-
-				</td>
+				
 				<td style="display:none">{{$f->servicos}}{{$f->obs}}</td>
 				<td><a href="{{route('faturamento.destroy',$f->id)}}" class="confirmation"> <i class="glyphicon glyphicon-trash"></i></a></td>
 				</tr>

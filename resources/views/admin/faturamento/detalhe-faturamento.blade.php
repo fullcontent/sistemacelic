@@ -4,8 +4,8 @@
 
 <style>
   @media print {
-  a::after{
-    content: " (" attr() ") ";
+  a[href]:after {
+    content: none !important;
   }
 }
 </style>
@@ -49,6 +49,7 @@
             <th>CNPJ</th>
             <th>Serviço</th>
             <th>Valor</th>
+            <th>NF</th>
             @if($link=='on')
             <th>Download</th>
             @endif
@@ -58,13 +59,15 @@
               @foreach($faturamentoItens as $i)
               <tr>
                 <td>{{$i->detalhes->unidade->codigo}}</td>
-                  <td><a href="{{route('unidades.show',$i->detalhes->unidade->id)}}">{{$i->detalhes->unidade->nomeFantasia}}</a></td>
+                  <td><a href="{{route('unidades.show',$i->detalhes->unidade->id)}}" class="no-print">{{$i->detalhes->unidade->nomeFantasia}}</a><span class="visible-print">{{$i->detalhes->unidade->nomeFantasia}}</span></td>
                   <td>{{$i->detalhes->unidade->cidade}}/{{$i->detalhes->unidade->uf}}</td>
                   <td>@php echo App\Http\Controllers\FaturamentoController::formatCnpjCpf($i->detalhes->unidade->cnpj); @endphp</td>
-                  <td>{{$i->detalhes->nome}}<p><a href="{{route('servicos.show',$i->servico_id)}}" class="btn btn-xs btn-success">{{$i->detalhes->os}}</a></p></td>
+                  <td>{{$i->detalhes->nome}}<p><a href="{{route('servicos.show',$i->servico_id)}}" class="btn btn-xs btn-success no-print">{{$i->detalhes->os}}</a></p></td>
                   <td>R$ {{number_format($i->valorFaturado,2,'.',',')}}</td>
+                  <td>{{$i->detalhes->nf}}</td>
                   @if($link=='on')
-                  <td><a href="{{ route('servico.downloadFile', ['servico_id'=> $i->servico_id,'tipo'=>'licenca']) }}" class="btn btn-xs btn-warning" target="_blank" rel="external">Ver Licença</a></td>
+                  <td><a href="{{ route('servico.downloadFile', ['servico_id'=> $i->servico_id,'tipo'=>'licenca']) }}" class="btn btn-xs btn-warning no-print" target="_blank" rel="external">Ver Licença</a>
+                    <a href="{{ route('servico.downloadFile', ['servico_id'=> $i->servico_id,'tipo'=>'licenca']) }}" class="btn btn-xs btn-warning visible-print" target="_blank">Ver Licença</a></td>
                   @endif
               </tr>
               @endforeach
