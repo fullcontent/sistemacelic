@@ -884,9 +884,9 @@ class ServicosController extends Controller
         if($request->nf)
         {
             // dump($servico->faturamento->id);
-            $faturamento = Faturamento::find($servico->faturamento->id);
-            $faturamento->nf = $request->nf;
-            $faturamento->save();
+            // $faturamento = Faturamento::find($servico->faturamento->id);
+            // $faturamento->nf = $request->nf;
+            // $faturamento->save();
 
             $servico->nf = $request->nf;
         }
