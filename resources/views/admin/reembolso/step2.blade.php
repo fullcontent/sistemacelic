@@ -57,6 +57,7 @@
 				<th>Serviço</th>
 				<th>Taxa</th>
 				<th>Solicitante</th>
+				<th>Departamento</th>
 				<th width="100">Valor</th>
 				<th>Vcto.</th>
 				<th>Pgto.</th>
@@ -80,6 +81,7 @@
 						{{\App\Models\Solicitante::where('id',$s->servico->solicitante)->value('nome')}}
 						@endif
 					</td>
+					<td>{{$s->servico->departamento}}</td>
 					<td>R$ {{number_format($s->valor,2,'.',',')}}</td>
 					<td>{{ \Carbon\Carbon::parse($s->vencimento)->format('d/m/Y')}}</td>
 					<td>{{ \Carbon\Carbon::parse($s->pagamento)->format('d/m/Y')}}</td>
