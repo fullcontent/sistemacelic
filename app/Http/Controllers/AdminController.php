@@ -41,6 +41,7 @@ class AdminController extends Controller
 						'vencer'=>$this->servicosVencer(),
 						'finalizados'=>$this->servicosFinalizados(),
 						'andamento'=>$this->servicosAndamento(),
+                        'andamentoCoResponsavel'=>$this->servicosAndamentoCoResponsavel(),
 						'pendencias'=>$this->pendencias(),
 						
 					]);
@@ -102,6 +103,22 @@ class AdminController extends Controller
                                 
         // ->whereIn('unidade_id',$this->getUnidadesList())
         ->orWhere('responsavel_id',Auth::id())
+        ->get();
+
+
+        $servicos = $servicos->where('situacao','=','andamento')
+        
+        ->where('situacao','<>','arquivado');
+
+        return $servicos;
+    }
+
+    public function servicosAndamentoCoResponsavel()
+    {
+        $servicos = Servico::with('unidade','empresa','responsavel')
+                                
+        // ->whereIn('unidade_id',$this->getUnidadesList())
+        ->orWhere('coresponsavel_id',Auth::id())
         ->get();
 
 

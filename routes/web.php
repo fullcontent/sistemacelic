@@ -149,6 +149,7 @@ Route::get('/', function () {
 
 
 		Route::get('/servico/andamento/', 'ServicosController@listaAndamento')->name('servico.andamento');
+		Route::get('/servico/andamentoCo/', 'ServicosController@listaAndamentoCo')->name('servico.andamentoCo');
 		Route::get('/servico/finalizados/', 'ServicosController@listaFinalizados')->name('servico.finalizado');
 		Route::get('/servico/vigentes/', 'ServicosController@listaVigentes')->name('servico.vigente');
 		Route::get('/servico/vencidos/', 'ServicosController@listaVencidos')->name('servico.vencido');
@@ -338,5 +339,28 @@ Route::get('repararHistorico', function () {
 			}
 						
 		}
+});
 
+Route::get('nf', function () {
+	$servicos = \App\Models\Servico::whereHas('faturamento')->get();
+
+
+	foreach($servicos->where('nf',null) as $s)
+	{	
+		if($s->nf == null)
+		{
+			$ser = \App\Models\Servico::find($s->id);
+			$ser->nf = $s->faturamento->nf;
+			$ser->save();
+			dump($ser);
+		}
+
+		else
+		{
+			dump("ja tem nf");
+		}
+		
+		
+	}
+	
 });

@@ -63,6 +63,7 @@
               <h3>{{count($andamento)}}</h3>
 
               <p>Serviços em andamento</p>
+              <small>Responsável</small>
             </div>
             <div class="icon">
               <i class="ion ion-pie-graph"></i>
@@ -71,8 +72,27 @@
           </div>
         </div>
         <!-- ./col -->
+
+        <div class="col-lg-3 col-xs-6">
+          <!-- small box -->
+          <div class="small-box bg-yellow">
+            <div class="inner">
+              <h3>{{count($andamentoCoResponsavel)}}</h3>
+
+              <p>Serviços em andamento</p>
+              <small>Co-Responsável</small>
+            </div>
+            <div class="icon">
+              <i class="ion ion-pie-graph"></i>
+            </div>
+            <a href="{{route('servico.andamentoCo')}}" class="small-box-footer">Visualizar <i class="fa fa-arrow-circle-right"></i></a>
+          </div>
+        </div>
+        <!-- ./col -->
         
       </div>
+
+      
 
 
 @if(count($pendencias->where('status','pendente')->where('vencimento',date('Y-m-d'))) > 0)

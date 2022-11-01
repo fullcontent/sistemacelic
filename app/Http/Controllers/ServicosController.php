@@ -106,6 +106,26 @@ class ServicosController extends Controller
                     ->with('servicos',$servicos);
     }
 
+    public function listaAndamentoCo()
+    {
+        
+        $servicos = Servico::with('unidade','empresa','responsavel')
+                                
+                                // ->whereIn('unidade_id',$this->getUnidadesList())
+                                ->orWhere('coresponsavel_id',Auth::id())
+                                ->get();
+
+
+        $servicos = $servicos->where('situacao','=','andamento')
+                                
+                                ->where('situacao','<>','arquivado');
+
+
+
+        return view('admin.lista-servicos')
+                    ->with('servicos',$servicos);
+    }
+
     public function listaFinalizados()
     {
         
@@ -848,6 +868,8 @@ class ServicosController extends Controller
         $servico->servico_lpu = $request->servico_lpu;
         $servico->tipoLicenca = $request->tipoLicenca;
 
+        $servico->nf = $request->nf;
+
 
 
         //Edit Financeiro
@@ -881,15 +903,7 @@ class ServicosController extends Controller
         //Edit Faturamento
         
 
-        if($request->nf)
-        {
-            // dump($servico->faturamento->id);
-            // $faturamento = Faturamento::find($servico->faturamento->id);
-            // $faturamento->nf = $request->nf;
-            // $faturamento->save();
-
-            $servico->nf = $request->nf;
-        }
+        
 
 
         //-----------------------------------
