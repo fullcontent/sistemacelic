@@ -110,6 +110,8 @@ class TaxasController extends Controller
 
         $taxa->reembolso = $request->reembolso;
 
+        $taxa->responsavelPgto = $request->responsavelPgto;
+
         $taxa->observacoes  = $request->observacoes;
         
         

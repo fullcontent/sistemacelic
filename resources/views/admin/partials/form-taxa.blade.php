@@ -63,10 +63,17 @@
         @endif        
         </div>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-2">
         <div class="form-group">
         {!! Form::label('valor', 'Valor', array('class'=>'control-label')) !!}
         {!! Form::text('valor', null, ['class'=>'form-control','id'=>'valor']) !!}
+        </div>
+      </div>
+
+      <div class="col-md-2">
+        <div class="form-group">
+        {!! Form::label('responsavelPgto', 'Resp. Pgto', array('class'=>'control-label')) !!}
+        {!! Form::select('responsavelPgto', ['castro'=>'Castro','cliente'=>'Cliente'] ,null, ['class'=>'form-control','id'=>'responsavelPgto']) !!}
         </div>
       </div>
       <div class="col-md-2">

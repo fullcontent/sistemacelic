@@ -12,7 +12,7 @@
 
 	
 
-	{!! Form::open(['route'=>'taxas.store','enctype'=>'multipart/form-data']) !!}
+	{!! Form::open(['route'=>'taxas.store','enctype'=>'multipart/form-data','id'=>'cadastroTaxa']) !!}
 
 	@include('admin.partials.form-taxa')
 	
@@ -56,7 +56,31 @@
 	  $("#pagamento").prop('required',true).val(null);
 	});
 
+
+	$( "#responsavelPgto" ).change(function() {
+		
+		var responsavel = $("#responsavelPgto").val();
+
+		if(responsavel == "cliente"){
+
+			$("#reembolso").val("nao");
+			$("#reembolso").prop('disabled',true);
+		}
+
+		if(responsavel == "castro"){
+
+			
+			$("#reembolso").prop('disabled',false);
+			$("#reembolso").val("sim");
+			}
 	
+	 });
+	 
+	 
+	 $("#cadastroTaxa").on("submit",function(){
+
+		$("#reembolso").prop('disabled',false);
+	 })
 	  	
  
 });
