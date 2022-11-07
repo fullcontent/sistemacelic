@@ -18,7 +18,7 @@
                     <th>Valor</th>
                     <th>Vencimento</th>
                     <th>Situação</th>
-                    <th>O.S.</th>
+                    <th>Data Pgto</th>
                     <th></th>
                     <th></th>
                   </tr>
@@ -52,7 +52,11 @@
                         @break
                       @endswitch
                     </td>
-                    <td>{{$taxa->servico->os}}</td>
+                    <td>
+                      @if($taxa->pagamento)
+                      {{\Carbon\Carbon::parse($taxa->pagamento)->format('d/m/Y')}}
+                      @endif
+                    </td>
                     <td>
         
         
