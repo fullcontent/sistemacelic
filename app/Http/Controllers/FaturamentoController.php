@@ -185,6 +185,7 @@ class FaturamentoController extends Controller
 
                 if($request->nf)
                 {
+                   
                     $s->nf = $request->nf;
                     $s->save();
                 }
@@ -443,6 +444,7 @@ class FaturamentoController extends Controller
             'obs'=>$faturamento->obs,
             'data'=>$faturamento->created_at,
             'link'=>$faturamento->link,
+            'id'=>$faturamento->id,
         ]);
         
 
@@ -600,6 +602,19 @@ class FaturamentoController extends Controller
 
         return redirect()->route('faturamentos.index');
 
+    }
+
+    public function editarFaturamento(Request $request)
+    {
+        $faturamento = Faturamento::find($request->faturamentoID);
+
+        
+
+        $faturamento->nome = $request->nome;
+        $faturamento->obs = $request->obs;
+        $faturamento->save();
+
+        return redirect()->route('faturamento.show',$request->faturamentoID);
     }
 
 

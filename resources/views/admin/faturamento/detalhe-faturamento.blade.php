@@ -30,8 +30,10 @@
     <!-- info row -->
     <div class="row invoice-info">
       <div class="col-sm-6">
-        <p><b>RELATÓRIO DE FATURAMENTO: </b>{{$descricao}}</p>
+        <p><b>RELATÓRIO DE FATURAMENTO: </b>{{$descricao}} <span><button type="button" class="btn btn-xs btn-info" data-toggle="modal" data-target="#edit-faturamento"><i class="fa fa-edit"></i> Editar</button></span></p>
         <p><b>Referência: </b>{{$obs}}</p>
+
+        
       </div>
       
     </div>
@@ -107,5 +109,41 @@
       </div>
     </div>
   </section>
+
+  <div class="modal fade" id="edit-faturamento" style="display: none;">
+    <div class="modal-dialog">
+    <div class="modal-content">
+    <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+    <span aria-hidden="true">×</span></button>
+    <h4 class="modal-title">Editar faturamento</h4>
+    </div>
+    <div class="modal-body">
+
+      {!! Form::open(['route'=>'faturamento.editarFaturamento']) !!}
+
+
+      {!! Form::hidden('faturamentoID', $id) !!}
+
+      {!! Form::label('nome', 'Descrição', array('class'=>'control-label')) !!}
+      {!! Form::text('nome', $descricao, ['class'=>'form-control','id'=>'nome']) !!}
+     
+
+      {!! Form::label('obs', 'Referência', array('class'=>'control-label')) !!}
+      {!! Form::text('obs', $obs, ['class'=>'form-control','id'=>'obs']) !!}
+
+    </div>
+    <div class="modal-footer">
+    <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Fechar</button>
+    <button type="submit" class="btn btn-primary">Salvar</button>
+
+    {!! Form::close() !!}
+    </div>
+    </div>
+    
+    </div>
+    
+    </div>
+
 
 @endsection

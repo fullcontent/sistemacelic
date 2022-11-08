@@ -57,6 +57,9 @@ Route::get('/', function () {
 
 		Route::post('/faturamento/addNF','FaturamentoController@addNF')->name('faturamento.addNF');
 
+		Route::post('/faturamento/editarFaturamento','FaturamentoController@editarFaturamento')->name('faturamento.editarFaturamento');
+
+
 		Route::post('/faturamento/editNF','FaturamentoController@update')->name('faturamento.editNF');
 
 
