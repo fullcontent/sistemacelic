@@ -560,7 +560,7 @@ class PropostasController extends Controller
     $this->reOrderServices($proposta->id); //Reordenar indice dos servicos da proposta
 
 
-    $pdf = \PDF::loadView('admin.proposta.pdf', ['proposta' => $proposta])->stream("Proposta - ".$proposta->empresa->nomeFantasia." - ".$proposta->id.".pdf ");
+    $pdf = \PDF::loadView('admin.proposta.pdf', ['proposta' => $proposta])->stream("Proposta ".$proposta->id." - ".$proposta->empresa->nomeFantasia." - ".$proposta->unidade->codigo." - ".$proposta->unidade->nomeFantasia.".pdf");
     return $pdf;
 
     // return view('admin.proposta.pdf', ['proposta' => $proposta]);
