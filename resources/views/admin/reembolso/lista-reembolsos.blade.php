@@ -64,8 +64,10 @@
 		      "info": true,
 		      "autoWidth": false,
 		       "language": {
-                "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
-            }           
+                "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json",
+				
+            },
+			"order": [[2, 'desc']],   
   });
 $('.confirmation').on('click', function () {
         		return confirm('Você deseja excluir o reembolso?');
