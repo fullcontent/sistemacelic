@@ -378,8 +378,8 @@ class AdminController extends Controller
         $servicos = Servico::with('pendencias')
                             ->whereNotIn('responsavel_id',[1])
                             ->orderBy('id','DESC')
-                            ->select('id','nome','os','unidade_id','tipo')
-                            // ->take(200)   //Somente para testes
+                            ->select('id','nome','os','unidade_id','tipo','protocolo_anexo','laudo_anexo')
+                            ->take(200)   //Somente para testes
                             ->get();
 
         // $servicos = Pendencia::all();
@@ -393,7 +393,7 @@ class AdminController extends Controller
             "Expires"             => "0"
         );
 
-        $columns = array('Empresa','Tipo','Serviço','OS','Código','Unidade','CNPJ','Status da Unidade','Data Inauguração','Cidade/UF','Pendência',
+        $columns = array('Empresa','Tipo','Serviço','OS','Etapa do Processo','Código','Unidade','CNPJ','Status da Unidade','Data Inauguração','Cidade/UF','Pendência',
                         'Responsabilidade','Responsável','Status','Vencimento','Data Criação');
 
         $callback = function() use($servicos, $columns) {
@@ -484,6 +484,23 @@ class AdminController extends Controller
                         
                         
                     }
+
+
+                    $etapa = null;
+
+                    if(!$s->protocolo_anexo)
+                    {
+                        $etapa = "Em elaboração";
+                    }
+                    else{
+                        if(!$s->laudo_anexo)
+                        {
+                            $etapa = "Em elaboração";
+                        }
+                        else{
+                            $etapa = "1° Análise";
+                        }
+                    }
                 
                     
 
@@ -492,6 +509,7 @@ class AdminController extends Controller
                     $s->tipo,
                     $s->nome,
                     $s->os,
+                    $etapa,
                     $s->unidade->codigo,
                     $s->unidade->nomeFantasia,
                     $s->unidade->cnpj,
