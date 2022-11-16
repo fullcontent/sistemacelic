@@ -71,8 +71,8 @@
             <div class="form-group">
                     
                     {!! Form::label('dataInauguracao', 'Data Inauguração', array('class'=>'control-label')) !!}
-                    @if(Route::is('unidade.show'))
-                    {!! Form::text('dataInauguracao', \Carbon\Carbon::parse($unidades->dataInauguracao)->format('d/m/Y'), ['class'=>'form-control','id'=>'dataInauguracao','data-date-format'=>'dd/mm/yyyy']) !!}
+                    @if(Route::is('unidades.edit'))
+                    {!! Form::text('dataInauguracao', null, ['class'=>'form-control','id'=>'dataInauguracao','data-date-format'=>'dd/mm/yyyy']) !!}
                     @else
                     {!! Form::text('dataInauguracao', null, ['class'=>'form-control','id'=>'dataInauguracao','data-date-format'=>'dd/mm/yyyy']) !!}
                     @endif 
@@ -311,7 +311,18 @@
 
 <script>
 $(document).ready(function(){
+    
+    
     $("#dataInauguracao").datepicker();
+
+    var dataInauguracao = new Date($("#dataInauguracao").val());
+
+    var dataInauguracao2 = [dataInauguracao.getDate(),dataInauguracao.getMonth() + 1,  dataInauguracao.getFullYear()].join('/');
+
+
+    $("#dataInauguracao").val(dataInauguracao2);
+
+
 
   //Mascaras nos campos
 

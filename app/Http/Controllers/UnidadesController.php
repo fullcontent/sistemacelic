@@ -253,7 +253,13 @@ class UnidadesController extends Controller
             $empresa->nomeFantasia  = $request->nomeFantasia;
             $empresa->razaoSocial   = $request->razaoSocial;
             $empresa->status        = $request->status;
-            $empresa->dataInauguracao        = Carbon::createFromFormat('d/m/Y', $request->dataInauguracao)->toDateString();
+
+            if($request->dataInauguracao)
+            {
+                $empresa->dataInauguracao  = Carbon::createFromFormat('d/m/Y', $request->dataInauguracao)->toDateString();
+            }
+            
+            
             $empresa->inscricaoEst  = $request->inscricaoEst;
             $empresa->inscricaoMun  = $request->inscricaoMun;
             $empresa->inscricaoImo  = $request->inscricaoImo;
@@ -273,6 +279,10 @@ class UnidadesController extends Controller
             $empresa->area          = $request->area;
             $empresa->areaTerreno   = $request->areaTerreno;
             $empresa->tipoImovel    = $request->tipoImovel;
+
+
+
+            // return $request->all();
 
             $empresa->save();
             
