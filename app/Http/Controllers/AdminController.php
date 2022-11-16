@@ -223,6 +223,16 @@ class AdminController extends Controller
                         $licenca_validade = null;
                     }
 
+
+                    if($s->unidade->dataInauguraao)
+                    {
+                        $dataInauguracao =  \Carbon\Carbon::parse($s->unidade->dataInauguracao)->format('d/m/Y');
+                    }
+                    else
+                    {
+                        $dataInauguracao = null;
+                    }
+
                 fputcsv($file, array(
                     $s->unidade->razaoSocial,
                     $s->unidade->codigo,
@@ -239,6 +249,7 @@ class AdminController extends Controller
                     $s->unidade->endereco,
                     $s->unidade->numero,
                     $s->unidade->complemento,
+                    $dataInauguracao,
                     $cidadeUF,
                     $s->unidade->cep,
                     $s->tipo,
@@ -312,6 +323,15 @@ class AdminController extends Controller
                         $proposta = $s->proposta;
                     }
                 
+
+                    if($s->unidade->dataInauguraao)
+                    {
+                        $dataInauguracao =  \Carbon\Carbon::parse($s->unidade->dataInauguracao)->format('d/m/Y');
+                    }
+                    else
+                    {
+                        $dataInauguracao = null;
+                    }
                     
 
 
@@ -323,6 +343,7 @@ class AdminController extends Controller
                     $s->unidade->codigo,
                     $s->unidade->nomeFantasia,
                     $s->unidade->cnpj,
+                    $dataInauguracao,
                     $cidadeUF,
                     $proposta,
                     $s->financeiro->valorTotal ?? '',
@@ -371,7 +392,7 @@ class AdminController extends Controller
             "Expires"             => "0"
         );
 
-        $columns = array('Empresa','Serviço','OS','Código','Unidade','CNPJ','Cidade/UF','Pendência',
+        $columns = array('Empresa','Serviço','OS','Código','Unidade','CNPJ','Data Inauguração','Cidade/UF','Pendência',
                         'Responsabilidade','Responsável','Status','Vencimento');
 
         $callback = function() use($servicos, $columns) {
@@ -395,6 +416,16 @@ class AdminController extends Controller
                     {
                         $proposta = $s->proposta;
                     }
+
+
+                    if($s->unidade->dataInauguraao)
+                    {
+                        $dataInauguracao =  \Carbon\Carbon::parse($s->unidade->dataInauguracao)->format('d/m/Y');
+                    }
+                    else
+                    {
+                        $dataInauguracao = null;
+                    }
                 
                     
 
@@ -405,6 +436,7 @@ class AdminController extends Controller
                     $s->unidade->codigo,
                     $s->unidade->nomeFantasia,
                     $s->unidade->cnpj,
+                    $dataInauguracao,
                     $cidadeUF,
                     $p->pendencia,
                     $p->responsavel_tipo,

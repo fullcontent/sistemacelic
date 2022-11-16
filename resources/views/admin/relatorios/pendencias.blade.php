@@ -1,6 +1,3 @@
-
-
-
 <div class="box">
   <div class="box-header"></div>
   <div class="box-body">
@@ -12,6 +9,7 @@
             <th>OS</th>
             <th>Código</th>
             <th>Unidade</th>
+            <th>Data Inauguração</th>
             <th>CNPJ</th>
             <th>Cidade/UF</th>
            
@@ -35,6 +33,7 @@
                     <td>{{$s->os}}</td>
                     <td>{{$s->unidade->codigo}}</td>
                     <td>{{$s->unidade->nomeFantasia}}</td>
+                    <td>{{\Carbon\Carbon::parse($s->unidade->dataInauguracao)->format('d/m/Y') ?? ''}}</td>
                     <td>{{$s->unidade->cnpj}}</td>
                     <td>{{$s->unidade->cidade}}/{{$s->unidade->uf}}</td>
                     

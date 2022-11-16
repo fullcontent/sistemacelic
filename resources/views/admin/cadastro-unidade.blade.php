@@ -28,3 +28,18 @@
 	{!! Form::close() !!}
 
 @endsection
+
+@section('js')
+<script>
+
+$(document).ready(function() {
+
+	
+	$("#dataInauguracao").datepicker();
+	
+})	
+</script>
+
+
+
+@endsection
