@@ -48,6 +48,19 @@
             <div class="box-body">
                 
                 <div class="col-sm-6">
+                
+                  <p><b>Etapa do Processo:</b> 
+                  @if(!$servico->protocolo_anexo)
+                    <button class="btn btn-primary">Em elaboração</button>
+                  @endif
+                  @if($servico->protocolo_anexo)
+                    @if($servico->laudo_anexo)
+                      <button class="btn btn-success">1° análise</button>
+                    @endif
+                  @endif
+                  
+                </p>
+
                 <p><b>Nome: </b>{{$servico->nome}}</p>
                   <p><b>Situação: </b>
                   @switch($servico->situacao)
