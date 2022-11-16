@@ -378,7 +378,8 @@ class AdminController extends Controller
         $servicos = Servico::with('pendencias')
                             ->whereNotIn('responsavel_id',[1])
                             ->orderBy('id','DESC')
-                            ->select('id','nome','os','unidade_id')
+                            ->select('id','nome','os','unidade_id','tipo')
+                            // ->take(200)   //Somente para testes
                             ->get();
 
         // $servicos = Pendencia::all();
@@ -392,8 +393,8 @@ class AdminController extends Controller
             "Expires"             => "0"
         );
 
-        $columns = array('Empresa','Serviço','OS','Código','Unidade','CNPJ','Data Inauguração','Cidade/UF','Pendência',
-                        'Responsabilidade','Responsável','Status','Vencimento');
+        $columns = array('Empresa','Tipo','Serviço','OS','Código','Unidade','CNPJ','Status da Unidade','Data Inauguração','Cidade/UF','Pendência',
+                        'Responsabilidade','Responsável','Status','Vencimento','Data Criação');
 
         $callback = function() use($servicos, $columns) {
             $file = fopen('php://output', 'w');
@@ -426,16 +427,75 @@ class AdminController extends Controller
                     {
                         $dataInauguracao = null;
                     }
+
+                    switch ($p->responsavel_tipo) {
+                        
+                        
+                        case 'usuario':
+                            $p->responsavel_tipo = "Castro";
+                            break; 
+                        
+                        case 'op':
+                            $p->responsavel_tipo = "Órgão";
+                            break;
+                            
+                            case 'cliente':
+                                $p->responsavel_tipo = "Cliente";
+                                break; 
+                       
+                    }
+
+                    switch ($p->status) {
+                        case 'pendente':
+                            $p->status = "Pendente";
+                            break;
+
+                            case 'concluido':
+                                $p->status = "Concluído";
+                                break;
+                        
+                            
+                        
+                    }
+
+
+                    switch ($s->tipo) {
+                        
+                        
+                        case 'licencaOperacao':
+                            $s->tipo = "Licença de Operação";
+                            break;
+
+                            case 'nRenovaveis':
+                                $s->tipo = "Não Renováveis";
+                                break;
+
+                                case 'controleCertidoes':
+                                    $s->tipo = "Controle de Certidões";
+                                    break;
+
+                                    case 'controleTaxas':
+                                        $s->tipo = "Controle de Taxas";
+                                        break;
+
+                                        case 'facilitiesRealEstate':
+                                            $s->tipo = "Facilities/Real Estate";
+                                            break;
+                        
+                        
+                    }
                 
                     
 
                 fputcsv($file, array(
                     $s->unidade->empresa->nomeFantasia,
+                    $s->tipo,
                     $s->nome,
                     $s->os,
                     $s->unidade->codigo,
                     $s->unidade->nomeFantasia,
                     $s->unidade->cnpj,
+                    $s->unidade->status,
                     $dataInauguracao,
                     $cidadeUF,
                     $p->pendencia,
@@ -443,6 +503,8 @@ class AdminController extends Controller
                     $p->responsavel->name ?? '',
                     $p->status,
                     \Carbon\Carbon::parse($p->vencimento)->format('d/m/Y'),
+                    \Carbon\Carbon::parse($p->created_at)->format('d/m/Y'),
+
 
                     
                 ));

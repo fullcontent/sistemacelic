@@ -19,7 +19,8 @@
 			'nRenovaveis' => 'Projetos/licenças não renováveis',
 			'controleCertidoes' => 'Controle de Certidões',
 			'controleTaxas' => 'Controle de Taxas',
-			'facilitiesRealEstate' => 'Facilities/Real Estate'
+			'facilitiesRealEstate' => 'Facilities/Real Estate',
+			'projetosLaudos' => 'Projetos e Laudos',
 			), 
 			$tipoServico, ['class'=>'form-control'])!!}
 
@@ -29,7 +30,8 @@
 			'nRenovaveis' => 'Projetos/licenças não renováveis',
 			'controleCertidoes' => 'Controle de Certidões',
 			'controleTaxas' => 'Controle de Taxas',
-			'facilitiesRealEstate' => 'Facilities/Real Estate'
+			'facilitiesRealEstate' => 'Facilities/Real Estate',
+			'projetosLaudos' => 'Projetos e Laudos',
 			), 
 			null, ['class'=>'form-control'])!!}
 		@endif
@@ -332,6 +334,9 @@
 
 					</div>
 				</div>
+
+
+
 				
 
 				
