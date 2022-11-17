@@ -378,8 +378,8 @@ class AdminController extends Controller
         $servicos = Servico::with('pendencias')
                             ->whereNotIn('responsavel_id',[1])
                             ->orderBy('id','DESC')
-                            ->select('id','nome','os','unidade_id','tipo','protocolo_anexo','laudo_anexo')
-                            ->take(200)   //Somente para testes
+                            ->with('responsavel','coresponsavel')
+                            ->select('id','nome','os','unidade_id','tipo','protocolo_anexo','laudo_anexo','solicitante','responsavel_id','coresponsavel_id')
                             ->get();
 
         // $servicos = Pendencia::all();
@@ -393,8 +393,29 @@ class AdminController extends Controller
             "Expires"             => "0"
         );
 
-        $columns = array('Empresa','Tipo','Serviço','OS','Etapa do Processo','Código','Unidade','CNPJ','Status da Unidade','Data Inauguração','Cidade/UF','Pendência',
-                        'Responsabilidade','Responsável','Status','Vencimento','Data Criação');
+        $columns = array(
+            'Empresa',
+            'Serviço',
+            'Código',
+            'Unidade',
+            'CNPJ',
+            'Cidade',
+            'UF',
+            'Status da Unidade',
+            'Data Inauguração',
+            'OS',
+            'Tipo',
+            'Solicitante',
+            'Responsável',
+            'Co-Responsável',
+            'Etapa do Processo',
+            'Pendência',
+            'Responsabilidade',
+            'Data Criação',
+            'Data Limite',
+            'Status'
+        );
+
 
         $callback = function() use($servicos, $columns) {
             $file = fopen('php://output', 'w');
@@ -501,31 +522,41 @@ class AdminController extends Controller
                             $etapa = "1° Análise";
                         }
                     }
+
+                    if($s->solicitanteServico)
+                    {
+                        $solicitante = $s->solicitanteServico->nome;
+                    }
+
+                    else{
+                        $solicitante = $s->solicitante;
+                    }
                 
                     
 
-                fputcsv($file, array(
+               fputcsv($file, array(
                     $s->unidade->empresa->nomeFantasia,
-                    $s->tipo,
                     $s->nome,
-                    $s->os,
-                    $etapa,
                     $s->unidade->codigo,
                     $s->unidade->nomeFantasia,
                     $s->unidade->cnpj,
+                    $s->unidade->cidade,
+                    $s->unidade->uf,
                     $s->unidade->status,
                     $dataInauguracao,
-                    $cidadeUF,
+                    $s->os,
+                    $s->tipo,
+                    $solicitante,
+                    $s->responsavel->name ?? '',
+                    $s->coResponsavel->name ?? '',
+                    $etapa,
                     $p->pendencia,
                     $p->responsavel_tipo,
-                    $p->responsavel->name ?? '',
-                    $p->status,
-                    \Carbon\Carbon::parse($p->vencimento)->format('d/m/Y'),
-                    \Carbon\Carbon::parse($p->created_at)->format('d/m/Y'),
-
-
-                    
+                    \Carbon\Carbon::parse($p->created_at)->format('d/m/Y') ?? '',
+                    \Carbon\Carbon::parse($p->vencimento)->format('d/m/Y') ?? '',
+                    $p->status
                 ));
+
                 }              
             }
 
@@ -534,8 +565,205 @@ class AdminController extends Controller
 
         return response()->stream($callback, 200, $headers);
 
-        // return $servicos;
-    
+    }
+
+
+    public function pendenciasFilter(Request $request)
+    {
+        
+       
+        $fileName = 'Celic_RelatorioFiltro_Pendencias'.date('d-m-Y').'.csv';
+
+        $servicos = Servico::with(['pendencias'=>function($q)use($request){
+            $q->where('status',$request->status);
+        }])
+                    ->whereNotIn('responsavel_id',[1])
+                    ->orderBy('id','DESC')
+                    ->with('responsavel','coresponsavel')
+                    ->select('id','nome','os','unidade_id','tipo','protocolo_anexo','laudo_anexo','solicitante','responsavel_id','coresponsavel_id')
+                    // ->take(200)   //Somente para testes
+                    ->whereIn('empresa_id',$request->empresa_id)
+                    ->get();
+
+
+        $headers = array(
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        );
+
+        $columns = array(
+            'Empresa',
+            'Serviço',
+            'Código',
+            'Unidade',
+            'CNPJ',
+            'Cidade',
+            'UF',
+            'Status da Unidade',
+            'Data Inauguração',
+            'OS',
+            'Tipo',
+            'Solicitante',
+            'Responsável',
+            'Co-Responsável',
+            'Etapa do Processo',
+            'Pendência',
+            'Responsabilidade',
+            'Data Criação',
+            'Data Limite',
+            'Status'
+        );
+        
+        $callback = function() use($servicos, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($servicos as $s) {
+
+                foreach($s->pendencias as $p)
+                {
+
+                     if($s->proposta_id)
+                    {
+                        $proposta = $s->proposta_id;
+                    }
+                    else
+                    {
+                        $proposta = $s->proposta;
+                    }
+
+
+                    if($s->unidade->dataInauguraao)
+                    {
+                        $dataInauguracao =  \Carbon\Carbon::parse($s->unidade->dataInauguracao)->format('d/m/Y');
+                    }
+                    else
+                    {
+                        $dataInauguracao = null;
+                    }
+
+                    switch ($p->responsavel_tipo) {  
+                        
+                        case 'usuario':
+                            $p->responsavel_tipo = "Castro";
+                            break; 
+                        
+                        case 'op':
+                            $p->responsavel_tipo = "Órgão";
+                            break;
+                            
+                            case 'cliente':
+                                $p->responsavel_tipo = "Cliente";
+                                break; 
+                       
+                    }
+
+                    switch ($p->status) {
+                        case 'pendente':
+                            $p->status = "Pendente";
+                            break;
+
+                            case 'concluido':
+                                $p->status = "Concluído";
+                                break;
+                        
+                    }
+
+
+                    switch ($s->tipo) {
+                        
+                        case 'licencaOperacao':
+                            $s->tipo = "Licença de Operação";
+                            break;
+
+                            case 'nRenovaveis':
+                                $s->tipo = "Não Renováveis";
+                                break;
+
+                                case 'controleCertidoes':
+                                    $s->tipo = "Controle de Certidões";
+                                    break;
+
+                                    case 'controleTaxas':
+                                        $s->tipo = "Controle de Taxas";
+                                        break;
+
+                                        case 'facilitiesRealEstate':
+                                            $s->tipo = "Facilities/Real Estate";
+                                            break;
+                        
+                    }
+
+
+                    $etapa = null;
+
+                    if(!$s->protocolo_anexo)
+                    {
+                        $etapa = "Em elaboração";
+                    }
+                    else{
+                        if(!$s->laudo_anexo)
+                        {
+                            $etapa = "Em elaboração";
+                        }
+                        else{
+                            $etapa = "1° Análise";
+                        }
+                    }
+                
+                   
+                    if($s->solicitanteServico)
+                    {
+                        $solicitante = $s->solicitanteServico->nome;
+                    }
+
+                    else{
+                        $solicitante = $s->solicitante;
+                    }
+
+                   
+
+                fputcsv($file, array(
+                    $s->unidade->empresa->nomeFantasia,
+                    $s->nome,
+                    $s->unidade->codigo,
+                    $s->unidade->nomeFantasia,
+                    $s->unidade->cnpj,
+                    $s->unidade->cidade,
+                    $s->unidade->uf,
+                    $s->unidade->status,
+                    $dataInauguracao,
+                    $s->os,
+                    $s->tipo,
+                    $solicitante,
+                    $s->responsavel->name ?? '',
+                    $s->coResponsavel->name ?? '',
+                    $etapa,
+                    $p->pendencia,
+                    $p->responsavel_tipo,
+                    \Carbon\Carbon::parse($p->created_at)->format('d/m/Y') ?? '',
+                    \Carbon\Carbon::parse($p->vencimento)->format('d/m/Y') ?? '',
+                    $p->status
+                ));
+
+
+
+                }              
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+
+
+
+        
+
+
 
     }
 
