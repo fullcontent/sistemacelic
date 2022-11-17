@@ -164,7 +164,7 @@ class AdminController extends Controller
         );
 
         $columns = array('Razão Social', 'Código', 'Nome', 'CNPJ', 'Status', 'Imóvel', 'Ins. Estadual', 'Ins.
-        Municipal', 'Ins. Imob.', 'RIP', 'Matrícula RI', 'Área da Loja', 'Endereço', 'Número', 'Complemento',
+        Municipal', 'Ins. Imob.', 'RIP', 'Matrícula RI', 'Área da Loja', 'Endereço', 'Número', 'Complemento','Data Inauguração',
         'Cidade/UF', 'CEP', 'Tipo', 'O.S.', 'Situação', 'Responsável', 'Co-Responsável', 'Nome', 'Solicitante',
         'Departamento', 'N° Protocolo', 'Emissão Protocolo', 'Tipo Licença', 'Proposta', 'Emissão Licença', 'Validade
         Licença', 'Valor Total', 'Valor em Aberto', 'Finalizado', 'Criação');
@@ -232,6 +232,7 @@ class AdminController extends Controller
                     {
                         $dataInauguracao = null;
                     }
+
 
                 fputcsv($file, array(
                     $s->unidade->razaoSocial,
