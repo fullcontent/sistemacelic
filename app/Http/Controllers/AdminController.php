@@ -165,7 +165,7 @@ class AdminController extends Controller
 
         $columns = array('Razão Social', 'Código', 'Nome', 'CNPJ', 'Status', 'Imóvel', 'Ins. Estadual', 'Ins.
         Municipal', 'Ins. Imob.', 'RIP', 'Matrícula RI', 'Área da Loja', 'Endereço', 'Número', 'Complemento','Data Inauguração',
-        'Cidade/UF', 'CEP', 'Tipo', 'O.S.', 'Situação', 'Responsável', 'Co-Responsável', 'Nome', 'Solicitante',
+        'Cidade','UF', 'CEP', 'Tipo', 'O.S.', 'Situação', 'Responsável', 'Co-Responsável', 'Nome', 'Solicitante',
         'Departamento', 'N° Protocolo', 'Emissão Protocolo', 'Tipo Licença', 'Proposta', 'Emissão Licença', 'Validade
         Licença', 'Valor Total', 'Valor em Aberto', 'Finalizado', 'Criação');
 
@@ -251,7 +251,8 @@ class AdminController extends Controller
                     $s->unidade->numero,
                     $s->unidade->complemento,
                     $dataInauguracao,
-                    $cidadeUF,
+                    $s->unidade->cidade,
+                    $s->cidade->uf,
                     $s->unidade->cep,
                     $s->tipo,
                     $s->os,
@@ -301,7 +302,7 @@ class AdminController extends Controller
             "Expires"             => "0"
         );
 
-        $columns = array('Empresa','Serviço','OS','Código','Unidade','CNPJ','Cidade/UF','Proposta',
+        $columns = array('Empresa','Serviço','OS','Código','Unidade','CNPJ','Cidade','UF','Proposta',
     'Valor Total','Taxa','Emissão','Vencimento','Pagamento','Reembolso','Status','Valor');
 
         $callback = function() use($servicos, $columns) {
@@ -345,7 +346,8 @@ class AdminController extends Controller
                     $s->unidade->nomeFantasia,
                     $s->unidade->cnpj,
                     $dataInauguracao,
-                    $cidadeUF,
+                    $s->unidade->cidade,
+                    $s->unidade->uf,
                     $proposta,
                     $s->financeiro->valorTotal ?? '',
                     $t->nome,
