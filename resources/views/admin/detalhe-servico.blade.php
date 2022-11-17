@@ -61,7 +61,7 @@
                   
                 </p>
 
-                <p><b>Nome: </b>{{$servico->nome}}</p>
+                <p><b>Nome do Serviço: </b>{{$servico->nome}}</p>
                   <p><b>Situação: </b>
                   @switch($servico->situacao)
 

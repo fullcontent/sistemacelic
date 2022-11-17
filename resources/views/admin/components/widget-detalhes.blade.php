@@ -13,11 +13,11 @@
 		
 		<div class="col-md-4">
 			
-			<p><b>Nome: </b>{{$dados->nomeFantasia}}</p>
+			<p><b>Nome da Unidade: </b>{{$dados->nomeFantasia}}</p>
 			<p><b>Razão Social:</b> {{$dados->razaoSocial}}</p>
 			<p><b>CNPJ:</b> {{$dados->cnpj}}</p>
 			<p><b>Status: </b>{{$dados->status}}</p>
-			<p><b>Data de Inauguração: </b>{{\Carbon\Carbon::parse($dados->dataInauguracao)->format('d/m/Y') ?? ''}}</p>
+			<p><b>Data de Inauguração: </b>@if($dados->dataInauguracao){{\Carbon\Carbon::parse($dados->dataInauguracao)->format('d/m/Y')}}@endif</p>
 			<p><b>Ins. Estadual:</b> {{$dados->inscricaoEst}}</p>
 			<p><b>Insc. Municipal:</b> {{$dados->inscricaoMun}}</p>
 		</div>
