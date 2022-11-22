@@ -138,7 +138,7 @@ class AdminController extends Controller
                             ->take(4000)
                             ->get();
 
-        // dump($servicos);
+        dump($servicos);
 
         return view('admin.relatorios.completo')->with(['servicos'=>$servicos]);
 
@@ -152,7 +152,7 @@ class AdminController extends Controller
         
         $servicos = Servico::with('unidade','responsavel','financeiro','servicoFinalizado')
         ->whereNotIn('responsavel_id',[1])
-        // ->take(100)
+        // ->take(10)
         ->get();
 
         $headers = array(
@@ -163,11 +163,8 @@ class AdminController extends Controller
             "Expires"             => "0"
         );
 
-        $columns = array('Razão Social', 'Código', 'Nome', 'CNPJ', 'Status', 'Imóvel', 'Ins. Estadual', 'Ins.
-        Municipal', 'Ins. Imob.', 'RIP', 'Matrícula RI', 'Área da Loja', 'Endereço', 'Número', 'Complemento','Data Inauguração',
-        'Cidade','UF', 'CEP', 'Tipo', 'O.S.', 'Situação', 'Responsável', 'Co-Responsável', 'Nome', 'Solicitante',
-        'Departamento', 'N° Protocolo', 'Emissão Protocolo', 'Tipo Licença', 'Proposta', 'Emissão Licença', 'Validade
-        Licença', 'Valor Total', 'Valor em Aberto', 'Finalizado', 'Criação');
+        $columns = array('Razão Social', 'Código', 'Nome', 'CNPJ', 'Status', 'Imóvel', 'Ins. Estadual', 'Ins. Municipal', 'Ins. Imob.', 'RIP', 'Matrícula RI', 'Área da Loja', 'Endereço', 'Número', 'Complemento','Data Inauguração',
+        'Cidade','UF', 'CEP', 'Tipo', 'O.S.', 'Situação', 'Responsável', 'Co-Responsável', 'Nome', 'Solicitante','Departamento', 'N° Protocolo', 'Emissão Protocolo', 'Tipo Licença', 'Proposta', 'Emissão Licença', 'Validade Licença', 'Valor Total', 'Valor em Aberto', 'Finalizado', 'Criação');
 
         $callback = function() use($servicos, $columns) {
             $file = fopen('php://output', 'w');
@@ -177,7 +174,7 @@ class AdminController extends Controller
 
 
 
-                $cidadeUF = $s->unidade->cidade."/".$s->unidade->uf;
+                // $cidadeUF = $s->unidade->cidade."/".$s->unidade->uf;
 
                 if(is_numeric($s->solicitante))
                 {
@@ -252,7 +249,7 @@ class AdminController extends Controller
                     $s->unidade->complemento,
                     $dataInauguracao,
                     $s->unidade->cidade,
-                    $s->cidade->uf,
+                    $s->unidade->uf,
                     $s->unidade->cep,
                     $s->tipo,
                     $s->os,
@@ -280,6 +277,7 @@ class AdminController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+        // dd($callback);
     
     }
 
