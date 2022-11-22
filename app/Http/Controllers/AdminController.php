@@ -343,7 +343,6 @@ class AdminController extends Controller
                     $s->unidade->codigo,
                     $s->unidade->nomeFantasia,
                     $s->unidade->cnpj,
-                    $dataInauguracao,
                     $s->unidade->cidade,
                     $s->unidade->uf,
                     $proposta,
