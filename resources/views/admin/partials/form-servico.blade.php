@@ -16,7 +16,7 @@
 		
 		{!! Form::select('tipo', array(
 			'licencaOperacao' => 'Licenças de Operação',
-			'nRenovaveis' => 'Projetos/licenças não renováveis',
+			'nRenovaveis' => 'Licenças não renováveis',
 			'controleCertidoes' => 'Controle de Certidões',
 			'controleTaxas' => 'Controle de Taxas',
 			'facilitiesRealEstate' => 'Facilities/Real Estate',
@@ -27,7 +27,7 @@
 		@else
 		{!! Form::select('tipo', array(
 			'licencaOperacao' => 'Licenças de Operação',
-			'nRenovaveis' => 'Projetos/licenças não renováveis',
+			'nRenovaveis' => 'Licenças não renováveis',
 			'controleCertidoes' => 'Controle de Certidões',
 			'controleTaxas' => 'Controle de Taxas',
 			'facilitiesRealEstate' => 'Facilities/Real Estate',
