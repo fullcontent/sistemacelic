@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 @section('content_header')
-<h1>Detalhes da unidade test</h1>
+<h1>Detalhes da unidade</h1>
 @stop
 @section('content')
 @if (session()->has('success'))
