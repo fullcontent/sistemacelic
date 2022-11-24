@@ -33,7 +33,7 @@ class Servico extends Model
 
     public function interacoes()
     {
-    	return $this->hasMany('App\Models\Historico')->orderBy('created_at','desc')->where('observacoes','like',"%@%");
+    	return $this->hasMany('App\Models\Historico')->orderBy('created_at','desc')->where('observacoes','like',"%@%")->where('observacoes','not like',"%alterado%")->where('observacoes','not like',"%Concluiu%")->where('observacoes','not like',"%cadastrado%");
     }
 
     public function taxas()
