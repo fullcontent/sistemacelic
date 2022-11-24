@@ -30,8 +30,11 @@ Route::get('/', function () {
 		Route::get('/relatorioCompleto','AdminController@completoCSV')->name('relatorio.completo');
 		Route::get('/relatorioTaxas','AdminController@taxasCSV')->name('relatorio.taxas');
 		Route::get('/relatorioPendencias','AdminController@pendenciasCSV')->name('relatorio.pendencias');
+		Route::post('/relatorioPendenciasFilter','AdminController@pendenciasFilter')->name('relatorioPendenciasFilter');
 		Route::get('/relatorios', function () {
-			return view('admin.relatorios.index');
+
+			$empresas = \App\Models\Empresa::orderBy('nomeFantasia')->pluck('nomeFantasia','id');
+			return view('admin.relatorios.index')->with(['empresas'=>$empresas]);
 		});
 
 
@@ -366,4 +369,41 @@ Route::get('nf', function () {
 		
 	}
 	
+});
+
+
+Route::get('corrigirNomes', function () {
+	
+	$servicos = \App\Models\Servico::where('os','like','ELX%')->get();
+
+
+	$os = "0001";
+	$number = 1;
+
+	
+
+	foreach($servicos as $s)
+	{	
+
+		$u = \App\Models\Unidade::find($s->unidade_id);
+                    $a = $u->empresa->razaoSocial;
+                    $a = explode(' ',$a);
+                    $os = substr($a[0], 0, 1);
+                    $os .= substr($a[1], 0, 1); 
+
+
+		
+		$number++;
+		$number = str_pad($number, 4, '0', STR_PAD_LEFT);
+		
+
+		$os .= $number;
+
+		dump($os."  -  ".$s->os);
+
+		$serv = \App\Models\Servico::find($s->id);
+		$serv->os = $os;
+		$serv->save();
+	}
+
 });
