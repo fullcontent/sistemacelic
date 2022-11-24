@@ -14,6 +14,11 @@ class PendenciasVinculos extends Model
 
     public function Servicos()
     {
-        return $this->hasMany('App\Models\Servicos');
+        return $this->hasMany('App\Models\Servico');
+    }
+
+    public function servico()
+    {
+        return $this->belongsTo('App\Models\Servico')->select('os');
     }
 }

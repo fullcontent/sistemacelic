@@ -37,7 +37,7 @@
         <div class="box-header with-border">
 
             <h3 class="box-title">Relatórios de pendências</h3>
-            
+            <p>Download em formato .csv</p>
         </div>
 
         <div class="box-body">

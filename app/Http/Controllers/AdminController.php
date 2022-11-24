@@ -150,7 +150,7 @@ class AdminController extends Controller
     { 
         $fileName = 'Celic_RelatorioCompleto_Servicos'.date('d-m-Y').'.csv';
         
-        $servicos = Servico::with('unidade','responsavel','financeiro','servicoFinalizado')
+        $servicos = Servico::with('unidade','responsavel','financeiro','servicoFinalizado','vinculos')
         ->whereNotIn('responsavel_id',[1])
         // ->take(10)
         ->get();
@@ -164,7 +164,7 @@ class AdminController extends Controller
         );
 
         $columns = array('Razão Social', 'Código', 'Nome', 'CNPJ', 'Status', 'Imóvel', 'Ins. Estadual', 'Ins. Municipal', 'Ins. Imob.', 'RIP', 'Matrícula RI', 'Área da Loja', 'Endereço', 'Número', 'Complemento','Data Inauguração',
-        'Cidade','UF', 'CEP', 'Tipo', 'O.S.', 'Situação', 'Responsável', 'Co-Responsável', 'Nome', 'Solicitante','Departamento', 'N° Protocolo', 'Emissão Protocolo', 'Tipo Licença', 'Proposta', 'Emissão Licença', 'Validade Licença', 'Valor Total', 'Valor em Aberto', 'Finalizado', 'Criação');
+        'Cidade','UF', 'CEP', 'Tipo', 'O.S.', 'Situação', 'Responsável', 'Co-Responsável', 'Nome', 'Solicitante','Departamento', 'N° Protocolo', 'Emissão Protocolo', 'Tipo Licença', 'Proposta', 'Emissão Licença', 'Validade Licença', 'Valor Total', 'Valor em Aberto', 'Finalizado', 'Criação', 'Vinculo');
 
         $callback = function() use($servicos, $columns) {
             $file = fopen('php://output', 'w');
@@ -230,6 +230,22 @@ class AdminController extends Controller
                         $dataInauguracao = null;
                     }
 
+                    if(count($s->vinculos))
+                    {	
+                        $vinculo = null;
+                        foreach($s->vinculos as $v)
+                        {
+                            // dump($v->servico->os);
+                            $vinculo = $v->servico->os;
+                        }
+                    }
+                    else
+                    {
+                        $vinculo = null;
+                    }
+
+
+
 
                 fputcsv($file, array(
                     $s->unidade->razaoSocial,
@@ -269,6 +285,7 @@ class AdminController extends Controller
                     $s->financeiro->valorAberto ?? '0',
                     $finalizado,
                     \Carbon\Carbon::parse($s->created_at)->format('d/m/Y') ?? '',
+                    $vinculo,
 
                 ));
             }
