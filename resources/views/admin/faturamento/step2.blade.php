@@ -68,6 +68,7 @@
 				<th>CNPJ</th>
 				<th>Serviço</th>
 				<th>Solicitante</th>
+				<th>Departamento</th>
 				<th>Total</th>
 				
 				<th>Em Aberto</th>
@@ -137,6 +138,8 @@
 								{{$s->solicitante}}
 			
 								@endif</td>
+
+								<td>{{$s->departamento ?? ' '}}</td>
 								<td>R$ {{number_format($s->financeiro['valorTotal'],2,'.',',')}}</td>
 								
 								<td>R$ {{number_format($s->financeiro['valorAberto'],2,'.',',')}}</td>

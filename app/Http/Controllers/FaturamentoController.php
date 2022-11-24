@@ -109,17 +109,20 @@ class FaturamentoController extends Controller
         }
         else{
             $servicosFaturar = Servico::with('financeiro','faturado')
-            ->orWhereIn('id', $s2)
+            // ->orWhereIn('id', $s2)
             ->whereHas('servicoFinalizado', function($q) use ($start_date, $end_date){
                 return $q->whereBetween('finalizado', [$start_date,$end_date]);
-            })
-            // ->orWhereIn('proposta',$request->propostas)                                                                                     
+            })                                                                
             ->get();
+
+
+            $servicosFaturar = $servicosFaturar->whereIn('id',$s2);           
+            
         }
         
 
              
-                           
+        //  dd($servicosFaturar->pluck('unidade_id'));                  
         
         
         return view('admin.faturamento.step2')->with([

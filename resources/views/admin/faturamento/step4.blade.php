@@ -36,6 +36,7 @@
             <th>CNPJ</th>
             <th>Serviço</th>
             <th>Valor</th>
+            <th>NF</th>
             @if($link=='on')
             <th>Download</th>
             @endif
@@ -50,6 +51,7 @@
                   <td>@php echo App\Http\Controllers\FaturamentoController::formatCnpjCpf($i->unidade->cnpj); @endphp</td>
                   <td>{{$i->nome}}</td>
                   <td>R$ {{number_format($i->financeiro->valorFaturar,2,'.',',')}}</td>
+                  <td>{{$i->nf}}</td>
                   @if($link=='on')
                   <td>
                     @if($i->licenca_anexo)
