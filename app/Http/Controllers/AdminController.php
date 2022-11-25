@@ -164,7 +164,7 @@ class AdminController extends Controller
         );
 
         $columns = array('Razão Social', 'Código', 'Nome', 'CNPJ', 'Status', 'Imóvel', 'Ins. Estadual', 'Ins. Municipal', 'Ins. Imob.', 'RIP', 'Matrícula RI', 'Área da Loja', 'Endereço', 'Número', 'Complemento','Data Inauguração',
-        'Cidade','UF', 'CEP', 'Tipo', 'O.S.', 'Situação', 'Responsável', 'Co-Responsável', 'Nome', 'Solicitante','Departamento', 'N° Protocolo', 'Emissão Protocolo', 'Tipo Licença', 'Proposta', 'Emissão Licença', 'Validade Licença', 'Valor Total', 'Valor em Aberto', 'Finalizado', 'Criação', 'Vinculo');
+        'Cidade','UF', 'CEP', 'Tipo', 'O.S.', 'Situação', 'Responsável', 'Co-Responsável', 'Nome', 'Solicitante','Departamento', 'N° Protocolo', 'Emissão Protocolo', 'Tipo Licença', 'Proposta', 'Emissão Licença', 'Validade Licença', 'Valor Total', 'Valor em Aberto', 'Finalizado', 'Criação');
 
         $callback = function() use($servicos, $columns) {
             $file = fopen('php://output', 'w');
@@ -230,19 +230,7 @@ class AdminController extends Controller
                         $dataInauguracao = null;
                     }
 
-                    if(count($s->vinculos))
-                    {	
-                        $vinculo = null;
-                        foreach($s->vinculos as $v)
-                        {
-                            // dump($v->servico->os);
-                            $vinculo = $v->servico->os;
-                        }
-                    }
-                    else
-                    {
-                        $vinculo = null;
-                    }
+                    
 
 
 
@@ -430,7 +418,8 @@ class AdminController extends Controller
             'Responsabilidade',
             'Data Criação',
             'Data Limite',
-            'Status'
+            'Status',
+            'Vinculo'
         );
 
 
@@ -548,6 +537,20 @@ class AdminController extends Controller
                     else{
                         $solicitante = $s->solicitante;
                     }
+
+                    if(count($s->vinculos))
+                    {	
+                        $vinculo = null;
+                        foreach($s->vinculos as $v)
+                        {
+                            // dump($v->servico->os);
+                            $vinculo = $v->servico->os;
+                        }
+                    }
+                    else
+                    {
+                        $vinculo = null;
+                    }
                 
                     
 
@@ -571,7 +574,8 @@ class AdminController extends Controller
                     $p->responsavel_tipo,
                     \Carbon\Carbon::parse($p->created_at)->format('d/m/Y') ?? '',
                     \Carbon\Carbon::parse($p->vencimento)->format('d/m/Y') ?? '',
-                    $p->status
+                    $p->status,
+                    $vinculo,
                 ));
 
                 }              
@@ -631,7 +635,8 @@ class AdminController extends Controller
             'Responsabilidade',
             'Data Criação',
             'Data Limite',
-            'Status'
+            'Status',
+            'Vinculo'
         );
         
         $callback = function() use($servicos, $columns) {
@@ -741,6 +746,20 @@ class AdminController extends Controller
                         $solicitante = $s->solicitante;
                     }
 
+                    if(count($s->vinculos))
+                    {	
+                        $vinculo = null;
+                        foreach($s->vinculos as $v)
+                        {
+                            // dump($v->servico->os);
+                            $vinculo = $v->servico->os;
+                        }
+                    }
+                    else
+                    {
+                        $vinculo = null;
+                    }
+
                    
 
                 fputcsv($file, array(
@@ -763,7 +782,8 @@ class AdminController extends Controller
                     $p->responsavel_tipo,
                     \Carbon\Carbon::parse($p->created_at)->format('d/m/Y') ?? '',
                     \Carbon\Carbon::parse($p->vencimento)->format('d/m/Y') ?? '',
-                    $p->status
+                    $p->status,
+                    $vinculo,
                 ));
 
 
