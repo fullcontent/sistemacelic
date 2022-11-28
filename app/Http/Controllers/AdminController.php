@@ -273,7 +273,6 @@ class AdminController extends Controller
                     $s->financeiro->valorAberto ?? '0',
                     $finalizado,
                     \Carbon\Carbon::parse($s->created_at)->format('d/m/Y') ?? '',
-                    $vinculo,
 
                 ));
             }
