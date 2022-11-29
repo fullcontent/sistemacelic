@@ -30,7 +30,7 @@
     <!-- info row -->
     <div class="row invoice-info">
       <div class="col-sm-6">
-        <p><b>RELATÓRIO DE FATURAMENTO: </b>{{$descricao}} <span><button type="button" class="btn btn-xs btn-info" data-toggle="modal" data-target="#edit-faturamento"><i class="fa fa-edit"></i> Editar</button></span></p>
+        <p><b>RELATÓRIO DE FATURAMENTO: </b>{{$descricao}} <span><button type="button" class="btn btn-xs btn-info no-print" data-toggle="modal" data-target="#edit-faturamento"><i class="fa fa-edit"></i> Editar</button></span></p>
         <p><b>Referência: </b>{{$obs}}</p>
 
         
