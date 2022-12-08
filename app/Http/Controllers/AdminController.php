@@ -305,7 +305,7 @@ class AdminController extends Controller
         );
 
         $columns = array('Empresa','Serviço','OS','Código','Unidade','CNPJ','Cidade','UF','Proposta',
-    'Valor Total','Taxa','Emissão','Vencimento','Pagamento','Reembolso','Status','Valor');
+    'Valor Total','Taxa','Emissão','Vencimento','Pagamento','Resp. Pgto','Reembolso','Status','Valor');
 
         $callback = function() use($servicos, $columns) {
             $file = fopen('php://output', 'w');
@@ -355,6 +355,7 @@ class AdminController extends Controller
                     \Carbon\Carbon::parse($t->emissao)->translatedFormat('d-M-Y'),
                     \Carbon\Carbon::parse($t->vencimento)->translatedFormat('d-M-Y'),
                     \Carbon\Carbon::parse($t->pagamento)->translatedFormat('d-M-Y'),
+                    $t->respPgto,
                     $t->reembolso,
                     $t->situacao,
                     number_format($t->valor,2,",","."),
