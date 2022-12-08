@@ -221,6 +221,7 @@ class TaxasController extends Controller
         // $taxa->comprovante = $request->comprovante;
         $taxa->situacao = $request->situacao;
         $taxa->reembolso = $request->reembolso;
+        $taxa->responsavelPgto = $request->responsavelPgto;
 
 
 
