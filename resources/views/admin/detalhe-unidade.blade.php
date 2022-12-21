@@ -109,6 +109,17 @@
         
     </div>
 
+    <div class="col-md-6">
+        
+        @if(count($servicos->where('tipo','projetosLaudos')))
+            @include('admin.components.widget-projetosLaudos')
+        @else
+       
+        @endif
+       
+        
+    </div>
+
 
     
 
