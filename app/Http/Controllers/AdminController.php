@@ -381,7 +381,7 @@ class AdminController extends Controller
         $fileName = 'Celic_RelatorioCompleto_Pendencias'.date('d-m-Y').'.csv';
         
         $servicos = Servico::with('pendencias')
-                            ->whereNotIn('responsavel_id',[1])
+                            // ->whereNotIn('responsavel_id',[1])
                             ->orderBy('id','DESC')
                             ->with('responsavel','coresponsavel')
                             ->select('id','nome','os','unidade_id','tipo','protocolo_anexo','laudo_anexo','solicitante','responsavel_id','coresponsavel_id')
@@ -572,7 +572,7 @@ class AdminController extends Controller
                     $s->coResponsavel->name ?? '',
                     $etapa,
                     $p->pendencia,
-                    $p->responsavel->name,
+                    $p->responsavel->name ?? '',
                     $p->responsavel_tipo,
                     \Carbon\Carbon::parse($p->created_at)->format('d/m/Y') ?? '',
                     \Carbon\Carbon::parse($p->vencimento)->format('d/m/Y') ?? '',
@@ -600,7 +600,7 @@ class AdminController extends Controller
         $servicos = Servico::with(['pendencias'=>function($q)use($request){
             $q->where('status',$request->status);
         }])
-                    ->whereNotIn('responsavel_id',[1])
+                    // ->whereNotIn('responsavel_id',[1])
                     ->orderBy('id','DESC')
                     ->with('responsavel','coresponsavel')
                     ->select('id','nome','os','unidade_id','tipo','protocolo_anexo','laudo_anexo','solicitante','responsavel_id','coresponsavel_id')
