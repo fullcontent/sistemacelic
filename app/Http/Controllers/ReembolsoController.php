@@ -82,21 +82,21 @@ class ReembolsoController extends Controller
         }
 
 
+       
         
 
 
-        $servicosFaturar = Servico::whereIn('id', $s2)
-                           
-                            
-                            ->with('reembolsos')
+        $servicosFaturar = Servico::with('reembolsos')
                             ->whereHas('reembolsos',function($q) use ($start_date, $end_date){
                                 return $q->whereBetween('pagamento', [$start_date,$end_date]);
-                            })                     
+                            })                  
                             ->get();
+        
+        
         
                       
                
-        foreach($servicosFaturar as $s)
+        foreach($servicosFaturar->whereIn('id',$s2) as $s)
         {
 
             foreach($s->reembolsos as $r)
@@ -458,7 +458,9 @@ class ReembolsoController extends Controller
         $rPath = public_path('uploads/reembolsos/'.$id);
         $reembolso = Reembolso::with('taxas.taxa.unidade')->find($id);
 
-        $zip_file = $rPath."/".utf8_decode($reembolso->empresa->nomeFantasia)." - Relatorio Reembolso -".$reembolso->nome.".zip";
+        $zip_file = $rPath."/".utf8_decode($this->tirarAcentos($reembolso->empresa->nomeFantasia))." - Relatorio Reembolso -".$reembolso->nome.".zip";
+
+        
         $zip = new \ZipArchive();
         $zip->open($zip_file, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
         
@@ -467,15 +469,22 @@ class ReembolsoController extends Controller
         
         
         
+
+
         foreach ($files as $name => $file)
         {   
+
+            
 
             $extension = pathinfo($file->getRealPath(), PATHINFO_EXTENSION);
 
             if($extension != "zip")
-            {
+            {   
+
+                
                 // We're skipping all subfolders
                 if (!$file->isDir()) {
+
                     $filePath     = $file->getRealPath();
 
                     // extracting filename with substr/strlen
@@ -484,9 +493,6 @@ class ReembolsoController extends Controller
                     $zip->addFile($filePath, $relativePath);
                 }
             }
-            
-            
-
 
         }
 
@@ -560,6 +566,10 @@ class ReembolsoController extends Controller
         File::makeDirectory($path, $mode = 0777, true, true);
         
 
+    }
+
+    private function tirarAcentos($string){
+        return preg_replace(array("/(á|à|ã|â|ä)/","/(Á|À|Ã|Â|Ä)/","/(é|è|ê|ë)/","/(É|È|Ê|Ë)/","/(í|ì|î|ï)/","/(Í|Ì|Î|Ï)/","/(ó|ò|õ|ô|ö)/","/(Ó|Ò|Õ|Ô|Ö)/","/(ú|ù|û|ü)/","/(Ú|Ù|Û|Ü)/","/(ñ)/","/(Ñ)/","/(Ç)/","/(ç)/","/(Ã)/"),explode(" ","a A e E i I o O u U n N C c A"),$string);
     }
 
 
