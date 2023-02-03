@@ -1069,6 +1069,16 @@ class ServicosController extends Controller
         $servico->delete();
 
 
+        //Insert history
+
+        $history = new Historico();
+        $history->servico_id = $servico->id;
+        $history->user_id = Auth::id();
+        $history->observacoes = "Serviço ".$servico->id." excluido.";
+        $history->created_at = Carbon::now('america/sao_paulo');
+        $history->save();
+
+
 
 
         return redirect()->route('unidades.show',$servico->unidade_id);
