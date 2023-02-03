@@ -50,13 +50,21 @@
                 <div class="col-sm-6">
                 
                   <p><b>Etapa do Processo:</b> 
+
+                  @if($servico->situacao == 'finalizado')
+                    <button class="btn btn-success">Concluído</button>
+                  @else
+
                   @if(!$servico->protocolo_anexo)
                     <button class="btn btn-primary">Em elaboração</button>
                   @endif
+
                   @if($servico->protocolo_anexo)
                     @if($servico->laudo_anexo)
                       <button class="btn btn-success">1° análise</button>
                     @endif
+                  @endif
+
                   @endif
                   
                 </p>
