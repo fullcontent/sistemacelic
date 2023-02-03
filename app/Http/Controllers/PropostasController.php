@@ -28,7 +28,16 @@ class PropostasController extends Controller
     public function index()
     {   
 
-        $propostas = Proposta::whereNotIn('empresa_id',[16])->orderBy('created_at','DESC')->get();
+        $propostas = Proposta::select(['id','proposta','empresa_id','unidade_id','status'])
+                                    ->with('empresa','unidade','servicosFaturados')
+                                    ->whereNotIn('empresa_id',[16])
+                                    ->orderBy('created_at','DESC')
+                                    // ->take(10)
+                                    ->get();
+
+
+        
+
 
         return view('admin.proposta.lista-propostas')->with('propostas',$propostas);
     }
