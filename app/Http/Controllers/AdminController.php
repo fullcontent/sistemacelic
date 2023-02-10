@@ -381,7 +381,7 @@ class AdminController extends Controller
         $fileName = 'Celic_RelatorioCompleto_Pendencias'.date('d-m-Y').'.csv';
         
         $servicos = Servico::with('pendencias')
-                            // ->whereNotIn('responsavel_id',[1])
+                            ->whereNotIn('responsavel_id',[1])
                             ->orderBy('id','DESC')
                             ->with('responsavel','coresponsavel')
                             ->select('id','nome','os','unidade_id','tipo','protocolo_anexo','laudo_anexo','solicitante','responsavel_id','coresponsavel_id')
@@ -600,7 +600,7 @@ class AdminController extends Controller
         $servicos = Servico::with(['pendencias'=>function($q)use($request){
             $q->where('status',$request->status);
         }])
-                    // ->whereNotIn('responsavel_id',[1])
+                    ->whereNotIn('responsavel_id',[1])
                     ->orderBy('id','DESC')
                     ->with('responsavel','coresponsavel')
                     ->select('id','nome','os','unidade_id','tipo','protocolo_anexo','laudo_anexo','solicitante','responsavel_id','coresponsavel_id')
@@ -799,12 +799,133 @@ class AdminController extends Controller
         return response()->stream($callback, 200, $headers);
 
 
-
-        
-
-
-
     }
+
+
+    public function servicosFilterCSV(Request $request)
+    { 
+        $fileName = 'Celic_RelatorioServicos'.date('d-m-Y').'.csv';
+        
+        $servicos = Servico::whereNotIn('responsavel_id',[1])
+                    ->orderBy('id','DESC')
+                    ->with('responsavel','coresponsavel')
+                    // ->take(200)   //Somente para testes
+                    ->whereIn('empresa_id',$request->empresa_id)
+                    ->get();
+
+        $headers = array(
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        );
+
+        $columns = array(
+            'Nome Unidade',
+            'CNPJ',
+            'Status',
+            'Cidade',
+            'UF',
+            'Tipo',
+            'Situação',
+            'Responsável',
+            'Co-Responsável',
+            'Nome Serviço',
+            'Solicitante',
+            'Departamento',
+            'Proposta',
+            'Emissão Licença',
+            'Validade Licença',
+            'Finalizado',
+            'Criação'
+          );
+          
+        $callback = function() use($servicos, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($servicos as $s) {
+
+
+
+                // $cidadeUF = $s->unidade->cidade."/".$s->unidade->uf;
+
+                if(is_numeric($s->solicitante))
+                {
+                  $s->solicitante =  \App\Models\Solicitante::where('id',$s->solicitante)->value('nome');
+                }
+                                
+                    if($s->proposta_id)
+                    {
+                        $proposta = $s->proposta_id;
+                    }
+                    else
+                    {
+                        $proposta = $s->proposta;
+                    }
+                
+                    if(isset($s->servicoFinalizado)){
+                        $finalizado = \Carbon\Carbon::parse($s->servicoFinalizado->finalizado)->format('d/m/Y');
+                    }
+                    else{
+                        $finalizado = '';
+                    }
+
+                    
+
+                    if(isset($s->licenca_emissao))
+                    {
+                        $licenca_emissao = \Carbon\Carbon::parse($s->licenca_emissao)->format('d/m/Y');
+                    }
+                    else{
+                        $licenca_emissao = null;
+                    }
+                    if(isset($s->licenca_validade))
+                    {
+                        $licenca_validade = \Carbon\Carbon::parse($s->licenca_validade)->format('d/m/Y');
+                    }
+                    else{
+                        $licenca_validade = null;
+                    }
+
+
+                    
+
+
+
+
+                fputcsv($file, array(
+                    $s->unidade->nomeFantasia,
+                    $s->unidade->cnpj,
+                    $s->unidade->status,
+                    $s->unidade->cidade,
+                    $s->unidade->uf,
+                    $s->tipo,
+                    $s->situacao,
+                    $s->responsavel->name,
+                    $s->coresponsavel->name ?? '',
+                    $s->nome,
+                    $s->solicitante,
+                    $s->departamento,
+                    $proposta,
+                    $licenca_emissao,
+                    $licenca_validade,
+                    $finalizado,
+                    \Carbon\Carbon::parse($s->created_at)->format('d/m/Y') ?? '',
+
+                ));
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+        // dd($callback);
+    
+    }
+
+
 
 
     

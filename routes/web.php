@@ -26,11 +26,18 @@ Route::get('/', function () {
 
 		Route::get('/home', 'AdminController@index')->name('dashboard');
 
+		Route::get('/dashboard',function(){
+
+			return view('admin.dashboard.v1');
+		});
+
 
 		Route::get('/relatorioCompleto','AdminController@completoCSV')->name('relatorio.completo');
 		Route::get('/relatorioTaxas','AdminController@taxasCSV')->name('relatorio.taxas');
 		Route::get('/relatorioPendencias','AdminController@pendenciasCSV')->name('relatorio.pendencias');
 		Route::post('/relatorioPendenciasFilter','AdminController@pendenciasFilter')->name('relatorioPendenciasFilter');
+		Route::post('/relatorioServicosFilter','AdminController@servicosFilterCSV')->name('relatorioServicosFilter');
+
 		Route::get('/relatorios', function () {
 
 			$empresas = \App\Models\Empresa::orderBy('nomeFantasia')->pluck('nomeFantasia','id');
@@ -196,7 +203,16 @@ Route::get('/', function () {
 
 		Route::get('/users/list','UsersController@usersList')->name('users.list');
 
-		Route::get('/mapa','DashboardController@getOurClientsLocation');
+		Route::get('/mapa','DashboardController@mapa');
+
+		Route::get('/api/mapa','DashboardController@getOurClientsLocation');
+
+
+
+		Route::get('/api/getLicencasEmitidasMes','DashboardController@getLicencasEmitidasMes')->name('getLicencasEmitidasMes');
+		Route::get('/api/usersMoreActive','DashboardController@usersMoreActive')->name('usersMoreActive');
+
+
 		
 
 	});
@@ -292,6 +308,7 @@ Route::get('clearMentions', function(){
 
 
 Route::get('api/unidades/get', 'ApiController@getUnidades');
+Route::get('api/empresas/get', 'ApiController@getEmpresas');
 Route::get('api/responsaveis/get', 'ApiController@getResponsaveis');
 Route::get('api/servicosLpu/get', 'ApiController@getServicosLpu');
 Route::get('api/servicosLpu/find', 'ApiController@getServicoLpuById');
@@ -319,8 +336,6 @@ Route::get('solicitantes', function(){
 Route::get('solicitantes/todos', function(){
 
 	$solicitantes = \App\Models\Servico::orderBy('solicitante')->get()->groupBy('solicitante');
-
-
 	dump($solicitantes);
 	
 });
@@ -347,3 +362,64 @@ Route::get('repararHistorico', function () {
 		}
 });
 
+
+Route::get('/timeline/{id}', function($id){
+
+
+	$servico = \App\Models\Servico::find($id);
+
+	
+	$pendencias = \App\Models\Pendencia::whereIn('id',$servico->pendencias->pluck('id'))
+										->get()
+										->groupBy(function($data){
+													return \Carbon\Carbon::parse($data->created_at)->format('Y-m-d');
+												});
+
+
+												
+
+	
+	return view('tests.timeline')->with('servico',$servico);
+
+})->name('timeline');
+
+Route::get('/pendencia/{id}/nextEtapa', function($id){
+
+	$pendencia = \App\Models\Pendencia::find($id);
+
+	if($pendencia->etapa)
+	{
+		$nextEtapa = $pendencia->etapa+1;
+		$pendencia->etapa = $nextEtapa;
+		$pendencia->save();
+		return redirect()->route('timeline',$pendencia->servico_id) ;
+	}
+	else
+	{	
+		$nextEtapa = $pendencia->etapa+1;
+		$pendencia->etapa = $nextEtapa;
+		$pendencia->save();
+
+		return redirect()->route('timeline',$pendencia->servico_id) ;
+	}
+
+});
+
+Route::get('/pendencia/{id}/previousEtapa', function($id){
+
+		$pendencia = \App\Models\Pendencia::find($id);
+	
+
+	if($pendencia->etapa >= 1){
+		$previousEtapa = $pendencia->etapa-1;
+		$pendencia->etapa = $previousEtapa;
+		$pendencia->save();
+		return redirect()->route('timeline',$pendencia->servico_id) ;
+	}
+	else{
+		
+		return redirect()->route('timeline',$pendencia->servico_id) ;
+	}
+		
+
+});
