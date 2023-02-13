@@ -54,13 +54,12 @@ class ServicosController extends Controller
     {
         
        
-        $servicos = Servico::all();
-
+        $servicos = Servico::select('id','nome','os','empresa_id','unidade_id','servicoPrincipal','situacao','solicitante')->with('unidade','empresa','responsavel')->get();
         // $servicos = $servicos->where('unidade.status','Ativa');
 
         // dd($servicos);
 
-        return view('admin.lista-servicos')
+        return view('admin.lista-servicos-geral')
                     ->with('servicos',$servicos);
     }
 
@@ -1085,83 +1084,104 @@ class ServicosController extends Controller
     }
 
 
-
     public function salvarInteracao(Request $request)
     {   
-        
         $validator = Validator::make($request->all(), [
-
-                'observacoes'=>'required',
-                
-            ])->validate();
-
+            'observacoes' => 'required',
+        ])->validate();
+    
+        // Create a new Historico instance
         $interacao = new Historico;
-
         $interacao->servico_id = $request->servico_id;
         $interacao->observacoes = $request->observacoes;
         $interacao->user_id = Auth::id();
         $interacao->created_at = Carbon::now('America/Sao_Paulo');
-
         $interacao->save();
-
+    
+        // Find the associated service
         $servico = Servico::find($request->servico_id);
-
-
-         //Notify users
-         $mentions = preg_match_all('[\B@[a-zA-Z\wÀ-ú]+\s\w+]', $request->observacoes, $users);
-        
-
-         if($mentions > 0)
-         {
-           
-             foreach($users as $users2)
-             {
-                 
-                foreach($users2 as $u)
-                {
-                    $u = ltrim($u, "@");
-                    
-                    $user = User::where('name','like', '%'.$u.'%')->first();
-                    
-                    if($user->privileges == 'admin')
-                    {
-                        $route = 'servicos.show';
-                    }
-                    elseif($user->privileges == 'cliente')
-                    {
-                        $route = 'cliente.servico.show';
-                    }
-
-
-                    Notification::send($user, new UserMentioned($interacao->servico_id,$route));
+    
+        // Check for mentions in the observacoes
+        $mentions = preg_match_all('[\B@[a-zA-Z\wÀ-ú]+\s\w+]', $request->observacoes, $users);
+        if ($mentions > 0) {
+            foreach ($users[0] as $u) {
+                $u = ltrim($u, "@");
+                $user = User::where('name', 'like', '%' . $u . '%')->first();
+                if ($user) {
+                    $route = $user->privileges == 'admin' ? 'servicos.show' : 'cliente.servico.show';
+                    Notification::send($user, new UserMentioned($interacao->servico_id, $route));
                     Mail::to($user)->send(new UsuarioMencionado($servico, $route));
                 }
-             }
-         }         
- 
-
+            }
+        }
+    
+        // Redirect to the show route for the service
         return redirect()->route('servicos.show', $request->servico_id);
     }
+    
 
 
     public function interacoes($id)
     {
-        $interacoes = Historico::where('servico_id',$id)
-                            
-                            ->with(['user'=>function($query){
-                                $query->select('id','name','privileges');
-                            }])
-                            ->orderBy('created_at','desc')
-                            ->get();
+        $interacoes = $this->interacoesAutomaticas($id);
+
+        $interacoesSistema = Historico::where('servico_id',$id)->whereNotIn('id',$interacoes->pluck('id'))->get();
+
+
+
         $servico = Servico::select('os','id')->find($id);
-        // dd($interacoes);
+        
 
         return view('admin.lista-interacoes')->with(
             [
                 'interacoes'=>$interacoes,
+                'interacoesSistema' => $interacoesSistema,
                 'servico'=>$servico,
                 
                 ]);
+    }
+
+    public function interacoesAutomaticas($id){
+
+	
+        $filters = [
+            'observacoes' => [
+                'Serviço '.$id.' cadastrado',
+                'Alterou ',
+                'Concluiu ',
+                'Pendencia ',
+                'Taxa ',
+                'Marcou ',
+            ],
+        ];
+        
+        $historico = \App\Models\Historico::where('servico_id',$id)
+                    ->where(function($query) use ($filters, $id) {
+                        $ids = \App\Models\Historico::where('servico_id',$id)->filter($filters)->pluck('id');
+                        $query->whereNotIn('id', $ids);
+                    })
+                    ->get();
+                    
+        return $historico;
+    }
+
+
+    public function timeline($id)
+    {
+        $servico = Servico::find($id);
+
+	
+	    $pendencias = Pendencia::whereIn('id',$servico->pendencias->pluck('id'))
+										->get()
+										->groupBy(function($data){
+													return Carbon::parse($data->created_at)->format('Y-m-d');
+												});
+
+
+												
+
+	
+	return view('admin.timeline')->with('servico',$servico);
     }
 
 
@@ -1278,37 +1298,41 @@ class ServicosController extends Controller
     }
     
     public function anexarProtocolo(Request $request)
+{
+    // Retrieve the service by ID from the request
+    $servico = Servico::find($request->servico_id);
+
+    // If the request has a protocol emission date, format it
+    if($request->protocolo_emissao)
     {
-        $servico = Servico::find($request->servico_id);
-
-        if($request->protocolo_emissao)
-        {
-            $servico->protocolo_emissao = Carbon::createFromFormat('d/m/Y', $request->protocolo_emissao)->toDateString();
-        }
-        
-        $servico->protocolo_numero  =   $request->protocolo_numero;
-
-       
-        // Se informou o arquivo, retorna um boolean
-        if ($request->hasFile('protocolo_anexo') && $request->file('protocolo_anexo')->isValid()) {
-            $nameFile = null;
-            $name = uniqid(date('HisYmd'));
-            $extension = $request->protocolo_anexo->extension();
-
-            $nameFile = "{$name}.{$extension}";
-            // Faz o upload:
-            $upload = $request->protocolo_anexo->storeAs('protocolos', $nameFile);
-            // Se tiver funcionado o arquivo foi armazenado em storage/app/public/categories/nomedinamicoarquivo.extensao
-
-            $servico->protocolo_anexo = $upload;
-
-
-        }
-
-
-        $servico->save();
-
-        return redirect()->route('servicos.show',$servico->id);
+        $servico->protocolo_emissao = Carbon::createFromFormat('d/m/Y', $request->protocolo_emissao)->toDateString();
     }
+    
+    // Update the service with the protocol number from the request
+    $servico->protocolo_numero  =   $request->protocolo_numero;
+
+    // If the request has a valid file, upload it
+    if ($request->hasFile('protocolo_anexo') && $request->file('protocolo_anexo')->isValid()) {
+        // Generate a unique file name
+        $nameFile = null;
+        $name = uniqid(date('HisYmd'));
+        $extension = $request->protocolo_anexo->extension();
+
+        $nameFile = "{$name}.{$extension}";
+
+        // Upload the file
+        $upload = $request->protocolo_anexo->storeAs('protocolos', $nameFile);
+
+        // Save the file path in the service
+        $servico->protocolo_anexo = $upload;
+    }
+
+    // Save the updated service
+    $servico->save();
+
+    // Redirect to the service show page
+    return redirect()->route('servicos.show',$servico->id);
+}
+
     
 }
