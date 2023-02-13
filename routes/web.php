@@ -41,6 +41,10 @@ Route::get('/', function () {
 		Route::get('/relatorios', function () {
 
 			$empresas = \App\Models\Empresa::orderBy('nomeFantasia')->pluck('nomeFantasia','id');
+
+			
+
+
 			return view('admin.relatorios.index')->with(['empresas'=>$empresas]);
 		});
 
@@ -200,6 +204,8 @@ Route::get('/', function () {
 		
 		Route::get('/servico/{id}/interacoes', 'ServicosController@interacoes')->name('interacoes.lista');
 
+		Route::get('/servico/{id}/timeline', 'ServicosController@timeline')->name('timeline');
+
 
 		Route::get('/users/list','UsersController@usersList')->name('users.list');
 
@@ -313,6 +319,8 @@ Route::get('api/responsaveis/get', 'ApiController@getResponsaveis');
 Route::get('api/servicosLpu/get', 'ApiController@getServicosLpu');
 Route::get('api/servicosLpu/find', 'ApiController@getServicoLpuById');
 
+Route::get('api/getAllServicesJson', 'ApiController@getAllServicesJSON')->name('getAllServicesJSON');
+
 
 
 //Test Routes
@@ -337,6 +345,30 @@ Route::get('solicitantes/todos', function(){
 
 	$solicitantes = \App\Models\Servico::orderBy('solicitante')->get()->groupBy('solicitante');
 	dump($solicitantes);
+	
+});
+
+Route::get('/automaticInteractions/{id}',function($id){
+
+	
+	$filters = [
+		'observacoes' => [
+			'Serviço '.$id.' cadastrado',
+			'Alterou ',
+			'Concluiu ',
+			'Pendencia ',
+			'Taxa ',
+			'Marcou ',
+		],
+	];
+	
+	$historico = \App\Models\Historico::where('servico_id',$id)
+                ->where(function($query) use ($filters, $id) {
+                    $ids = \App\Models\Historico::where('servico_id',$id)->filter($filters)->pluck('id');
+                    $query->whereNotIn('id', $ids);
+                })
+                ->get();
+	return $historico;
 	
 });
 
@@ -381,7 +413,7 @@ Route::get('/timeline/{id}', function($id){
 	
 	return view('tests.timeline')->with('servico',$servico);
 
-})->name('timeline');
+});
 
 Route::get('/pendencia/{id}/nextEtapa', function($id){
 
