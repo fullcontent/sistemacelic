@@ -55,16 +55,16 @@
 						@endif
 					</td>
 					<td>
-					@switch(count($p->servicosFaturados))
+					@switch($p->servicosFaturados_count)
 						@case(0)
 							<span class="btn btn-default btn-xs">Em aberto</span>
 						@break
 
-						@case(count($p->servicosFaturados) < count($p->servicosCriados))
+						@case($p->servicosFaturados_count < count($p->servicosCriados_count))
 						<span class="btn btn-success btn-xs">Parcial</span>
 						@break
 
-						@case(count($p->servicosFaturados) == count($p->servicosCriados))
+						@case($p->servicosFaturados_count == count($p->servicosCriados_count))
 						<span class="btn btn-success btn-xs">Faturado</span>
 						@break
 
@@ -119,7 +119,8 @@
 		      "autoWidth": true,
 		       "language": {
                 "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
-            }           
+            }, 
+			"order": [[0, 'desc']], 
   });
   $('.confirmation').on('click', function (e) {
 						

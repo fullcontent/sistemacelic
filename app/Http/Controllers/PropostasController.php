@@ -29,14 +29,15 @@ class PropostasController extends Controller
     {   
 
         $propostas = Proposta::select(['id','proposta','empresa_id','unidade_id','status'])
-                                    ->with('empresa','unidade','servicosFaturados')
+                                    ->with(['empresa','unidade'])
                                     ->whereNotIn('empresa_id',[16])
                                     ->orderBy('created_at','DESC')
+                                    // ->withCount('servicosFaturados','servicosCriados')
                                     // ->take(10)
                                     ->get();
 
-
-        
+        // dd($propostas);
+                          
 
 
         return view('admin.proposta.lista-propostas')->with('propostas',$propostas);
@@ -531,35 +532,34 @@ class PropostasController extends Controller
 
     }
 
-    public function getLastOs($unidade_id)
-    {
-                    $u = Unidade::find($unidade_id);
-                    $a = $u->empresa->razaoSocial;
-                    $a = explode(' ',$a);
-                    $os = substr($a[0], 0, 1);
-                    $os .= substr($a[1], 0, 1); 
-
-                    $lastOS = Servico::where('os','like','%'.$os.'%')->orderBy('os','DESC')->pluck('os')->first();
-
-                    if(!$lastOS)
-                    {
-                        $number = "0001";
-                        
-
-                    }
-                    else {
-
-                        $number = substr($lastOS, 2,4);
-                        $number = str_pad($number+1, 4, "000", STR_PAD_LEFT);    
-                                                      
-                        
-                    }
-                 
-
-                    $os .= $number;
-
-                    return $os;
+    public function getLastOs() {
+        // Retrieve unit based on id.
+        $unit = Unidade::find();
+        
+        // Get company's full name.
+        $fullName = $unit->empresa->razaoSocial;
+        
+        // Divide name into parts using whitespaces.
+        $parts = explode(' ', $fullName);
+        
+        // Generate OS name by concatenating first letter of each part.
+        $os = substr($parts[0], 0, 1) . substr($parts[1], 0, 1);
+    
+        // Get latest OS in which string starts with generated $os.
+        $lastOS = Servico::where('os', 'like', '%' . $os . '%')->orderBy('os', 'DESC')->value('os');
+    
+        // If there's no such OS, return with default number.
+        if (!$lastOS) {
+            return $os . "0001";
+        }
+    
+        // Otherwise, increase the archival number by 1.
+        $number = (int)substr($lastOS, 2) + 1;
+        return $os . str_pad($number, 4, "0", STR_PAD_LEFT);
     }
+
+  
+    
 
 
     public function printPDF($id) {
