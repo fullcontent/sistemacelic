@@ -6,18 +6,22 @@
 
 @section('content')
 	
-	<div class="box" style="padding: 20px;">
+	<div class="box" style="padding: 5px;">
 				<div class="box-header">
 					
 				</div>
 				<table id="lista-servicos" class="table table-bordered table-hover">
                 <thead>
                 <tr>
-                  <th>OS</th>
-                 
+                  <th>Cliente</th>
+				  <th>OS</th>
                   <th>Serviço</th>
+				  <th>Venc. Licença</th>
                   <th>Cod. Unid.</th>
-                  <th>Unidade</th>
+				  <th>Unidade</th>
+				  <th>Cidade</th>
+				  <th>Solicitante</th>
+				  <th>N° Protocolo</th>
                   <th>Situação</th>
                   
                   <th></th>
@@ -26,9 +30,16 @@
 				@foreach($servicos as $servico)
                 	
                 	<tr>
-	              	<td>{{$servico->os}}</td>
+						<?php
+						$tmp = \App\Models\Empresa::find($servico->unidade->empresa_id);
+						?>
+						
+						<td>{{ $tmp->nomeFantasia }}</td>
+					<td>{{$servico->os}}@if($servico->servicoPrincipal) <small class="label bg-red">S</small>@endif</td>
+					 
 	              	
 	              	<td><a href="{{route('servicos.show', $servico->id)}}">{{$servico->nome}}</a></td>
+					  <td>{{ \Carbon\Carbon::parse($servico->licenca_validade)->format('d/m/Y')}}</td>
 
 	              	@php
 	              		if($servico->unidade_id){
@@ -41,7 +52,16 @@
 	              		}
 	              	@endphp
 	              	<td>{{$servico->unidade->codigo ?? ''}}</td>
-	              	<td><a href="{{$route}}">{{$empresa}}</a></td>
+					  <td><a href="{{$route}}">{{$empresa}}</a></td>
+					<td>{{$servico->unidade->cidade}}/{{$servico->unidade->uf}}</td>
+					<td>
+						@if(!is_numeric($servico->solicitante))
+						{{$servico->solicitante}}
+						@else
+						{{\App\Models\Solicitante::where('id',$servico->solicitante)->value('nome')}}
+						@endif
+					</td>
+					<td>{{$servico->protocolo_numero}}</td>
 	              	<td>
 
 	              		
@@ -50,12 +70,12 @@
 
 	              			@case('andamento')
 
-								@if(($servico->licenca_validade >= date('Y-m-d')) && ($servico->tipo == 'primario'))
+								@if(($servico->licenca_validade >= date('Y-m-d')) && ($servico->tipo == 'licencaOperacao'))
 									
 									<button type="button" class="btn btn-xs btn-success">Andamento</button>
-	              					@elseif(($servico->licenca_validade < date('Y-m-d'))&& ($servico->tipo == 'primario'))
+	              					@elseif(($servico->licenca_validade < date('Y-m-d'))&& ($servico->tipo == 'licencaOperacao'))
 	              					<button type="button" class="btn btn-xs btn-danger">Andamento</button>
-								@elseif($servico->tipo == 'secundario')
+								@elseif($servico->tipo == 'nRenovaveis')
 									<button type="button" class="btn btn-xs btn-warning">Andamento</button>
 
 	              				@endif
@@ -67,13 +87,13 @@
 
 	              			@case('finalizado')
 
-	              				@if(($servico->licenca_validade >= date('Y-m-d')) && ($servico->tipo == 'primario'))
+	              				@if(($servico->licenca_validade >= date('Y-m-d')) && ($servico->tipo == 'licencaOperacao'))
 									
 									<button type="button" class="btn btn-xs btn-success">Finalizado</button>
-	              					@elseif(($servico->licenca_validade < date('Y-m-d'))&& ($servico->tipo == 'primario'))
+	              					@elseif(($servico->licenca_validade < date('Y-m-d'))&& ($servico->tipo == 'licencaOperacao'))
 	              					<button type="button" class="btn btn-xs btn-danger">Finalizado</button>
 
-	              				@elseif($servico->tipo == 'secundario')
+	              				@elseif($servico->tipo == 'nRenovaveis')
 									<button type="button" class="btn btn-xs btn-warning">Finalizado</button>
 
 	              				@endif
@@ -83,11 +103,22 @@
 	              			@case('arquivado')
 								<button type="button" class="btn btn-xs btn-default">Arquivado</button>
 	              				@break
+							@case('standBy')
+								<button type="button" class="btn btn-xs btn-gray">Stand By</button>
+	              				@break
+
+								  @case('nRenovado')
+								<button type="button" class="btn btn-xs btn-default">Não renovado</button>
+	              				@break
 
 	              		@endswitch
 
 					@if (\Request::is('admin/servico/vencer'))  
   							<a href="{{route('servico.renovar',$servico->id)}}" class="btn btn-xs btn-primary">Renovar</a>
+					@endif
+
+					@if (\Request::is('admin/servico/vencer'))  
+  							<a href="{{route('servico.desconsiderar',$servico->id)}}" class="btn btn-xs btn-info">Desconsiderar</a>
 					@endif
 
 	              	</td>
@@ -120,7 +151,7 @@
 		      "searching": true,
 		      "ordering": true,
 		      "info": true,
-		      "autoWidth": false,
+		      "autoWidth": true,
 		       "language": {
                 "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
             }           

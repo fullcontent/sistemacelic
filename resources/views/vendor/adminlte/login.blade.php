@@ -10,7 +10,8 @@
 @section('body')
     <div class="login-box">
         <div class="login-logo">
-            <a href="{{ url(config('adminlte.dashboard_url', 'home')) }}">{!! config('adminlte.login_logo', '<b>Admin</b>LTE') !!}</a>
+            <a href="{{ url(config('adminlte.dashboard_url', 'home')) }}">
+                {!! config('adminlte.login_logo', '<b>Admin</b>LTE') !!}</a>
         </div>
         <!-- /.login-logo -->
         <div class="login-box-body">
@@ -61,16 +62,11 @@
                     {{ __('adminlte::adminlte.i_forgot_my_password') }}
                 </a>
             </p>
-            @if (config('adminlte.register_url', 'register'))
-                <p>
-                    <a href="{{ url(config('adminlte.register_url', 'register')) }}" class="text-center">
-                        {{ __('adminlte::adminlte.register_a_new_membership') }}
-                    </a>
-                </p>
-            @endif
+            
         </div>
         <!-- /.login-box-body -->
     </div><!-- /.login-box -->
+    <p class="text-center">Copyright © Castro Empresarial. Todos os direitos reservados.</p>
 @stop
 
 @section('adminlte_js')

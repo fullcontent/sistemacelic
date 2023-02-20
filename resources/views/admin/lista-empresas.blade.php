@@ -7,12 +7,16 @@
 			
 				<div class="box">
 					<div class="box-header">
-					
+						
+						@if(Auth::id() <= 3)
 						<a class="btn btn-app" href="{{route('empresa.cadastro')}}">
 	                		<i class="fa fa-plus"></i> Cadastrar
-	         			</a>
+						 </a>
+						@endif
 
 					</div>
+				<div class="box-body">
+
 				
 				<table id="lista-empresas" class="table table-bordered table-hover">
 
@@ -64,7 +68,8 @@
 	                </tr>
 	            @endforeach
                 </tbody>
-              </table>   
+			  </table>  
+			</div> 
 			</div>
 	 		
 @stop

@@ -28,6 +28,7 @@ class CreatePendenciasTable extends Migration
             $table->integer('responsavel_id')->nullable();
 
             $table->string('status');
+            $table->text('observacoes')->nullable();
 
             $table->timestamps();
         });

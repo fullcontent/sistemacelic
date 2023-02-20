@@ -30,7 +30,7 @@
 	@include('admin.partials.form-usuario')
 	<div class="box-footer">
 		<a href="{{route('usuarios.index')}}" class="btn btn-default">Voltar</a>
-		<button type="submit" class="btn btn-info">Editar</button>
+		<button type="submit" class="btn btn-info"> Salvar</button>
 	</div>
 	
 	

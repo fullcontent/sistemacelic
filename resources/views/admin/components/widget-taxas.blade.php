@@ -1,9 +1,9 @@
-<div class="box box-info">
+<div class="box box-info ">
             <div class="box-header with-border">
-              <h3 class="box-title">Taxa</h3>
+              <h3 class="box-title"><i class="fa fa-credit-card"></i> Controle de Taxas</h3>
 
               <div class="box-tools pull-right">
-                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i>
                 </button>
                 <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
               </div>
@@ -17,8 +17,8 @@
                     <th>Nome</th>
                     <th>Valor</th>
                     <th>Vencimento</th>
-                    <th>Situacao</th>
-                    <th>O.S.</th>
+                    <th>Situação</th>
+                    <th>Data Pgto</th>
                     <th></th>
                     <th></th>
                   </tr>
@@ -27,7 +27,7 @@
                     @foreach($taxas ?? '' as $taxa)
                   <tr>
                     <td><a href="{{route('taxas.show',$taxa->id)}}">{{$taxa->nome}}</a></td>
-                    <td>R$ {{$taxa->valor}}</td>
+                    <td>R$ {{number_format($taxa->valor,2,",",".")}}</td>
                     <td><span class="label label-default">{{ \Carbon\Carbon::parse($taxa->vencimento)->format('d/m/Y')}}
 </span></td>
                     <td>
@@ -52,19 +52,26 @@
                         @break
                       @endswitch
                     </td>
-                    <td>{{$taxa->servico->os}}</td>
                     <td>
-        @if(empty($taxa->comprovante))
+                      @if($taxa->pagamento)
+                      {{\Carbon\Carbon::parse($taxa->pagamento)->format('d/m/Y')}}
+                      @endif
+                    </td>
+                    <td>
+        
+        
+        
         @unless ( empty($taxa->boleto))
         
-        <a href="{{ url("uploads/$taxa->boleto") }}" class="btn btn-xs btn-warning" target="_blank">Ver Boleto</a>
+        <a href="{{ url("public/uploads/$taxa->boleto") }}" class="btn btn-xs btn-warning" target="_blank"> Boleto</a>
         @endunless
-        @endif
+        
         
         @unless ( empty($taxa->comprovante) )
         
-        <a href="{{ url("uploads/$taxa->comprovante") }}" class="btn btn-xs btn-success" target="_blank">Ver Comprovante</a>
+        <a href="{{ url("public/uploads/$taxa->comprovante") }}" class="btn btn-xs btn-success" target="_blank">Comprovante</a>
         @endunless</td>
+        
         <td>
                     <a href="{{route('taxas.delete',$taxa->id)}}" onclick="return confirm('Tem certeza que deseja excluir a taxa?');"><i class="fa fa-trash"></i></a></td>
 

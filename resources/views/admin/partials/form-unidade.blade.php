@@ -1,6 +1,10 @@
 <div class="box-body">
   
 
+    @if($errors->any())
+    {!! implode('', $errors->all('<div class="callout callout-danger">:message</div>')) !!}
+@endif
+
       
 
       <div class="col-md-12">
@@ -40,7 +44,7 @@
 
       </div>
             
-        <div class="col-md-10">
+        <div class="col-md-8">
               
         <div class="form-group">
                   
@@ -56,14 +60,29 @@
           <div class="form-group">
                   
                   {!! Form::label('status', 'Status', array('class'=>'control-label')) !!}
-                  {!! Form::select('status', array('ativa' => 'Ativa', 'inativa' => 'Inativa'), null, ['class'=>'form-control'])!!}
+                  {!! Form::select('status', array('ativa' => 'Ativa', 'inativa' => 'Inativa','prospeccao'=>'Prospecção','inauguracao'=>'Inauguração'), null, ['class'=>'form-control'])!!}
         
               </div>
 
         </div>
 
+        <div class="col-md-2">
+          
+            <div class="form-group">
+                    
+                    {!! Form::label('dataInauguracao', 'Data Inauguração', array('class'=>'control-label')) !!}
+                    @if(Route::is('unidades.edit'))
+                    {!! Form::text('dataInauguracao', null, ['class'=>'form-control','id'=>'dataInauguracao','data-date-format'=>'dd/mm/yyyy']) !!}
+                    @else
+                    {!! Form::text('dataInauguracao', null, ['class'=>'form-control','id'=>'dataInauguracao','data-date-format'=>'dd/mm/yyyy']) !!}
+                    @endif 
+          
+                </div>
+  
+          </div>
+
             
-            <div class="col-md-3">
+            <div class="col-md-2">
               
               <div class="form-group">
                   
@@ -98,12 +117,23 @@
               </div>
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-2">
                 
                 <div class="form-group">
                     
                     {!! Form::label('inscricaoImo', 'Inscrição Imobiliária', array('class'=>'control-label')) !!}
                     {!! Form::text('inscricaoImo', null, ['class'=>'form-control','id'=>'inscricaoImo']) !!}
+          
+                </div>
+
+            </div>
+
+            <div class="col-md-2">
+                
+                <div class="form-group">
+                    
+                    {!! Form::label('rip', 'RIP', array('class'=>'control-label')) !!}
+                    {!! Form::text('rip', null, ['class'=>'form-control','id'=>'rip']) !!}
           
                 </div>
 
@@ -262,6 +292,18 @@
 
 
             </div>
+            <div class="col-md-3">
+                
+                <div class="form-group">
+                    
+                    {!! Form::label('areaTerreno', 'Área do terreno', array('class'=>'control-label')) !!}
+                    {!! Form::text('areaTerreno', null, ['class'=>'form-control input-group','id'=>'areaTerreno']) !!}
+                    
+                   
+                </div>
+
+
+            </div>
 </div>
 
 @section('js')
@@ -269,6 +311,17 @@
 
 <script>
 $(document).ready(function(){
+    
+    
+    $("#dataInauguracao").datepicker();
+
+    var dataInauguracao = new Date($("#dataInauguracao").val());
+
+    var dataInauguracao2 = [dataInauguracao.getDate(),dataInauguracao.getMonth() + 1,  dataInauguracao.getFullYear()].join('/');
+
+
+    $("#dataInauguracao").val(dataInauguracao2);
+
 
 
   //Mascaras nos campos
@@ -276,6 +329,8 @@ $(document).ready(function(){
   $("#cep").mask("00000-000");
   $("#telefone").mask("(00) 0000-0000");
   $('#cnpj').mask('00.000.000/0000-00', {reverse: true});
+
+ 
 
 
   // Adicionamos o evento onclick ao botão com o ID "pesquisar"
@@ -304,15 +359,18 @@ $(document).ready(function(){
           if(response.status == 'OK') {
           
             // Agora preenchemos os campos com os valores retornados
-            $('#razaoSocial').val(response.nome);
-            $('#nomeFantasia').val(response.fantasia);
+            $('#razaoSocial').val(formatText(response.nome));
 
-            $('#endereco').val(response.logradouro);
+            
+            
+            $('#nomeFantasia').val(formatText(response.fantasia));
+
+            $('#endereco').val(formatText(response.logradouro));
             $('#numero').val(response.numero);
             $('#complemento').val(response.complemento);
             $('#cep').val(response.cep);
-            $('#bairro').val(response.bairro);
-            $('#cidade').val(response.municipio);
+            $('#bairro').val(formatText(response.bairro));
+            $('#cidade').val(formatText(response.municipio));
             $('#uf').val(response.uf);
 
 
@@ -338,6 +396,22 @@ $(document).ready(function(){
     }
   });
 });
+
+
+function formatText(text) {
+    var loweredText = text.toLowerCase();
+    var words = loweredText.split(" ");
+    for (var a = 0; a < words.length; a++) {
+        var w = words[a];
+
+        var firstLetter = w[0];
+        w = firstLetter.toUpperCase() + w.slice(1);
+
+        words[a] = w;
+    }
+    return words.join(" ");
+}
+
 </script>
 
 

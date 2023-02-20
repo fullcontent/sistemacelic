@@ -18,6 +18,7 @@
 					<div class="btn-group-vertical" style="padding-left:20px;">
 						<p class="text-left "><b>CB: </b><small>AVCB</small></p>
 						<p class="text-left "><b>AS: </b><small>Alvará Sanitário</small></p>
+						<p class="text-left "><b>LE: </b><small>Licença de Elevador</small></p>
 
 
 					</div>
@@ -25,6 +26,7 @@
 
 					<p class="text-left"><b>AF: </b><small>Alvará de Funcionamento</small></p>
 					<p class="text-left "><b>AP: </b><small>Alvará de Publicidade</small></p>
+					<p class="text-left "><b>AL: </b><small>AMLURB</small></p>
 					
 					
                       
@@ -32,6 +34,7 @@
                   <div class="btn-group-vertical" style="padding-left:20px;">
                   	<p class="text-left "><b>PC: </b><small>Alvará da Polícia Civil</small></p>
 					<p class="text-left "><b>LA: </b><small>Licença Ambiental</small></p>
+					<p class="text-left "><b>CR: </b><small>CREFITO</small></p>
 					
                      
                     </div>
@@ -41,15 +44,20 @@
 	         	
 
 
+				<div class="box-body">
+
 				
 
 				<table id="lista-unidades" class="table table-bordered table-hover">
                 <thead>
                 <tr>
-                 
-                  <th>Cod.</th>
+                <th>Empresa</th>
+				<th>Cod.</th>
                   <th>Nome Fantasia</th>
+                  
                   <th>CNPJ</th>
+				  <th>Endereço</th>
+				  <th>Bairro</th>
                   <th>Cidade/UF</th>
                   <th>Licenças</th>
                   
@@ -60,16 +68,20 @@
 				@foreach($unidades as $unidade)
                 	<tr>
 
-	              	<td>{{$unidade->codigo}}</td>
-	              	
+	              	<td>{{$unidade->empresa->nomeFantasia}}</td>
+					<td>{{$unidade->codigo}}</td>
 	              	<td><a href="{{route('unidades.show', $unidade->id)}}">{{$unidade->nomeFantasia}}</a></td>
+					  
 	              	<td>{{$unidade->cnpj}}</td>
+					  <td>{{$unidade->endereco}}</td>
+					  <td>{{$unidade->bairro}}</td>
 	              	<td>{{$unidade->cidade}}/{{$unidade->uf}}</td>
 	              	<td>
 	              	@php
 
-	              	$lic = $unidade->servicos->where('tipo','primario')->sortByDesc('created_at')->unique('nome');
-
+	              	$lic = $unidade->servicos->where('tipo','licencaOperacao')->sortByDesc('created_at')->unique('nome');
+					
+					  
 
 	              	foreach($lic as $l)
 	              	{	
@@ -113,6 +125,20 @@
 	              			$name = "LA";
 	              			break;
 
+							case 'Licença de Elevador':
+	              			$name = "LE";
+	              			break;
+							
+							case 'AMLURB':
+	              			$name = "AL";
+	              			break;
+							
+							case 'CREFITO':
+	              			$name = "CR";
+	              			break;
+
+
+
 	              		}
 
 	              		if(empty($name))
@@ -143,14 +169,17 @@
                     <li><a href="{{route('unidades.edit', $unidade->id)}}">Editar</a></li>
                     <li><a href="{{route('unidade.delete', $unidade->id)}}" class="confirmation">Excluir</a></li>
                                     
-                  </ul>
+				  </ul>
+				  
                 </div>
 </td>
 	                </tr>
 	            @endforeach
                 </tbody>
-              </table>   
+			  </table> 
+			  
 			</div>
+		</div>
 	 		
 @stop
 

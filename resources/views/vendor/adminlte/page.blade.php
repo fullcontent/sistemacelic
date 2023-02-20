@@ -3,6 +3,9 @@
 @section('adminlte_css')
     <link rel="stylesheet"
           href="{{ asset('vendor/adminlte/dist/css/skins/skin-' . config('adminlte.skin', 'blue') . '.min.css')}} ">
+    <link rel="stylesheet"
+          href="{{ asset('vendor/mentions/jquery.mentions.css')}}">
+
     @stack('css')
     @yield('css')
 @stop
@@ -58,17 +61,20 @@
 
 
 
-                    <ul class="nav navbar-nav">
-                        
+        <ul class="nav navbar-nav">
+
+
+
+                     <!-- MENÇOES DO USUARIO -->
         <li class="dropdown notifications-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <i class="glyphicon glyphicon-bell"></i>
-              <span class="label label-warning">{{count(auth()->user()->unreadNotifications)}}</span>
+              <i class="glyphicon glyphicon-comment"></i>
+              <span class="label label-info">{{count(auth()->user()->unreadNotifications->where('type','App\Notifications\UserMentioned'))}}</span>
             </a>
                 <ul class="dropdown-menu">
                        
 
-              <li class="header">Você tem {{count(auth()->user()->unreadNotifications)}} nova(s) notificação(es)</li>
+              <li class="header">Você foi mencionado {{count(auth()->user()->unreadNotifications->where('type','App\Notifications\UserMentioned'))}} vezes.</li>
               <li>
                 <!-- inner menu: contains the actual data -->
                 <ul class="menu">
@@ -77,7 +83,41 @@
                         List notifications
                    -->
                 
-                   @foreach(auth()->user()->unreadNotifications as $n)
+                   @foreach(auth()->user()->unreadNotifications->where('type','App\Notifications\UserMentioned') as $n)
+                        <li>
+                    <a href="{{$n->data['action']}}" data-notif-id="{{$n->id}}">
+                      <i class="glyphicon glyphicon-comment text-info"></i> {{$n->data['mensagem']}} #{{$n->data['servico']}}
+                    </a></li>
+
+
+                   @endforeach
+                  
+                </ul>
+              </li>
+              
+              <li class="footer"><a href="{{route('clearMentions')}}">Limpar notificações</a></li>
+            </ul>
+          </li>
+          
+          
+          <li class="dropdown notifications-menu">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <i class="glyphicon glyphicon-bell"></i>
+              <span class="label label-warning">{{count(auth()->user()->unreadNotifications->where('type','!=','App\Notifications\UserMentioned'))}}</span>
+            </a>
+                <ul class="dropdown-menu">
+                       
+
+              <li class="header">Você tem {{count(auth()->user()->unreadNotifications->where('type','!=','App\Notifications\UserMentioned'))}} nova(s) notificação(es)</li>
+              <li>
+                <!-- inner menu: contains the actual data -->
+                <ul class="menu">
+                  
+                  <!--
+                        List notifications
+                   -->
+                
+                   @foreach(auth()->user()->unreadNotifications->where('type','!=','App\Notifications\UserMentioned') as $n)
                         <li>
                     <a href="{{$n->data['action']}}" data-notif-id="{{$n->id}}">
                       <i class="glyphicon glyphicon-exclamation-sign text-yellow"></i> {{$n->data['mensagem']}}
@@ -88,9 +128,11 @@
                   
                 </ul>
               </li>
-              <li class="footer"><a href="#">Todas as notificações</a></li>
+              @if(auth()->user()->unreadNotifications->count())<li class="footer"><a href="{{route('clearNotifications')}}">Limpar notificações</a></li>@endif
+              
             </ul>
           </li>
+          
 
           <li class="dropdown tasks-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -168,7 +210,7 @@
             <section class="content-header">
 
                 @yield('content_header')
-                 {{Breadcrumbs::render()}}
+                 {{-- {{Breadcrumbs::render()}} --}}
 
             </section>
 
@@ -207,6 +249,13 @@
 
 @section('adminlte_js')
     <script src="{{ asset('vendor/adminlte/dist/js/adminlte.min.js') }}"></script>
+    <script src='https://cdn.rawgit.com/jashkenas/underscore/1.8.3/underscore-min.js' type='text/javascript'></script>
+    <script src='http://podio.github.io/jquery-mentions-input/lib/jquery.events.input.js' type='text/javascript'></script>
+    <script src='http://podio.github.io/jquery-mentions-input/lib/jquery.elastic.js' type='text/javascript'></script>
+    <script src='http://podio.github.io/jquery-mentions-input/jquery.mentionsInput.js' type='text/javascript'></script>
+
+    
+    
     <script>
         $('a[data-notif-id]').click(function () {
 

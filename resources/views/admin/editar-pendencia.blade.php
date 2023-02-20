@@ -7,7 +7,7 @@
 	<div class="box box-primary">
 	
 	<div class="box-header with-border">
-		<h3 class="box-title">Editar pendencia</h3>
+		<h3 class="box-title">Editar pendência</h3>
 	</div>
 
 	
@@ -21,7 +21,7 @@
       			<div class="box-footer">
       			<a href="{{route('servicos.show',$pendencia->servico_id)}}" class="btn btn-default">Voltar</a>
                 
-                <button type="submit" class="btn btn-info">Cadastrar</button>
+                <button type="submit" class="btn btn-info"><i class="fa fa-save"></i> Salvar</button>
               	</div>
     	
     

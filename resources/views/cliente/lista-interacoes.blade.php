@@ -1,6 +1,8 @@
 @extends('adminlte::page')
 
-
+@section('content_header')
+    <h1>Interações</h1>
+@stop
 
 
 

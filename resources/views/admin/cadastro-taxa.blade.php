@@ -12,7 +12,7 @@
 
 	
 
-	{!! Form::open(['route'=>'taxas.store','enctype'=>'multipart/form-data']) !!}
+	{!! Form::open(['route'=>'taxas.store','enctype'=>'multipart/form-data','id'=>'cadastroTaxa']) !!}
 
 	@include('admin.partials.form-taxa')
 	
@@ -21,7 +21,7 @@
       			<div class="box-footer">
       			
                 
-                <button type="submit" class="btn btn-info">Cadastrar</button>
+                <button type="submit" class="btn btn-info"><i class="fa fa-save"></i> Salvar</button>
               	</div>
     	
     
@@ -53,9 +53,34 @@
     $( "#comprovante" ).change(function() {
   		$("#pagamento").prop('disabled',false);
   		$("#situacao").val('pago');
+	  $("#pagamento").prop('required',true).val(null);
 	});
 
+
+	$( "#responsavelPgto" ).change(function() {
+		
+		var responsavel = $("#responsavelPgto").val();
+
+		if(responsavel == "cliente"){
+
+			$("#reembolso").val("nao");
+			$("#reembolso").prop('disabled',true);
+		}
+
+		if(responsavel == "castro"){
+
+			
+			$("#reembolso").prop('disabled',false);
+			$("#reembolso").val("sim");
+			}
 	
+	 });
+	 
+	 
+	 $("#cadastroTaxa").on("submit",function(){
+
+		$("#reembolso").prop('disabled',false);
+	 })
 	  	
  
 });

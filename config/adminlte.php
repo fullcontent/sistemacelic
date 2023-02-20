@@ -30,11 +30,11 @@ return [
     |
     */
 
-    'logo' => '<img src="http://sistemacelic.net/img/logoCastro2.png">',
+    'logo' => '<img src="http://sistemacelic.net/img/logoCelicLogin.png">',
 
-    'login_logo' => '<img src="http://sistemacelic.net/img/logoCastro2.png">',
+    'login_logo' => '<img src="http://sistemacelic.net/img/logoCelicLogin.png" width="280">',
 
-    'logo_mini' => '<img src="http://sistemacelic.net/img/logoCastro.png">',
+    'logo_mini' => '<img src="http://sistemacelic.net/img/logoCelicMini.png">',
 
     /*
     |--------------------------------------------------------------------------
@@ -175,12 +175,12 @@ return [
                 [
                     'type' => 'js',
                     'asset' => false,
-                    'location' => '//cdn.datatables.net/v/bs/dt-1.10.18/datatables.min.js',
+                    'location' => '//cdn.datatables.net/v/dt/dt-1.12.1/sb-1.3.4/datatables.min.js',
                 ],
                 [
                     'type' => 'css',
                     'asset' => false,
-                    'location' => '//cdn.datatables.net/v/bs/dt-1.10.18/datatables.min.css',
+                    'location' => '//cdn.datatables.net/v/dt/dt-1.12.1/sb-1.3.4/datatables.min.css',
                 ],
             ],
         ],

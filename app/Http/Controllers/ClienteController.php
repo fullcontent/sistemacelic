@@ -2,19 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Auth;
-use Illuminate\Support\Facades\Hash;
-
-
-use App\UserAccess;
 use App\User;
-use App\Models\Empresa;
-use App\Models\Unidade;
+use App\UserAccess;
+use App\Models\Taxa;
 
+
+use App\Models\Empresa;
 use App\Models\Servico;
+use App\Models\Unidade;
 use App\Models\Historico;
+
+use App\Models\Pendencia;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+
+
+use App\Notifications\UserMentioned;
+use Illuminate\Support\Facades\Notification;
 
 
 
@@ -33,12 +39,22 @@ class ClienteController extends Controller
 
     public function index()
     {   
+        
+        $user = User::find(Auth::id());
 
+        if(!count($user->empresas))
+        {
+            return view('errors.403');
+        }
+        else{
+            $servicos = $this->getServicosCliente();
+            $pendencias = $this->getPendenciasCliente();
+        }
        
-
     	return view ('cliente.dashboard')
                         ->with([
-                            'servicos'=>$this->getServicosCliente(),
+                            'servicos'=>$servicos,
+                            'pendencias'=>$pendencias,
 
 
                         ]);
@@ -73,9 +89,11 @@ class ClienteController extends Controller
 
 
         $unidade = Unidade::find($id);
-        $access = UserAccess::where('user_id',Auth::id())->whereNull('empresa_id')->get();
 
-        if($access->pluck('unidade_id')->contains($id))
+        $access = Unidade::whereIn('empresa_id', UserAccess::where('user_id',Auth::id())->pluck('empresa_id'))->get();
+
+
+        if($access->pluck('id')->contains($id))
         {
             return view('cliente.detalhe-empresa')
                     ->with([
@@ -98,7 +116,6 @@ class ClienteController extends Controller
     public function empresaUnidades($id)
     {   
         $unidades = Unidade::with('empresa')->where('empresa_id','=',$id)->get();
-
         $access = UserAccess::where('user_id',Auth::id())->whereNull('unidade_id')->get();
 
         if($access->pluck('empresa_id')->contains($id))
@@ -121,7 +138,7 @@ class ClienteController extends Controller
     {
     	$user = User::find(Auth::id());
 
-        $unidades = $user->unidades;
+        $unidades = $this->getUnidadesCliente();
 
         return view('cliente.lista-unidades')->with('unidades',$unidades);
     }
@@ -131,7 +148,20 @@ class ClienteController extends Controller
     {   
         $user = User::find(Auth::id());
 
-    	$servicos = Servico::whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))->with('unidade','empresa','responsavel')->get();
+        if(count($user->empresas))
+        {
+            $servicos = $this->getServicosCliente();
+            $servicos = $servicos->where('situacao','<>','arquivado');
+        }
+
+        else
+        {
+            return view('errors.403');
+        }
+
+        
+
+        
 
         return view('cliente.lista-servicos')
                     ->with('servicos', $servicos)
@@ -142,11 +172,8 @@ class ClienteController extends Controller
 
     public function servicoShow($id)
     {   
-
-
-
-
-
+        
+        
         $servico = Servico::find($id);
 
         if($servico->unidade_id){
@@ -159,12 +186,27 @@ class ClienteController extends Controller
             $route = 'empresas.edit';
         }
 
+
+        
+
+       
         return view('cliente.detalhe-servico')
                     ->with([
                         'servico'=>$servico,
                         'dados'=>$dados,
                         'route'=>$route,
                         'taxas'=>$servico->taxas,
+                        'pendencias'=>$servico->pendencias,
+                    ]);
+    }
+
+    public function showTaxa(Request $request)
+    {
+        $taxa = Taxa::find($request->taxa);
+
+        return view('cliente.detalhe-taxa')
+                    ->with([
+                        'taxa'=>$taxa,
                     ]);
     }
 
@@ -174,16 +216,20 @@ class ClienteController extends Controller
         
          $user = User::find(Auth::id());
 
+        if(count($user->empresas))
+        {
+            $servicos = $this->getServicosCliente();
+
+
+            $servicos = $servicos->where('situacao','=','andamento')
+            ->where('situacao','<>','arquivado');
+
+        }
+        else
+        {
+            return view('errors.403');
+        }
         
-        $servicos = Servico::with('unidade','empresa','responsavel')
-                            ->whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))
-                            ->where('situacao','andamento')
-                            
-                            ->get();
-
-
-       $servicos = $servicos->where('unidade.status','Ativa'); 
-
     
 
         return view('cliente.lista-servicos')
@@ -199,12 +245,21 @@ class ClienteController extends Controller
         
          $user = User::find(Auth::id());
         
-        $servicos = Servico::with('unidade','empresa','responsavel')
-                                ->whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))
-                                ->where('situacao','finalizado')
-                                ->get();
+        
+        if(count($user->empresas))
+        {
+            $servicos = $this->getServicosCliente();
 
-        $servicos = $servicos->where('unidade.status','Ativa');                               
+            $servicos = $servicos->where('situacao','=','finalizado')
+                                ->where('situacao','<>','arquivado');    
+        }
+
+        else
+        {
+            return view('errors.403');
+        }
+        
+                                 
 
         return view('cliente.lista-servicos')
                     ->with(
@@ -219,14 +274,26 @@ class ClienteController extends Controller
 
          $user = User::find(Auth::id());
         
-        $servicos = Servico::with('unidade','empresa','responsavel')
-                        ->whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))
-                        ->where('licenca_validade','>',date('Y-m-d'))
-                        ->where('tipo','primario')
-                        ->get();
+         
+
+         if(count($user->empresas))
+         {
+
+            $servicos = $this->getServicosCliente();
        
 
-        $servicos = $servicos->where('unidade.status','Ativa');
+            $servicos = $servicos->where('unidade.status','=','Ativa')
+                            ->where('licenca_validade','>',date('Y-m-d'))
+                            ->where('tipo','licencaOperacao')
+                            ->where('situacao','<>','arquivado');
+         }
+
+         else
+         {
+            return view('errors.403');
+         }
+         
+        
 
         return view('cliente.lista-servicos')
                     ->with(
@@ -241,14 +308,25 @@ class ClienteController extends Controller
         
 
         $user = User::find(Auth::id());
-        $servicos = Servico::with('unidade','empresa','responsavel')
-                            ->whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))
-                            ->where('licenca_validade','<',date('Y-m-d'))
-                            
-                            ->where('tipo','primario')
-                            ->get();
         
-       $servicos = $servicos->where('unidade.status','Ativa');
+        
+
+        if(count($user->empresas))
+        {
+            $servicos = $this->getServicosCliente();
+        
+            $servicos = $servicos->where('unidade.status','=','Ativa')
+                                ->where('licenca_validade','<',date('Y-m-d'))
+                                ->where('tipo','=','licencaOperacao')
+                                ->where('situacao','<>','arquivado');
+        }
+
+        else
+        {
+            return view('errors.403');
+        }
+        
+        
 
        
 
@@ -264,13 +342,22 @@ class ClienteController extends Controller
     public function listaVencer()
     {
          $user = User::find(Auth::id());
-        $servicos = Servico::with('unidade','empresa','responsavel')
-                            ->whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))
-                            ->where('licenca_validade','<',\Carbon\Carbon::today()->addDays(60))
-                            ->where('situacao','Finalizado')
-                            ->get();
+         
+         
+         if(count($user->empresas))
+         {
+            $servicos = $this->getServicosCliente();
 
-       $servicos = $servicos->where('unidade.status','Ativa');
+            $servicos = $servicos->where('licenca_validade','<',\Carbon\Carbon::today()->addDays(60))
+                                ->where('situacao','=','finalizado'); 
+         }
+
+         else
+         {
+            return view('errors.403');
+         }
+         
+        
 
         return view('cliente.lista-servicos')
                     ->with(
@@ -283,12 +370,20 @@ class ClienteController extends Controller
     public function listaInativo()
     {
          $user = User::find(Auth::id());
-        $servicos = Servico::with('unidade','empresa','responsavel')
-                            ->whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))
-                            
-                            ->get();
+        
+        
+         if(count($user->empresas))
+         {
+            $servicos = $this->getServicosCliente();
 
-       $servicos = $servicos->where('unidade.status','Inativa');
+            $servicos = $servicos->where('unidade.status','=','Inativa');
+         }
+
+         else
+         {
+            return view('errors.403');
+         }
+       
 
         return view('cliente.lista-servicos')
                     ->with(
@@ -316,6 +411,40 @@ class ClienteController extends Controller
 
         $interacao->save();
 
+
+
+         //Notify users
+         $mentions = preg_match_all('[\B@\w+\s\w+]', $request->observacoes, $users);
+        
+
+         if($mentions > 0)
+         {
+           
+             foreach($users as $users2)
+             {
+                 
+                foreach($users2 as $u)
+                {
+                    $u = ltrim($u, "@");
+                    
+                    $user = User::where('name','like', '%'.$u.'%')->first();
+
+                    if($user->privileges == 'admin')
+                    {
+                        $route = 'servicos.show';
+                    }
+                    elseif($user->privileges == 'cliente')
+                    {
+                        $route = 'cliente.servico.show';
+                    }
+
+                 
+                    Notification::send($user, new UserMentioned($interacao->servico_id,$route));
+                }
+             }
+         }         
+
+
         return redirect()->route('cliente.servico.show', $request->servico_id);
     }
 
@@ -331,9 +460,56 @@ class ClienteController extends Controller
     {
         $user = User::find(Auth::id());
 
-        $servicos = Servico::whereIn('empresa_id',$user->empresas->pluck('id'))->orWhereIn('unidade_id', $user->unidades->pluck('id'))->get();
 
-        return $servicos;
+        if(count($user->empresas))
+        {
+
+            $unidades = Unidade::where('empresa_id', $user->empresas->pluck('id'))->pluck('id');
+
+            $servicos = Servico::orWhereIn('empresa_id',$user->empresas->pluck('id'))
+                                ->orWhereIn('unidade_id', $unidades)
+                                ->get();
+    
+            return $servicos;
+        }
+
+        else
+        {
+            $servicos = null;
+            return $servicos;
+        }
+        
+    }
+
+    public function getUnidadesCliente()
+    {   
+        $user = User::find(Auth::id());
+
+        if(count($user->empresas))
+        {
+            $unidades = Unidade::where('empresa_id', $user->empresas->pluck('id'))->get();
+            return $unidades;
+        }
+
+        else{
+            $unidades = [];
+            return $unidades;
+        }
+        
+
+        
+    }
+
+    public function getPendenciasCliente()
+    {
+        $pendencias = Pendencia::with('servico','unidade')
+    						->where('responsavel_id', Auth::id())
+    						// ->whereIn('servico_id', $servicos)
+    						// ->orWhere('responsavel_id',Auth::id())
+    						->get();
+
+        	
+        	return $pendencias;
     }
 
 
@@ -391,6 +567,26 @@ class ClienteController extends Controller
                     
     }
 
+    public function getUnidadesList()
+    {
+        $unidadesList = Unidade::where('empresa_id', UserAccess::where('user_id',Auth::id())->pluck('empresa_id'))->pluck('id');
+
+        return $unidadesList;
+    }
+
+
+    public function usersList()
+	{
+		$users = User::all();
+
+		foreach($users as $u)
+		{
+
+			$u->name = "@".$u->name." ";
+		}
+
+		return json_encode($users);
+	}
     
 
     

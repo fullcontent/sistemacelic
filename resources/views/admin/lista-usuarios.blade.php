@@ -17,6 +17,7 @@
 				<td>Nome</td>
 				<td>Email</td>
 				<td>Tipo</td>
+				<td>Status</td>
 				<td>Ações</td>
 			</thead>
 
@@ -28,6 +29,13 @@
 					<td>{{$user->name}}</td>
 					<td>{{$user->email}}</td>
 					<td>{{$user->privileges}}</td>
+					<td>
+						@if($user->active == 1)
+						<span class="label label-success">Ativo</span>
+						@else
+						<span class="label label-danger">Inativo</span>
+						@endif
+					</td>
 					<td>
 						<div class="btn-group">
                   <button type="button" class="btn btn-default btn-flat">Ações</button>

@@ -13,18 +13,18 @@ class CreateFaturamentosTable extends Migration
      */
     public function up()
     {
-        Schema::create('faturamentos', function (Blueprint $table) {
-            $table->increments('id');
+     Schema::create('faturamentos', function (Blueprint $table) {
+           
+        $table->increments('id');
             $table->timestamps();
 
             $table->integer('empresa_id');
 
 
-            $table->float('valorFaturado',10,2)->nullable();
-            $table->float('valorFaturar',10,2)->nullable();
-            $table->float('valorAberto',10,2)->nullable();
-
+           $table->string('nome')->nullable();
+            $table->float('valorTotal')->nullable();
             $table->string('nf')->nullable();
+            $table->string('obs')->nullable();
 
             $table->date('dataPagamento')->nullable();
 

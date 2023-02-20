@@ -45,19 +45,35 @@
       <div class="col-md-3">
         <div class="form-group">
         {!! Form::label('emissao', 'Emissão', array('class'=>'control-label')) !!}
+        @if(Route::is('taxas.show'))
+        {!! Form::text('emissao', \Carbon\Carbon::parse($taxa->emissao)->format('d/m/Y'), ['class'=>'form-control','id'=>'emissao','data-date-format'=>'dd/mm/yyyy']) !!}
+        @else
         {!! Form::text('emissao', null, ['class'=>'form-control','id'=>'emissao','data-date-format'=>'dd/mm/yyyy']) !!}
+        @endif
+
         </div>
       </div>
       <div class="col-md-3">
         <div class="form-group">
         {!! Form::label('vencimento', 'Vencimento', array('class'=>'control-label')) !!}
+        @if(Route::is('taxas.show'))
+        {!! Form::text('vencimento', \Carbon\Carbon::parse($taxa->vencimento)->format('d/m/Y'), ['class'=>'form-control','id'=>'vencimento','data-date-format'=>'dd/mm/yyyy']) !!}
+        @else
         {!! Form::text('vencimento', null, ['class'=>'form-control','id'=>'vencimento','data-date-format'=>'dd/mm/yyyy']) !!}
+        @endif        
         </div>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-2">
         <div class="form-group">
         {!! Form::label('valor', 'Valor', array('class'=>'control-label')) !!}
         {!! Form::text('valor', null, ['class'=>'form-control','id'=>'valor']) !!}
+        </div>
+      </div>
+
+      <div class="col-md-2">
+        <div class="form-group">
+        {!! Form::label('responsavelPgto', 'Resp. Pgto', array('class'=>'control-label')) !!}
+        {!! Form::select('responsavelPgto', ['castro'=>'Castro','cliente'=>'Cliente'] ,null, ['class'=>'form-control','id'=>'responsavelPgto']) !!}
         </div>
       </div>
       <div class="col-md-2">
@@ -73,8 +89,10 @@
         {!! Form::file('boleto', null, ['class'=>'form-control','id'=>'boleto']) !!}
 
         @unless ( empty($taxa->boleto) )
+        <a href="{{ url("uploads/$taxa->boleto") }}" class="form-control btn btn-warning" target="_blank" id="btnBoleto">Ver Boleto</a>
+        <span><a href="#" class="btn btn-xs btn-danger" alt="Remover Boleto" id="removerBoleto">X</a></span>
         
-        <a href="{{ url("storage/$taxa->boleto") }}" class="btn btn-xs btn-warning" target="_blank">Ver Boleto</a>
+       
         @endunless
     
         </div>
@@ -84,16 +102,21 @@
         {!! Form::label('comprovante', 'Comprovante', array('class'=>'control-label')) !!}
         {!! Form::file('comprovante', null, ['class'=>'form-control','id'=>'comprovante']) !!}
         @unless ( empty($taxa->comprovante) )
-        
-        <a href="{{ url("storage/$taxa->comprovante") }}" class="btn btn-xs btn-warning" target="_blank">Ver Comprovante</a>
+        <a href="{{ url("uploads/$taxa->comprovante") }}" class="form-control btn btn-warning" target="_blank" id="btnComprovante">Ver Comprovante</a>
+        <span><a href="#" class="btn btn-xs btn-danger" alt="Remover Comprovante" id="removerComprovante">X</a></span>
+     
         @endunless
         </div>
       </div>
       
       <div class="col-md-4">
         <div class="form-group">
-        {!! Form::label('pagamento', 'Data de Pagamento', array('class'=>'control-label')) !!}
-        {!! Form::text('pagamento', null, ['class'=>'form-control','id'=>'pagamento','data-date-format'=>'dd/mm/yyyy']) !!}
+        {!! Form::label('pagamento', 'Data de Pagamento', array('class'=>'control-label')) !!}  
+          @if(Route::is('taxas.show'))
+          {!! Form::text('pagamento', \Carbon\Carbon::parse($taxa->pagamento)->format('d/m/Y'), ['class'=>'form-control','id'=>'pagamento','data-date-format'=>'dd/mm/yyyy']) !!}
+          @else
+          {!! Form::text('pagamento', null, ['class'=>'form-control','id'=>'pagamento','data-date-format'=>'dd/mm/yyyy']) !!}
+          @endif 
         </div>
       </div>
 

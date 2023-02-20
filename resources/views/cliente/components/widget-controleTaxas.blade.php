@@ -1,6 +1,6 @@
-<div class="box box-info">
-            <div class="box-header with-border">
-              <h3 class="box-title">Serviços primários</h3>
+<div class="box box-primary  collapsed-box">
+  <div class="box-header with-border">
+    <a href="#" data-widget="collapse"><h3 class="box-title">Controle de Taxas</h3></a>
 
               <div class="box-tools pull-right">
                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -21,7 +21,7 @@
                   </tr>
                   </thead>
                   <tbody>
-                    @foreach($servicos->where('tipo','primario') as $servico)
+                    @foreach($servicos->where('tipo','controleTaxas') as $servico)
                   <tr>
                     
                     <td><a href="{{route('cliente.servico.show',$servico->id)}}">{{$servico->os}} | {{$servico->nome}}</a></td>

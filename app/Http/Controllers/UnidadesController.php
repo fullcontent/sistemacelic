@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Unidade;
+use App\UserAccess;
+use App\Models\Taxa;
 use App\Models\Empresa;
 use App\Models\Servico;
+use App\Models\Unidade;
 use App\Models\Pendencia;
-use App\Models\Taxa;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-
+use Carbon\Carbon;
 
 
 
@@ -32,8 +34,11 @@ class UnidadesController extends Controller
 
     public function index()
     {
-        //
-        $unidades = Unidade::with('servicos')->get();
+        
+        $access = UserAccess::where('user_id',Auth::id())->whereNull('unidade_id')->pluck('empresa_id');
+
+        $unidades = Unidade::with('servicos','empresa')->whereIn('empresa_id',$access)->get();
+
         return view('admin.lista-unidades')->with('unidades',$unidades);
     }
 
@@ -57,13 +62,20 @@ class UnidadesController extends Controller
     public function store(Request $request)
     {
         //
-        $validator = Validator::make($request->all(), [
+       
 
+
+            $request->validate([
                 'responsavel'=>'required',
                 'nomeFantasia' => 'required',
                 'email' => 'required|email',
+                'cnpj'=>'required',
+                'razaoSocial' => 'required',
+                
+            ]);
 
-            ])->validate();
+            
+            
 
             $empresa = new Unidade;
 
@@ -75,9 +87,17 @@ class UnidadesController extends Controller
             $empresa->nomeFantasia  = $request->nomeFantasia;
             $empresa->razaoSocial   = $request->razaoSocial;
             $empresa->status        = $request->status;
+
+            if($request->dataInauguracao)
+        {
+            $empresa->dataInauguracao = Carbon::createFromFormat('d/m/Y', $request->dataInauguracao)->toDateString(); 
+        }
+                   
+
             $empresa->inscricaoEst  = $request->inscricaoEst;
             $empresa->inscricaoMun  = $request->inscricaoMun;
             $empresa->inscricaoImo  = $request->inscricaoImo;
+            $empresa->rip  = $request->rip;
             $empresa->codigo        = $request->codigo;
             $empresa->endereco      = $request->endereco;
             $empresa->numero        = $request->numero;
@@ -91,6 +111,7 @@ class UnidadesController extends Controller
             $empresa->email         = $request->email;
             $empresa->matriculaRI   = $request->matriculaRI;
             $empresa->area          = $request->area;
+            $empresa->areaTerreno   = $request->areaTerreno;
             $empresa->tipoImovel    = $request->tipoImovel;
 
             $empresa->save();
@@ -110,21 +131,28 @@ class UnidadesController extends Controller
     {
         //
         $unidade = Unidade::find($id);
+        $access = UserAccess::where('user_id',Auth::id())->whereNull('unidade_id')->pluck('empresa_id');
+        $unidades = Unidade::whereIn('empresa_id',$access)->pluck('id');
+        
+
+        if($unidades->contains($id))
+        {
+            return view('admin.detalhe-unidade')
+            ->with([
+                'dados'=>$unidade,
+                'servicos'=>$unidade->servicos,
+                'taxas'=>$unidade->taxas,
+                'route' => 'unidades.edit',
+                'arquivo'=>'unidade',
+        ]);
+        }
+        else
+        {
+            return view('errors.403');
+        }
 
 
         
-
-        
-        
-
-        return view('admin.detalhe-unidade')
-                    ->with([
-                        'dados'=>$unidade,
-                        'servicos'=>$unidade->servicos,
-                        'taxas'=>$unidade->taxas,
-                        'route' => 'unidades.edit',
-                        'arquivo'=>'unidade',
-                ]);
     }
 
     /**
@@ -174,6 +202,10 @@ class UnidadesController extends Controller
 
         $unidade = Unidade::find($id);
 
+        $access = UserAccess::where('unidade_id',$unidade->id)->delete();
+       
+
+        
 
         //Select and delete services from unidade
 
@@ -191,6 +223,9 @@ class UnidadesController extends Controller
         }
 
         $unidade->delete();
+
+       
+
 
         return $this->index();
 
@@ -218,9 +253,17 @@ class UnidadesController extends Controller
             $empresa->nomeFantasia  = $request->nomeFantasia;
             $empresa->razaoSocial   = $request->razaoSocial;
             $empresa->status        = $request->status;
+
+            if($request->dataInauguracao)
+            {
+                $empresa->dataInauguracao  = Carbon::createFromFormat('d/m/Y', $request->dataInauguracao)->toDateString();
+            }
+            
+            
             $empresa->inscricaoEst  = $request->inscricaoEst;
             $empresa->inscricaoMun  = $request->inscricaoMun;
             $empresa->inscricaoImo  = $request->inscricaoImo;
+            $empresa->rip  = $request->rip;
             $empresa->codigo        = $request->codigo;
             $empresa->endereco      = $request->endereco;
             $empresa->numero        = $request->numero;
@@ -234,7 +277,12 @@ class UnidadesController extends Controller
             $empresa->email         = $request->email;
             $empresa->matriculaRI   = $request->matriculaRI;
             $empresa->area          = $request->area;
+            $empresa->areaTerreno   = $request->areaTerreno;
             $empresa->tipoImovel    = $request->tipoImovel;
+
+
+
+            // return $request->all();
 
             $empresa->save();
             
@@ -247,7 +295,10 @@ class UnidadesController extends Controller
 
     public function cadastro()
     {   
-        $empresas = Empresa::pluck('nomeFantasia','id')->toArray();
+
+        $access = UserAccess::where('user_id',Auth::id())->whereNull('unidade_id')->pluck('empresa_id');
+
+        $empresas = Empresa::whereIn('id',$access)->pluck('nomeFantasia','id')->toArray();
 
         return view('admin.cadastro-unidade')->with('empresas',$empresas);
     }

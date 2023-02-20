@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Auth;
+use App\UserAccess;
 use App\Models\Empresa;
+
 use App\Models\Unidade;
 
-use Auth;
-
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class EmpresasController extends Controller
@@ -28,8 +29,15 @@ class EmpresasController extends Controller
     public function index()
     {
         //
+        if(Auth::id() <= 3)
+        {
+            $empresas = Empresa::all();
+        }
+        else{
+            $access = UserAccess::where('user_id',Auth::id())->whereNull('unidade_id')->pluck('empresa_id');
+            $empresas = Empresa::whereIn('id',$access)->get();
+        }
         
-        $empresas = Empresa::all();
         return view ('admin.lista-empresas')
             ->with([
                 'empresas'=>$empresas,
@@ -165,7 +173,25 @@ class EmpresasController extends Controller
     public function unidades($id)
     {
         $unidades = Unidade::with('empresa')->where('empresa_id','=',$id)->get();
-        return view('admin.lista-unidades')->with('unidades',$unidades);
+        
+        $access = UserAccess::where('user_id',Auth::id())->whereNull('unidade_id')->pluck('empresa_id');
+
+       
+        
+
+        if($access->contains($id))
+        {
+            return view('admin.lista-unidades')->with('unidades',$unidades);
+        }
+        else
+        {
+            return view('errors.403');
+        }
+
+
+
+
+        
     }
 
     public function editar(Request $request, $id)

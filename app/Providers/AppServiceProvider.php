@@ -40,6 +40,8 @@ class AppServiceProvider extends ServiceProvider
 
         
         
+            \Carbon\Carbon::setlocale(LC_TIME, 'pt-BR');
+
 
 
         $events->listen(BuildingMenu::class, function (BuildingMenu $event) {
@@ -62,9 +64,16 @@ class AppServiceProvider extends ServiceProvider
                             'icon' => 'glyphicon glyphicon-home'
                             ],
                             [
+                                'text' => 'Relatorios',
+                                'url' =>  ''.Auth::user()->privileges.'/relatorios',
+                                'icon' => 'glyphicon glyphicon-object-align-bottom
+                                '
+                                ],
+                            [
                             'text' => 'Empresas',
                             'url' =>  ''.Auth::user()->privileges.'/empresas',
-                            'icon' => 'glyphicon glyphicon-briefcase'
+                            'icon' => 'glyphicon glyphicon-briefcase',
+                            
                             ],
                             [
                             'text' => 'Unidades',
@@ -92,6 +101,11 @@ class AppServiceProvider extends ServiceProvider
                             'icon'  =>  'glyphicon glyphicon-time text-yellow',
                             ],
                             [
+                                'text' => 'Não renovados',
+                                'url'  =>  route('servico.nRenovado'),
+                                'icon'  =>  'glyphicon glyphicon-remove text-yellow',
+                                ],
+                            [
                             'text' => 'Finalizados',
                             'url'  =>  route('servico.finalizado'),
                             'icon'  =>  'glyphicon glyphicon-ok-sign text-green',
@@ -115,25 +129,104 @@ class AppServiceProvider extends ServiceProvider
                             'text' => 'Unid. inativas',
                             'url'  =>  route('servico.inativo'),
                             'icon'  =>  'glyphicon glyphicon-ban-circle text-red',
+                            ]
+                            
+                            ]
+                        ],
+                            [
+                            'text' => 'Pendências',
+                            'url' => ''.Auth::user()->privileges.'/pendencias',
+                            'icon' => 'fa fa-tasks',
+                            'submenu'=>[
+                            [
+                            'text'=>'Minhas pendências',
+                            'url' => route('pendencias.minhas'),
+                            'icon'=>'fa fa-user-secret',
                             ],
                             [
-                            'text' => 'Listagem geral',
-                            'url'  =>  ''.Auth::user()->privileges.'/servicos',
-                            'icon'  =>  'glyphicon glyphicon-th-list',
+                            'text' => 'Outras pendências',
+                            'url' => route('pendencias.outras'),
+                            'icon' => 'fa fa-child',
                             ],
+                            [
+                            'text' => 'Pendências Vinculadas',
+                            'url' => route('pendencias.vinculadas'),
+                            'icon' => 'fa fa-link',
+                            ],
+
                             ]
-                            ]
+                            ],
+                            [
+                            'text' => 'Propostas',
+                            'url' => ''.Auth::user()->privileges.'/proposta',
+                            'icon' => 'fa fa-newspaper',
+                            ],
+                            
 
 
                             );
-                            $event->menu->add(
-                            ['header'=> 'Administração'],
-                            [
-                            'text' => 'Usuários',
-                            'url'  =>  ''.Auth::user()->privileges.'/usuarios',
-                            'icon' => 'fa fa-users'
-                            ]
-                            );
+
+                            if(Auth::id() <= 3)
+                            {
+                                $event->menu->add(
+                                    ['header'=> 'Administração'],
+                                    [
+                                    'text' => 'Usuários',
+                                    'url'  =>  ''.Auth::user()->privileges.'/usuarios',
+                                    'icon' => 'fa fa-users'
+                                    ],
+                                    [
+                                        'text'=>'Solicitantes',
+                                        'url' => ''.Auth::user()->privileges.'/solicitantes',
+                                        'icon' => 'glyphicon glyphicon-user'
+                                    ],
+                                    [
+                                        'text' => 'Listagem geral dos serviços',
+                                        'url'  =>  ''.Auth::user()->privileges.'/servicos',
+                                        'icon'  =>  'glyphicon glyphicon-th-list',
+                                    ],
+                                    [
+                                        'text' => 'Faturamentos',
+                                        'url'  =>  ''.Auth::user()->privileges.'/faturamentos',
+                                        'icon'  =>  'glyphicon glyphicon glyphicon-barcode',
+                                    ],
+                                    [
+                                        'text' => 'Reembolsos',
+                                        'url'  =>  ''.Auth::user()->privileges.'/reembolsos',
+                                        'icon'  =>  'glyphicon glyphicon glyphicon-usd',
+                                    ],
+                                    [
+                                        'text' => 'Relatório Completo de Serviços',
+                                        'url'  =>  ''.Auth::user()->privileges.'/relatorio',
+                                        'icon'  =>  'glyphicon glyphicon glyphicon-th-list',
+                                    ],
+                                    [
+                                        'text' => 'Relatório de Pendencias',
+                                        'url'  =>  ''.Auth::user()->privileges.'/relatorioPendencias',
+                                        'icon'  =>  'glyphicon glyphicon glyphicon-th-list',
+                                    ],
+                                    [
+                                        'text' => 'Relatório de Taxas',
+                                        'url'  =>  ''.Auth::user()->privileges.'/relatorioTaxas',
+                                        'icon'  =>  'glyphicon glyphicon glyphicon-th-list',
+                                        'id'=>  'relatorioTaxas',
+                                    ]
+                                    
+                                );
+                            }
+                            elseif(Auth::id() != 15 || Auth::id() != 21 || Auth::id() != 14 || Auth::id() != 8 || Auth::id() != 27)
+                            {
+                                $event->menu->add(
+                                    ['header'=> 'Administração'],
+                                    [
+                                        'text' => 'Relatório Completo de Serviços',
+                                        'url'  =>  ''.Auth::user()->privileges.'/relatorio',
+                                        'icon'  =>  'glyphicon glyphicon glyphicon-th-list',
+                                    ]
+                                    
+                                );
+                            }
+                            
                             }
 
                         if(Auth::user()->privileges == 'cliente')
@@ -148,6 +241,12 @@ class AppServiceProvider extends ServiceProvider
                             'url' =>  route('cliente.home'),
                             'icon' => 'glyphicon glyphicon-home'
                             ],
+                            [
+                                'text' => 'Relatorios',
+                                'url' =>  ''.Auth::user()->privileges.'/relatorios',
+                                'icon' => 'glyphicon glyphicon-object-align-bottom
+                                '
+                                ],
                             [
                             'text' => 'Empresas',
                             'url' =>  route('cliente.empresas'),

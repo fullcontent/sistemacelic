@@ -1,9 +1,7 @@
-<div class="box box-info collapsed-box">
+<div class="box box-gray">
 	<div class="box-header with-border">
 		
-    <span class="h4"><a href="{{route('cliente.unidade.show', $dados->id)}}" class="text"><i class="glyphicon glyphicon-chevron-left"></i></a></span>
-
-		<a href="#" data-widget="collapse"><h3 class="box-title">{{$dados->nomeFantasia}}</h3></a>
+		<a href="#" data-widget="collapse"><h3 class="box-title text-bold">{{$dados->codigo}} | {{$dados->nomeFantasia}}</h3></a>
 		<div class="box-tools pull-right">
 			<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
 			</button>
@@ -36,6 +34,7 @@
 			<p><b>Complemento: </b>{{ $dados->complemento }}</p>
 			<p><b>Cidade/UF:</b> {{$dados->cidade}}/{{$dados->uf}}</p>
 			<p><b>CEP:</b> {{$dados->cep}}</p>
+			<p><b>Bairro:</b> {{$dados->bairro}}</p>
 		</div>
 		
 		

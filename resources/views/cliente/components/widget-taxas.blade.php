@@ -1,6 +1,6 @@
 <div class="box box-info">
             <div class="box-header with-border">
-              <h3 class="box-title">Taxa</h3>
+              <h3 class="box-title">Controle de taxas</h3>
 
               <div class="box-tools pull-right">
                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -26,7 +26,7 @@
                   <tbody>
                     @foreach($taxas ?? '' as $taxa)
                   <tr>
-                    <td><a href="{{route('taxas.show',$taxa->id)}}">{{$taxa->nome}}</a></td>
+                    <td><a href="{{route('cliente.taxa.show',['id'=>$taxa->servico_id,'taxa'=>$taxa->id])}}">{{$taxa->nome}}</a></td>
                     <td>R$ {{$taxa->valor}}</td>
                     <td><span class="label label-default">{{ \Carbon\Carbon::parse($taxa->vencimento)->format('d/m/Y')}}
 </span></td>

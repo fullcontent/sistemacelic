@@ -18,23 +18,206 @@
         
     </div>
 </div>
+
 <div class="row">
-    <div class="col-md-5">
+    <div class="col-md-3">
+        <div class="box box-gray collapsed-box">
+          <div class="box-header with-border">
+            <a href="#" data-widget="collapse"><h3 class="box-title">Cadastrar novo</h3></a>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+            </div>
+          </div>
+          
+          <!-- /.box-header -->
+          <div class="box-body">
+            <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'nRenovaveis'])}}" class="btn btn-block btn-default btn-flat">Licenças Não Renováveis</a>
+            <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'projetosLaudos'])}}" class="btn btn-block btn-default btn-flat">Projetos e Laudos</a>
+            <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'controleCertidoes'])}}" class="btn btn-block btn-default btn-flat">Controle de Certidões</a>
+            <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'controleTaxas'])}}" class="btn btn-block btn-default btn-flat">Controle de Taxas</a>
+            <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'facilitiesRealEstate'])}}" class="btn btn-block btn-default btn-flat">Facilities/Real Estate</a>
+            <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'licencaOperacao'])}}" class="btn btn-block btn-default btn-flat">Licença de Operação</a>
+
+          </div>
+          <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+      </div>
+      <div class="col-md-9">
         
-        @include('admin.components.widget-servicos')
-        @include('admin.components.widget-servicos-secundarios')
+            @include('admin.components.widget-arquivos')
         
+        
+       
     </div>
-    <div class="col-md-7">
+</div>
+<div class="row">
+    <div class="col-md-6">
         
-        @include('admin.components.widget-taxas')
+        @if(count($servicos->where('tipo','licencaOperacao')))
+            @include('admin.components.widget-licencasOperacao')
+        @else
+        
+       
+      
+        @endif
+    
+    </div>
+    <div class="col-md-6">
+        
+        @if(count($servicos->where('tipo','nRenovaveis')))
+            @include('admin.components.widget-naoRenovaveis')
+            @else
+           
+        
+        @endif
+       
         
     </div>
 
-     <div class="col-md-7">
+    <div class="col-md-6">
         
-        @include('admin.components.widget-arquivos')
+        @if(count($servicos->where('tipo','controleCertidoes')))
+            @include('admin.components.widget-controleCertidoes')
+        @else
+            
+        @endif
+       
         
     </div>
+
+    <div class="col-md-6">
+        
+        @if(count($servicos->where('tipo','controleTaxas')))
+            @include('admin.components.widget-controleTaxas')
+            @else
+           
+        @endif
+       
+        
+    </div>
+    <div class="col-md-6">
+        
+        @if(count($servicos->where('tipo','facilitiesRealEstate')))
+            @include('admin.components.widget-facilities')
+        @else
+       
+        @endif
+       
+        
+    </div>
+
+    <div class="col-md-6">
+        
+        @if(count($servicos->where('tipo','projetosLaudos')))
+            @include('admin.components.widget-projetosLaudos')
+        @else
+       
+        @endif
+       
+        
+    </div>
+
+
+    
+
+     
 </div>
 @endsection
+
+
+@section('js')
+
+
+<script src="http://cdn.datatables.net/plug-ins/1.12.1/i18n/Portuguese-Brasil.json"></script>
+<script>
+    
+    
+var licencaOperacao = $("#licencaOperacao").DataTable({
+    "lengthChange":false,
+    "ordering":false,
+    "paging":false,
+    searchBuilder: {
+        preDefined: {
+            criteria: [
+                {
+                    data: 'Status',
+                    condition: '!=',
+                    value: ['Arquivado']
+                }
+            ]
+        }
+    },
+    "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
+            } 
+});
+
+ 
+
+
+
+
+var nRenovaveis = $("#nRenovaveis").DataTable({
+    "lengthChange":false,
+    "ordering":false,
+    "paging":false,
+    searchBuilder: {
+        preDefined: {
+            criteria: [
+                {
+                    data: 'Status',
+                    condition: '!=',
+                    value: ['Arquivado']
+                }
+            ]
+        }
+    },
+    "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
+            } 
+});
+
+
+
+    $(function () {
+        $('#lista-arquivos').DataTable({
+          "paging": false,
+          "lengthChange": false,
+          "searching": true,
+          "ordering": false,
+          "info": false,
+          "autoWidth": false,
+           "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
+            }           
+  });
+$('.confirmation').on('click', function () {
+            return confirm('Você deseja excluir o serviço?');
+          });
+         
+        });
+
+
+$("#licencasOperacao_btn").on('click', function(e){
+   
+    var rebuild;
+    licencaOperacao.searchBuilder.rebuild(rebuild);
+
+    
+})
+
+
+ 
+
+
+$("#nRenovaveis_btn").on('click', function(e){
+   
+    var rebuild;
+    nRenovaveis.searchBuilder.rebuild(rebuild);
+
+})
+    </script>
+@stop
