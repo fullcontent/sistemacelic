@@ -429,7 +429,8 @@ class PropostasController extends Controller
     }
 
     public function aprovar($id,$s)
-    {
+    {   
+        
 
         $proposta = Proposta::find($id);
         $proposta->status = "Aprovada";
@@ -442,11 +443,12 @@ class PropostasController extends Controller
         // //Criar os serviços automaticamente de acordo com a proposta
 
         if($s==1)
-        {
+        {   
+
+            
             foreach($proposta->servicos as $key => $s)
             {
-                
-    
+                    
                 $servico = new Servico;
                 $servico->nome = $s->servico;
                 $servico->tipo = $s->servicoLpu->tipoServico;
@@ -532,9 +534,9 @@ class PropostasController extends Controller
 
     }
 
-    public function getLastOs() {
+    public function getLastOs($id) {
         // Retrieve unit based on id.
-        $unit = Unidade::find();
+        $unit = Unidade::find($id);
         
         // Get company's full name.
         $fullName = $unit->empresa->razaoSocial;
