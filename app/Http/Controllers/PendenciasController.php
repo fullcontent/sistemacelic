@@ -148,6 +148,7 @@ class PendenciasController extends Controller
         $pendencia->responsavel_id = $request->responsavel_id;
         $pendencia->status = $request->status;
         $pendencia->observacoes = $request->observacoes;
+        $pendencia->etapa = $request->etapa;
         // $pendencia->vinculo = $request->vinculo;
 
 
@@ -207,7 +208,7 @@ class PendenciasController extends Controller
 
         $responsaveis = User::orderBy('name')->where('active',1)->pluck('name','id')->toArray();
         
-
+        $pendencias = Pendencia::where('servico_id',$pendencia->servico_id)->pluck('pendencia','id')->toArray();
 
         $vinculos = $pendencia->vinculos->pluck('os','id');
 
@@ -217,6 +218,8 @@ class PendenciasController extends Controller
             [
                 'pendencia'=>$pendencia,
                 'servico'=>$servico,
+                'servico_id'=>$pendencia->servico_id,
+                'pendencias' => $pendencias,
                 'responsaveis'=>$responsaveis,
                 'vinculo'=>$vinculo,
                 'vinculos'=>$vinculos,
@@ -252,6 +255,7 @@ class PendenciasController extends Controller
         $pendencia->responsavel_id = $request->responsavel_id;
         $pendencia->status = $request->status;
         $pendencia->observacoes = $request->observacoes;
+        $pendencia->vinculoPendencia = $request->vinculoPendencia;
         // $pendencia->vinculo = $request->vinculo;
 
 
