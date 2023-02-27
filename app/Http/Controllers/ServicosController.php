@@ -709,6 +709,9 @@ class ServicosController extends Controller
         $access = UserAccess::where('user_id',Auth::id())->whereNull('unidade_id')->pluck('empresa_id');
         $empresa = Empresa::where('id',$servico->unidade->empresa_id)->pluck('id');
         
+
+        
+
         if($access->contains($empresa[0]))
         {
             return view('admin.detalhe-servico')
