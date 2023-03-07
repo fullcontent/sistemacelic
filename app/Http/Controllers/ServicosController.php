@@ -53,14 +53,7 @@ class ServicosController extends Controller
     public function index()
     {
         
-       
-        $servicos = Servico::select('id','nome','os','empresa_id','unidade_id','servicoPrincipal','situacao','solicitante')->with('unidade','empresa','responsavel')->get();
-        // $servicos = $servicos->where('unidade.status','Ativa');
-
-        // dd($servicos);
-
-        return view('admin.lista-servicos-geral')
-                    ->with('servicos',$servicos);
+        return view('admin.lista-servicos-geral');
     }
 
     public function lista()
@@ -72,6 +65,7 @@ class ServicosController extends Controller
                                 // ->whereIn('unidade_id',$this->getUnidadesList())
 
                                 ->where('responsavel_id',Auth::id())
+                                ->orWhere('coresponsavel_id', Auth::id())
                                 ->get();
 
 
@@ -92,6 +86,7 @@ class ServicosController extends Controller
                                 
                                 // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
+                                ->orWhere('coresponsavel_id', Auth::id())
                                 ->get();
 
 
@@ -112,6 +107,7 @@ class ServicosController extends Controller
                                 
                                 // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('coresponsavel_id',Auth::id())
+                                ->orWhere('coresponsavel_id', Auth::id())
                                 ->get();
 
 
@@ -133,6 +129,7 @@ class ServicosController extends Controller
         						
         						// ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
+                                ->orWhere('coresponsavel_id', Auth::id())
         						->get();
 
 
@@ -152,6 +149,7 @@ class ServicosController extends Controller
         $servicos = Servico::with('unidade','empresa','responsavel')
                                 // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
+                                ->orWhere('coresponsavel_id', Auth::id())
                                 ->get();
 
 
@@ -172,6 +170,7 @@ class ServicosController extends Controller
         $servicos = Servico::with('unidade','empresa','responsavel')
                                 // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
+                                ->orWhere('coresponsavel_id', Auth::id())
                                 ->get();
        
         $servicos = $servicos->where('situacao','=','arquivado');
@@ -189,6 +188,7 @@ class ServicosController extends Controller
         $servicos = Servico::with('unidade','empresa','responsavel')
                                 // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
+                                ->orWhere('coresponsavel_id', Auth::id())
                                 ->get();
        
         $servicos = $servicos->where('situacao','=','nRenovado');
@@ -205,6 +205,7 @@ class ServicosController extends Controller
         $servicos = Servico::with('unidade','empresa','responsavel')
                                 // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
+                                ->orWhere('coresponsavel_id', Auth::id())
                                 ->get();
         
        $servicos = $servicos->where('unidade.status','=','Ativa')
@@ -225,6 +226,7 @@ class ServicosController extends Controller
         $servicos = Servico::with('unidade','empresa','responsavel')
                                 // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
+                                ->orWhere('coresponsavel_id', Auth::id())
                                 ->get();
 
         $servicos = $servicos->where('licenca_validade','<',\Carbon\Carbon::today()->addDays(60))
@@ -247,6 +249,7 @@ class ServicosController extends Controller
         $servicos = Servico::with('unidade','empresa','responsavel')
                                 // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
+                                ->orWhere('coresponsavel_id', Auth::id())
                                 ->get();
 
        $servicos = $servicos->where('unidade.status','=','Inativa');
