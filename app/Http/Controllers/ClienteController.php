@@ -163,7 +163,7 @@ class ClienteController extends Controller
 
         
 
-        return view('cliente.lista-servicos')
+        return view('cliente.lista-servicos-geral')
                     ->with('servicos', $servicos)
                     ->with('title','Listando todos os serviços');
 
