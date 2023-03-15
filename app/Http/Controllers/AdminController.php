@@ -355,7 +355,7 @@ class AdminController extends Controller
                     \Carbon\Carbon::parse($t->emissao)->translatedFormat('d-M-Y'),
                     \Carbon\Carbon::parse($t->vencimento)->translatedFormat('d-M-Y'),
                     \Carbon\Carbon::parse($t->pagamento)->translatedFormat('d-M-Y'),
-                    $t->respPgto,
+                    $t->responsavelPgto,
                     $t->reembolso,
                     $t->situacao,
                     number_format($t->valor,2,",","."),
@@ -399,6 +399,8 @@ class AdminController extends Controller
         );
 
         $columns = array(
+            'id',
+            'Etapa',
             'Empresa',
             'Serviço',
             'Código',
@@ -556,6 +558,8 @@ class AdminController extends Controller
                     
 
                fputcsv($file, array(
+                    $p->id,
+                    $p->etapa,
                     $s->unidade->empresa->nomeFantasia,
                     $s->nome,
                     $s->unidade->codigo,
