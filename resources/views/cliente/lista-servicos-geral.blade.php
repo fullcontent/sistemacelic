@@ -450,7 +450,7 @@ $(document).ready(function () {
 
 
 
-        window.location.href = "servicos/" + id
+        window.location.href = "servico/" + id
 });
 
         $('tr').css('cursor','pointer');
