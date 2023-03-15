@@ -330,6 +330,7 @@ $(document).ready(function(){
   $("#telefone").mask("(00) 0000-0000");
   $('#cnpj').mask('00.000.000/0000-00', {reverse: true});
 
+  $('#empresa_id').val(null);
  
 
 
@@ -359,7 +360,9 @@ $(document).ready(function(){
           if(response.status == 'OK') {
           
             // Agora preenchemos os campos com os valores retornados
-            $('#razaoSocial').val(formatText(response.nome));
+            
+            
+            // $('#razaoSocial').val(formatText(response.nome));
 
             
             
@@ -411,6 +414,44 @@ function formatText(text) {
     }
     return words.join(" ");
 }
+
+// Select the element with id 'empresa_id' using jQuery
+const empresaIdField = $('#empresa_id');
+
+// Store the previous value of empresa_id field
+let prevEmpresaIdValue = empresaIdField.val();
+
+// Function to check if the value of empresa_id field changes
+function isEmpresaIdFieldChanged() {
+  if (prevEmpresaIdValue != empresaIdField.val()) {
+    // Update the value of previous empresa_id field
+    prevEmpresaIdValue = empresaIdField.val();
+    return true;
+  }
+  
+  return false;
+}
+
+// Event handler for the "change" event on empresa_id field
+empresaIdField.on('change', () => {
+  if (isEmpresaIdFieldChanged()) {
+    $.ajax({
+      // Your AJAX call here...
+      url: '/api/getRazaoSocial',
+      method: 'GET',
+      data: { empresa_id: empresaIdField.val() },
+      success: (data) => {
+        // Update the value of razaoSocial field with returned data from AJAX call
+        $('#razaoSocial').val(data.razaoSocial);
+      },
+      error: (err) => console.error(err)
+    });
+  }
+});
+
+
+
+
 
 </script>
 

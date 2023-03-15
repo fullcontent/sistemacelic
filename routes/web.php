@@ -321,6 +321,14 @@ Route::get('api/servicosLpu/find', 'ApiController@getServicoLpuById');
 
 Route::get('api/getAllServicesJson', 'ApiController@getAllServicesJSON')->name('getAllServicesJSON');
 
+Route::get('api/getClienteServicesJSON', 'ApiController@getClienteServicesJSON')->name('getClienteServicesJSON');
+
+Route::get('api/getUnidadesByState','DashboardController@getUnidadesByState')->name('api.getUnidadesByState');
+Route::get('api/getUnidadesByRegion','DashboardController@getUnidadesByRegion')->name('api.getUnidadesByRegion');
+
+Route::get('api/getRazaoSocial','ApiController@getRazaoSocial')->name('api.getRazaoSocial');
+
+
 
 
 //Test Routes

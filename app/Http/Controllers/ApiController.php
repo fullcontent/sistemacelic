@@ -422,4 +422,14 @@ class ApiController extends Controller
 
     
     }
+
+
+
+    public function getRazaoSocial(Request $request)
+    {
+              
+        $data = Empresa::find($request->empresa_id);
+
+       return response()->json($data);
+    }
 }
