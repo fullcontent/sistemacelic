@@ -217,7 +217,6 @@ h3 {
         
       </div>
       <div class="col-xs-12 text-right" style="line-height: 10px;">
-      
         <p>Rua novecentos e Um, 400 | Sala 405</p>
         <p>Balneário Camboriú | Santa Catarina | CEP: 88.330-725</p>
         <p>Telefone: 47 3334-2927</p>
@@ -244,6 +243,7 @@ h3 {
         <div class="empresa">
         
       <div class="col-xs-6 text-left" style="line-height: 10px;">
+        <h3>N° {{$id}}</h3>
 
         <p style="margin-bottom: 20px; padding-top:20px;">Bal. Camboriú, {{ \Carbon\Carbon::parse($data)->isoFormat("D, MMMM, YYYY") }}</p>
       

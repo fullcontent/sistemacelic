@@ -226,6 +226,7 @@ class ReembolsoController extends Controller
             'obs'=>$reembolso->obs,
             'data'=>$reembolso->created_at,
             'empresa'=>$empresa,
+            'id'=>$this->fillWithZeros($reembolso->id)
         ]);
     }
 
@@ -317,7 +318,8 @@ class ReembolsoController extends Controller
         $empresa = Empresa::find($reembolso->empresa_id);
       
       
-        // $reembolsoR = \PDF::loadHTML('<h1>Test</h1>');
+        $id = $this->fillWithZeros($reembolso->id);
+    
 
         $reembolsoR = \PDF::loadview('admin.reembolso.pdf',[
             'empresa'=>$empresa,
@@ -326,6 +328,7 @@ class ReembolsoController extends Controller
             'obs'=>$reembolso->obs,
             'data'=>$reembolso->created_at,
             'totalReembolso'=>$reembolso->valorTotal,
+            'id'=>$id,
             ])->setPaper('a4', 'portrait');
             
         
@@ -571,6 +574,26 @@ class ReembolsoController extends Controller
     private function tirarAcentos($string){
         return preg_replace(array("/(á|à|ã|â|ä)/","/(Á|À|Ã|Â|Ä)/","/(é|è|ê|ë)/","/(É|È|Ê|Ë)/","/(í|ì|î|ï)/","/(Í|Ì|Î|Ï)/","/(ó|ò|õ|ô|ö)/","/(Ó|Ò|Õ|Ô|Ö)/","/(ú|ù|û|ü)/","/(Ú|Ù|Û|Ü)/","/(ñ)/","/(Ñ)/","/(Ç)/","/(ç)/","/(Ã)/"),explode(" ","a A e E i I o O u U n N C c A"),$string);
     }
+
+    public function fillWithZeros($number) {
+         if ($number <= 999) {
+
+            if($number <= 100)
+            {
+                $number = str_pad($number, 4, "10", STR_PAD_LEFT);
+            }
+            else{
+                $number = str_pad($number, 4, "1", STR_PAD_LEFT);
+            }
+                 
+         }
+         else{
+            $number = $number;
+         }
+         return $number;
+       }
+       
+
 
 
     

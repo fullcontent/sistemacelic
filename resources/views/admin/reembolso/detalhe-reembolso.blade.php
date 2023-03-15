@@ -17,6 +17,7 @@
     <!-- info row -->
     <div class="row invoice-info">
       <div class="col-sm-6">
+        <h3>N° {{$id}}</h3>
         <p><b>Reembolso </b>{{$descricao}}</p>
         <p><b>Referência: </b>{{$obs}}</p>
       </div>
