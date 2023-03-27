@@ -96,9 +96,9 @@
     <!-- /.row -->
     <div class="col-xs-8" style="margin-top: 100px;">
         <p>__________________________________________________________________</p>
-        <p><b>CASTRO EMPRESARIAL - CONSULTORIA E LEGALIZAÇÃO IMOBILIÁRIA
+        <p><b>{{$dadosCastro->razaoSocial}}
         </b></p>
-        <p>CNPJ: 27.352.308/0001-52
+        <p>CNPJ: {{$dadosCastro->cnpj}}
         </p>
 
       </div>

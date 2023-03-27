@@ -448,6 +448,7 @@ class FaturamentoController extends Controller
             'data'=>$faturamento->created_at,
             'link'=>$faturamento->link,
             'id'=>$faturamento->id,
+            'dadosCastro'=>$faturamento->dadosCastro,
         ]);
         
 

@@ -81,9 +81,9 @@
     <!-- /.row -->
     <div class="col-xs-8" style="margin-top: 100px;">
         <p>__________________________________________________________________</p>
-        <p><b>CASTRO EMPRESARIAL - CONSULTORIA E LEGALIZAÇÃO IMOBILIÁRIA
+        <p><b>{{$dadosCastro->razaoSocial}}
         </b></p>
-        <p>CNPJ: 27.352.308/0001-52
+        <p>CNPJ: {{$dadosCastro->cnpj}}
         </p>
 
       </div>
@@ -158,18 +158,18 @@
 
     <div class="row">
       <div class="col-xs-12 text-left">
-        <p>CAIXA ECONÔMICA FEDERAL</p>
-        <p><b>Agência: </b>0921</p>
-        <p><b>Conta corrente: </b>6992-4</p>
-        <p><b>Castro Empresarial Serviços Administrativos LTDA ME</p>
-        <p><b>CNPJ: </b>27.352.308/0001-52</p>
+        <p>{{$dadosCastro->banco}}</p>
+        <p><b>Agência: </b>{{$dadosCastro->agencia}}</p>
+        <p><b>Conta corrente: </b>{{$dadosCastro->conta}}</p>
+        <p><b>{{$dadosCastro->razaoSocial}}</p>
+        <p><b>CNPJ: </b>{{$dadosCastro->cnpj}}</p>
       </div>
     </div>
     <div class="col-xs-8" style="margin-top: 100px;">
       <p>__________________________________________________________________</p>
-      <p><b>CASTRO EMPRESARIAL - CONSULTORIA E LEGALIZAÇÃO IMOBILIÁRIA
+      <p><b>{{$dadosCastro->razaoSocial}}
       </b></p>
-      <p>CNPJ: 27.352.308/0001-52
+      <p>CNPJ: {{$dadosCastro->cnpj}}
       </p>
 
     </div>

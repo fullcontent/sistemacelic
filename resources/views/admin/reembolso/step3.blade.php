@@ -21,14 +21,14 @@
 
 	<div class="col-md-12">
 		
-		<div class="col-md-4">
+		<div class="col-md-2">
 
 			{!! Form::label('empresa', 'Empresa: ') !!}
 			{!! Form::text('empresa', $empresa->nomeFantasia, ['class'=>'form-control','disabled'=>'disabled']) !!}	
 
 		</div>
 		
-		<div class="col-md-4">
+		<div class="col-md-3">
 
 			{!! Form::label('descricao', 'Descrição do Reembolso') !!}
 			{!! Form::text('descricao', $descricao, ['class'=>'form-control']) !!}	
@@ -39,6 +39,13 @@
 
 			{!! Form::label('obs', 'Observações') !!}
 			{!! Form::text('obs', null, ['class'=>'form-control']) !!}	
+
+		</div>
+
+		<div class="col-md-3">
+
+			{!! Form::label('dadosCastro', 'CNPJ Castro') !!}
+			{!! Form::select('dadosCastro', $dadosCastro, ['id'=>'dadosCastro','class'=>'form-control']) !!}
 
 		</div>
 		
@@ -115,5 +122,9 @@
 	function goBack() {
 	  window.history.back();
 	}
+
+
+
+	
 	</script>
 

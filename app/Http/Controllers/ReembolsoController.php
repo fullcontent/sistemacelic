@@ -9,6 +9,7 @@ use App\Models\Servico;
 use App\Models\Reembolso;
 use Illuminate\Http\Request;
 use App\Models\ReembolsoTaxa;
+use App\Models\DadosCastro;
 
 
 use PDFMerger;
@@ -31,12 +32,14 @@ class ReembolsoController extends Controller
     {
         
 
-        $reembolsos = Reembolso::query()
-       ->select('id','valorTotal','created_at','nome','empresa_id')
-         ->with(['empresa' => function($query) {
-            $query->select('id','nomeFantasia');
-        }])
-        ->get();
+    //     $reembolsos = Reembolso::query()
+    //    ->select('id','valorTotal','created_at','nome','empresa_id')
+    //      ->with(['empresa' => function($query) {
+    //         $query->select('id','nomeFantasia');
+    //     }])
+    //     ->get();
+
+        $reembolsos = Reembolso::all();
 
         return view('admin.reembolso.lista-reembolsos')->with([
             'reembolsos'=>$reembolsos,
@@ -156,19 +159,22 @@ class ReembolsoController extends Controller
 
 
         $empresa = Empresa::find($request->empresa_id);
+
+        $dadosCastro = DadosCastro::pluck('razaoSocial','id');
         
         return view('admin.reembolso.step3')->with([
             'taxasReembolsar'=>$taxasReembolsar,
             'total'=>$total,
             'empresa'=> $empresa,
             'descricao'=>$descricao,
+            'dadosCastro'=>$dadosCastro,
 
         ]);
     }
 
     public function step4(Request $request)
     {
-       
+      
         
         $taxasReembolsar = Taxa::whereIn('id',$request->taxas)->get();
         $total = $taxasReembolsar->sum('valor');
@@ -226,7 +232,8 @@ class ReembolsoController extends Controller
             'obs'=>$reembolso->obs,
             'data'=>$reembolso->created_at,
             'empresa'=>$empresa,
-            'id'=>$this->fillWithZeros($reembolso->id)
+            'id'=>$this->fillWithZeros($reembolso->id),
+            'dadosCastro'=>$reembolso->dadosCastro,
         ]);
     }
 
@@ -592,6 +599,11 @@ class ReembolsoController extends Controller
          }
          return $number;
        }
+
+    public function alterarEmpresa(Request $request)
+    {
+        return $request;
+    }
        
 
 

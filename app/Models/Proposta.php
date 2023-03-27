@@ -37,4 +37,9 @@ class Proposta extends Model
         {
             return $this->servicos->sum('valor');
         }
+
+        public function dadosCastro()
+    {
+        return $this->belongsTo('App\Models\DadosCastro','dadosCastro_id');
+    }
 }

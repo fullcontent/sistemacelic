@@ -26,6 +26,11 @@ class Faturamento extends Model
         return $this->hasManyThrough('App\Models\Servico','App\Models\FaturamentoServico','faturamento_id','id');
     }
 
+    public function dadosCastro()
+    {
+        return $this->belongsTo('App\Models\DadosCastro','dadosCastro_id');
+    }
+
    
 
    

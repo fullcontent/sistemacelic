@@ -124,6 +124,9 @@ Route::get('/', function () {
 		Route::get('/reembolso/{id}/downloadZip','ReembolsoController@downloadZip')->name('reembolso.downloadZip');
 
 
+		Route::post('/reembolso/alterarEmpresa', 'ReembolsoController@alterarEmpresa')->name('reembolso.alterarEmpresa');
+
+
 		Route::get('/empresa/{empresa}/unidades','EmpresasController@unidades')->name('empresa.unidades');
 		Route::get('/empresa/cadastro', 'EmpresasController@cadastro')->name('empresa.cadastro');
 		Route::get('/unidade/cadastro', 'UnidadesController@cadastro')->name('unidade.cadastro');
@@ -327,6 +330,14 @@ Route::get('api/getUnidadesByState','DashboardController@getUnidadesByState')->n
 Route::get('api/getUnidadesByRegion','DashboardController@getUnidadesByRegion')->name('api.getUnidadesByRegion');
 
 Route::get('api/getRazaoSocial','ApiController@getRazaoSocial')->name('api.getRazaoSocial');
+
+Route::get('api/getPendenciasFromUnidade','ApiController@getPendenciasFromUnidade')->name('api.getPendenciasFromUnidade');
+
+Route::get('api/getDadosCastro','ApiController@getDadosCastro')->name('api.getDadosCastro');
+
+Route::get('api/saveDadosCastro','ApiController@saveDadosCastro')->name('api.saveDadosCastro');
+
+
 
 
 

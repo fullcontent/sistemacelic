@@ -281,20 +281,21 @@
             {!! Form::textarea('dadosPagamento', $proposta->dadosPagamento, ['class'=>'form-control','id'=>'dadosPagamento']) !!}
             
         </div>
-        <button type="" class="btn btn-info"><i class="fa fa-save"></i> Salvar</button> 
+
+        <div class="row">
+
+            <div class="col-xs-12">
+                <br>
+                <p class="text-center">
+                    <button type="" class="btn btn-info"><i class="fa fa-save"></i> Salvar</button> 
+
+                </p>
+            </div>
+        </div>
 
        {!! Form::close() !!}
 
-    <div class="row">
-        <div class="col-xs-12" style="overflow:hidden">
-
-            <p class="text-right" style="margin-bottom: 20px; padding-top:20px; margin-right:100px;">Bal. Camboriú/SC, {{ \Carbon\Carbon::parse(date('Y-m-d'))->isoFormat("D, MMMM, YYYY") }}</p>
-
-            <p class="text-center" style="margin-top: 50px;">________________________________________________________________</p>
-            <p class="text-center"><b>Castro Empresarial - Consultoria e Legalização Imobiliária</b></p>
-            <p class="text-center">CNPJ: 27.352.308/0001-52</p>
-        </div>
-    </div>
+   
 
     <footer>
     <div class="col-xs-12">

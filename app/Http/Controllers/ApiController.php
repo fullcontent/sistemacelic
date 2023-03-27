@@ -8,7 +8,12 @@ use App\Models\Empresa;
 use App\Models\Unidade;
 use App\Models\ServicoLpu;
 use App\Models\Servico;
+use App\Models\Reembolso;
+use App\Models\Faturamento;
+use App\Models\Proposta;
+
 use App\User;
+use App\Models\DadosCastro;
 use Auth;
 
 class ApiController extends Controller
@@ -431,5 +436,53 @@ class ApiController extends Controller
         $data = Empresa::find($request->empresa_id);
 
        return response()->json($data);
+    }
+
+    public function getPendenciasFromUnidade(Request $request)
+    {
+        
+        $unidade = Unidade::find($request->unidade_id);
+
+        $data = $unidade->pendencias->pluck('id','pendencia');
+
+        return response()->json($data);    
+    }
+
+    public function getDadosCastro()
+    {
+        $data = DadosCastro::all();
+
+        return response()->json($data);
+    }
+
+    public function saveDadosCastro(Request $request)
+    {
+        
+
+
+        if($request->faturamento_id)
+        {
+            $faturamento = Faturamento::find($request->faturamento_id);
+            $faturamento->dadosCastro_id = $request->dadosCastro_id;
+            $faturamento->save();
+        }
+        
+        if($request->reembolso_id)
+        {
+            $reembolso = Reembolso::find($request->reembolso_id);
+            $reembolso->dadosCastro_id = $request->dadosCastro_id;
+            $reembolso->save();
+        }
+
+        if($request->proposta_id)
+        {
+            $proposta = Proposta::find($request->proposta_id);
+            $proposta->dadosCastro_id = $request->dadosCastro_id;
+            $proposta->save();
+        }
+
+
+       
+
     }
 }
