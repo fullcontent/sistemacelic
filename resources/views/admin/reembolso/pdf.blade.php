@@ -243,7 +243,7 @@ h3 {
         <div class="empresa">
         
       <div class="col-xs-6 text-left" style="line-height: 10px;">
-        <h3>N° {{$id ?? ''}}</h3>
+        
 
         <p style="margin-bottom: 20px; padding-top:20px;">Bal. Camboriú, {{ \Carbon\Carbon::parse($data)->isoFormat("D, MMMM, YYYY") }}</p>
       
@@ -314,6 +314,7 @@ h3 {
     <div class="row invoice-info">
     <h3 class="text-center">Demonstrativo de taxas pagas</h3>
       <div class="col-sm-6">
+        <p>N° {{$id ?? ''}}</p>
         <p>Reembolso {{$descricao}}</p>
         <p>Referência: {{$obs}}</p>
       </div>
