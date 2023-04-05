@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\FaturamentoServico;
 use App\Models\ServicoFinanceiro;
 use App\Models\ServicoFinalizado;
+use App\Models\DadosCastro;
 use DB;
 
 
@@ -146,6 +147,8 @@ class FaturamentoController extends Controller
 
         $total = $servicosFaturar->sum('financeiro.valorAberto');
 
+        $dadosCastro = DadosCastro::pluck('razaoSocial','id');
+
         
 
         $descricao = "00".Carbon::now()->month."-".Carbon::now()->year."";
@@ -156,6 +159,7 @@ class FaturamentoController extends Controller
             'total'=>$total,
             'empresa_id'=> $request->empresa_id,
             'descricao'=>$descricao,
+            'dadosCastro'=>$dadosCastro,
 
         ]);
     
@@ -164,6 +168,8 @@ class FaturamentoController extends Controller
 
     public function step4(Request $request)
     {      
+
+        $dadosCastro = DadosCastro::pluck('razaoSocial','id');
 
 
        
@@ -232,6 +238,8 @@ class FaturamentoController extends Controller
             'descricao'=>$request->descricao,
             'obs'=>$request->obs,
             'link'=>$request->link,
+            'dadosCastro'=>$dadosCastro,
+
         ]);
 
     }
