@@ -243,7 +243,7 @@ h3 {
         <div class="empresa">
         
       <div class="col-xs-6 text-left" style="line-height: 10px;">
-        <h3>N° {{$id}}</h3>
+        <h3>N° {{$id ?? ''}}</h3>
 
         <p style="margin-bottom: 20px; padding-top:20px;">Bal. Camboriú, {{ \Carbon\Carbon::parse($data)->isoFormat("D, MMMM, YYYY") }}</p>
       
