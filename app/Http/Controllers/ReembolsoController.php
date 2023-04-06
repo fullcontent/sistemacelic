@@ -323,6 +323,7 @@ class ReembolsoController extends Controller
         
         $reembolso = Reembolso::with('taxas.taxa.unidade')->find($id);
         $empresa = Empresa::find($reembolso->empresa_id);
+
       
       
         $id = $this->fillWithZeros($reembolso->id);
@@ -336,6 +337,7 @@ class ReembolsoController extends Controller
             'data'=>$reembolso->created_at,
             'totalReembolso'=>$reembolso->valorTotal,
             'id'=>$id,
+            'dadosCastro'=>$reembolso->dadosCastro,
             ])->setPaper('a4', 'portrait');
             
         

@@ -280,9 +280,9 @@ h3 {
     <div class="assinatura">
     <div class="col-xs-8" style="margin-top: 100px;">
       <p>__________________________________________________________________</p>
-      <p>Castro Empresarial - Consultoria e Legalização Imobiliária
+      <p>{{$dadosCastro->razaoSocial}}
       </p>
-      <p>CNPJ: 27.352.308/0001-52
+      <p>CNPJ: {{$dadosCastro->cnpj}}
       </p>
 
     </div>
