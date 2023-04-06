@@ -186,6 +186,10 @@ class ReembolsoController extends Controller
 
         $this->salvarReembolso($taxasReembolsar, $total, $request->descricao, $request->obs, $request->empresa_id);
 
+        $dadosCastro = DadosCastro::find($request->dadosCastro);
+
+       
+        
 
        return view('admin.reembolso.step4')->with([
             
@@ -195,6 +199,7 @@ class ReembolsoController extends Controller
             'totalReembolso'=>$total,
             'descricao'=>$request->descricao,
             'obs'=>$request->obs,
+            'dadosCastro' => $dadosCastro,
         ]);
         
     
@@ -325,7 +330,7 @@ class ReembolsoController extends Controller
         $empresa = Empresa::find($reembolso->empresa_id);
 
       
-      
+
         $id = $this->fillWithZeros($reembolso->id);
     
 
@@ -542,6 +547,7 @@ class ReembolsoController extends Controller
                 'obs'=>$reembolso->obs,
                 'data'=>$reembolso->created_at,
                 'totalReembolso'=>$reembolso->valorTotal,
+                'dadosCastro' => $reembolso->dadosCastro,
                 ]);
         
         
