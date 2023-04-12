@@ -40,6 +40,13 @@
 			{!! Form::checkbox('link', null, ['class'=>'form-control']) !!}	
 		</div>
 		
+		<div class="col-md-3">
+
+			{!! Form::label('dadosCastro', 'CNPJ Castro') !!}
+			{!! Form::select('dadosCastro', $dadosCastro, ['id'=>'dadosCastro','class'=>'form-control']) !!}
+
+		</div>
+		
 		
 
 

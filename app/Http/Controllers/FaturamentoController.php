@@ -169,7 +169,6 @@ class FaturamentoController extends Controller
     public function step4(Request $request)
     {      
 
-        $dadosCastro = DadosCastro::pluck('razaoSocial','id');
 
 
        
@@ -178,6 +177,7 @@ class FaturamentoController extends Controller
         $faturamento = new Faturamento;
         $faturamento->empresa_id = $request->empresa_id;
         $faturamento->link = $request->link;
+        $faturamento->dadosCastro_id = $request->dadosCastro;
         $faturamento->save();
 
 
@@ -238,7 +238,7 @@ class FaturamentoController extends Controller
             'descricao'=>$request->descricao,
             'obs'=>$request->obs,
             'link'=>$request->link,
-            'dadosCastro'=>$dadosCastro,
+            'dadosCastro'=>$faturamento->dadosCastro,
 
         ]);
 
