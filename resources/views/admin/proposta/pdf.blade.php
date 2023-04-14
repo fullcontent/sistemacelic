@@ -149,6 +149,8 @@ tfoot { display:table-footer-group }
                         {{$index}}.{{$s->posicao}}
 
                         @php
+                        
+                            $subtotal = 0;
                             $subtotal = $subtotal + $s->valor;
                             @endphp
 
