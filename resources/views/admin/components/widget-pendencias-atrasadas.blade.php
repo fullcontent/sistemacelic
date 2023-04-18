@@ -116,7 +116,7 @@ $('.priorize').click(function(){
 
 $('#lista-pendencias-usuario').DataTable({
 		      "paging": true,
-		      "lengthChange": false,
+		      "lengthChange": true,
 		      "searching": true,
 		      "ordering": true,
 		      "info": true,
@@ -128,7 +128,7 @@ $('#lista-pendencias-usuario').DataTable({
 
   $('#lista-pendencias-atrasadas').DataTable({
 		      "paging": true,
-		      "lengthChange": false,
+		      "lengthChange": true,
 		      "searching": true,
 		      "ordering": true,
 		      "info": true,
