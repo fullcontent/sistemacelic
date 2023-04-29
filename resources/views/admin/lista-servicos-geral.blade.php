@@ -41,6 +41,7 @@
 							<th>Nome</th>
 							<th>Solicitante</th>
 							<th>Departamento</th>
+                            <th>Licenciamento</th>
 							<th>N° Protocolo</th>
 							<th>Emissão Protocolo</th>
 							<th>Tipo Licença</th>

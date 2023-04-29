@@ -215,7 +215,10 @@
                   <p><b>Laudo: </b> <a href="{{ route('servico.downloadFile', ['servico_id'=> $servico->id,'tipo'=>'laudo']) }}" class="btn btn-xs btn-warning" target="_blank"><i class="fa fa-file"></i> Ver Laudo</a></p>
                   @endunless
                   <p><b>Escopo: </b>{{$servico->escopo}}</p>
-                  
+
+                  @if($servico->licenciamento)
+                  <p><b>Licenciamento: </b>{{$servico->licenciamento}}</p>
+                  @endif
 
                 </div>
 

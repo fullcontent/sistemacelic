@@ -163,7 +163,7 @@ class AdminController extends Controller
             "Expires"             => "0"
         );
 
-        $columns = array('Razão Social', 'Código', 'Nome', 'CNPJ', 'Status', 'Imóvel', 'Ins. Estadual', 'Ins. Municipal', 'Ins. Imob.', 'RIP', 'Matrícula RI', 'Área da Loja', 'Endereço', 'Número', 'Complemento','Data Inauguração',
+        $columns = array('ID','Razão Social', 'Código', 'Nome','Licenciamento', 'CNPJ', 'Status', 'Imóvel', 'Ins. Estadual', 'Ins. Municipal', 'Ins. Imob.', 'RIP', 'Matrícula RI', 'Área da Loja', 'Endereço', 'Número', 'Complemento','Data Inauguração',
         'Cidade','UF', 'CEP', 'Tipo', 'O.S.', 'Situação', 'Responsável', 'Co-Responsável', 'Nome', 'Solicitante','Departamento', 'N° Protocolo', 'Emissão Protocolo', 'Tipo Licença', 'Proposta', 'Emissão Licença', 'Validade Licença', 'Valor Total', 'Valor em Aberto', 'Finalizado', 'Criação');
 
         $callback = function() use($servicos, $columns) {
@@ -221,7 +221,7 @@ class AdminController extends Controller
                     }
 
 
-                    if($s->unidade->dataInauguraao)
+                    if($s->unidade->dataInaugurcao)
                     {
                         $dataInauguracao =  \Carbon\Carbon::parse($s->unidade->dataInauguracao)->format('d/m/Y');
                     }
@@ -230,15 +230,24 @@ class AdminController extends Controller
                         $dataInauguracao = null;
                     }
 
+                    if($s->licenciamento)
+                    {
+                        $licenciamento = $s->licenciamento;
+                    }
+                    else{
+                        $licenciamento = null;
+                    }
                     
 
 
 
 
                 fputcsv($file, array(
+                    $s->id,
                     $s->unidade->razaoSocial,
                     $s->unidade->codigo,
                     $s->unidade->nomeFantasia,
+                    $licenciamento,
                     $s->unidade->cnpj,
                     $s->unidade->status,
                     $s->unidade->tipoImovel,

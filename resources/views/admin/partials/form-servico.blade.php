@@ -131,7 +131,7 @@
 
 
 
-<div class="col-md-6">
+<div class="col-md-4">
 	
 	<div class="form-group">
 		
@@ -140,6 +140,19 @@
 		
 		{!! Form::text('nome', null, ['class'=>'form-control','id'=>'nome']) !!}
 		
+	</div>
+</div>
+
+<div class="col-md-2">
+	<div class="form-group">
+		{!! Form::label('licenciamento', 'Licenciamento', array('class'=>'control-label')) !!}
+
+		{!! Form::select('licenciamento', array(
+				null,
+				'empresa' => 'Empresa',
+				'imovel' => 'Imóvel',
+				
+				), null, ['class'=>'form-control'])!!}
 	</div>
 </div>
 
@@ -177,6 +190,7 @@
 				'obras'=>'Obras',
 				'expansao'=>'Expansão',
 				'compras' => 'Compras',
+				'farmaceutico' => 'Farmacêutico',
 				'outros' => 'Outros'
 				), null, ['class'=>'form-control'])!!}
 		

@@ -524,6 +524,13 @@ class ServicosController extends Controller
         $servico->coresponsavel_id = $request->coresponsavel_id;
                
         $servico->protocolo_numero  =   $request->protocolo_numero;
+
+        if($request->licenciamento)
+        {
+            $servico->licenciamento  =   $request->licenciamento;
+        }
+        
+       
         
         $servico->observacoes   = $request->observacoes;
         $servico->escopo   = $request->escopo;
@@ -861,6 +868,12 @@ class ServicosController extends Controller
         $servico->responsavel_id = $request->responsavel_id;
         $servico->coresponsavel_id = $request->coresponsavel_id;
 
+        
+        if($request->licenciamento)
+        {
+            $servico->licenciamento  =   $request->licenciamento;
+
+        }
         
         $servico->protocolo_numero  =   $request->protocolo_numero;
         $servico->laudo_numero = $request->laudo_numero;
