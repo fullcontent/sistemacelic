@@ -147,12 +147,23 @@
 	<div class="form-group">
 		{!! Form::label('licenciamento', 'Licenciamento', array('class'=>'control-label')) !!}
 
+
+		@if(Route::is('servicos.edit'))
+		{!! Form::select('licenciamento', array(
+			null,
+			'empresa' => 'Empresa',
+			'imovel' => 'Imóvel',
+			
+			), $licenciamento, ['class'=>'form-control'])!!}
+		@else
 		{!! Form::select('licenciamento', array(
 				null,
 				'empresa' => 'Empresa',
 				'imovel' => 'Imóvel',
 				
 				), null, ['class'=>'form-control'])!!}
+
+		@endif
 	</div>
 </div>
 

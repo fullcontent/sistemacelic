@@ -307,6 +307,11 @@ jQuery.validator.addMethod("notEqual", function (value, element, param) { // Add
     $('#valorAberto').val($(this).val());
 });
 
+var licenciamento = "{{$licenciamento}}";
+
+lic = licenciamento.toLowerCase();
+
+$('#licenciamento').val(lic);
 
 
 </script>

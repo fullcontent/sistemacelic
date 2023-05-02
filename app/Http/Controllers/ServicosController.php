@@ -839,6 +839,7 @@ class ServicosController extends Controller
                         'financeiro'=>$servico->financeiro,
                         'ps'=>$servico->tipo,
                         'solicitantes'=>$solicitantes,
+                        'licenciamento'=>$servico->licenciamento,
                                                 
                     ]);
     }

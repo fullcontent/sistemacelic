@@ -412,6 +412,7 @@ class AdminController extends Controller
             'Etapa',
             'Empresa',
             'Serviço',
+            'Licenciamento',
             'Código',
             'Unidade',
             'CNPJ',
@@ -563,6 +564,14 @@ class AdminController extends Controller
                     {
                         $vinculo = null;
                     }
+
+                    if($s->licenciamento)
+                    {
+                        $licenciamento = $s->licenciamento;
+                    }
+                    else{
+                        $licenciamento = null;
+                    }
                 
                     
 
@@ -571,6 +580,7 @@ class AdminController extends Controller
                     $p->etapa,
                     $s->unidade->empresa->nomeFantasia,
                     $s->nome,
+                    $licenciamento,
                     $s->unidade->codigo,
                     $s->unidade->nomeFantasia,
                     $s->unidade->cnpj,
@@ -845,6 +855,7 @@ class AdminController extends Controller
             'Responsável',
             'Co-Responsável',
             'Nome Serviço',
+            'Licenciamento',
             'Solicitante',
             'Departamento',
             'Proposta',
@@ -903,7 +914,13 @@ class AdminController extends Controller
                     }
 
 
-                    
+                    if($s->licenciamento)
+                    {
+                        $licenciamento = $s->licenciamento;
+                    }
+                    else{
+                        $licenciamento = null;
+                    }
 
 
 
@@ -919,6 +936,7 @@ class AdminController extends Controller
                     $s->responsavel->name,
                     $s->coresponsavel->name ?? '',
                     $s->nome,
+                    $licenciamento,
                     $s->solicitante,
                     $s->departamento,
                     $proposta,
