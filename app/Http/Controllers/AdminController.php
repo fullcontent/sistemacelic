@@ -393,7 +393,7 @@ class AdminController extends Controller
                             ->whereNotIn('responsavel_id',[1])
                             ->orderBy('id','DESC')
                             ->with('responsavel','coresponsavel')
-                            ->select('id','nome','os','unidade_id','tipo','protocolo_anexo','laudo_anexo','solicitante','responsavel_id','coresponsavel_id')
+                            ->select('id','nome','os','unidade_id','tipo','protocolo_anexo','laudo_anexo','solicitante','responsavel_id','coresponsavel_id','licenciamento')
                             ->get();
 
         // $servicos = Pendencia::all();
@@ -626,7 +626,7 @@ class AdminController extends Controller
                     ->whereNotIn('responsavel_id',[1])
                     ->orderBy('id','DESC')
                     ->with('responsavel','coresponsavel')
-                    ->select('id','nome','os','unidade_id','tipo','protocolo_anexo','laudo_anexo','solicitante','responsavel_id','coresponsavel_id')
+                    ->select('id','nome','os','unidade_id','tipo','protocolo_anexo','laudo_anexo','solicitante','responsavel_id','coresponsavel_id','licenciamento')
                     // ->take(200)   //Somente para testes
                     ->whereIn('empresa_id',$request->empresa_id)
                     ->get();
@@ -643,6 +643,7 @@ class AdminController extends Controller
         $columns = array(
             'Empresa',
             'Serviço',
+            'Licenciamento',
             'Código',
             'Unidade',
             'CNPJ',
@@ -785,11 +786,18 @@ class AdminController extends Controller
                         $vinculo = null;
                     }
 
-                   
+                   if($s->licenciamento)
+                   {
+                    $licenciamento = $s->licenciamento;
+                   }
+                   else {
+                    $licenciamento = null;
+                   }
 
                 fputcsv($file, array(
                     $s->unidade->empresa->nomeFantasia,
                     $s->nome,
+                    $licenciamento,
                     $s->unidade->codigo,
                     $s->unidade->nomeFantasia,
                     $s->unidade->cnpj,
