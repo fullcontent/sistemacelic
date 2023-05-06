@@ -58,6 +58,8 @@ Route::get('/', function () {
 		Route::resource('/pendencia','PendenciasController');
 		Route::resource('/arquivo','ArquivosController');
 
+		Route::resource('/prestador','PrestadorController');
+
 		Route::resource('/solicitantes','SolicitantesController');
 
 		Route::get('/solicitantes/delete/{id}', 'SolicitantesController@destroy')->name('solicitantes.destroy');
@@ -474,3 +476,4 @@ Route::get('/pendencia/{id}/previousEtapa', function($id){
 		
 
 });
+
