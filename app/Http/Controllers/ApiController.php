@@ -11,6 +11,7 @@ use App\Models\Servico;
 use App\Models\Reembolso;
 use App\Models\Faturamento;
 use App\Models\Proposta;
+use App\Models\Prestador;
 
 use App\User;
 use App\Models\DadosCastro;
@@ -486,5 +487,12 @@ class ApiController extends Controller
 
        
 
+    }
+
+    public function getPrestadorInfo(Request $request)
+    {
+        $data = Prestador::find($request->prestador_id);
+
+        return response()->json($data);
     }
 }

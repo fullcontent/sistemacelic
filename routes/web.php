@@ -59,6 +59,9 @@ Route::get('/', function () {
 		Route::resource('/arquivo','ArquivosController');
 
 		Route::resource('/prestador','PrestadorController');
+		Route::resource('/ordemCompra','OrdemCompraController');
+
+		Route::get('/ordemCompra/{servico_id}/create','OrdemCompraController@create');
 
 		Route::resource('/solicitantes','SolicitantesController');
 
@@ -338,6 +341,8 @@ Route::get('api/getPendenciasFromUnidade','ApiController@getPendenciasFromUnidad
 Route::get('api/getDadosCastro','ApiController@getDadosCastro')->name('api.getDadosCastro');
 
 Route::get('api/saveDadosCastro','ApiController@saveDadosCastro')->name('api.saveDadosCastro');
+
+Route::get('api/getPrestadorInfo','ApiController@getPrestadorInfo')->name('api.getPrestadorInfo');
 
 
 
