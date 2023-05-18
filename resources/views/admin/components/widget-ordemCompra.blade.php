@@ -39,7 +39,9 @@
                       <td>{{$oc->dataPagamento}}</td>
                       <td>
                       @foreach($oc->pagamentos as $p)
+                      @if($p->comprovante)
                       <a href="{{ url("public/uploads/$p->comprovante") }}" class="btn btn-xs btn-success" target="_blank">Comprovante</a>
+                      @endif
                       @endforeach
                       </td>
                       <td></td>

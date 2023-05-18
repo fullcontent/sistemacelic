@@ -80,11 +80,14 @@ class OrdemCompraController extends Controller
         }
         
         // Checks if comprovante exists in the request object. If it does, then the loop iterates over the comprovante array obtained from the request.
-        
-        foreach ($request->comprovante as $v => $p) {
+        if($request->comprovante)
+        {
+            foreach ($request->comprovante as $v => $p) {
                 // The value at a particular index is added as a key-value pair to the parcela array.
                 $parcela[$v]['comprovante'] = $p;
         }
+        }
+        
         
         
         // The loop iterates over the obs array obtained from the request.
@@ -203,20 +206,24 @@ class OrdemCompraController extends Controller
             // Set the value of the "comprovante" property to the one received for the current installment
             
            
-            $ordemCompraPagamento->comprovante = $par['comprovante'];
+            if(isset($par['comprovante']))
+            {
+                $ordemCompraPagamento->comprovante = $par['comprovante'];
 
-           //Se informou o arquivo, retorna um boolean
-           if ($ordemCompraPagamento->comprovante->isValid()) {
-               $nameFile = null;
-               $name = uniqid(date('HisYmd'));
-               $extension = $ordemCompraPagamento->comprovante->extension();
-               $nameFile = "{$name}.{$extension}";
-               //Faz o upload:
-               $upload = $ordemCompraPagamento->comprovante->storeAs('comprovantes', $nameFile);
-               //Se tiver funcionado o arquivo foi armazenado em storage/app/public/categories/nomedinamicoarquivo.extensao
-           
-               $ordemCompraPagamento->comprovante = $upload;
-           }
+                //Se informou o arquivo, retorna um boolean
+                if ($ordemCompraPagamento->comprovante->isValid()) {
+                    $nameFile = null;
+                    $name = uniqid(date('HisYmd'));
+                    $extension = $ordemCompraPagamento->comprovante->extension();
+                    $nameFile = "{$name}.{$extension}";
+                    //Faz o upload:
+                    $upload = $ordemCompraPagamento->comprovante->storeAs('comprovantes', $nameFile);
+                    //Se tiver funcionado o arquivo foi armazenado em storage/app/public/categories/nomedinamicoarquivo.extensao
+                
+                    $ordemCompraPagamento->comprovante = $upload;
+                }
+            }
+            
            
 
         
@@ -238,6 +245,8 @@ class OrdemCompraController extends Controller
         }
 
 
+
+        return redirect()->route('servicos.show',$request->servico_id)->with('message','Ordem de compra criada com sucesso!');
 
 
 
