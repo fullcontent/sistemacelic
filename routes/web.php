@@ -59,6 +59,10 @@ Route::get('/', function () {
 		Route::resource('/arquivo','ArquivosController');
 
 		Route::resource('/prestador','PrestadorController');
+
+		Route::get('/prestador/delete/{id}','PrestadorController@delete')->name('prestador.delete');
+
+
 		Route::resource('/ordemCompra','OrdemCompraController');
 
 		Route::get('/ordemCompra/{servico_id}/create','OrdemCompraController@create');

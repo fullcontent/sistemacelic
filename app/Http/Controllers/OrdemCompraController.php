@@ -22,6 +22,9 @@ class OrdemCompraController extends Controller
     public function index()
     {
         //
+        $ordensCompra = OrdemCompra::all();
+
+        return view('admin.ordemCompra.lista-ordemCompras')->with('ordensCompra',$ordensCompra);
     }
 
     /**
@@ -142,6 +145,7 @@ class OrdemCompraController extends Controller
         $ordemCompra->prestador_id = $request->prestador_id;
         $ordemCompra->valorServico = $request->valorServico;
         $ordemCompra->escopo = $request->escopo;
+        $ordemCompra->informacoes = $request->informacoes;
         $ordemCompra->servico_id = $request->servico_id;
         $ordemCompra->formaPagamento = $request->formaPagamento;
         $ordemCompra->situacao = $request->situacao;
@@ -244,7 +248,19 @@ class OrdemCompraController extends Controller
      */
     public function edit($id)
     {
-        //
+        
+
+        $ordemCompra = OrdemCompra::find($id);
+        $servico = Servico::find($ordemCompra->servico_id);
+        $prestadores = Prestador::pluck('nome','id')->toArray();
+
+        return view('admin.ordemCompra.editar-ordemCompra')->with([
+            'ordemCompra'=>$ordemCompra,
+            'servico'=>$servico,
+            'prestadores'=>$prestadores
+        ]);
+
+
     }
 
     /**
@@ -256,7 +272,7 @@ class OrdemCompraController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        return $request->all();
     }
 
     /**

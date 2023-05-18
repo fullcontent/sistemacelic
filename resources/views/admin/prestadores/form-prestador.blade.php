@@ -145,7 +145,7 @@
 
 
 
-    <div class="col-md-3">
+    <div class="col-md-4">
 
 
         <div class="form-group">
@@ -153,9 +153,9 @@
             {!! Form::label('ufAtuacao', 'UF', array('class'=>'control-label')) !!}
 
             @if(Route::is('prestador.create'))
-            {!! Form::select('ufAtuacao[]', array() ,null, ['class'=>'form-control','id'=>'ufAtuacao']) !!}
+            {!! Form::select('ufAtuacao', array() ,null, ['class'=>'form-control','id'=>'ufAtuacao']) !!}
             @else
-            {!! Form::select('ufAtuacao[]', array() ,$prestador->ufAtuacao, ['class'=>'form-control','id'=>'ufAtuacao'])
+            {!! Form::select('ufAtuacao', array() ,$prestador->ufAtuacao, ['class'=>'form-control','id'=>'ufAtuacao'])
             !!}
             @endif
 
@@ -163,19 +163,18 @@
 
 
     </div>
-    <div class="col-md-4">
+    <div class="col-md-8">
 
 
         <div class="form-group">
 
-            {!! Form::label('cidadeAtuacao', 'Cidade', array('class'=>'control-label')) !!}
+            {!! Form::label('cidadeAtuacao', 'Cidade(s)', array('class'=>'control-label')) !!}
 
 
             @if(Route::is('prestador.create'))
             {!! Form::select('cidadeAtuacao[]', array() ,null, ['class'=>'form-control','id'=>'cidadeAtuacao'])!!}
             @else
-            {!! Form::select('cidadeAtuacao[]', array() ,$prestador->cidadeAtuacao,
-            ['class'=>'form-control','id'=>'cidadeAtuacao'])!!}
+            {!! Form::select('cidadeAtuacao[]', array() ,$prestador->cidadeAtuacao, ['class'=>'form-control','id'=>'cidadeAtuacao'])!!}
             @endif
         </div>
 
@@ -200,21 +199,61 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Import jQuery library -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.js"></script>
 
 <script>
 $(document).ready(function() {
 
     const route = "{{Route::current()->getName()}}";
-    const ufAtuacao = "{{$prestador->ufAtuacao}}";
-    const cidadeAtuacao = "{{$prestador->cidadeAtuacao}}";
-   
+    
+    const ufAtuacao = "{{$prestador->ufAtuacao ?? ''}}";
+    const cidadeAtuacao = "{{$prestador->cidadeAtuacao ?? ''}}";
+
+    
+    if(route != 'prestador.create')
+    {
+      const cidades = cidadeAtuacao.replace(/&quot;/g,'"');
+    arr = $.parseJSON(cidades); //convert to javascript array
+    }
+    
+
+    $("#telefone").mask("(00) 00000-0000");
 
 
-  
+    
+    const cnpj = "{{$prestador->cnpj ?? ''}}";
 
+    if(!cnpj)
+    {
+      var options = {
+              onKeyPress: function (cnpj, ev, el, op) {
+                  var masks = ['000.000.000-000', '00.000.000/0000-00'];
+                  $('#cnpj').mask((cnpj.length > 14) ? masks[1] : masks[0], op);
+              }
+          }
 
+          
+          $('#cnpj').length > 14 ? $('#cnpj').mask('00.000.000/0000-00', options) : $('#cnpj').mask('000.000.000-00#', options);
+    }
+    else
+    { 
+      var options = {
+              onKeyPress: function (cnpj, ev, el, op) {
+                  var masks = ['000.000.000-000', '00.000.000/0000-00'];
+                  $('#cnpj').mask((cnpj.length > 14) ? masks[1] : masks[0], op);
+              }
+          }
 
+          
+          $('#cnpj').mask('00.000.000/0000-00', options);
+    
+      
+    }      
+    
+    
+
+    
+    
 
     $.ajax({
     url: 'https://servicodados.ibge.gov.br/api/v1/localidades/estados',
@@ -233,11 +272,15 @@ $(document).ready(function() {
         $('#ufAtuacao').empty().append('<option value="">Selecione o UF</option>'); // Clear and reset the city select list
       }
       
-      
-      
+
       $('#ufAtuacao').append(options); // Append all the options to the select element
-    
-      $('#ufAtuacao option[value="'+ufAtuacao+'"]').attr("selected", "selected").change();
+      
+      if(route == 'prestador.edit')
+      {
+        $("#ufAtuacao option[value="+ufAtuacao.toLowerCase()+"]").attr('selected', 'selected').change();
+
+      }
+
 
 
     }
@@ -258,8 +301,10 @@ $(document).ready(function() {
             placeholder: 'Selecione a cidade',
 	          allowClear: true,
 	          multiple: true,
+            width: "resolve",
+            theme: "classic",
+      
           });
-
 
           $('#cidadeAtuacao').empty().append('<option value="">Selecione a cidade</option>'); // Clear and reset the city select list
           
@@ -270,6 +315,13 @@ $(document).ready(function() {
               text : city.nome
             }));
           });
+
+          if(route == 'prestador.edit')
+          {
+            $('#cidadeAtuacao').val(arr)
+          }
+          
+
           $('#cidadeAtuacao').prop('disabled', false); // Enable the city select list
         }
       });
@@ -287,6 +339,8 @@ $(document).ready(function() {
     $('#banco').prop('disabled', true); // Enable the city select list
     $('#agencia').prop('disabled', true); // Enable the city select list
     $('#conta').prop('disabled', true); // Enable the city select list
+    $('#tomadorNome').prop('disabled', true); // Enable the city select list
+    $('#tomadorCnpj').prop('disabled', true); // Enable the city select list
   }
 
   $("#formaPagamento").change(function(){
@@ -296,6 +350,9 @@ $(document).ready(function() {
         console.log('forma pix');
         $('#tipoChave').prop('disabled', false); // Enable the city select list
         $('#chavePix').prop('disabled', false); // Enable the city select list
+        $('#tomadorNome').prop('disabled', true); // Enable the city select list
+        $('#tomadorCnpj').prop('disabled', true); // Enable the city select list
+
         break;
       case 'deposito':
         console.log('forma deposito');
@@ -315,12 +372,21 @@ $(document).ready(function() {
         $('#banco').prop('disabled', true); // Enable the city select list
         $('#agencia').prop('disabled', true); // Enable the city select list
         $('#conta').prop('disabled', true); // Enable the city select list
+
+        $('#tomadorNome').prop('disabled', false); // Enable the city select list
+        $('#tomadorCnpj').prop('disabled', false); // Enable the city select list
         break;
       
     }
 
   
   });
+
+if(route == 'prestador.create')
+{
+  $("#qualificacao").val(null).change();
+}
+  
 
 
     

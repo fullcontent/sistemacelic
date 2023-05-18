@@ -37,7 +37,10 @@ class PrestadorController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
+    {   
+
+
+       
         
         $prestador = new Prestador();
         $prestador->nome = $request->nome;
@@ -46,29 +49,8 @@ class PrestadorController extends Controller
         $prestador->telefone = $request->telefone;
         $prestador->email = $request->email;
         
-       // Sanitize input
-       $cidadeAtuacao = isset($request->cidadeAtuacao) ? $request->cidadeAtuacao : null;
-       $ufAtuacao = isset($request->ufAtuacao) ? $request->ufAtuacao : null;
-       
-       // Validate cidadeAtuacao
-       if (!empty($cidadeAtuacao)) {
-           if(is_array($cidadeAtuacao)) {
-               $cidadeAtuacao = implode(',', $cidadeAtuacao);
-           }
-           
-           // Assign value to prestador object
-           $prestador->cidadeAtuacao = $cidadeAtuacao;
-       }
-       
-       // Validate ufAtuacao
-       if (!empty($ufAtuacao)) {
-           if (is_array($ufAtuacao)) {
-               $ufAtuacao = implode(',', $ufAtuacao);
-           }
-           
-           // Assign value to prestador object
-           $prestador->ufAtuacao = $ufAtuacao;
-       }
+       $prestador->ufAtuacao = $request->ufAtuacao;
+       $prestador->cidadeAtuacao = json_encode($request->cidadeAtuacao);
        
         
         $prestador->chavePix = $request->input('chavePix');
@@ -129,7 +111,7 @@ class PrestadorController extends Controller
      */
     public function update(Request $request, $id)
     {
-        
+    
         $prestador = Prestador::find($id);
 
         $prestador->nome = $request->nome;
@@ -138,7 +120,8 @@ class PrestadorController extends Controller
         $prestador->telefone = $request->telefone;
         $prestador->email = $request->email;
         
-       
+        $prestador->cidadeAtuacao = json_encode($request->cidadeAtuacao);
+        $prestador->ufAtuacao = $request->ufAtuacao;
        
         
         $prestador->chavePix = $request->input('chavePix');
@@ -155,6 +138,8 @@ class PrestadorController extends Controller
 
         $prestador->save();
 
+        
+
 
 
         return redirect()->route('prestador.index')->with('success', 'Item updated successfully.');
@@ -168,8 +153,10 @@ class PrestadorController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function delete($id)
     {
-        //
+        $prestador = Prestador::destroy($id);
+        return redirect()->route('prestador.index')->with('success', 'Prestador excluído com sucesso!');
+
     }
 }
