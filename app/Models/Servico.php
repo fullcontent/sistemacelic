@@ -138,6 +138,11 @@ class Servico extends Model
         return $this->hasOne('App\Models\Solicitante','id','solicitante');
     }
 
+    public function ordensCompra()
+    {
+        return $this->hasMany('App\Models\OrdemCompra','servico_id');
+    }
+
     
 
 }

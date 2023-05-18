@@ -65,7 +65,7 @@ Route::get('/', function () {
 
 		Route::resource('/ordemCompra','OrdemCompraController');
 
-		Route::get('/ordemCompra/{servico_id}/create','OrdemCompraController@create');
+		Route::get('/ordemCompra/{servico_id}/create','OrdemCompraController@create')->name('ordemCompra.criar');
 
 		Route::resource('/solicitantes','SolicitantesController');
 

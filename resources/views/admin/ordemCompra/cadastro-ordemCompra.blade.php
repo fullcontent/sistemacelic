@@ -12,7 +12,7 @@
 
 	
 
-	{!! Form::open(['route'=>'ordemCompra.store']) !!}
+	{!! Form::open(['route'=>'ordemCompra.store','enctype'=>'multipart/form-data']) !!}
 
 	@include('admin.ordemCompra.form-ordemCompra')
 	

@@ -733,6 +733,7 @@ class ServicosController extends Controller
                 'pendencias'=>$servico->pendencias,
                 'arquivo'=>'servico',
                 'usuarios'=>User::pluck('name','id')->toArray(),
+                'ordensCompra'=>$servico->ordensCompra,
                 
             ]);
 

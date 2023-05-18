@@ -314,7 +314,9 @@
   @include('admin.components.widget-pendencias')
 </div>
 
-
+<div class="col-md-7">
+  @include('admin.components.widget-ordemCompra')
+</div>
 
 
 <div class="row">

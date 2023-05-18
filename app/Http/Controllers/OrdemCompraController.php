@@ -80,12 +80,12 @@ class OrdemCompraController extends Controller
         }
         
         // Checks if comprovante exists in the request object. If it does, then the loop iterates over the comprovante array obtained from the request.
-        if (isset($request->comprovante)) {
-            foreach ($request->comprovante as $v => $p) {
+        
+        foreach ($request->comprovante as $v => $p) {
                 // The value at a particular index is added as a key-value pair to the parcela array.
                 $parcela[$v]['comprovante'] = $p;
-            }
         }
+        
         
         // The loop iterates over the obs array obtained from the request.
         foreach ($request->obs as $v => $p) {
@@ -133,19 +133,13 @@ class OrdemCompraController extends Controller
         }
         
         
-        // dd($servicosVinculados);
-
-
         
-
-
                 
         $ordemCompra = new OrdemCompra;
         $ordemCompra->user_id = Auth::id();
         $ordemCompra->prestador_id = $request->prestador_id;
         $ordemCompra->valorServico = $request->valorServico;
         $ordemCompra->escopo = $request->escopo;
-        $ordemCompra->informacoes = $request->informacoes;
         $ordemCompra->servico_id = $request->servico_id;
         $ordemCompra->formaPagamento = $request->formaPagamento;
         $ordemCompra->situacao = $request->situacao;
@@ -207,7 +201,24 @@ class OrdemCompraController extends Controller
             $ordemCompraPagamento->obs = $par['obs'];
         
             // Set the value of the "comprovante" property to the one received for the current installment
+            
+           
             $ordemCompraPagamento->comprovante = $par['comprovante'];
+
+           //Se informou o arquivo, retorna um boolean
+           if ($ordemCompraPagamento->comprovante->isValid()) {
+               $nameFile = null;
+               $name = uniqid(date('HisYmd'));
+               $extension = $ordemCompraPagamento->comprovante->extension();
+               $nameFile = "{$name}.{$extension}";
+               //Faz o upload:
+               $upload = $ordemCompraPagamento->comprovante->storeAs('comprovantes', $nameFile);
+               //Se tiver funcionado o arquivo foi armazenado em storage/app/public/categories/nomedinamicoarquivo.extensao
+           
+               $ordemCompraPagamento->comprovante = $upload;
+           }
+           
+
         
             // If a payment has been made (there's a comprovante file attached), set the value of the "situacao" property to 'pago'. Otherwise, set it to 'aberto'
             if($ordemCompraPagamento->comprovante)
@@ -220,6 +231,9 @@ class OrdemCompraController extends Controller
             }
             
             // Save the current OrdemCompraPagamento object to the database
+
+            // dump($ordemCompraPagamento);
+
             $ordemCompraPagamento->save();
         }
 

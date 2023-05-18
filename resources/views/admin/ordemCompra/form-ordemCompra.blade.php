@@ -87,7 +87,7 @@
         </div>
     </div>
 
-    <div class="col-md-12">
+    <div class="col-md-12" id="dadosPagamento">
         <div class="form-group">
             <p><b>Dados de pagamento</b></p>
         </div>
@@ -134,7 +134,7 @@
                 <div class="col-md-7">
                     <div class="form-group">
                         {!! Form::label('servicoPrincipal_nome', 'Serviço') !!}
-                        {!! Form::text('servicoPrincipal_nome', $servico->os.' | '.$servico->nome.' | '.$servico->unidade->nomeFantasia, ['class'=>'form-control']) !!}
+                        {!! Form::text('servicoPrincipal_nome', $servico->os.' | '.$servico->empresa->nomeFantasia.' | '.$servico->unidade->codigo.' | '.$servico->unidade->nomeFantasia, ['class'=>'form-control']) !!}
                         
                         {!! Form::hidden('servicoPrincipal_id', $servico->id, ['class'=>'form-control']) !!}
                     </div>
@@ -206,6 +206,7 @@ $(document).ready(function () {
 
 
 
+    const route = "{{Route::current()->getName()}}";
    
     // Get the select element and the parcela div
     var $parcelaDiv = $('#parcela');
@@ -302,15 +303,26 @@ $(document).ready(function () {
         $('#telefone').val(response.telefone);
         
         if(response.formaPagamento == 'pix')
-        {
+        {   
+            $("#dadosPagamento").show();
             $('#prestadorFormaPagamento h2').html(response.formaPagamento)
             $('#prestadorTipoChave h2').html(response.tipoChave)
             $('#prestadorChavePix h2').html(response.chavePix)
         }
 
         if(response.formaPagamento == 'deposito')
-        {
-            $('#prestadorFormaPagamento h2').html(response.formaPagamento)
+        {   
+            $("#dadosPagamento").hide();
+
+
+
+        }
+
+        if(response.formaPagamento == 'boleto')
+        {   
+            $("#dadosPagamento").hide();
+
+            
 
         }
         
@@ -322,6 +334,13 @@ $(document).ready(function () {
       }
     });
   });
+
+  if(route == 'ordemCompra.criar')
+  {
+    $("#prestador_id").val(null).change();
+    $("#dadosPagamento").hide();
+    
+  }
     
 
 });
