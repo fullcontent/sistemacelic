@@ -61,6 +61,13 @@ Route::get('/', function () {
 		Route::resource('/prestador','PrestadorController');
 
 		Route::get('/prestador/delete/{id}','PrestadorController@delete')->name('prestador.delete');
+		
+		
+		
+		Route::post('/prestador/rate','PrestadorController@rate')->name('prestador.rate');
+
+		Route::get('/prestador/ratings/{prestador_id}','PrestadorController@ratings')->name('prestador.ratings');
+
 
 
 		Route::resource('/ordemCompra','OrdemCompraController');

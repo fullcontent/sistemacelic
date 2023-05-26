@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Prestador;
+use App\Models\PrestadorComentario;
+use Auth;
 
 class PrestadorController extends Controller
 {
@@ -158,5 +160,30 @@ class PrestadorController extends Controller
         $prestador = Prestador::destroy($id);
         return redirect()->route('prestador.index')->with('success', 'Prestador excluído com sucesso!');
 
+    }
+
+
+    public function rate(Request $request)
+    {
+       
+       
+       $prestador = Prestador::find($request->prestador_id);
+
+       $prestadorComentario = new PrestadorComentario();
+       $prestadorComentario->prestador_id = $request->prestador_id;
+       $prestadorComentario->ordemCompra_id = $request->ordemCompra_id;
+       $prestadorComentario->rating = $request->rating;
+       $prestadorComentario->comentario = $request->comentario;
+       $prestadorComentario->user_id = Auth::id();
+       $prestadorComentario->save();
+
+       return redirect()->route('ordemCompra.index')->with('success', 'Avaliacao feita!');
+    }
+
+
+    public function ratings(Request $request)
+    {
+        $data = PrestadorComentario::where('prestador_id',$request->prestador_id)->where('ordemCompra_id',$request->ordemCompra_id)->with('prestador','user','ordemCompra','ordemCompra.servicoPrincipal')->get();
+        return response()->json($data);
     }
 }

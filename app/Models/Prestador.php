@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Prestador extends Model
 {
-    public function comentarios()
+    public function rating()
     {
         return $this->hasMany('App\Models\PrestadorComentario');
     }
