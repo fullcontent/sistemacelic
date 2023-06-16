@@ -72,7 +72,7 @@
                     
                     {!! Form::label('dataInauguracao', 'Data Inauguração', array('class'=>'control-label')) !!}
                     @if(Route::is('unidades.edit'))
-                    {!! Form::text('dataInauguracao', null, ['class'=>'form-control','id'=>'dataInauguracao','data-date-format'=>'dd/mm/yyyy']) !!}
+                    {!! Form::text('dataInauguracao', \Carbon\Carbon::parse($unidade->dataInauguracao)->format('d/m/Y'), ['class'=>'form-control','id'=>'dataInauguracao','data-date-format'=>'dd/mm/yyyy']) !!}
                     @else
                     {!! Form::text('dataInauguracao', null, ['class'=>'form-control','id'=>'dataInauguracao','data-date-format'=>'dd/mm/yyyy']) !!}
                     @endif 
@@ -315,12 +315,9 @@ $(document).ready(function(){
     
     $("#dataInauguracao").datepicker();
 
-    var dataInauguracao = new Date($("#dataInauguracao").val());
-
-    var dataInauguracao2 = [dataInauguracao.getDate(),dataInauguracao.getMonth() + 1,  dataInauguracao.getFullYear()].join('/');
 
 
-    $("#dataInauguracao").val(dataInauguracao2);
+
 
 
 
@@ -330,7 +327,18 @@ $(document).ready(function(){
   $("#telefone").mask("(00) 0000-0000");
   $('#cnpj').mask('00.000.000/0000-00', {reverse: true});
 
-  $('#empresa_id').val(null);
+  
+  const route = "{{Route::current()->getName()}}";
+  console.log(route)
+  if(route == 'unidade.cadastro')
+  {
+    $('#empresa_id').val(null);
+    $("#dataInauguracao").val(null);
+  }
+  
+
+ 
+  
  
 
 
