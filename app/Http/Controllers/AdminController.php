@@ -133,7 +133,7 @@ class AdminController extends Controller
     public function relatorioCompleto()
     {
         
-        $servicos = Servico::with('unidade','responsavel','financeiro','servicoFinalizado')
+        $servicos = Servico::with('unidade','responsavel','financeiro','servicoFinalizado','historico')
                             ->whereNotIn('responsavel_id',[1])
                             ->take(4000)
                             ->get();
@@ -150,9 +150,9 @@ class AdminController extends Controller
     { 
         $fileName = 'Celic_RelatorioCompleto_Servicos'.date('d-m-Y').'.csv';
         
-        $servicos = Servico::with('unidade','responsavel','financeiro','servicoFinalizado','vinculos')
+        $servicos = Servico::with('unidade','responsavel','financeiro','servicoFinalizado','vinculos','historico')
         ->whereNotIn('responsavel_id',[1])
-        // ->take(10)
+        // ->take(1000)
         ->get();
 
         $headers = array(
@@ -164,7 +164,7 @@ class AdminController extends Controller
         );
 
         $columns = array('ID','Razão Social', 'Código', 'Nome','Licenciamento', 'CNPJ', 'Status', 'Imóvel', 'Ins. Estadual', 'Ins. Municipal', 'Ins. Imob.', 'RIP', 'Matrícula RI', 'Área da Loja', 'Endereço', 'Número', 'Complemento','Data Inauguração',
-        'Cidade','UF', 'CEP', 'Tipo', 'O.S.', 'Situação', 'Responsável', 'Co-Responsável', 'Nome', 'Solicitante','Departamento', 'N° Protocolo', 'Emissão Protocolo', 'Tipo Licença', 'Proposta', 'Emissão Licença', 'Validade Licença', 'Valor Total', 'Valor em Aberto', 'Finalizado', 'Criação');
+        'Cidade','UF', 'CEP', 'Tipo', 'O.S.', 'Situação', 'Responsável', 'Co-Responsável', 'Nome', 'Solicitante','Departamento', 'N° Protocolo', 'Emissão Protocolo', 'Tipo Licença', 'Proposta', 'Emissão Licença', 'Validade Licença', 'Valor Total', 'Valor em Aberto', 'Finalizado', 'Criação','Pendência(s)','Responsável(eis) pela(s) Pendência(s)');
 
         $callback = function() use($servicos, $columns) {
             $file = fopen('php://output', 'w');
@@ -237,6 +237,28 @@ class AdminController extends Controller
                     else{
                         $licenciamento = null;
                     }
+
+                   
+                    if($s->pendencias)
+                    {
+
+                        $pendencias = null;
+                        $responsavelPendencia = null;
+
+                        foreach($s->pendencias as $p)
+                        {
+                            $pendencias = $p->pendencia;
+
+                            if(isset($p->responsavel->name))
+                            {
+                                $responsavelPendencia = $p->responsavel->name;
+                            }
+                            
+                        }
+
+                    }
+
+                    
                     
 
 
@@ -282,6 +304,9 @@ class AdminController extends Controller
                     $s->financeiro->valorAberto ?? '0',
                     $finalizado,
                     \Carbon\Carbon::parse($s->created_at)->format('d/m/Y') ?? '',
+                    $pendencias,
+                    $responsavelPendencia,
+                    
 
                 ));
             }
@@ -290,7 +315,7 @@ class AdminController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
-        // dd($callback);
+       
     
     }
 
@@ -432,7 +457,8 @@ class AdminController extends Controller
             'Data Criação',
             'Data Limite',
             'Status',
-            'Vinculo'
+            'Vinculo',
+            'ServicoID'
         );
 
 
@@ -580,7 +606,7 @@ class AdminController extends Controller
                     $p->etapa,
                     $s->unidade->empresa->nomeFantasia,
                     $s->nome,
-                    $licenciamento,
+                    $s->licenciamento ?? '',
                     $s->unidade->codigo,
                     $s->unidade->nomeFantasia,
                     $s->unidade->cnpj,
@@ -601,6 +627,7 @@ class AdminController extends Controller
                     \Carbon\Carbon::parse($p->vencimento)->format('d/m/Y') ?? '',
                     $p->status,
                     $vinculo,
+                    $s->id
                 ));
 
                 }              
@@ -608,7 +635,9 @@ class AdminController extends Controller
 
             fclose($file);
         };
+        
 
+       
         return response()->stream($callback, 200, $headers);
 
     }
