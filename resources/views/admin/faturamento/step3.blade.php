@@ -83,7 +83,7 @@
 								   @endphp
 								</td>
 								<td><p>{{$s->nome}}</p> <a href="{{route('servicos.show',$s->id)}}" class="btn btn-xs btn-success no-print">{{$s->os}}</a></td>
-								<td>{!! Form::text('nf', $s->nf, null, ['class'=>'form-control','id'=>'nf']) !!}</td>
+								<td>{!! Form::text('faturamento['.$value.'][nf]', $s->nf, null, ['class'=>'form-control','id'=>'nf']) !!}</td>
 								<td>R$ {{number_format($s->financeiro['valorTotal'],2,'.',',')}}</td>
 								<td>R$ {{number_format($s->financeiro['valorAberto'],2,'.',',')}}</td>
 								<td>

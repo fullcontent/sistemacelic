@@ -187,18 +187,18 @@ class FaturamentoController extends Controller
         $servicos = [];
         
         //Selecionar os servicos based on servico_id of request
+        
+            dump($request->all());
 
+            
             foreach($request->faturamento as $f)
             {
                 $s = Servico::with('financeiro')->find($f['servico_id']);
-
-                if($request->nf)
-                {
-                   
-                    $s->nf = $request->nf;
-                    $s->save();
-                }
                 
+                $s->nf = $f['nf'];
+                $s->save();
+                
+                                
                 $valorFaturar = $f['valorFaturar'];
 
 
