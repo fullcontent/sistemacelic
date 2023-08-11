@@ -417,8 +417,9 @@ class AdminController extends Controller
         $servicos = Servico::with('pendencias')
                             ->whereNotIn('responsavel_id',[1])
                             ->orderBy('id','DESC')
-                            ->with('responsavel','coresponsavel')
-                            ->select('id','nome','os','unidade_id','tipo','protocolo_anexo','laudo_anexo','solicitante','responsavel_id','coresponsavel_id','licenciamento')
+                            ->with('responsavel','coresponsavel','financeiro','historico')
+                            ->select('id', 'nome', 'os', 'unidade_id', 'tipo', 'protocolo_anexo', 'laudo_anexo', 'solicitante', 'responsavel_id', 'coresponsavel_id', 'licenciamento', 'departamento', 'situacao', 'created_at') // Add 'situacao' and 'created_at' to the select list
+                            ->take(200)
                             ->get();
 
         // $servicos = Pendencia::all();
@@ -446,8 +447,11 @@ class AdminController extends Controller
             'Status da Unidade',
             'Data Inauguração',
             'OS',
+            'Situação',     // Add 'Situação' column
             'Tipo',
+            'Valor Serviço',
             'Solicitante',
+            'Departamento', // Add 'Departamento' column
             'Responsável',
             'Co-Responsável',
             'Etapa do Processo',
@@ -458,7 +462,10 @@ class AdminController extends Controller
             'Data Limite',
             'Status',
             'Vinculo',
-            'ServicoID'
+            'ServicoID',
+            'Criado em',     // Add 'Criado em' column
+            'Historico',
+
         );
 
 
@@ -598,6 +605,13 @@ class AdminController extends Controller
                     else{
                         $licenciamento = null;
                     }
+
+                    $historico = null;
+                    foreach($s->historico as $h)
+                    {
+                        $historico = $h->observacoes." ";
+                    }
+                    
                 
                     
 
@@ -615,8 +629,11 @@ class AdminController extends Controller
                     $s->unidade->status,
                     $dataInauguracao,
                     $s->os,
+                    $s->situacao ?? '',     // Add 'situacao' field
                     $s->tipo,
+                    number_format($s->financeiro->valorTotal,2,",",".") ?? '',
                     $solicitante,
+                    $s->departamento ?? '', // Add 'departamento' field
                     $s->responsavel->name ?? '',
                     $s->coResponsavel->name ?? '',
                     $etapa,
@@ -627,7 +644,10 @@ class AdminController extends Controller
                     \Carbon\Carbon::parse($p->vencimento)->format('d/m/Y') ?? '',
                     $p->status,
                     $vinculo,
-                    $s->id
+                    $s->id,
+                    $s->created_at->format('d/m/Y H:i:s') ?? '', // Add 'created_at' field formatted as desired
+                    $historico,
+
                 ));
 
                 }              
