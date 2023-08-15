@@ -46,6 +46,9 @@
           <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#cadastro-arquivo" data-nome="{{$pendencia->pendencia}}">
                 <span class="fa fa-paperclip"></span>Anexar
                 </button>
+                <button type="button" class="btn btn-xs btn-default" id="verPendencia" data-toogle="modal" data-id="{{$pendencia->id}}">
+                  <span class="fa fa-paperclip"></span>Ver
+                  </button>
                   </span>
          
         
@@ -117,6 +120,18 @@ $('#cadastro-arquivo').on('show.bs.modal', function(e) {
            
             $("#nomeArquivo").val(getIdFromRow);
             });
+
+$('#verPendencia').on('click', function(e){
+
+  var id = $(this).data('id');
+
+
+  var url = "{{ route('cliente.pendencia.show', ':id') }}";
+    url = url.replace(':id', id);
+    window.location.href = url;
+
+
+})
 
 
 

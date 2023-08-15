@@ -1,4 +1,4 @@
-<div class="box box-gray">
+<div class="box box-gray collapsed-box">
 	<div class="box-header with-border">
 		
 		<a href="#" data-widget="collapse"><h3 class="box-title text-bold">{{$dados->codigo}} | {{$dados->nomeFantasia}}</h3></a>

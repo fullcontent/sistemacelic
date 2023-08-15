@@ -55,7 +55,7 @@
                   @endswitch
 
                 
-                <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#cadastro-arquivo" data-nome="{{$pendencia->pendencia}}">
+                <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#cadastro-arquivo" data-nome="{{$pendencia->pendencia}}" data-pendencia="{{$pendencia->id}}" data-servico="{{$pendencia->servico_id}}">
                 <span class="fa fa-paperclip"></span>Anexar
                 </button>
                   
@@ -109,6 +109,9 @@
                 
 
                 {!! Form::hidden('unidade_id', $servico->unidade_id) !!}
+                {!! Form::hidden('pendencia_id', null,['class'=>'form-control','id'=>'pendenciaID']) !!}
+                {!! Form::hidden('servico_id', null,['class'=>'form-control','id'=>'servicoID']) !!}
+                
 
                 {!! Form::hidden('user_id', Auth::id()) !!}
 
@@ -139,9 +142,14 @@
         
         $('#cadastro-arquivo').on('show.bs.modal', function(e) {  
             var getIdFromRow = $(e.relatedTarget).data('nome');
-
+            var pendenciaID = $(e.relatedTarget).data('pendencia');
+            var servicoID = $(e.relatedTarget).data('servico');
            
             $("#nomeArquivo").val(getIdFromRow);
+            $("#pendenciaID").val(pendenciaID);
+            $("#servicoID").val(servicoID);
+
+            console.log(pendenciaID)
             });
 
         

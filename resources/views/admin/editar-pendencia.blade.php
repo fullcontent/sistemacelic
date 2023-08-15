@@ -16,6 +16,30 @@
 
 	@include('admin.partials.form-pendencia')
 	
+
+	<div class="col-md-12">
+		<h3>Arquivos</h3>
+		<table class="table table-bordered">
+			<thead>
+			  <tr>
+				<td>Arquivo</td>
+				<td>Cadastrado por:</td>
+				<td>Download</td>
+			  </tr>
+			  <!-- No data rows here -->
+			</thead>
+			<tbody>
+				@foreach($arquivos as $a)
+				<tr>
+					<td>{{$a->nome}}</td>
+					<td>{{$a->user->name}}</td>
+					<td><a href="{{$a->arquivo}}" class="btn btn-xs btn-success">Download</a></td>
+				</tr>
+				@endforeach
+			</tbody>
+		  </table>
+
+	  </div>
 	
 
       			<div class="box-footer">

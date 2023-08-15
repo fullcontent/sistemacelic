@@ -12,6 +12,8 @@ use App\Models\Servico;
 use App\Models\Unidade;
 use App\Models\Historico;
 
+use App\Models\Arquivo;
+
 use App\Models\Pendencia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -82,6 +84,20 @@ class ClienteController extends Controller
                         'taxas' => $empresa->taxas,
                         'route' => 'empresas.edit',
                     ]);
+    }
+
+    public function showPendencia($id)
+    {
+        $pendencia = Pendencia::find($id);
+        $arquivos = Arquivo::where('servico_id',$pendencia->servico_id)->get();
+        $responsaveis = User::orderBy('name')->where('active',1)->pluck('name','id')->toArray();
+
+        return view('cliente.detalhe-pendencia')->with(
+            [
+                'pendencia'=>$pendencia,
+                'arquivos'=>$arquivos,
+                'responsaveis'=>$responsaveis,
+            ]);
     }
 
     public function unidadeShow($id)

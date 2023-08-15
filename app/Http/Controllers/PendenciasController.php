@@ -7,6 +7,7 @@ use App\Models\Pendencia;
 use App\Models\PendenciasVinculos;
 use App\Models\Historico;
 use App\Models\Servico;
+use App\Models\Arquivo;
 use App\User;
 use Auth;
 use Carbon\Carbon;
@@ -207,8 +208,8 @@ class PendenciasController extends Controller
 
 
         $responsaveis = User::orderBy('name')->where('active',1)->pluck('name','id')->toArray();
+        $arquivos = Arquivo::where('servico_id',$pendencia->servico_id)->get();
         
-        $pendencias = Pendencia::where('servico_id',$pendencia->servico_id)->pluck('pendencia','id')->toArray();
 
         $vinculos = $pendencia->vinculos->pluck('os','id');
 
@@ -219,10 +220,11 @@ class PendenciasController extends Controller
                 'pendencia'=>$pendencia,
                 'servico'=>$servico,
                 'servico_id'=>$pendencia->servico_id,
-                'pendencias' => $pendencias,
+                'unidade_id'=>$pendencia->servico->unidade->id,
                 'responsaveis'=>$responsaveis,
                 'vinculo'=>$vinculo,
                 'vinculos'=>$vinculos,
+                'arquivos'=>$arquivos,
             ]
         );
     }
