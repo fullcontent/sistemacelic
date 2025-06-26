@@ -16,9 +16,4 @@ class Reembolso extends Model
     {
         return $this->hasMany('App\Models\ReembolsoTaxa','reembolso_id');
     }
-    
-    public function dadosCastro()
-    {
-        return $this->belongsTo('App\Models\DadosCastro','dadosCastro_id');
-    }
 }

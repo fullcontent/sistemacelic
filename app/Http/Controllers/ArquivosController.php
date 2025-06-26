@@ -13,8 +13,6 @@ use App\Models\Pendencia;
 use App\Models\Servico;
 
 
-
-
 class ArquivosController extends Controller
 {
     /**
@@ -52,12 +50,9 @@ class ArquivosController extends Controller
         if ($request->hasFile('arquivo') && $request->file('arquivo')->isValid()) {
                 $nameFile = null;
                 $name = uniqid(date('HisYmd'));
-                
-                $extension = $request->arquivo->getClientOriginalExtension();
-             
+                $extension = $request->arquivo->extension();
                 $nameFile = "{$name}.{$extension}";
-
-                
+                // Faz o upload:
                 $upload = $request->arquivo->storeAs('arquivos', $nameFile);
                 // Se tiver funcionado o arquivo foi armazenado em storage/app/public/categories/nomedinamicoarquivo.extensao
 
@@ -177,25 +172,8 @@ class ArquivosController extends Controller
         //===================================================
         
 
-        //Redirecionar para a pagina do serviço
-
-
-        $user = User::find($request->user_id);
-
-
-        if($user->privileges == 'cliente')
-        {
-
-            return redirect()->route('cliente.servico.show',$request->servico_id);
-
-        }
-
-        else
-        {
-            return redirect()->route('servico',$request->servico_id);
-        }
         
-        
+        return redirect()->back();
 
 
 
@@ -227,45 +205,6 @@ class ArquivosController extends Controller
 
     }
 
-    public function downloadFile($tipo, $servico_id)
-    {
-        
-
-        $servico = Servico::find($servico_id);
-
-        switch ($tipo) {
-            case 'licenca':
-                $filename = $servico->licenca_anexo;
-                $tipo = "Licença";
-                break;
-                case 'laudo':
-                    $filename = $servico->laudo_anexo;
-                    $tipo = "Laudo";
-                    break;
-                    case 'protocolo':
-                        $filename = $servico->protocolo_anexo;
-                        $tipo = "Protocolo";
-                        break;
-            
-        }
-
-                       
-                
-        $extension = pathinfo($filename, PATHINFO_EXTENSION);
-        
-        $arquivo = $tipo.' '.$servico->unidade->codigo.' - '.$servico->unidade->nomeFantasia.' - '.$servico->nome.'.'.$extension;
-
-        $headers = [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="'.$arquivo.'"',
-
-
-        ];
-                       
-        return response()->file(public_path('uploads/'.$filename.''),$headers);
-
-    }
-
     public function delete($id)
     {
         $file = Arquivo::find($id);
@@ -288,7 +227,6 @@ class ArquivosController extends Controller
         $history->servico_id = $servico->id;
         $history->user_id = Auth::id();
         $history->observacoes = "Anexou documento ".$pendencia->pendencia." ";
-        $history->created_at = Carbon::now('america/sao_paulo');
         $history->save();
 
     }

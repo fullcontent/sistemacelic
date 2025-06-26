@@ -11,7 +11,7 @@ class Historico extends Model
    public function servico()
    {
    	
-   		return $this->hasOne('App\Models\Servico','id','servico_id');
+   		return $this->belongsTo('App\Models\Servico');
    }
 
 
@@ -19,23 +19,4 @@ class Historico extends Model
    {
    		return $this->belongsTo('App\User');
    }
-
-   public function scopeFilter($query, $filters)
-    {
-        if ($filters) {
-            foreach ($filters as $key => $value) {
-                if (is_array($value)) {
-                    $query->where(function ($q) use ($key, $value) {
-                        foreach ($value as $v) {
-                            $q->orWhere($key, 'like', '%' . $v . '%');
-                        }
-                    });
-                } else {
-                    $query->where($key, 'like', '%' . $value . '%');
-                }
-            }
-        }
-
-        return $query;
-    }
 }

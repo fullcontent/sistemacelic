@@ -40,11 +40,6 @@ class Empresa extends Model
 			return $this->hasManyThrough('App\Models\Servico','App\Models\Unidade','empresa_id');
 		}
 
-		public function propostas()
-		{
-			return $this->hasManyThrough('App\Models\Servico','App\Models\Unidade','empresa_id','proposta');
-		}
-
 
 
 }

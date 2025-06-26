@@ -24,11 +24,11 @@ class AdminMiddleware
                 return $next($request);
                 }
 
-                return response(view('auth.login')->with('message','Permissão negada!'));
+                return redirect('/notAllowed');
                 }
                 else
                 {
-                return response(view('auth.login')->with('message','Sessão expirada.'));
+                return view('auth.login')->with('message','Sessão expirada.');
                 }
 
            

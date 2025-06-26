@@ -56,16 +56,10 @@ class TaxasController extends Controller
         $taxa->nome  = $request->nome;
         $taxa->servico_id = $request->servico_id;
         
-        if($request->emissao)
-        {
-            $taxa->emissao = Carbon::createFromFormat('d/m/Y', $request->emissao)->toDateString(); 
-        }
-       
-        if($request->vencimento)
-        {
-            $taxa->vencimento = Carbon::createFromFormat('d/m/Y', $request->vencimento)->toDateString();
-        }
+
+        $taxa->emissao = Carbon::createFromFormat('d/m/Y', $request->emissao)->toDateString(); 
         
+        $taxa->vencimento = Carbon::createFromFormat('d/m/Y', $request->vencimento)->toDateString();
         
         if($request->pagamento)
         {
@@ -109,10 +103,6 @@ class TaxasController extends Controller
             }
 
         $taxa->reembolso = $request->reembolso;
-
-        $taxa->responsavelPgto = $request->responsavelPgto;
-
-        $taxa->observacoes  = $request->observacoes;
         
         
         $taxa->save();
@@ -124,7 +114,6 @@ class TaxasController extends Controller
         $history->servico_id = $request->servico_id;
         $history->user_id = Auth::id();
         $history->observacoes = "Taxa ".$taxa->nome." cadastrada.";
-        $history->created_at = Carbon::now('america/sao_paulo');
         $history->save();
 
         
@@ -144,9 +133,9 @@ class TaxasController extends Controller
         $taxa = Taxa::find($id);
         $servicos = Servico::pluck('os','id')->toArray();
 
-        // $taxa->emissao = Carbon::parse($taxa->emissao)->format('d/m/Y');
-        // $taxa->vencimento = Carbon::parse($taxa->vencimento)->format('d/m/Y');
-        // $taxa->pagamento = Carbon::parse($taxa->pagamento)->format('d/m/Y');
+        $taxa->emissao = Carbon::parse($taxa->emissao)->format('d/m/Y');
+        $taxa->vencimento = Carbon::parse($taxa->vencimento)->format('d/m/Y');
+        $taxa->pagamento = Carbon::parse($taxa->pagamento)->format('d/m/Y');
 
 
         return view('admin.editar-taxa')->with(['taxa'=>$taxa,'servicos'=>$servicos]);
@@ -186,42 +175,19 @@ class TaxasController extends Controller
 
 
         $taxa->nome  = $request->nome;
+        $taxa->emissao = Carbon::createFromFormat('d/m/Y', $request->emissao)->toDateString(); 
         
-        
-        if($request->emissao)
-        {
-            $taxa->emissao = Carbon::createFromFormat('d/m/Y', $request->emissao)->toDateString(); 
-        }
-      
-        
-
-        if($request->pagamento)
-        {
-            $taxa->pagamento = Carbon::createFromFormat('d/m/Y', $request->pagamento)->toDateString();
-        }
-        else{
-            $taxa->pagamento = null;
-        }
         if($taxa->pagamento)
         {
              $taxa->pagamento = Carbon::createFromFormat('d/m/Y', $request->pagamento)->toDateString();
         }
-
-        if($request->vencimento)
-        {
-            $taxa->vencimento = Carbon::createFromFormat('d/m/Y', $request->vencimento)->toDateString(); 
-        }
-        
-        
-        
-        
+        $taxa->vencimento = Carbon::createFromFormat('d/m/Y', $request->vencimento)->toDateString(); 
         $taxa->valor =  str_replace (',', '.', str_replace ('.', '', $request->valor));
         $taxa->observacoes = $request->observacoes;
         // $taxa->boleto   =   $request->boleto;
         // $taxa->comprovante = $request->comprovante;
         $taxa->situacao = $request->situacao;
         $taxa->reembolso = $request->reembolso;
-        $taxa->responsavelPgto = $request->responsavelPgto;
 
 
 
@@ -253,15 +219,12 @@ class TaxasController extends Controller
 
 
             }
-        
-        
-               
-        
-            
-        // return $taxa;
+
+      
+
         $taxa->save();
+
         
-                  
         
         return redirect()->route('servicos.show',$taxa->servico_id);
 
@@ -289,7 +252,6 @@ class TaxasController extends Controller
         $history->servico_id = $servico->id;
         $history->user_id = Auth::id();
         $history->observacoes = "Taxa ".$servico->id." cadastrado.";
-        $history->created_at = Carbon::now('america/sao_paulo');
         $history->save();
 
     }
@@ -310,24 +272,6 @@ class TaxasController extends Controller
         $t = Taxa::destroy($id);
         
         return redirect()->back();
-    }
-
-
-    public function removerComprovante($id)
-    {
-        $taxa = Taxa::find($id);
-
-        $taxa->comprovante = null;
-        $taxa->pagamento = null;
-        $taxa->save();
-    }
-
-    public function removerBoleto($id)
-    {
-        $taxa = Taxa::find($id);
-
-        $taxa->boleto = null;
-        $taxa->save();
     }
 
 

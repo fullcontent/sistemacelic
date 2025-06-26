@@ -76,7 +76,6 @@ class UsersController extends Controller
     	$usuario->name 		=	$request->name;
     	$usuario->email 	=	$request->email;
       	$usuario->privileges=	$request->privileges;
-		$usuario->active=	$request->active;
 
     	
 	    $usuario->acesso_empresa()->sync($request->empresas_user_access);
@@ -114,7 +113,6 @@ class UsersController extends Controller
 			$usuario->name 		=	$request->name;
 			$usuario->email 	=	$request->email;
 			$usuario->privileges=	$request->privileges;
-			$usuario->active=	$request->active;
 			$usuario->save();
 			
 			$empresas_user_access	= $request->empresas_user_access;
@@ -157,20 +155,5 @@ class UsersController extends Controller
     
 
         return route('usuarios.index');
-	}
-	
-
-
-	public function usersList()
-	{
-		$users = User::all();
-
-		foreach($users as $u)
-		{
-
-			$u->name = "@".$u->name." ";
-		}
-
-		return json_encode($users);
-	}
+    }
 }
