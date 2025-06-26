@@ -9,9 +9,7 @@
 
   
     <div class="row etapa">
-        <div class="col-md-4 text-right">
-            <h1>Inicio</h1>
-        </div>
+        <div class="col-md-4 text-right"><h2>Inicio</h2></div>
         <div class="col-md-8">
             
            
@@ -23,8 +21,8 @@
                     <div class="box-body">
                         
                         <ul class="nav nav-pills nav-stacked">
-                            <li><h4><a href="javascript:void()"><i class="fa fa-user"></i> {{$servico->responsavel->name ?? ''}}</a></h4></li>
-                            <li><h4><a href="javascript:void()"><i class="glyphicon glyphicon-calendar"></i> {{\Carbon\Carbon::parse($servico->created_at)->format('d/m/Y')}}</a></h4></li>
+                            <li><h4><a href="#"><i class="fa fa-user"></i> {{$servico->responsavel->name}}</a></h4></li>
+                            <li><h4><a href="#"><i class="glyphicon glyphicon-calendar"></i> {{\Carbon\Carbon::parse($servico->created_at)->format('d/m/Y')}}</a></h4></li>
                             
                             <li></li>
                         </ul>
@@ -39,7 +37,7 @@
         </div>
     </div>
 
-@foreach($servico->pendencias->sortBy('etapa')->groupBy('etapa') as $etapa => $pendencia)
+@foreach($servico->pendencias->groupBy('etapa') as $etapa => $pendencia)
     <div class="row etapa">
         <div class="col-md-4 text-right"><h2>Etapa @if($etapa){{$etapa}} @endif</h2></div>
         <div class="col-md-8">
@@ -49,7 +47,6 @@
                 <div class="timeline-item">
                     <div class="timeline-header no-border">
                         <h3 class="box-title">{{$p->pendencia}}</h3>
-                        <small>tes</small>
                         </div>
                     <div class="box-body">
                         
@@ -57,70 +54,50 @@
 
                             @if($p->responsavel_tipo == 'usuario')
 
-                            <li><a href="javascript:void()"><i class="fa fa-copyright"></i> Castro</a></li>
+                            <li><a href="#"><i class="fa fa-copyright"></i>  Castro</a></li>
 
                             @elseif($p->responsavel_tipo == 'op')
 
-                            <li><a href="javascript:void()"><i class="fa fa-building"></i> Órgão Público</a></li>
+                            <li><a href="#"><i class="fa fa-building"></i>  Órgão Público</a></li>
 
-                            @elseif($p->responsavel_tipo == 'cliente')
-
-                            <li><a href="javascript:void()"><i class="fa fa-user"></i> Cliente</a></li>
-
-                            @elseif($p->responsavel_tipo == 'vinculada')
-
-                            <li><a href="javascript:void()"><i class="fa fa-link"></i> Vinculada</a></li>
-
+                            @endif
+                            
+                            
+                            
+                            <li><a href="#"><i class="fa fa-user"></i> {{$p->responsavel->name}}</a></li>
+                            <li><a href="#"><i class="glyphicon glyphicon-calendar"></i> {{\Carbon\Carbon::parse($p->created_at)->format('d/m/Y')}}</a></li>
+                            
+                            @switch($p->vencimento)
+                        
+                            @case($p->vencimento > date('Y-m-d'))
+                                <li><span id="dataPendencia" class="label label-success">{{ \Carbon\Carbon::parse($p->vencimento)->format('d/m/Y')}}</span>
+                                    </li>
+                                
+                            @break
+    
+                            @case($p->vencimento < date('Y-m-d'))
+                                 <span id="dataPendencia"  class="label label-danger">{{ \Carbon\Carbon::parse($p->vencimento)->format('d/m/Y')}}</span>
+                            @break
+    
+                            @case($p->vencimento == date('Y-m-d'))
+                                <span id="dataPendencia"  class="label label-warning">{{ \Carbon\Carbon::parse($p->vencimento)->format('d/m/Y')}}</span>
+                            @break
+    
+    
+    
+    
+    
+                      @endswitch
+                            @if($p->status)
+                            <li><a href="#"><i class="fa fa-status"></i> {{$p->status}}</a></li>
+                            @elseif($p->status)
+                            
                             @endif
 
 
 
-                            <li><a href="javascript:void()"><i class="fa fa-user"></i> {{$p->responsavel->name}}</a></li>
-                            <li><a href="javascript:void()"><i class="glyphicon glyphicon-calendar"></i>
-                                    {{\Carbon\Carbon::parse($p->created_at)->format('d/m/Y')}}</a></li>
                             
-                            <li>
-                            @if($p->status == "concluido")
-                            <a href="javascript:void()"><i class="fa fa-check-square"></i> <span class="label label-success">{{$p->status}}</span></a>
-                            @elseif($p->status == "pendente")
-                            <a href="javascript:void()"><i class="fa fa-exclamation"></i> <span class="label label-warning">{{$p->status}}</span></a>
-                            @endif
-                            </li>
                             
-                            <li>
-
-
-                                <a href="javascript:void()">
-                                    @switch($p->vencimento)
-
-                                    @case($p->vencimento > date('Y-m-d'))
-                                    <i class="fa fa-calendar-check"></i> <span id="dataPendencia"
-                                        class="label label-success">{{ \Carbon\Carbon::parse($p->vencimento)->format('d/m/Y')}}</span>
-
-
-                                    @break
-
-                                    @case($p->vencimento < date('Y-m-d')) <i class="fa fa-calendar-times"></i> <span
-                                            id="dataPendencia"
-                                            class="label label-danger">{{ \Carbon\Carbon::parse($p->vencimento)->format('d/m/Y')}}</span>
-                                        @break
-
-                                        @case($p->vencimento == date('Y-m-d'))
-                                        <i class="fa fa-calendar-times"></i> <span id="dataPendencia"
-                                            class="label label-warning">{{ \Carbon\Carbon::parse($p->vencimento)->format('d/m/Y')}}</span>
-                                        @break
-
-                                </a> </li>
-
-
-
-                            @endswitch
-                            
-
-
-
-
-
 
                         </ul>
 
@@ -148,15 +125,6 @@
 @endsection
 
 
-@section('js')
-
-<script>
-    
-</script>
-
-
-@endsection
-
 @section('css')
 
 <style>
@@ -172,18 +140,13 @@
     }
     .etapa h2 {
 
-        
-        display: flex;
-        align-items: center;
-        height: 100%;
+        margin: 25% auto;
     }
 
     .item {
         -webkit-box-shadow: 0 2px 2px 0 rgba(0,0,0,0.2),0 6px 10px 0 rgba(0,0,0,0.2);
         box-shadow: 0 2px 2px 0 rgba(0,0,0,0.2),0 6px 10px 0 rgba(0,0,0,0.2);
         padding: 10px;
-        height: 400px;
-        margin-top: 20px;
         
     }
 

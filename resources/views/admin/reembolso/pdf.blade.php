@@ -267,12 +267,12 @@ h3 {
 
     <div class="row" style="padding-top:20px;">
       <div class="col-xs-12 text-left">
-        <p>CHAVE PIX: 27352308000152</p>
-        <p>Caixa Econômica Federal</p>
-        <p>Agência: 0921</p>
-        <p>Conta corrente: 6992-4</p>
-        <p>Castro Empresarial Serviços Administrativos LTDA ME</p>
-        <p>CNPJ: 27.352.308/0001-52</p>
+        <p>CHAVE PIX: {{$dadosCastro->chavePix}}</p>
+        <p>{{$dadosCastro->banco}}</p>
+        <p>Agência: {{$dadosCastro->agencia}}</p>
+        <p>Conta corrente: {{$dadosCastro->conta}}</p>
+        <p>{{$dadosCastro->razaoSocial}}</p>
+        <p>CNPJ: {{$dadosCastro->cnpj}}</p>
       </div>
     </div>
 

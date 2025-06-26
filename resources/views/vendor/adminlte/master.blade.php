@@ -31,6 +31,7 @@
 <meta name="msapplication-TileColor" content="#ffffff">
 <meta name="msapplication-TileImage" content="img/favicon/ms-icon-144x144.png">
 <meta name="theme-color" content="#ffffff">
+<meta name="google-adsense-account" content="ca-pub-3191612541015123">
 
     @include('adminlte::plugins', ['type' => 'css'])
 

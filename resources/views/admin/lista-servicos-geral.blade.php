@@ -26,8 +26,10 @@
 							<th>RIP</th>
 							<th>Matrícula RI</th>
 							<th>Área da Loja</th>
+                            <th>Área do Terreno</th>
 							<th>Endereço</th>
 							<th>Número</th>
+                            <th>Bairro</th>
 							<th>Complemento</th>
 							<th>Data Inauguração</th>
 							<th>Cidade</th>
@@ -38,6 +40,8 @@
 							<th>Situação</th>
 							<th>Responsável</th>
 							<th>Co-Responsável</th>
+                            <th>Analista 1</th>
+                            <th>Analista 2</th>
 							<th>Nome</th>
 							<th>Solicitante</th>
 							<th>Departamento</th>
@@ -52,6 +56,7 @@
 							<th>Valor em Aberto</th>
 							<th>Finalizado</th>
 							<th>Criação</th>
+                            <th>Interações</th>
                             
 						  </tr>
 					</thead>

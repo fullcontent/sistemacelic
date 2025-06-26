@@ -31,9 +31,9 @@
 
 				<tr>
 					<td><a href="{{route('proposta.edit',$p->id)}}">#{{$p->id}}</a> </td>
-					<td>{{$p->empresa->nomeFantasia}}</td>
-					<td>{{$p->unidade->codigo}}</td>
-					<td>{{$p->unidade->nomeFantasia}}</td>
+					<td>{{$p->empresa->nomeFantasia ?? ''}}</td>
+					<td>{{$p->unidade->codigo ?? ''}}</td>
+					<td>{{$p->unidade->nomeFantasia ?? ''}}</td>
 					
 					<td>R$ {{number_format($p->servicos->sum('valor'),2)}}</td>
 					<td>

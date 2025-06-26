@@ -63,7 +63,7 @@
         
         @unless ( empty($taxa->comprovante) )
         
-        <a href="{{ url("uploads/$taxa->comprovante") }}" class="btn btn-xs btn-success" target="_blank">Ver Comprovante</a>
+        <a href="{{ url("public/uploads/$taxa->comprovante") }}" class="btn btn-xs btn-success" target="_blank">Ver Comprovante</a>
         @endunless</td>
         
 

@@ -23,7 +23,7 @@ Route::get('/', function () {
 
 		
 		
-
+ 
 		Route::get('/home', 'AdminController@index')->name('dashboard');
 
 		Route::get('/dashboard',function(){
@@ -32,11 +32,17 @@ Route::get('/', function () {
 		});
 
 
-		Route::get('/relatorioCompleto','AdminController@completoCSV')->name('relatorio.completo');
+		Route::get('/relatorioCompleto','AdminController@completoCSV'); 
 		Route::get('/relatorioTaxas','AdminController@taxasCSV')->name('relatorio.taxas');
 		Route::get('/relatorioPendencias','AdminController@pendenciasCSV')->name('relatorio.pendencias');
 		Route::post('/relatorioPendenciasFilter','AdminController@pendenciasFilter')->name('relatorioPendenciasFilter');
 		Route::post('/relatorioServicosFilter','AdminController@servicosFilterCSV')->name('relatorioServicosFilter');
+		
+		Route::get('/gerar-relatorio', 'AdminController@gerarRelatorioCompletoCSV')->name('relatorio.completo'); 
+		Route::delete('/deleteRelatorio/{filename}', 'AdminController@deleteRelatorio');
+
+		Route::get('/listar-relatorios', 'AdminController@listarRelatorios');
+
 
 		Route::get('/relatorios', function () {
 
@@ -57,6 +63,22 @@ Route::get('/', function () {
 		Route::resource('/taxas','TaxasController');
 		Route::resource('/pendencia','PendenciasController');
 		Route::resource('/arquivo','ArquivosController');
+
+		Route::resource('/prestador','PrestadorController');
+
+		Route::get('/prestador/delete/{id}','PrestadorController@delete')->name('prestador.delete');
+		
+		
+		
+		Route::post('/prestador/rate','PrestadorController@rate')->name('prestador.rate');
+
+		Route::get('/prestador/ratings/{prestador_id}','PrestadorController@ratings')->name('prestador.ratings');
+
+
+
+		Route::resource('/ordemCompra','OrdemCompraController');
+
+		Route::get('/ordemCompra/{servico_id}/create','OrdemCompraController@create')->name('ordemCompra.criar');
 
 		Route::resource('/solicitantes','SolicitantesController');
 
@@ -248,6 +270,8 @@ Route::get('/usuario/editar/', 'ClienteController@editarUsuario')->name('cliente
 Route::post('/usuario/editar/', 'ClienteController@updateUsuario')->name('cliente.usuario.update');
 Route::get('/servico/{id}/taxas/{taxa}','ClienteController@showTaxa')->name('cliente.taxa.show');
 
+Route::get('/pendencia/{pendencia}','ClienteController@showPendencia')->name('cliente.pendencia.show');
+
 Route::post('/arquivo/anexar','ArquivosController@anexar')->name('cliente.arquivo.anexar');
 Route::get('/users/list','ClienteController@usersList')->name('cliente.users.list');
 Route::get('/relatorios',function(){
@@ -337,6 +361,8 @@ Route::get('api/getDadosCastro','ApiController@getDadosCastro')->name('api.getDa
 
 Route::get('api/saveDadosCastro','ApiController@saveDadosCastro')->name('api.saveDadosCastro');
 
+Route::get('api/getPrestadorInfo','ApiController@getPrestadorInfo')->name('api.getPrestadorInfo');
+
 
 
 
@@ -353,6 +379,26 @@ Route::get('solicitantes', function(){
 		dump($s->empresa);
 	}
 
+
+});
+
+
+Route::get('vinculos/{id}', function($id){
+
+
+	
+
+	$servicos = App\Models\Servico::with('pendencias')
+                            ->whereNotIn('responsavel_id',[1])
+                            ->orderBy('id','DESC')
+                            ->with('responsavel','coresponsavel')
+                            ->select('id','nome','os','unidade_id','tipo','protocolo_anexo','laudo_anexo','solicitante','responsavel_id','coresponsavel_id','licenciamento')
+							->take(100)
+							->get();
+
+							
+
+	return $servicos;
 
 });
 
@@ -474,3 +520,45 @@ Route::get('/pendencia/{id}/previousEtapa', function($id){
 		
 
 });
+
+Route::get('/test' ,function(){
+
+
+
+	$servicos = App\Models\Servico::with('pendencias')
+	->whereNotIn('responsavel_id',[1])
+	->orderBy('id','DESC')
+	->with('responsavel','coresponsavel','financeiro','historico')
+	->select('id', 'nome', 'os', 'unidade_id', 'tipo', 'protocolo_anexo', 'laudo_anexo', 'solicitante', 'responsavel_id', 'coresponsavel_id', 'licenciamento', 'departamento', 'situacao', 'created_at') // Add 'situacao' and 'created_at' to the select list
+	// ->take(200)
+	->whereDoesntHave('financeiro')
+	->count();
+
+	return $servicos;
+	
+	// foreach($servicos as $servico)
+	// {
+	// 	if(!$servico->financeiro)
+	// 	{
+			
+	// 		 $financeiro = new App\Models\ServicoFinanceiro();
+	// 		 $financeiro->servico_id = $servico->id;
+	// 		 $financeiro->valorTotal = 0;
+	// 		 $financeiro->valorFaturado = 0;
+	// 		 $financeiro->valorFaturar = 0;
+	// 		 $financeiro->valorAberto = 0;
+	// 		 $financeiro->status = 'aberto';
+ 
+	// 		 $financeiro->save();
+	// 		 $servico->financeiro = $financeiro;
+		 
+	// 	}
+	// }
+	
+	
+
+	
+
+
+});
+

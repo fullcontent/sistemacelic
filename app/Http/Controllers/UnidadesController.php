@@ -12,7 +12,7 @@ use App\Models\Pendencia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-
+use Carbon\Carbon;
 
 
 
@@ -37,7 +37,7 @@ class UnidadesController extends Controller
         
         $access = UserAccess::where('user_id',Auth::id())->whereNull('unidade_id')->pluck('empresa_id');
 
-        $unidades = Unidade::with('servicos')->whereIn('empresa_id',$access)->get();
+        $unidades = Unidade::with('servicos','empresa')->whereIn('empresa_id',$access)->get();
 
         return view('admin.lista-unidades')->with('unidades',$unidades);
     }
@@ -87,9 +87,17 @@ class UnidadesController extends Controller
             $empresa->nomeFantasia  = $request->nomeFantasia;
             $empresa->razaoSocial   = $request->razaoSocial;
             $empresa->status        = $request->status;
+
+            if($request->dataInauguracao)
+        {
+            $empresa->dataInauguracao = Carbon::createFromFormat('d/m/Y', $request->dataInauguracao)->toDateString(); 
+        }
+                   
+
             $empresa->inscricaoEst  = $request->inscricaoEst;
             $empresa->inscricaoMun  = $request->inscricaoMun;
             $empresa->inscricaoImo  = $request->inscricaoImo;
+            $empresa->rip  = $request->rip;
             $empresa->codigo        = $request->codigo;
             $empresa->endereco      = $request->endereco;
             $empresa->numero        = $request->numero;
@@ -103,6 +111,7 @@ class UnidadesController extends Controller
             $empresa->email         = $request->email;
             $empresa->matriculaRI   = $request->matriculaRI;
             $empresa->area          = $request->area;
+            $empresa->areaTerreno   = $request->areaTerreno;
             $empresa->tipoImovel    = $request->tipoImovel;
 
             $empresa->save();
@@ -244,9 +253,17 @@ class UnidadesController extends Controller
             $empresa->nomeFantasia  = $request->nomeFantasia;
             $empresa->razaoSocial   = $request->razaoSocial;
             $empresa->status        = $request->status;
+
+            if($request->dataInauguracao)
+            {
+                $empresa->dataInauguracao  = Carbon::createFromFormat('d/m/Y', $request->dataInauguracao)->toDateString();
+            }
+            
+            
             $empresa->inscricaoEst  = $request->inscricaoEst;
             $empresa->inscricaoMun  = $request->inscricaoMun;
             $empresa->inscricaoImo  = $request->inscricaoImo;
+            $empresa->rip  = $request->rip;
             $empresa->codigo        = $request->codigo;
             $empresa->endereco      = $request->endereco;
             $empresa->numero        = $request->numero;
@@ -260,7 +277,12 @@ class UnidadesController extends Controller
             $empresa->email         = $request->email;
             $empresa->matriculaRI   = $request->matriculaRI;
             $empresa->area          = $request->area;
+            $empresa->areaTerreno   = $request->areaTerreno;
             $empresa->tipoImovel    = $request->tipoImovel;
+
+
+
+            // return $request->all();
 
             $empresa->save();
             

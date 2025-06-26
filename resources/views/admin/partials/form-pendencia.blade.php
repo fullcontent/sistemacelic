@@ -5,6 +5,15 @@
 @endif
 
 
+
+      <div class="col-md-1">
+        <div class="form-group">
+          {!! Form::label('etapa', 'Etapa', ['class'=>'control-label']) !!}
+          {!! Form::select('etapa', array_combine(range(1, 10), range(1, 10)), null, ['class'=>'form-control','id'=>'etapa']) !!}
+
+        </div>
+      </div>
+
       <div class="col-md-3">
         <div class="form-group">
           
@@ -17,10 +26,42 @@
 
      
 
-      <div class="col-md-6">
+      <div class="col-md-5">
         <div class="form-group">
         {!! Form::label('pendencia', 'Descrição', array('class'=>'control-label')) !!}
-        {!! Form::text('pendencia', null, ['class'=>'form-control','id'=>'pendencia']) !!}
+        {!! Form::select('pendencia', [
+    'Responsabilidade Castro' => [
+        'Adequação em projeto' => 'Adequação em projeto',
+        'Comunicar cliente' => 'Comunicar cliente',
+        'Contato com órgão' => 'Contato com órgão',
+        'Documental' => 'Documental',
+        'Elaboração' => 'Elaboração',
+        'Emissão de taxa' => 'Emissão de taxa',
+        'Montar processo' => 'Montar processo',
+        'Pagamento de taxa' => 'Pagamento de taxa',
+        'Pedido de prazo' => 'Pedido de prazo',
+        'Protocolar' => 'Protocolar',
+        'Protocolar reentrada' => 'Protocolar reentrada',
+        'RT' => 'RT',
+        'Tramitação interna' => 'Tramitação interna'
+    ],
+    'Responsabilidade Cliente' => [
+        'Adequação física' => 'Adequação física',
+        'Adequação em projeto' => 'Adequação em projeto',
+        'Documental' => 'Documental',
+        'Em análise' => 'Em análise',
+        'Pagamento de taxa' => 'Pagamento de taxa',
+        'Retorno cliente' => 'Retorno cliente'
+    ],
+    'Responsabilidade Órgão' => [
+        'Em análise' => 'Em análise',
+        'Emissão de alvará' => 'Emissão de alvará',
+        'Retorno órgão' => 'Retorno órgão'
+    ],
+    'Vinculada' => [
+        'Vinculada' => 'Vinculada'
+    ]
+], null, ['class' => 'form-control']) !!}
         </div>
         
       </div>
@@ -59,7 +100,7 @@
       </div>
 
       
-      <div class="col-md-6" id="vinculos">
+      <div class="col-md-4" id="vinculos">
         <label for="vinculo" class="control-label">Vínculo</label>
         <div class="input-group control-group after-add-more">  
           {!! Form::select('vinculo', $vinculo, 1,['class'=>'form-control','id'=>'vinculo','name'=>'vinculo[]']) !!}
@@ -92,6 +133,15 @@
       </div>
 
 
+      <div class="col-md-6">
+        <div class="form-group">
+          {!! Form::label('vinculoPendencia', 'Vinculado a pendencia', array('class'=>'control-label')) !!}
+          <div class="input-group">
+            {!! Form::select('vinculoPendencia',[null], array('class'=>'form-control','id'=>'vinculoPendencia')) !!} 
+          </div>
+        </div>
+      </div>
+
       <div class="col-md-12">
         <div class="form-group">
            {!! Form::label('observacoes', 'Observações', array('class'=>'control-label')) !!}
@@ -108,10 +158,12 @@
 @section('js')
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
+
+
+
 @if(Route::is('pendencia.edit'))
 <script>
 var vinculo = {!! $pendencia->vinculos !!}
-console.log(vinculo.length);
 if(vinculo.length != 0)
   {
     $('#vencimento').prop('disabled',true);
@@ -126,8 +178,7 @@ if(vinculo.length != 0)
   
 $(document).ready(function() {
 
-  
-
+ 
     
     $('#vinculo').select2({
     placeholder: "Selecione um serviço",
@@ -208,6 +259,38 @@ $('#vinculo').on('select2:select', function (e) {
 });
  
 }
+</script>
+<script>
+  $(document).ready(function() {
+    $("#pendencia").change(function() {
+      switch($("#pendencia option:selected").parent().attr("label")) {
+        case "Responsabilidade Castro":
+          $("#responsavel_tipo").val("usuario");
+          break;
+        case "Responsabilidade Cliente":
+          $("#responsavel_tipo").val("cliente");
+          break;
+        case "Responsabilidade Órgão":
+          $("#responsavel_tipo").val("op");
+          break;
+        case "Vinculada":
+          $("#responsavel_tipo").append("<option value='vinculada'>Vinculada</option>");
+          $("#responsavel_tipo").val("vinculada");
+          break;
+        default:
+          $("#responsavel_tipo").val("");
+      }
+    });
+    $("#vinculo").change(function() {
+      
+        if ($("#responsavel_tipo option[value='vinculada']").length == 0) {
+          $("#responsavel_tipo").append("<option value='vinculada'>Vinculada</option>");
+        }
+        $("#responsavel_tipo").val("vinculada");
+        $("#pendencia").val("Vinculada")
+     
+    });
+  });
 </script>
 
 

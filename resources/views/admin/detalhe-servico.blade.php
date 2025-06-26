@@ -128,6 +128,14 @@
                   <p><b>Co-Responsável: </b>{{$servico->coresponsavel->name ?? ''}}</p>
                   @endif
 
+                  @if($servico->analista1)
+                  <p><b>Analista 1: </b>{{$servico->analista1->name ?? ''}}</p>
+                  @endif
+
+                  @if($servico->analista2)
+                  <p><b>Analista 2: </b>{{$servico->analista2->name ?? ''}}</p>
+                  @endif
+
                   @if($servico->solicitanteServico)
                       <p><b>Solicitante (novo): </b>
                         {{$servico->solicitanteServico->nome}}
@@ -164,7 +172,7 @@
           
 
                   @endunless
-                  <p><b>Observações: </b>{{$servico->observacoes}}</p>
+                  <p><b>Observações: </b>{!! $servico->observacoes !!}</p>
 
                 </div>
                 
@@ -214,7 +222,7 @@
                   <p><b>N. do Laudo </b> {{$servico->laudo_numero }}</p>
                   <p><b>Laudo: </b> <a href="{{ route('servico.downloadFile', ['servico_id'=> $servico->id,'tipo'=>'laudo']) }}" class="btn btn-xs btn-warning" target="_blank"><i class="fa fa-file"></i> Ver Laudo</a></p>
                   @endunless
-                  <p><b>Escopo: </b>{{$servico->escopo}}</p>
+                  <p><b>Escopo: </b>{!! $servico->escopo !!}</p>
 
                   @if($servico->licenciamento)
                   <p><b>Licenciamento: </b>{{$servico->licenciamento}}</p>
@@ -314,7 +322,9 @@
   @include('admin.components.widget-pendencias')
 </div>
 
-
+<div class="col-md-7">
+  
+</div>
 
 
 <div class="row">

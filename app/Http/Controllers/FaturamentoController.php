@@ -8,6 +8,10 @@ use App\Models\Servico;
 use App\Models\Faturamento;
 use Illuminate\Http\Request;
 use App\Models\FaturamentoServico;
+use App\Models\ServicoFinanceiro;
+use App\Models\ServicoFinalizado;
+use App\Models\DadosCastro;
+use DB;
 
 
 
@@ -21,8 +25,19 @@ class FaturamentoController extends Controller
      */
     public function index()
     {
-    //    $faturamentos = Faturamento::all();
-            $faturamentos = Faturamento::where('empresa_id',16)->get();
+       $faturamentos = Faturamento::query()
+       ->select('id','valorTotal','created_at','nf','nome','empresa_id','obs')
+         ->with(['empresa' => function($query) {
+            $query->select('id','nomeFantasia');
+        },'servicos' => function($query){
+            $query->select('proposta');
+        }])
+        ->get();
+
+
+    //    return $faturamentos;
+    //    dd($faturamentos);
+    // $faturamentos = Faturamento::where('empresa_id',16)->get();
 
         return view('admin.faturamento.lista-faturamentos')->with([
             'faturamentos'=>$faturamentos,
@@ -38,9 +53,12 @@ class FaturamentoController extends Controller
     public function create()
     {
 
-        $empresas = Empresa::all()->pluck('nomeFantasia','id');
+        $empresas = Empresa::orderBy('nomeFantasia')->pluck('nomeFantasia','id');
 
-        return view('admin.faturamento.step1')->with(compact('empresas',$empresas));
+        $propostas = [];
+
+        
+        return view('admin.faturamento.step1')->with(['empresas'=>$empresas,'propostas'=>$propostas]);
 
     }
 
@@ -67,30 +85,56 @@ class FaturamentoController extends Controller
         {
 
             $empresa = Empresa::whereHas('servicosFaturar')->with('servicosFaturar')->find($e);
-            $s = $empresa->servicosFaturar->pluck('id');
-            $s2 = $s2->merge($s);
+
+            if($empresa)
+            {
+                $s = $empresa->servicosFaturar->pluck('id');
+                $s2 = $s2->merge($s);
+            }
+            
+            
         }
 
- 
+        
+        if($request->propostas)
+        {
+            $servicosFaturar = Servico::with('financeiro','faturado')
+            
+            ->orWhereIn('id', $s2)
+            ->whereHas('servicoFinalizado', function($q) use ($start_date, $end_date){
+                return $q->whereBetween('finalizado', [$start_date,$end_date]);
+            })
+            ->orWhereIn('proposta',$request->propostas)
+            // ->orWhere('proposta','<>', null)                                                                                     
+            ->get();
+        }
+        else{
+            $servicosFaturar = Servico::with('financeiro','faturado')
+            // ->orWhereIn('id', $s2)
+            ->whereHas('servicoFinalizado', function($q) use ($start_date, $end_date){
+                return $q->whereBetween('finalizado', [$start_date,$end_date]);
+            })                                                                
+            ->get();
 
 
-        $servicosFaturar = Servico::with('financeiro')
-                            ->whereIn('id', $s2)
-                            ->whereHas('finalizado',function($q) use ($start_date, $end_date){
-                                return $q->whereBetween('created_at', [$start_date,$end_date]);
-                            })
-                                                     
-                            ->get();
-              
+            $servicosFaturar = $servicosFaturar->whereIn('id',$s2);           
+            
+        }
+        
+
+             
+        //  dd($servicosFaturar->pluck('unidade_id'));                  
         
         
         return view('admin.faturamento.step2')->with([
                 'servicosFaturar'=>$servicosFaturar,
                 'empresas'=>$empresas,
                 'periodo'=>$periodo,
+                'propostas'=>$request->propostas,
             ]);
 
     }
+    
 
     public function step3(Request $request)
     {   
@@ -103,6 +147,8 @@ class FaturamentoController extends Controller
 
         $total = $servicosFaturar->sum('financeiro.valorAberto');
 
+        $dadosCastro = DadosCastro::pluck('razaoSocial','id');
+
         
 
         $descricao = "00".Carbon::now()->month."-".Carbon::now()->year."";
@@ -113,6 +159,7 @@ class FaturamentoController extends Controller
             'total'=>$total,
             'empresa_id'=> $request->empresa_id,
             'descricao'=>$descricao,
+            'dadosCastro'=>$dadosCastro,
 
         ]);
     
@@ -123,11 +170,14 @@ class FaturamentoController extends Controller
     {      
 
 
+
        
         //Criando faturamento
 
         $faturamento = new Faturamento;
         $faturamento->empresa_id = $request->empresa_id;
+        $faturamento->link = $request->link;
+        $faturamento->dadosCastro_id = $request->dadosCastro;
         $faturamento->save();
 
 
@@ -137,11 +187,18 @@ class FaturamentoController extends Controller
         $servicos = [];
         
         //Selecionar os servicos based on servico_id of request
+        
+            dump($request->all());
 
+            
             foreach($request->faturamento as $f)
             {
                 $s = Servico::with('financeiro')->find($f['servico_id']);
                 
+                $s->nf = $f['nf'];
+                $s->save();
+                
+                                
                 $valorFaturar = $f['valorFaturar'];
 
 
@@ -180,7 +237,60 @@ class FaturamentoController extends Controller
             'totalFaturamento'=>$total,
             'descricao'=>$request->descricao,
             'obs'=>$request->obs,
+            'link'=>$request->link,
+            'dadosCastro'=>$faturamento->dadosCastro,
+
         ]);
+
+    }
+
+
+    public function faturarServicoSub(Request $request)
+    {
+        
+
+                      
+        $servico = Servico::whereIn('id',$request->servicos)->first();
+        
+
+        
+        if($servico->servicoPrincipal != null)
+        {
+            // dump("esse servico é sub");
+            $subServicos = Servico::where('servicoPrincipal',$servico->servicoPrincipal)
+                                    ->orWhere('id',$servico->servicoPrincipal)
+                                    ->pluck('id');
+
+        }
+        else{
+            // dump("esse servico é principal");
+            $subServicos = Servico::whereIn('id',$servico->subServicos->pluck('id'))
+                                    ->pluck('id');
+        }
+        
+        
+        $servicosFaturar = Servico::with('financeiro')
+                                    ->whereIn('id',$subServicos)
+                                    ->orWhere('id',$servico->id)
+                                    // ->whereHas('servicoFinalizado')
+                                    ->get();       
+
+
+
+
+                
+        
+        $empresas = Empresa::where('id',$request->empresa_id)->get();
+
+
+        // return $subServicos;
+                
+        
+        return view('admin.faturamento.step2')->with([
+                'servicosFaturar'=>$servicosFaturar,
+                'empresas'=>$empresas,
+                
+            ]);
 
     }
 
@@ -344,6 +454,9 @@ class FaturamentoController extends Controller
             'descricao'=>$faturamento->nome,
             'obs'=>$faturamento->obs,
             'data'=>$faturamento->created_at,
+            'link'=>$faturamento->link,
+            'id'=>$faturamento->id,
+            'dadosCastro'=>$faturamento->dadosCastro,
         ]);
         
 
@@ -357,7 +470,7 @@ class FaturamentoController extends Controller
      */
     public function edit($id)
     {
-        //
+       //
     }
 
     /**
@@ -367,9 +480,16 @@ class FaturamentoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        
+        $faturamento = Faturamento::find($request->faturamentoID);
+
+        $faturamento->nf=$request->nf;
+        $faturamento->save();
+
+        return redirect()->route('faturamentos.index');
+        
     }
 
     /**
@@ -496,6 +616,19 @@ class FaturamentoController extends Controller
 
     }
 
+    public function editarFaturamento(Request $request)
+    {
+        $faturamento = Faturamento::find($request->faturamentoID);
+
+        
+
+        $faturamento->nome = $request->nome;
+        $faturamento->obs = $request->obs;
+        $faturamento->save();
+
+        return redirect()->route('faturamento.show',$request->faturamentoID);
+    }
+
 
     static function formatCnpjCpf($value)
     {
@@ -508,4 +641,94 @@ class FaturamentoController extends Controller
     return preg_replace("/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/", "\$1.\$2.\$3/\$4-\$5", $cnpj_cpf);
     }
     
+
+    public function getAllServicesFinished()
+    {
+        
+        $servicoFinalizado = Servico::whereHas('servicoFinalizado')->pluck('id');
+
+        // dd($servicoFinalizado);
+
+
+        
+        
+        $servicosFaturar = Servico::whereNotIn('id',$servicoFinalizado)->whereHas('finalizado')->get();
+
+
+        // dd($servicosFaturar);
+
+        foreach($servicosFaturar as $s)
+        {
+            
+            
+            
+            if(!ServicoFinalizado::where('servico_id',$s->id)->first())
+            {
+                $servico = new ServicoFinalizado;
+                $servico->servico_id = $s->id;
+                $servico->finalizado = $s->finalizado->created_at;
+                $servico->save();
+   
+                dump("Adicionado ".$s->id);
+            }
+            else{
+                dump("JA FOI ".$s->id);
+            }
+
+            
+           
+        }
+
+        
+        
+
+
+    }
+
+
+    public function getErrors()
+    {
+        $servicos = ServicoFinanceiro::where('status','faturado')->get();
+
+        foreach($servicos as $s)
+        {
+
+            if($s->valorAberto == $s->valorFaturado)
+            {
+                // $s->valorAberto = 0;
+                // $s->valorFaturar = 0;
+                // $s->save();
+                
+                dump($s->servico_id);
+            }
+
+        }
+
+        
+    }
+
+
+    public function getPropostas($id)
+    {
+                $id = explode(',',$id);
+            
+            $empresas = \App\Models\Empresa::whereIn('id',$id)->whereHas('propostas')->with('propostas')->get();
+
+            $propostas = [];
+            foreach($empresas as $i)
+            {
+                foreach($i->propostas as $key => $j)
+                {
+                    $propostas[$key] = $j['proposta'];
+                }
+            }
+
+            $data =\App\Models\Servico::whereIn('proposta',$propostas)->distinct('proposta')->pluck('proposta');
+
+            
+
+        return response()->json(['data' => $data]);	
+    }
+
+
 }

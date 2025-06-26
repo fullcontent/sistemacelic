@@ -135,7 +135,7 @@ $('.priorize').click(function(){
   $(function () {
         $('#lista-pendencias-atrasadas').DataTable({
           "paging": true,
-          "lengthChange": false,
+          "lengthChange": true,
           "searching": true,
           "ordering": true,
           "info": true,
@@ -149,7 +149,7 @@ $('.priorize').click(function(){
   $(function () {
         $('#lista-pendencias-dia').DataTable({
           "paging": true,
-          "lengthChange": false,
+          "lengthChange": true,
           "searching": true,
           "ordering": true,
           "info": true,

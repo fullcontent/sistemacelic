@@ -7,7 +7,6 @@
   <table id="relatorio-completo" class="table table-bordered" >
           <thead>
           <tr>
-            <th>ID</th>
             <th>Razão Social</th>
             <th>Código</th>
             <th>Nome</th>
@@ -51,7 +50,6 @@
                @foreach($servicos as $s)
 
                 <tr>
-                    <td>{{$s->id}}</td>
                     <td>{{$s->unidade->razaoSocial}}</td>
                     <td>{{$s->unidade->codigo}}</td>
                     <td>{{$s->unidade->nomeFantasia}}</td>

@@ -148,7 +148,10 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 
-<script src="https://cdn.tiny.cloud/1/mdbybl5sde5aiobm264wk5r9q3cua6n3r2z6hvc7aag1ry65/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+
+
+
+
 
 
 <script>
@@ -199,11 +202,7 @@ $("#condicoesPagamento").html(condicoesPagamento);
 $("#dadosPagamento").html(dadosPagamento);
 
 
-tinymce.init({
-    selector: 'textarea',
-    menubar: false,
-    toolbar: false,
-});
+
 
 var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
 

@@ -5,7 +5,11 @@
 
 
 @section('content')
-
+@if (session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
 <div class="col-md-3">
     <div class="box box-default">
         <div class="box-header with-border">
@@ -17,8 +21,8 @@
         <div class="box-body">
 
 
-            <a href="{{route('relatorio.completo')}}" target="_blank"
-                class="btn btn-block btn-default btn-lg">Serviços</a>
+            <a href="{{route('relatorio.completo')}}" class="btn btn-block btn-default btn-lg">Serviços</a>
+                
 
             <a href="{{route('relatorio.taxas')}}" target="_blank" class="btn btn-block btn-default btn-lg">Taxas</a>
 
@@ -128,15 +132,98 @@
 
 {!! Form::close() !!}
 
+
+
+
     </div>
 
 </div>
 
+<div class="col-md-12">
+
+<div class="box box-default">
+<div class="box-header with-border">
+
+<h3 class="box-title">Últimos relatórios gerados</h3>
+</div>
+<table id="reports-table" class="table table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th>Nome do Arquivo</th>
+                    <th>Data</th>
+                    <th>Ações</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Os dados da tabela serão preenchidos pelo JavaScript -->
+                </tbody>
+            </table>
+</div>
+                
+               
+            
+        </div>
 
 @endsection
 
 
 @section('js')
+<script>
+$(document).ready(function () {
+    function fetchReports() {
+        $.ajax({
+            url: 'listar-relatorios', // URL da rota que lista os relatórios
+            method: 'GET',
+            success: function (data) {
+                const tableBody = $('#reports-table tbody');
+                tableBody.empty(); // Limpa o conteúdo anterior
+
+                data.forEach(function (report) {
+                    const date = new Date(report.date * 1000).toLocaleString('pt-BR'); // Formata a data
+                    const row = `
+                        <tr>
+                            <td>${report.name}</td>
+                            <td>${date}</td>
+                            <td>
+                                <a href="${report.download_link}" class="btn btn-success" download>Download</a>
+                               
+                            </td>
+                        </tr>
+                    `;
+                    tableBody.append(row);
+                });
+            },
+            error: function (error) {
+                console.error("Erro ao buscar relatórios:", error);
+            }
+        });
+    }
+
+    // Chama a função para carregar os relatórios ao iniciar
+    fetchReports();
+
+    // Evento de clique no botão de exclusão
+    $(document).on('click', '.delete-report', function () {
+        const filename = $(this).data('filename');
+
+        if (confirm('Tem certeza que deseja excluir este relatório?')) {
+            $.ajax({
+                url: `/deleteRelatorio/${filename}`, // URL para deletar o relatório
+                type: 'DELETE',
+                success: function (response) {
+                    alert(response.message);
+                    fetchReports(); // Recarrega os relatórios após a exclusão
+                },
+                error: function (xhr) {
+                    alert(xhr.responseJSON.message || 'Erro ao excluir o relatório.');
+                    console.error("Erro ao excluir o relatório:", error); // Adicionado para depuração
+
+                }
+            });
+        }
+    });
+});
+</script>
 
 
 <script>
@@ -202,16 +289,14 @@ $("#selectAll").click(function(){
 
 
 
-$("#gerarRelatorio").on("submit",function(){
 
-
-    console.log("test");
-
-})
 
 
   
 
 });
 </script>
-@endsection
+
+
+
+@endsection 

@@ -36,12 +36,15 @@
 				    <td>R$ {{number_format($f->valorTotal,2,'.',',')}}</td>
 
 				    <td style="display:none">{{$f->servicos}}{{$f->obs}}</td>
-				    <td><a href="{{route('faturamento.destroy',$f->id)}}" class="confirmation"> <i
-				                class="glyphicon glyphicon-trash"></i></a>
-				        <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#myModal"
+				    <td>
+						<button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#myModal"
 				            data-faturamento_id="{{ $f->id }}" data-dados_id="{{ $f->dadosCastro_id}}">
 				            Alterar CNPJ
 				        </button>
+						
+						<a href="{{route('faturamento.destroy',$f->id)}}" class="confirmation"> <i
+				                class="glyphicon glyphicon-trash"></i></a>
+				        
 				    </td>
 				</tr>
 

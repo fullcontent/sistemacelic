@@ -255,6 +255,17 @@
     <script src='http://podio.github.io/jquery-mentions-input/jquery.mentionsInput.js' type='text/javascript'></script>
 
     
+        <script src="https://adminlte.io/themes/AdminLTE/bower_components/ckeditor/ckeditor.js"></script>
+        <script>    
+            
+            $(function () {
+    // Replace the <textarea id="editor1"> with a CKEditor
+    // instance, using default configuration.
+    CKEDITOR.replaceAll('form-control');
+    
+   
+  })
+        </script>
     
     <script>
         $('a[data-notif-id]').click(function () {

@@ -29,4 +29,9 @@ class Unidade extends Model
 		{
 			return $this->hasMany('App\Models\Arquivo');
 		}
+
+		public function pendencias()
+		{
+			return $this->hasManyThrough('App\Models\Pendencia','App\Models\Servico','unidade_id','servico_id','id');
+		}
 }

@@ -26,6 +26,12 @@
 </button>
 @endif
 
+@if($proposta->status == "Aprovada")
+@if(!count($proposta->servicosCriados))
+        <a href="#" data-id="{{$proposta->id}}" class="btn btn-warning atualizar"><i class="glyphicon glyphicon-wrench"></i></a> 
+@endif
+@endif
+
 <div class="pull-right no-print">
 @if($proposta->status == 'Revisando')
 							<a href="#" class="btn btn-default  status" data-id="{{$proposta->id}}">{{$proposta->status}}</a> 
@@ -330,6 +336,46 @@
 
 <script>
 
+$(function() {
+    $('.atualizar').click(function(e) {        
+		
+		e.preventDefault();
+		
+		if(confirm("Gostaria de criar os serviços automaticamente?")){
+        	var s = 1;
+		}
+		else{
+			var s = 0;
+		}
+
+        var proposta_id = $(this).data('id');
+		
+         
+		// console.log(status);
+
+        $.ajax({
+            type: "GET",
+            url: "/admin/proposta/aprovar/"+proposta_id+"/"+s+"",
+			datatType : 'JSON',
+            data: {
+				id: proposta_id,
+				_token: CSRF_TOKEN,
+				s: s,
+				},
+            success: function(data){
+              
+				console.log(data)	
+                location.reload();
+	  
+			  
+			  
+            },
+			error: function (result) {
+                console.log(result)
+            }
+        });
+    })
+  })	
 var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
 
 function calculaTotal(){
@@ -428,11 +474,11 @@ $(function () {
 
 
 
-tinymce.init({
-    selector: 'textarea',
-    menubar: false,
-    toolbar: false,
-});
+//tinymce.init({
+  //  selector: 'textarea',
+    //menubar: false,
+    //toolbar: false,
+//});
 
 
 

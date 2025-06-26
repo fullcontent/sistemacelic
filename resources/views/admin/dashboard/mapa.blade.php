@@ -1,116 +1,162 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Earthquake Markers</title>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-    <link rel="stylesheet" type="text/css" href="./style.css" />
-    
-  </head>
-  <style>
-      /* Always set the map height explicitly to define the size of the div
-       * element that contains the map. */
-#map {
-  height: 100%;
-}
+@extends('adminlte::page')
 
-/* Optional: Makes the sample page fill the window. */
-html,
-body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-  </style>
-  <body>
+
+@section('content')
+
+<h3>Onde estão nossos clientes?</h3>
+
+<div class="row">
+  <div class="col-md-6">
     <div id="map"></div>
+  </div>
+  <div class="col-md-6">
+    <canvas id="graficoUF"></canvas>
+  </div>
+</div>
 
-    <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
-    <script
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDvbAJ_BSNB6E5_P7DpIOmGrZI8GURRmI0&callback=initMap&libraries=&v=weekly"
-      async
+
+<button onclick="initMap()" class="btn btn-default btn-xs">Centralizar</button>
+
+@endsection
+
+
+@section('js')
+<script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDOIxyXtEWnbcGYXUEQmVHHagZizBplcfI&callback=initMap&v=weekly"
+      defer
     ></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  let map;
+  var unidades = {!! json_encode($unidades) !!}
 
-    <script>
+      function initMap() {
+          map = new google.maps.Map(document.getElementById("map"), {
+              zoom: 5,
+              center: new google.maps.LatLng(-15.7801, -47.9292),
+              mapTypeId: "terrain",
+              disableDefaultUI: true,
+
+          });
+
+          const infoWindow = new google.maps.InfoWindow({
+              content: "",
+              disableAutoPan: true,
+          });
+
+          $.each(unidades, function (index, value) {
+
+              
+              const marker = new google.maps.Marker({
+                  position: {
+                      lat: parseFloat(value.latitude),
+                      lng: parseFloat(value.longitude)
+                  },
+                  map: map,
+                  icon: 'http://sistemacelic.com/public/img/favicon/favicon-32x32.png',
+              });
+
+              const contentString = "<div class='infoWindow' id="+value.id+"><h2>" + value.empresa.nomeFantasia + "</h2><h3>" + value.nomeFantasia + "</h3><p>" + value.endereco + "," + value.numero + " " + value.complemento + "</p><p>" + value.bairro + " " + value.cep + "</p><p>" + value.cidade + "/" + value.uf + "</p><p><a href=unidades/"+value.id+" class='btn btn-primary btn-xs'>Ver Unidade</a></p></div>";
 
 
+              marker.addListener("click", () => {
+                  infoWindow.setContent(contentString);
+                  infoWindow.open(map, marker);
+                  map.panTo({lat: parseFloat(this.latitude), lng: parseFloat(this.longitude)});
+                  
 
-    // Initialize and add the map
-  function initMap() {
-    var map = new google.maps.Map(document.getElementById('map'), {
-      zoom: 6,
-      center: new google.maps.LatLng(-14.235004, -51.92528),
-      mapTypeId: google.maps.MapTypeId.ROADMAP
-    });
-  
-    
-  
-  
-  function codeAddress(address) {
-    var geocoder = new google.maps.Geocoder();
-    geocoder.geocode( { 'address': address}, function(results, status) {
-      if (status == google.maps.GeocoderStatus.OK) {
-        map.setCenter(results[0].geometry.location);
-        var marker = new google.maps.Marker({
-            map: map,
-            position: results[0].geometry.location
-        });
-      } else {
-        alert('Geocode was not successful for the following reason: ' + status);
-      }
-    });
-  }
-
-        function addInfoWindow(marker, message) {
-
-      var infoWindow = new google.maps.InfoWindow({
-          content: message
-      });
-
-      google.maps.event.addListener(marker, 'click', function () {
-          infoWindow.open(map, marker);
-      });
-      }
-
-  
-    
-    var locations = {!! json_encode($cidades) !!};
-
-   
-
-    var apikey = "AIzaSyDvbAJ_BSNB6E5_P7DpIOmGrZI8GURRmI0";
-    const image =
-    "https://yata.ostr.locaweb.com.br/72153c158e827ca039d7fa915121f15ea9b4628c8c92ee745221f3041221cba2";
-
-    var marker, i;
-
-    for (i = 0; i < locations.length; i++) {  
-      
-      var busca = locations[i]['endereco'] + ' - ' +locations[i]['cidade']+ '/' + locations[i]['uf'] + ' Brasil';
-      var query = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + busca + '&key=' + apikey;
-      var empresa = locations[i]['empresa'];
-      
-      
-          $.getJSON(query, function (data) {
-            if (data.status === 'OK') { 
-              var geo_data = data.results[0];
-                marker = new google.maps.Marker({
-                map: map,
-                position: geo_data.geometry.location,
-                title: empresa,
-                icon: image,
-            });
                                     
-            }
-            // addInfoWindow(marker, marker.title);
- 
-        })
-    }
+              });
 
-   
+          });
 
-}
+
+      }
+
+  window.initMap = initMap;
+
+
+  </script>
+
+<script>
+   const endpoint = "{{ route('api.getUnidadesByState') }}"; // Route URL referenced in the controller function that returns the JSON data
+$.ajax({
+  method: "GET",
+  url: endpoint
+}).done(function(response){
   
-    </script>
-  </body>
-</html>
+  const pieData = [];
+  const pieLabels = [];
+  const randomColor = Math.floor(Math.random()*16777215).toString(16);
+
+  var resultArray = $.map(response, function(value, index) { return [value]; });
+    
+  console.log(resultArray.sort(sortDps()).reverse());
+
+  $.each(resultArray, function(key, value){
+    pieData.push(value.total);
+    pieLabels.push(value.uf);
+    pieColors = randomColor;
+  });
+
+
+
+
+
+  var pieChart = new Chart(document.getElementById("graficoUF"), {
+    type: 'pie',
+    data: {
+      labels: pieLabels,
+      datasets: [{
+        
+        data: pieData
+      }]
+    },
+    options: {
+      responsive: true,
+      legend: {
+            position: 'top',
+        },
+        title: {
+            display: true,
+            text: 'Chart.js Doughnut Chart'
+        },
+        
+  scales: {}
+},
+    
+  });
+});
+
+function sortDps(){
+  return function(a, b){
+    if(a.total < b.total){
+      return -1;
+    }else if(a.total > b.total){
+      return 1;
+    }else{
+      return 0;   
+    }
+  }
+}
+
+
+</script>
+
+@endsection
+
+@section('css')
+<style>
+  /* 
+* Always set the map height explicitly to define the size of the div element
+* that contains the map. 
+*/
+#map {
+height: 600px;
+}
+.infoWindow{
+  padding: 20px;
+}
+
+</style>
+@endsection

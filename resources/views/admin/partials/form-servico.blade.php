@@ -111,6 +111,27 @@
 	</div>
 </div>
 
+<div class="col-md-2">
+
+	<div class="form-group">
+		{!! Form::label('analista1_id', 'Analista 1', array('class'=>'control-label')) !!}
+				
+		{!! Form::select('analista1_id', $users, null, ['class'=>'form-control','id'=>'analista1_id']) !!}
+
+	</div>
+</div>
+
+<div class="col-md-2">
+
+	<div class="form-group">
+		{!! Form::label('analista2_id', 'Analista2', array('class'=>'control-label')) !!}
+				
+		{!! Form::select('analista2_id', $users, null, ['class'=>'form-control','id'=>'analista2_id']) !!}
+
+
+	</div>
+</div>
+
 
 
 @switch($t ?? '')
@@ -197,10 +218,13 @@
 				null,
 				'licenciamento' => 'Licenciamento',
 				'permits' => 'Permits',
+				'permitsAmbiental'=>'Permits Ambiental',
 				'regulatorio'=>'Regulatório',
+				'regulatorioAmbiental'=>'Regulatório Ambiental',
 				'obras'=>'Obras',
 				'expansao'=>'Expansão',
 				'compras' => 'Compras',
+				'arquitetura' => 'Arquitetura',
 				'farmaceutico' => 'Farmacêutico',
 				'outros' => 'Outros'
 				), null, ['class'=>'form-control'])!!}

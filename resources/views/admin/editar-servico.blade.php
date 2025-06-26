@@ -69,6 +69,22 @@
 					
 		})
 
+		$("#analista1_id").select2({
+            placeholder: 'Algum analista?',
+            allowClear: true,
+        });
+
+        $("#analista1_id").val('{{$servico->analista1_id ?? ''}}').trigger('change');
+
+
+
+		$("#analista2_id").select2({
+            placeholder: 'Algum outro analista?',
+            allowClear: true,
+        });
+
+        $("#analista2_id").val('{{$servico->analista2_id ?? ''}}').trigger('change');
+
   	$("#protocolo_emissao").datepicker();
   	$("#licenca_emissao").datepicker();
   	$("#licenca_validade").datepicker();

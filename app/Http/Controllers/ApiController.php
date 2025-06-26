@@ -11,6 +11,7 @@ use App\Models\Servico;
 use App\Models\Reembolso;
 use App\Models\Faturamento;
 use App\Models\Proposta;
+use App\Models\Prestador;
 
 use App\User;
 use App\Models\DadosCastro;
@@ -160,16 +161,17 @@ class ApiController extends Controller
    public function getAllServicesJSON()
     { 
                
-        $servicos = Servico::with('unidade','responsavel','financeiro','servicoFinalizado','vinculos')
+        $servicos = Servico::with('unidade','responsavel','financeiro','servicoFinalizado','vinculos','historico')
         ->whereNotIn('responsavel_id',[1])
-        // ->take(100)
+        // ->whereHas('historico')
+        // ->take(5)
         ->get();
         
 
         $data = [];
 
-        $columns = array('ServicoID','Razão Social', 'Código', 'Nome', 'CNPJ', 'Status', 'Imóvel', 'Ins. Estadual', 'Ins. Municipal', 'Ins. Imob.', 'RIP', 'Matrícula RI', 'Área da Loja', 'Endereço', 'Número', 'Complemento','Data Inauguração',
-        'Cidade','UF', 'CEP', 'Tipo', 'O.S.', 'Situação', 'Responsável', 'Co-Responsável', 'Nome', 'Solicitante','Departamento','Licenciamento', 'N° Protocolo', 'Emissão Protocolo', 'Tipo Licença', 'Proposta', 'Emissão Licença', 'Validade Licença', 'Valor Total', 'Valor em Aberto', 'Finalizado', 'Criação');
+        $columns = array('ServicoID','Razão Social', 'Código', 'Nome', 'CNPJ', 'Status', 'Imóvel', 'Ins. Estadual', 'Ins. Municipal', 'Ins. Imob.', 'RIP', 'Matrícula RI', 'Área da Loja', 'Área do Terreno','Endereço', 'Número', 'Bairro','Complemento','Data Inauguração',
+        'Cidade','UF', 'CEP', 'Tipo', 'O.S.', 'Situação', 'Responsável', 'Co-Responsável', 'Analista 1','Analista 2','Nome', 'Solicitante','Departamento','Licenciamento', 'N° Protocolo', 'Emissão Protocolo', 'Tipo Licença', 'Proposta', 'Emissão Licença', 'Validade Licença', 'Valor Total', 'Valor em Aberto', 'Finalizado', 'Criação','Interações');
 
 
         
@@ -229,6 +231,16 @@ class ApiController extends Controller
              {
                  $dataInauguracao = null;
              }
+
+             if($s->historico)
+             {     
+                $interacoes = [];
+                foreach($s->historico as $key =>$i)
+                {
+                    
+                    $interacoes[$key] = ltrim(\Carbon\Carbon::parse($i->created_at)->format('d/m/Y'),',')." - ".$i->observacoes."\n";
+                }
+             }
              
             
              array_push($data, [
@@ -245,8 +257,10 @@ class ApiController extends Controller
                $s->unidade->rip,
                $s->unidade->matriculaRI,
                $s->unidade->area,
+               $s->unidade->areaTerreno,
                $s->unidade->endereco,
                $s->unidade->numero,
+               $s->unidade->bairro,
                $s->unidade->complemento,
                $dataInauguracao,
                $s->unidade->cidade,
@@ -257,6 +271,8 @@ class ApiController extends Controller
                $s->situacao,
                $s->responsavel->name,
                $s->coresponsavel->name ?? '',
+               $s->analista1->name ?? '',
+               $s->analista2->name ?? '',
                $s->nome,
                $s->solicitante,
                $s->departamento,
@@ -271,6 +287,7 @@ class ApiController extends Controller
                $s->financeiro->valorAberto ?? '0',
                $finalizado,
                \Carbon\Carbon::parse($s->created_at)->format('d/m/Y') ?? '',
+               $interacoes,
                
              
             
@@ -316,8 +333,8 @@ class ApiController extends Controller
 
         $data = [];
 
-        $columns = array('ServicoID','Razão Social', 'Código', 'Nome', 'CNPJ', 'Status', 'Imóvel', 'Ins. Estadual', 'Ins. Municipal', 'Ins. Imob.', 'RIP', 'Matrícula RI', 'Área da Loja', 'Endereço', 'Número', 'Complemento','Data Inauguração',
-        'Cidade','UF', 'CEP', 'Tipo', 'O.S.', 'Situação', 'Responsável', 'Co-Responsável', 'Nome', 'Solicitante','Departamento','Licenciamento', 'N° Protocolo', 'Emissão Protocolo', 'Tipo Licença', 'Proposta', 'Emissão Licença', 'Validade Licença', 'Valor Total', 'Valor em Aberto', 'Finalizado', 'Criação');
+        $columns = array('ServicoID','Razão Social', 'Código', 'Nome', 'CNPJ', 'Status', 'Imóvel', 'Ins. Estadual', 'Ins. Municipal', 'Ins. Imob.', 'RIP', 'Matrícula RI', 'Área da Loja', 'Área do terreno','Endereço', 'Número', 'Bairro' ,'Complemento','Data Inauguração',
+        'Cidade','UF', 'CEP', 'Tipo', 'O.S.', 'Situação', 'Responsável', 'Co-Responsável', 'Nome', 'Solicitante','Departamento','Licenciamento', 'N° Protocolo', 'Emissão Protocolo', 'Tipo Licença', 'Proposta', 'Emissão Licença', 'Validade Licença', 'Valor Total', 'Valor em Aberto', 'Finalizado', 'Criação','Interações');
 
 
         
@@ -377,6 +394,16 @@ class ApiController extends Controller
              {
                  $dataInauguracao = null;
              }
+
+             if($s->historico)
+             {     
+                $interacoes = [];
+                foreach($s->historico as $key =>$i)
+                {
+                    
+                    $interacoes[$key] = ltrim(\Carbon\Carbon::parse($i->created_at)->format('d/m/Y'),',')." - ".$i->observacoes."\n";
+                }
+             }
              
             
              array_push($data, [
@@ -393,8 +420,10 @@ class ApiController extends Controller
                $s->unidade->rip,
                $s->unidade->matriculaRI,
                $s->unidade->area,
+               $s->unidade->areaTerreno,
                $s->unidade->endereco,
                $s->unidade->numero,
+               $s->unidade->bairro,
                $s->unidade->complemento,
                $dataInauguracao,
                $s->unidade->cidade,
@@ -419,7 +448,7 @@ class ApiController extends Controller
                $s->financeiro->valorAberto ?? '0',
                $finalizado,
                \Carbon\Carbon::parse($s->created_at)->format('d/m/Y') ?? '',
-               
+               $interacoes
              
             
              ]);
@@ -486,5 +515,12 @@ class ApiController extends Controller
 
        
 
+    }
+
+    public function getPrestadorInfo(Request $request)
+    {
+        $data = Prestador::find($request->prestador_id);
+
+        return response()->json($data);
     }
 }

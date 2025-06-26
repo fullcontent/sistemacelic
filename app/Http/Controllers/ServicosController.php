@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Auth;
+use Mail;
 use App\User;
 use Carbon\Carbon;
 use App\UserAccess;
@@ -12,10 +13,22 @@ use App\Models\Servico;
 use App\Models\Unidade;
 use App\Models\Historico;
 use App\Models\ServicoLpu;
+use App\Models\Pendencia;
+use App\Models\Solicitante;
+use App\Models\PendenciasVinculos;
+
 
 
 
 use App\Models\ServicoFinanceiro;
+use App\Models\ServicoFinalizado;
+use App\Models\Faturamento;
+
+
+use App\Notifications\UserMentioned;
+use App\Mail\UsuarioMencionado;
+use Illuminate\Support\Facades\Notification;
+
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -40,15 +53,7 @@ class ServicosController extends Controller
     public function index()
     {
         
-       
-        $servicos = Servico::with('unidade','empresa','responsavel')
-        						// ->where('responsavel_id',Auth::id())
-        						->get();
-
-        // $servicos = $servicos->where('unidade.status','Ativa');
-
-        return view('admin.lista-servicos')
-                    ->with('servicos',$servicos);
+        return view('admin.lista-servicos-geral');
     }
 
     public function lista()
@@ -60,6 +65,7 @@ class ServicosController extends Controller
                                 // ->whereIn('unidade_id',$this->getUnidadesList())
 
                                 ->where('responsavel_id',Auth::id())
+                                ->orWhere('coresponsavel_id', Auth::id())
                                 ->get();
 
 
@@ -80,6 +86,28 @@ class ServicosController extends Controller
                                 
                                 // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
+                                ->orWhere('coresponsavel_id', Auth::id())
+                                ->get();
+
+
+        $servicos = $servicos->where('situacao','=','andamento')
+                                
+                                ->where('situacao','<>','arquivado');
+
+
+
+        return view('admin.lista-servicos')
+                    ->with('servicos',$servicos);
+    }
+
+    public function listaAndamentoCo()
+    {
+        
+        $servicos = Servico::with('unidade','empresa','responsavel')
+                                
+                                // ->whereIn('unidade_id',$this->getUnidadesList())
+                                ->orWhere('coresponsavel_id',Auth::id())
+                                ->orWhere('coresponsavel_id', Auth::id())
                                 ->get();
 
 
@@ -101,6 +129,7 @@ class ServicosController extends Controller
         						
         						// ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
+                                ->orWhere('coresponsavel_id', Auth::id())
         						->get();
 
 
@@ -120,6 +149,7 @@ class ServicosController extends Controller
         $servicos = Servico::with('unidade','empresa','responsavel')
                                 // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
+                                ->orWhere('coresponsavel_id', Auth::id())
                                 ->get();
 
 
@@ -140,9 +170,28 @@ class ServicosController extends Controller
         $servicos = Servico::with('unidade','empresa','responsavel')
                                 // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
+                                ->orWhere('coresponsavel_id', Auth::id())
                                 ->get();
        
         $servicos = $servicos->where('situacao','=','arquivado');
+        
+
+        return view('admin.lista-servicos')
+                    ->with('servicos',$servicos);
+    }
+
+    public function listaNRenovados()
+    {   
+
+        
+        
+        $servicos = Servico::with('unidade','empresa','responsavel')
+                                // ->whereIn('unidade_id',$this->getUnidadesList())
+                                ->orWhere('responsavel_id',Auth::id())
+                                ->orWhere('coresponsavel_id', Auth::id())
+                                ->get();
+       
+        $servicos = $servicos->where('situacao','=','nRenovado');
         
 
         return view('admin.lista-servicos')
@@ -156,6 +205,7 @@ class ServicosController extends Controller
         $servicos = Servico::with('unidade','empresa','responsavel')
                                 // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
+                                ->orWhere('coresponsavel_id', Auth::id())
                                 ->get();
         
        $servicos = $servicos->where('unidade.status','=','Ativa')
@@ -176,6 +226,7 @@ class ServicosController extends Controller
         $servicos = Servico::with('unidade','empresa','responsavel')
                                 // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
+                                ->orWhere('coresponsavel_id', Auth::id())
                                 ->get();
 
         $servicos = $servicos->where('licenca_validade','<',\Carbon\Carbon::today()->addDays(60))
@@ -198,6 +249,7 @@ class ServicosController extends Controller
         $servicos = Servico::with('unidade','empresa','responsavel')
                                 // ->whereIn('unidade_id',$this->getUnidadesList())
                                 ->orWhere('responsavel_id',Auth::id())
+                                ->orWhere('coresponsavel_id', Auth::id())
                                 ->get();
 
        $servicos = $servicos->where('unidade.status','=','Inativa');
@@ -217,16 +269,23 @@ class ServicosController extends Controller
         if($servico->unidade_id)
         {
 
-            $initial = substr($servico->os, 0,2);
+           $string = $servico->os;
 
-            
-            $lastOS = Servico::where('os','like', '%'.$initial.'%')->orderBy('os','DESC')->pluck('os')->first();
+            $lastOS = Servico::where('os','like', '%'.$string.'%')->orderBy('os','DESC')->pluck('os')->first();
+            $count = strlen($string);
+            $i = 0;
+            while( $i < $count ) {
+                if( ctype_digit($string[$i]) ) {
+                    // echo "First digit found at position $i.";
+                    $os = substr($lastOS, 0, $i);
+                    $number = substr($lastOS, $i, 4);
+                    $number = $number + 1;
+                    $os .= $number;
+                }
+                $i++;
+                }
+                
 
-            $number = substr($lastOS, 2,4);
-            $number = str_pad($number+1, 4, "000", STR_PAD_LEFT);
-
-            $os = substr($lastOS, 0,2);
-            $os .= $number;
 
         }
 
@@ -247,6 +306,7 @@ class ServicosController extends Controller
 
         $newService->situacao = 'andamento';
         $newService->os = $os;
+
 
         $newService->save();
 
@@ -294,12 +354,32 @@ class ServicosController extends Controller
 
 
 
-        return redirect()->route('servicos.show',$newService->id);
+        return redirect()->route('servicos.edit',$newService->id);
         
 
     }
 
 
+    public function desconsiderar($id)
+    {
+        $servico = Servico::find($id);
+
+        $servico->situacao = 'nRenovado';
+        $servico->save();
+
+
+        //Insert history
+
+        $history = new Historico();
+        $history->servico_id = $servico->id;
+        $history->user_id = Auth::id();
+        $history->observacoes = "Serviço ".$servico->id." não renovado.";
+        $history->created_at = Carbon::now('america/sao_paulo');
+        $history->save();
+
+
+        return redirect()->route('servico.vencer');
+    }
 
 
 
@@ -312,13 +392,21 @@ class ServicosController extends Controller
     {
         //
 
+        
         $tipo = $request->t;
         $tipoServico = $request->tipoServico;
     
         $id = $request->id;
-        $users = User::where('privileges','=','admin')->pluck('name','id')->toArray();
+        $users = User::where('privileges','=','admin')->where('active',1)->orderBy('name')->pluck('name','id')->toArray();
 
+        $servico = null;
+        $servicoPrincipal=null;
         
+        
+        if(isset($request->servicoPrincipal))
+        {
+            $servicoPrincipal = $request->servicoPrincipal;
+        }
 
         switch ($tipo) {
             case 'unidade':
@@ -329,16 +417,19 @@ class ServicosController extends Controller
                     $os = substr($a[0], 0, 1);
                     $os .= substr($a[1], 0, 1); 
 
-                    $lastOS = Servico::where('os','like','%'.$os.'0%')->orderBy('os','DESC')->pluck('os')->first();
+                    $lastOS = Servico::where('os','like','%'.$os.'%')->orderBy('os','DESC')->pluck('os')->first();
 
                     if(!$lastOS)
                     {
                         $number = "0001";
+                        
 
                     }
                     else {
+
                         $number = substr($lastOS, 2,4);
-                        $number = str_pad($number+1, 4, "000", STR_PAD_LEFT);
+                        $number = str_pad($number+1, 4, "000", STR_PAD_LEFT);    
+                                                      
                         
                     }
 
@@ -346,7 +437,7 @@ class ServicosController extends Controller
 
                     $os .= $number;
 
-                    $servico_lpu = ServicoLpu::where('empresa_id',$u->empresa->id)->pluck('documento','id')->toArray();
+                    // $servico_lpu = ServicoLpu::where('empresa_id',$u->empresa->id)->pluck('documento','id')->toArray();
 
 
                 break;
@@ -373,19 +464,17 @@ class ServicosController extends Controller
 
                     $os .= $number;
 
-                    $servico_lpu = ServicoLpu::where('empresa_id',$u->id)->pluck('documento','id')->toArray();
+                    // $servico_lpu = ServicoLpu::where('empresa_id',$u->id)->pluck('documento','id')->toArray();
 
                 break;
             
             
         }
 
-        $servico = null;
 
-
-
-           
-         
+        $solicitantes = Solicitante::whereHas('empresas',function($q) use($u){
+            $q->where('empresa_id', '=', $u->empresa_id);
+        })->orderBy('nome')->get()->pluck('nome','id');   
 
 
         return view('admin.cadastro-servico')
@@ -395,8 +484,10 @@ class ServicosController extends Controller
                     'users'=>$users,
                     'os' => $os,
                     'servico'=>$servico,
-                    'servico_lpu'=>$servico_lpu,
+                    // 'servico_lpu'=>$servico_lpu,
                     'tipoServico'=>$tipoServico,
+                    'servicoPrincipal'=>$servicoPrincipal,
+                    'solicitantes'=>$solicitantes,
                     
                     
                 ]);
@@ -420,6 +511,8 @@ class ServicosController extends Controller
             
         ]);
         
+
+       
         
         
         $servico = new Servico;
@@ -428,16 +521,32 @@ class ServicosController extends Controller
         $servico->nome  =   $request->nome;
         $servico->situacao  =  $request->situacao;
         $servico->responsavel_id = $request->responsavel_id;
+        $servico->coresponsavel_id = $request->coresponsavel_id;
+
+        $servico->analista1_id = $request->analista1_id;
+        $servico->analista2_id = $request->analista2_id;
                
         $servico->protocolo_numero  =   $request->protocolo_numero;
+
+        if($request->licenciamento)
+        {
+            $servico->licenciamento  =   $request->licenciamento;
+        }
+        
+       
         
         $servico->observacoes   = $request->observacoes;
+        $servico->escopo   = $request->escopo;
+        $servico->proposta   = $request->proposta;
         $servico->solicitante = $request->solicitante;
+        $servico->departamento = $request->departamento;
         $servico->servico_lpu = $request->servico_lpu;
         $servico->tipoLicenca = $request->tipoLicenca;
         
 
         $servico->laudo_numero = $request->laudo_numero;
+
+        
 
         
         if($request->protocolo_emissao)
@@ -533,6 +642,7 @@ class ServicosController extends Controller
         }
         
 
+        $servico->servicoPrincipal = $request->servicoPrincipal;
 
 
               
@@ -569,11 +679,15 @@ class ServicosController extends Controller
         $history->servico_id = $servico->id;
         $history->user_id = Auth::id();
         $history->observacoes = "Serviço ".$servico->id." cadastrado.";
+        $history->created_at = Carbon::now('america/sao_paulo');
         $history->save();
 
         
 
-        return redirect()->route('servicos.show',$servico->id);
+
+
+
+        return redirect()->route('pendencia.create',$servico->id);
 
 
 
@@ -589,10 +703,10 @@ class ServicosController extends Controller
     public function show($id)
     {
         //
-        $servico = Servico::find($id);
+        $servico = Servico::with('servicoPrincipal')->find($id);
 
-       
-            
+        
+                   
         //Check if is empresa or unidade
 
         if($servico->unidade_id){
@@ -608,6 +722,9 @@ class ServicosController extends Controller
         $access = UserAccess::where('user_id',Auth::id())->whereNull('unidade_id')->pluck('empresa_id');
         $empresa = Empresa::where('id',$servico->unidade->empresa_id)->pluck('id');
         
+
+
+
         if($access->contains($empresa[0]))
         {
             return view('admin.detalhe-servico')
@@ -618,6 +735,8 @@ class ServicosController extends Controller
                 'taxas'=>$servico->taxas,
                 'pendencias'=>$servico->pendencias,
                 'arquivo'=>'servico',
+                'usuarios'=>User::pluck('name','id')->toArray(),
+                'ordensCompra'=>$servico->ordensCompra,
                 
             ]);
 
@@ -648,11 +767,11 @@ class ServicosController extends Controller
 
         $servico = Servico::find($id);
                 
-        $users = User::where('privileges','=','admin')->pluck('name','id')->toArray();
+       $users = User::where('privileges','=','admin')->where('active',1)->orderBy('name')->pluck('name','id')->toArray();
 
-        $servico_lpu = ServicoLpu::where('empresa_id',$servico->unidade->empresa->id)->pluck('documento','id')->toArray();
+        // $servico_lpu = ServicoLpu::where('empresa_id',$servico->unidade->empresa->id)->pluck('documento','id')->toArray();
 
-        
+        $servico_lpu = null;
 
         //Check if is empresa or unidade
 
@@ -708,6 +827,11 @@ class ServicosController extends Controller
         
        }
        
+       $solicitantes = Solicitante::whereHas('empresas',function($q) use($servico){
+        $q->where('empresa_id', '=', $servico->unidade->empresa_id);
+    })->orderBy('nome')->get()->pluck('nome','id');   
+       
+       
         
         return view('admin.editar-servico')
                     ->with([
@@ -715,9 +839,11 @@ class ServicosController extends Controller
                         'dados'=>$dados,
                         'route'=>$route,
                         'users'=>$users,
-                        'servico_lpu'=>$servico_lpu,
+                        // 'servico_lpu'=>$servico_lpu,
                         'financeiro'=>$servico->financeiro,
                         'ps'=>$servico->tipo,
+                        'solicitantes'=>$solicitantes,
+                        'licenciamento'=>$servico->licenciamento,
                                                 
                     ]);
     }
@@ -730,7 +856,16 @@ class ServicosController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    {
+    {   
+        $request->validate([
+            'solicitante' => 'required',
+            'valorTotal' => 'required',           
+            
+        ]);
+
+        
+
+
         //
         $servico = Servico::find($id);
         $servico->tipo  =   $request->tipo;
@@ -738,15 +873,30 @@ class ServicosController extends Controller
         $servico->nome  =   $request->nome;
         $servico->situacao  =  $request->situacao;
         $servico->responsavel_id = $request->responsavel_id;
+        $servico->coresponsavel_id = $request->coresponsavel_id;
 
+        $servico->analista1_id = $request->analista1_id;
+        $servico->analista2_id = $request->analista2_id;
+
+        
+        if($request->licenciamento)
+        {
+            $servico->licenciamento  =   $request->licenciamento;
+
+        }
         
         $servico->protocolo_numero  =   $request->protocolo_numero;
         $servico->laudo_numero = $request->laudo_numero;
 
         $servico->observacoes   = $request->observacoes;
+        $servico->escopo   = $request->escopo;
+        $servico->proposta   = $request->proposta;
         $servico->solicitante = $request->solicitante;
+        $servico->departamento = $request->departamento;
         $servico->servico_lpu = $request->servico_lpu;
         $servico->tipoLicenca = $request->tipoLicenca;
+
+        $servico->nf = $request->nf;
 
 
 
@@ -761,6 +911,27 @@ class ServicosController extends Controller
         
         $financeiro->save();
 
+       
+        if(!$financeiro->wasRecentlyCreated)
+                    {   
+                        $changes = $financeiro->getChanges();
+                        
+                        foreach ($changes as $value => $key) {
+
+                           
+                            $history = new Historico();
+                            $history->servico_id = $servico->id;
+                            $history->user_id = Auth::id();
+                            $history->observacoes = 'Alterou '.$value.' para R$'.$key.'';
+                            $history->created_at = Carbon::now('america/sao_paulo');
+                            $history->save();
+                        }
+                    }
+        
+        //Edit Faturamento
+        
+
+        
 
 
         //-----------------------------------
@@ -846,9 +1017,9 @@ class ServicosController extends Controller
             
             $servico->licenca_validade = '2059-12-31';
         }
-        
 
-       
+        
+     
         $servico->save();
 
         
@@ -857,16 +1028,41 @@ class ServicosController extends Controller
             $changes = $servico->getChanges();
             unset($changes['updated_at']);
 
-
              foreach ($changes as $value => $key) {
                  
                     $history = new Historico();
                     $history->servico_id = $servico->id;
-                        $history->user_id = Auth::id();
+                    $history->user_id = Auth::id();
                     $history->observacoes = 'Alterou '.$value.' para "'.$key.'"';
+                    $history->created_at = Carbon::now('america/sao_paulo');
                     $history->save();
+
+
+                    //Update Servico Finalizado
+
+                    if($history->observacoes == 'Alterou situacao para "finalizado"')
+                    {   
+                        if(!ServicoFinalizado::where('servico_id',$servico->id)->first())
+                        {
+                            $this->finalizarServico($servico->id);
+                            $this->removerVinculo($servico->vinculos);
+                        }
+                        
+                    }
+
+                    if($history->observacoes == 'Alterou situacao para "andamento"')
+                    {
+                        $mS = ServicoFinalizado::where('servico_id',$servico->id)->delete();
+                        
+                    }
+
+                    
              }
-            }
+        }
+
+
+          
+        
 
       
 
@@ -896,41 +1092,125 @@ class ServicosController extends Controller
         $servico = Servico::find($id);
         $servico->pendencias()->delete();
         $servico->taxas()->delete();
+        $servico->vinculos()->delete();
+        $servico->servicoFinalizado()->delete();
         $servico->delete();
 
 
-        return redirect()->route('servico.lista');
-    }
+        //Insert history
 
+        $history = new Historico();
+        $history->servico_id = $servico->id;
+        $history->user_id = Auth::id();
+        $history->observacoes = "Serviço ".$servico->id." excluido.";
+        $history->created_at = Carbon::now('america/sao_paulo');
+        $history->save();
+
+
+
+
+        return redirect()->route('unidades.show',$servico->unidade_id);
+    }
 
 
     public function salvarInteracao(Request $request)
     {   
-
         $validator = Validator::make($request->all(), [
-
-                'observacoes'=>'required',
-                
-            ])->validate();
-
+            'observacoes' => 'required',
+        ])->validate();
+    
+        // Create a new Historico instance
         $interacao = new Historico;
-
         $interacao->servico_id = $request->servico_id;
         $interacao->observacoes = $request->observacoes;
         $interacao->user_id = Auth::id();
         $interacao->created_at = Carbon::now('America/Sao_Paulo');
-
         $interacao->save();
-
+    
+        // Find the associated service
+        $servico = Servico::find($request->servico_id);
+    
+        // Check for mentions in the observacoes
+        $mentions = preg_match_all('[\B@[a-zA-Z\wÀ-ú]+\s\w+]', $request->observacoes, $users);
+        if ($mentions > 0) {
+            foreach ($users[0] as $u) {
+                $u = ltrim($u, "@");
+                $user = User::where('name', 'like', '%' . $u . '%')->first();
+                if ($user) {
+                    $route = $user->privileges == 'admin' ? 'servicos.show' : 'cliente.servico.show';
+                    Notification::send($user, new UserMentioned($interacao->servico_id, $route));
+                    Mail::to($user)->send(new UsuarioMencionado($servico, $route));
+                }
+            }
+        }
+    
+        // Redirect to the show route for the service
         return redirect()->route('servicos.show', $request->servico_id);
     }
+    
 
 
     public function interacoes($id)
     {
-        $interacoes = Historico::where('servico_id',$id)->orderBy('created_at','desc')->get();
+        $interacoes = $this->interacoesAutomaticas($id);
 
-        return view('admin.lista-interacoes')->with('interacoes',$interacoes);
+        $interacoesSistema = Historico::where('servico_id',$id)->whereNotIn('id',$interacoes->pluck('id'))->get();
+
+
+
+        $servico = Servico::select('os','id')->find($id);
+        
+
+        return view('admin.lista-interacoes')->with(
+            [
+                'interacoes'=>$interacoes,
+                'interacoesSistema' => $interacoesSistema,
+                'servico'=>$servico,
+                
+                ]);
+    }
+
+    public function interacoesAutomaticas($id){
+
+	
+        $filters = [
+            'observacoes' => [
+                'Serviço '.$id.' cadastrado',
+                'Alterou ',
+                'Concluiu ',
+                'Pendencia ',
+                'Taxa ',
+                'Marcou ',
+            ],
+        ];
+        
+        $historico = \App\Models\Historico::where('servico_id',$id)
+                    ->where(function($query) use ($filters, $id) {
+                        $ids = \App\Models\Historico::where('servico_id',$id)->filter($filters)->pluck('id');
+                        $query->whereNotIn('id', $ids);
+                    })
+                    ->get();
+                    
+        return $historico;
+    }
+
+
+    public function timeline($id)
+    {
+        $servico = Servico::find($id);
+
+	
+	    $pendencias = Pendencia::whereIn('id',$servico->pendencias->pluck('id'))
+										->get()
+										->groupBy(function($data){
+													return Carbon::parse($data->created_at)->format('Y-m-d');
+												});
+
+
+												
+
+	
+	return view('admin.timeline')->with('servico',$servico);
     }
 
 
@@ -940,4 +1220,148 @@ class ServicosController extends Controller
 
         return $unidadesList;
     }
+
+
+    public function removerProtocolo($id)
+    {
+        $servico = Servico::find($id);
+        $servico->protocolo_anexo = null;
+        $servico->save();
+    }
+
+    public function removerLicenca($id)
+    {
+        $servico = Servico::find($id);
+        $servico->licenca_anexo = null;
+        $servico->save();
+    }
+
+    public function removerLaudo($id)
+    {
+        $servico = Servico::find($id);
+        $servico->laudo_anexo = null;
+        $servico->save();
+    }
+
+
+    public function finalizarServico($id)
+    {
+        $servico = new ServicoFinalizado;
+        $servico->servico_id = $id;
+        $servico->finalizado = date('Y-m-d');
+        $servico->save();
+    }
+
+    public function removerVinculo($vinculos)
+    {
+       
+       
+       //find pendencia
+
+       foreach($vinculos as $v)
+       {
+           $pendencia = Pendencia::find($v->pendencia_id);
+           $pendencia->vencimento = date('Y-m-d');
+           $pendencia->save();
+
+           //remove vinculo
+
+           $pendencia_vinculo = PendenciasVinculos::where('id',$v->id)->delete();
+       }
+               
+        
+    }
+
+
+    public function findFirstNum($myString) {
+
+        $slength = strlen($myString);
+    
+        for ($index = 0;  $index < $slength; $index++)
+        {
+            $char = substr($myString, $index, 1);
+    
+            if (is_numeric($char))
+            {
+                return $index;
+            }
+        }
+    
+        return 0;  //no numbers found
+    }
+
+
+    public function anexarLaudo(Request $request)
+    {
+        $servico = Servico::find($request->servico_id);
+
+        if($request->laudo_emissao)
+        {
+            $servico->laudo_emissao = Carbon::createFromFormat('d/m/Y', $request->laudo_emissao)->toDateString();
+        }
+        
+        $servico->laudo_numero  =   $request->laudo_numero;
+
+       
+        // Se informou o arquivo, retorna um boolean
+        if ($request->hasFile('laudo_anexo') && $request->file('laudo_anexo')->isValid()) {
+            $nameFile = null;
+            $name = uniqid(date('HisYmd'));
+            $extension = $request->laudo_anexo->extension();
+
+            $nameFile = "{$name}.{$extension}";
+            // Faz o upload:
+            $upload = $request->laudo_anexo->storeAs('laudos', $nameFile);
+            // Se tiver funcionado o arquivo foi armazenado em storage/app/public/categories/nomedinamicoarquivo.extensao
+
+            $servico->laudo_anexo = $upload;
+
+
+        }
+
+
+        $servico->save();
+
+        return redirect()->route('servicos.show',$servico->id);
+
+    }
+    
+    public function anexarProtocolo(Request $request)
+{
+    // Retrieve the service by ID from the request
+    $servico = Servico::find($request->servico_id);
+
+    // If the request has a protocol emission date, format it
+    if($request->protocolo_emissao)
+    {
+        $servico->protocolo_emissao = Carbon::createFromFormat('d/m/Y', $request->protocolo_emissao)->toDateString();
+    }
+    
+    // Update the service with the protocol number from the request
+    $servico->protocolo_numero  =   $request->protocolo_numero;
+
+    // If the request has a valid file, upload it
+    if ($request->hasFile('protocolo_anexo') && $request->file('protocolo_anexo')->isValid()) {
+        // Generate a unique file name
+        $nameFile = null;
+        $name = uniqid(date('HisYmd'));
+        $extension = $request->protocolo_anexo->extension();
+
+        $nameFile = "{$name}.{$extension}";
+
+        // Upload the file
+        $upload = $request->protocolo_anexo->storeAs('protocolos', $nameFile);
+
+        // Save the file path in the service
+        $servico->protocolo_anexo = $upload;
+    }
+
+    // Save the updated service
+    $servico->save();
+
+    // Redirect to the service show page
+    return redirect()->route('servicos.show',$servico->id);
+}
+
+    
 }

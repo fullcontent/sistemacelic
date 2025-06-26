@@ -84,16 +84,16 @@ tfoot { display:table-footer-group }
     <body>
         <!-- Define header and footer blocks before your content -->
         <header>
-            <img src="http://sistemacelic.net/img/headerCastro.png" width="100%"/>
+            <img src="{{url('public/uploads/headerCastro.png')}}" width="100%"/>
         </header>
 
         <section>
-            <img src="http://sistemacelic.net/img/bgCastro.png" width="100%"/>
+            <img src="{{url('public/uploads/bgCastro.png')}}" width="100%"/>
         </section>
 
         <footer>
             
-            <img src="http://sistemacelic.net/img/footerCastro.png" width="100%"/>
+            <img src="{{url('public/uploads/footerCastro.png')}}" width="100%"/>
         </footer>
 
         <!-- Wrap the content of your PDF inside a main tag -->
@@ -134,8 +134,14 @@ tfoot { display:table-footer-group }
                     </tr>
                 </thead>
                 <tbody>
-                @php $index=0 @endphp
+                @php $index=0 
+                @endphp
                 @foreach($proposta->servicos as $key => $s)
+
+
+                @php
+                    $subtotal = 0;
+                @endphp
                     <tr id="{{$index}}">
                     <td>
                         @if(!$s->servicoPrincipal)
@@ -150,7 +156,7 @@ tfoot { display:table-footer-group }
 
                         @php
                         
-                            $subtotal = 0;
+                            
                             $subtotal = $subtotal + $s->valor;
                             @endphp
 
@@ -175,7 +181,7 @@ tfoot { display:table-footer-group }
                             
                             
                         </p>
-                        <p style="text-align:left;">{{$s->escopo}}</p>
+                        <p style="text-align:left;">{!! $s->escopo !!}</p>
                     </td>
                     
                     <td class="valor" id="{{$index}}">R$ {{number_format($s->valor,2)}}</td>

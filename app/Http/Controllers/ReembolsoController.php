@@ -9,6 +9,17 @@ use App\Models\Servico;
 use App\Models\Reembolso;
 use Illuminate\Http\Request;
 use App\Models\ReembolsoTaxa;
+use App\Models\DadosCastro;
+
+
+use PDFMerger;
+use ZipArchive;
+use File;
+
+use Dompdf\Dompdf;
+use PDF;
+
+
 
 class ReembolsoController extends Controller
 {
@@ -19,6 +30,15 @@ class ReembolsoController extends Controller
      */
     public function index()
     {
+        
+
+    //     $reembolsos = Reembolso::query()
+    //    ->select('id','valorTotal','created_at','nome','empresa_id')
+    //      ->with(['empresa' => function($query) {
+    //         $query->select('id','nomeFantasia');
+    //     }])
+    //     ->get();
+
         $reembolsos = Reembolso::all();
 
         return view('admin.reembolso.lista-reembolsos')->with([
@@ -35,7 +55,7 @@ class ReembolsoController extends Controller
     public function create()
     {
       
-        $empresas = Empresa::all()->pluck('nomeFantasia','id');
+        $empresas = Empresa::orderBy('nomeFantasia')->pluck('nomeFantasia','id');
 
         return view('admin.reembolso.step1')->with(compact('empresas',$empresas));
         
@@ -43,6 +63,8 @@ class ReembolsoController extends Controller
 
     public function step2(Request $request)
     {
+        
+         
         
         $periodo = explode(' - ', $request->periodo);
         $start_date = Carbon::parse($periodo[0])->toDateTimeString();
@@ -62,39 +84,63 @@ class ReembolsoController extends Controller
             $s2 = $s2->merge($s);
         }
 
-        $servicosFaturar = Servico::whereIn('id', $s2)
-                           
-                            
-                            ->with('reembolsos')
-                            ->whereHas('reembolsos',function($q) use ($start_date, $end_date){
-                                return $q->whereBetween('created_at', [$start_date,$end_date]);
-                            })                     
-                            ->get();
 
+       
         
-        foreach($servicosFaturar as $s)
+
+
+        $servicosFaturar = Servico::with('reembolsos')
+                            ->whereHas('reembolsos',function($q) use ($start_date, $end_date){
+                                return $q->whereBetween('pagamento', [$start_date,$end_date]);
+                            })                  
+                            ->get();
+        
+        
+        
+                      
+               
+        foreach($servicosFaturar->whereIn('id',$s2) as $s)
         {
 
             foreach($s->reembolsos as $r)
             {
-
+                
                 $t = $r->id;
                 $taxas = $taxas->merge($t);
+
             }
 
 
         }
 
-        //Buscando as taxas da lista
-
-        $t = Taxa::whereIn('id',$taxas)->get();
 
         
 
+
+        $taxasAberto = Taxa::whereIn('id',$taxas)
+                ->whereDoesntHave('reembolsada')
+                // ->whereHas('reembolsada')
+                ->whereNotNull('pagamento')
+                ->whereBetween('pagamento', [$start_date,$end_date])
+                ->get();
+                
+                $taxasReembolsadas = Taxa::whereIn('id',$taxas)
+                // ->whereDoesntHave('reembolsada')
+                ->whereHas('reembolsada')
+                ->whereNotNull('pagamento')
+                ->whereBetween('pagamento', [$start_date,$end_date])
+                ->get();    
+                
+
+       
+
         
+        
+
 
         return view('admin.reembolso.step2')->with([
-            'taxas'=>$t,
+            'taxas'=>$taxasAberto,
+            'reembolsadas'=>$taxasReembolsadas,
             'empresas'=>$empresas,
             'periodo'=>$periodo,
         ]);
@@ -113,19 +159,22 @@ class ReembolsoController extends Controller
 
 
         $empresa = Empresa::find($request->empresa_id);
+
+        $dadosCastro = DadosCastro::pluck('razaoSocial','id');
         
         return view('admin.reembolso.step3')->with([
             'taxasReembolsar'=>$taxasReembolsar,
             'total'=>$total,
             'empresa'=> $empresa,
             'descricao'=>$descricao,
+            'dadosCastro'=>$dadosCastro,
 
         ]);
     }
 
     public function step4(Request $request)
     {
-       
+      
         
         $taxasReembolsar = Taxa::whereIn('id',$request->taxas)->get();
         $total = $taxasReembolsar->sum('valor');
@@ -137,6 +186,10 @@ class ReembolsoController extends Controller
 
         $this->salvarReembolso($taxasReembolsar, $total, $request->descricao, $request->obs, $request->empresa_id);
 
+        $dadosCastro = DadosCastro::find($request->dadosCastro);
+
+       
+        
 
        return view('admin.reembolso.step4')->with([
             
@@ -146,6 +199,7 @@ class ReembolsoController extends Controller
             'totalReembolso'=>$total,
             'descricao'=>$request->descricao,
             'obs'=>$request->obs,
+            'dadosCastro' => $dadosCastro,
         ]);
         
     
@@ -183,6 +237,8 @@ class ReembolsoController extends Controller
             'obs'=>$reembolso->obs,
             'data'=>$reembolso->created_at,
             'empresa'=>$empresa,
+            'id'=>$this->fillWithZeros($reembolso->id),
+            'dadosCastro'=>$reembolso->dadosCastro,
         ]);
     }
 
@@ -265,4 +321,300 @@ class ReembolsoController extends Controller
             }
 
     }
+
+    
+    public function download($id)
+    {
+        
+        $reembolso = Reembolso::with('taxas.taxa.unidade')->find($id);
+        $empresa = Empresa::find($reembolso->empresa_id);
+
+      
+
+        $id = $this->fillWithZeros($reembolso->id);
+    
+
+        $reembolsoR = \PDF::loadview('admin.reembolso.pdf',[
+            'empresa'=>$empresa,
+            'reembolsoItens'=>$reembolso->taxas,
+            'descricao'=>$reembolso->nome,
+            'obs'=>$reembolso->obs,
+            'data'=>$reembolso->created_at,
+            'totalReembolso'=>$reembolso->valorTotal,
+            'id'=>$id,
+            'dadosCastro'=>$reembolso->dadosCastro,
+            ])->setPaper('a4', 'portrait');
+            
+        
+
+        
+
+        $reembolsoR->save(public_path('uploads/ReembolsoTemp.pdf'));
+
+        return response()->file(public_path('uploads/ReembolsoTemp.pdf'));
+
+
+
+        $reembolso = Reembolso::with('taxas')->find($id);
+
+        $pdf = new PDFMerger();
+
+        
+
+        $pdf->addPDF(public_path('uploads/ReembolsoTemp.pdf'),'all');
+
+
+        
+
+
+       foreach($reembolso->taxas as $t)
+       {
+
+            $taxa = Taxa::find($t->taxa_id);
+
+            if($taxa->comprovante)
+            {
+               
+                $extension = pathinfo(public_path("uploads/".$taxa->comprovante), PATHINFO_EXTENSION);
+                
+                if($extension == "png" || $extension == "jpg" || $extension == "jpeg")
+                {
+                   $compPDF = \PDF::loadHTML("<img src=".public_path("uploads/".$taxa->comprovante." width=100%>"));
+                   $compPDF->save(public_path('uploads/ComprovanteTEMP.pdf'));
+                   $pdf->addPDF(public_path("uploads/ComprovanteTEMP.pdf"), 'all');
+                }
+                else
+                {   
+                    $fp = @fopen(public_path("uploads/".$taxa->comprovante), 'rb');
+    
+                            if (!$fp) {
+                                return 0;
+                            }
+                            
+                            /* Reset file pointer to the start */
+                            fseek($fp, 0);
+                            /* Read 20 bytes from the start of the PDF */
+                            preg_match('/\d\.\d/',fread($fp,20),$match);
+                            
+                            fclose($fp);
+                            
+                            if (isset($match[0])) {
+
+                                
+                                if($match[0] <= 1.4)
+                                {
+                                    $pdf->addPDF(public_path("uploads/".$taxa->comprovante), 'all');
+                                }
+                               
+                            }
+
+                    
+                }
+
+
+            }
+
+            if($taxa->boleto)
+            {
+                $extension = pathinfo(public_path("uploads/".$taxa->boleto), PATHINFO_EXTENSION);
+                
+                if($extension == "png" || $extension == "jpg" || $extension == "jpeg")
+                {
+                   $compPDF = \PDF::loadHTML("<img src=".public_path("uploads/".$taxa->boleto." width=100%>"));
+                   $compPDF->save(public_path('uploads/boletoTEMP.pdf'));
+                   $pdf->addPDF(public_path("uploads/boletoTEMP.pdf"), 'all');
+                }
+                else
+                {
+
+                    $fp = @fopen(public_path("uploads/".$taxa->boleto), 'rb');
+    
+                    if (!$fp) {
+                        return 0;
+                    }
+                    
+                    /* Reset file pointer to the start */
+                    fseek($fp, 0);
+                    /* Read 20 bytes from the start of the PDF */
+                    preg_match('/\d\.\d/',fread($fp,20),$match);
+                    
+                    fclose($fp);
+                    
+                    if (isset($match[0])) {
+
+                       
+                        if($match[0] <= 1.4)
+                        {
+                            $pdf->addPDF(public_path("uploads/".$taxa->boleto), 'all');
+                        }
+                        
+                        
+                    }
+                    
+                    
+                }
+            }
+           
+            
+            
+       }
+
+    
+      // Merge the files and retrieve its PDF binary content
+      $pdf->merge('browser', "".utf8_decode($reembolso->empresa->nomeFantasia)." Relatorio Reembolso ".$reembolso->nome.".pdf");
+       
+    }
+
+    public function downloadZip($id)
+    {   
+
+        //check if exists
+
+        $this->createRelatorioFolder($id);
+
+        $rPath = public_path('uploads/reembolsos/'.$id);
+        $reembolso = Reembolso::with('taxas.taxa.unidade')->find($id);
+
+        $zip_file = $rPath."/".utf8_decode($this->tirarAcentos($reembolso->empresa->nomeFantasia))." - Relatorio Reembolso -".$reembolso->nome.".zip";
+
+        
+        $zip = new \ZipArchive();
+        $zip->open($zip_file, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+        
+        
+        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($rPath));
+        
+        
+        
+
+
+        foreach ($files as $name => $file)
+        {   
+
+            
+
+            $extension = pathinfo($file->getRealPath(), PATHINFO_EXTENSION);
+
+            if($extension != "zip")
+            {   
+
+                
+                // We're skipping all subfolders
+                if (!$file->isDir()) {
+
+                    $filePath     = $file->getRealPath();
+
+                    // extracting filename with substr/strlen
+                    $relativePath = substr($filePath, strlen($rPath) + 1);
+
+                    $zip->addFile($filePath, $relativePath);
+                }
+            }
+
+        }
+
+        
+        $zip->close();
+
+        return response()->download($zip_file);
+
+
+
+    }
+
+
+    public function createRelatorioFolder($id)
+    {   
+
+        $path = public_path('uploads/');
+        $rPath = public_path('uploads/reembolsos/'.$id);
+
+        //check if folder exists
+
+        if($rPath)
+        {
+
+            $this->createFolder($id);
+           
+        }
+
+        $reembolso = Reembolso::with('taxas.taxa.unidade')->find($id);
+            $empresa = Empresa::find($reembolso->empresa_id);
+            $reembolsoR = \PDF::loadview('admin.reembolso.pdf',[
+                'empresa'=>$empresa,
+                'reembolsoItens'=>$reembolso->taxas,
+                'descricao'=>$reembolso->nome,
+                'obs'=>$reembolso->obs,
+                'data'=>$reembolso->created_at,
+                'totalReembolso'=>$reembolso->valorTotal,
+                'dadosCastro' => $reembolso->dadosCastro,
+                ]);
+        
+        
+        
+            $reembolsoR->save($rPath.'/Reembolso - '.$reembolso->nome.'.pdf');
+
+        
+
+        foreach($reembolso->taxas as $key => $t)
+        {
+            $taxa = Taxa::find($t->taxa_id);
+            $key = $key+1;
+            if($taxa->comprovante)
+            {   
+                $extension = pathinfo(public_path("uploads/".$taxa->comprovante), PATHINFO_EXTENSION);
+                $compr = File::copy($path.$taxa->comprovante, $path.'/reembolsos/'.$id.'/Item '.$key.' - Comprovante.'.$extension);
+            }
+            if($taxa->boleto)
+            {   
+                $extension = pathinfo(public_path("uploads/".$taxa->boleto), PATHINFO_EXTENSION);
+                $compr = File::copy($path.$taxa->boleto, $path.'/reembolsos/'.$id.'/Item '.$key.' - Boleto.'.$extension);
+            }
+
+        }
+
+        
+                    
+    }
+
+
+    private function createFolder($id)
+    {
+        $path = public_path('uploads/reembolsos/'.$id);
+        File::makeDirectory($path, $mode = 0777, true, true);
+        
+
+    }
+
+    private function tirarAcentos($string){
+        return preg_replace(array("/(á|à|ã|â|ä)/","/(Á|À|Ã|Â|Ä)/","/(é|è|ê|ë)/","/(É|È|Ê|Ë)/","/(í|ì|î|ï)/","/(Í|Ì|Î|Ï)/","/(ó|ò|õ|ô|ö)/","/(Ó|Ò|Õ|Ô|Ö)/","/(ú|ù|û|ü)/","/(Ú|Ù|Û|Ü)/","/(ñ)/","/(Ñ)/","/(Ç)/","/(ç)/","/(Ã)/"),explode(" ","a A e E i I o O u U n N C c A"),$string);
+    }
+
+    public function fillWithZeros($number) {
+         if ($number <= 999) {
+
+            if($number <= 100)
+            {
+                $number = str_pad($number, 4, "10", STR_PAD_LEFT);
+            }
+            else{
+                $number = str_pad($number, 4, "1", STR_PAD_LEFT);
+            }
+                 
+         }
+         else{
+            $number = $number;
+         }
+         return $number;
+       }
+
+    public function alterarEmpresa(Request $request)
+    {
+        return $request;
+    }
+       
+
+
+
+    
 }

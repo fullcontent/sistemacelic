@@ -161,6 +161,16 @@ class AppServiceProvider extends ServiceProvider
                             'url' => ''.Auth::user()->privileges.'/proposta',
                             'icon' => 'fa fa-newspaper',
                             ],
+                            [
+                                'text' => 'Ordens de Compra',
+                                'url' => ''.Auth::user()->privileges.'/ordemCompra',
+                                'icon' => 'fa fa-credit-card',
+                                ],
+                                [
+                                    'text' => 'Prestadores',
+                                    'url' => ''.Auth::user()->privileges.'/prestador',
+                                    'icon' => 'fa fa-user',
+                                    ],
                             
 
 
@@ -194,39 +204,11 @@ class AppServiceProvider extends ServiceProvider
                                         'text' => 'Reembolsos',
                                         'url'  =>  ''.Auth::user()->privileges.'/reembolsos',
                                         'icon'  =>  'glyphicon glyphicon glyphicon-usd',
-                                    ],
-                                    [
-                                        'text' => 'Relatório Completo de Serviços',
-                                        'url'  =>  ''.Auth::user()->privileges.'/relatorio',
-                                        'icon'  =>  'glyphicon glyphicon glyphicon-th-list',
-                                    ]
-                                    
-                                    
-                                );
-                            }
-                            elseif(Auth::id() != 15 || Auth::id() != 21 || Auth::id() != 14 || Auth::id() != 8 || Auth::id() != 27)
-                            {
-                                $event->menu->add(
-                                    ['header'=> 'Administração'],
-                                    [
-                                        'text' => 'Relatório Completo de Serviços',
-                                        'url'  =>  ''.Auth::user()->privileges.'/relatorio',
-                                        'icon'  =>  'glyphicon glyphicon glyphicon-th-list',
-                                    ],
-                                    [
-                                        'text' => 'Relatório de Pendencias',
-                                        'url'  =>  ''.Auth::user()->privileges.'/relatorioPendencias',
-                                        'icon'  =>  'glyphicon glyphicon glyphicon-th-list',
-                                    ],
-                                    [
-                                        'text' => 'Relatório de Taxas',
-                                        'url'  =>  ''.Auth::user()->privileges.'/relatorioTaxas',
-                                        'icon'  =>  'glyphicon glyphicon glyphicon-th-list',
-                                        'id'=>  'relatorioTaxas',
                                     ]
                                     
                                 );
                             }
+                            
                             
                             }
 
@@ -243,8 +225,8 @@ class AppServiceProvider extends ServiceProvider
                             'icon' => 'glyphicon glyphicon-home'
                             ],
                             [
-                                'text' => 'Relatorios',
-                                'url' =>  ''.Auth::user()->privileges.'/relatorios',
+                                'text' => 'Relatorio',
+                                'url' =>  route('cliente.servicos'),
                                 'icon' => 'glyphicon glyphicon-object-align-bottom
                                 '
                                 ],
