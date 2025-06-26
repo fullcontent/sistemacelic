@@ -94,8 +94,14 @@
 
       <div class="col-md-3">
         <div class="form-group">
-        {!! Form::label('vencimento', 'Data limite', array('class'=>'control-label')) !!}
+        {!! Form::label('vencimento', 'Data inicio', array('class'=>'control-label')) !!}
         {!! Form::text('vencimento' , null, ['class'=>'form-control','id'=>'vencimento','data-date-format'=>'dd/mm/yyyy']) !!}
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="form-group">
+        {!! Form::label('dataLimite', 'Data limite', array('class'=>'control-label')) !!}
+        {!! Form::text('dataLimite' , null, ['class'=>'form-control','id'=>'dataLimite','data-date-format'=>'dd/mm/yyyy']) !!}
         </div>
       </div>
 
@@ -198,6 +204,13 @@ $(document).ready(function() {
 var Today = new Date();
 
       $("#vencimento").datepicker({
+        defaultDate:Today,
+        showButtonPanel:true,
+        todayHighlight: true,
+
+      });
+
+      $("#dataLimite").datepicker({
         defaultDate:Today,
         showButtonPanel:true,
         todayHighlight: true,

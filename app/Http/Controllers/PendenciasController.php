@@ -141,6 +141,10 @@ class PendenciasController extends Controller
         if($request->vencimento){
             $pendencia->vencimento = Carbon::createFromFormat('d/m/Y', $request->vencimento)->toDateString(); 
         }
+
+        if($request->dataLimite){
+            $pendencia->dataLimite = Carbon::createFromFormat('d/m/Y', $request->dataLimite)->toDateString(); 
+        }
         
         
         
@@ -196,6 +200,8 @@ class PendenciasController extends Controller
         $pendencia = Pendencia::find($id);
 
         $pendencia->vencimento = date('d/m/Y', strtotime($pendencia->vencimento));
+        $pendencia->dataLimite = date('d/m/Y', strtotime($pendencia->dataLimite));
+
 
         $servico = Servico::where('id',$pendencia->servico_id)->pluck('os','id')->toArray();
 
@@ -248,7 +254,11 @@ class PendenciasController extends Controller
         {
             $pendencia->vencimento = Carbon::createFromFormat('d/m/Y', $request->vencimento)->toDateString();
         }
-         
+        
+         if($request->dataLimite)
+        {
+            $pendencia->dataLimite = Carbon::createFromFormat('d/m/Y', $request->dataLimite)->toDateString();
+        }
 
 
         $pendencia->responsavel_tipo = $request->responsavel_tipo;

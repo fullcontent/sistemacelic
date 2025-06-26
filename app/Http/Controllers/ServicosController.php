@@ -554,6 +554,11 @@ class ServicosController extends Controller
             $servico->protocolo_emissao = Carbon::createFromFormat('d/m/Y', $request->protocolo_emissao)->toDateString();
         }
 
+        if($request->dataFinal)
+        {
+            $servico->dataFinal = Carbon::createFromFormat('d/m/Y', $request->dataFinal)->toDateString();
+        }
+
         if($request->licenca_emissao)
         {
             $servico->licenca_emissao = Carbon::createFromFormat('d/m/Y', $request->licenca_emissao)->toDateString();
@@ -792,6 +797,10 @@ class ServicosController extends Controller
         {
             $servico->protocolo_emissao = date('d/m/Y',strtotime($servico->protocolo_emissao));
         }
+        if($servico->dataFinal)
+        {
+            $servico->dataFinal = date('d/m/Y',strtotime($servico->dataFinal));
+        }
 
         
 
@@ -863,6 +872,7 @@ class ServicosController extends Controller
             
         ]);
 
+        
         
 
 
@@ -988,6 +998,15 @@ class ServicosController extends Controller
             $servico->protocolo_emissao = Carbon::createFromFormat('d/m/Y', $request->protocolo_emissao)->toDateString();
         }
 
+        if($request->dataFinal == null)
+        {
+            $servico->dataFinal = null;
+        }
+        if($request->dataFinal)
+        {
+            $servico->dataFinal = Carbon::createFromFormat('d/m/Y', $request->dataFinal)->toDateString();
+        }
+
         if($request->licenca_emissao)
         {
             $servico->licenca_emissao = Carbon::createFromFormat('d/m/Y', $request->licenca_emissao)->toDateString();
@@ -1018,8 +1037,10 @@ class ServicosController extends Controller
             $servico->licenca_validade = '2059-12-31';
         }
 
+
         
-     
+        
+        // dd($servico);
         $servico->save();
 
         

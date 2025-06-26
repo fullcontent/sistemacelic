@@ -104,6 +104,8 @@
   	$("#licenca_validade").datepicker();
   	$("#laudo_emissao").datepicker();
 
+	$("#dataFinal").datepicker();
+
   	$("#os").val("{!! $os !!}");  	
 				
 

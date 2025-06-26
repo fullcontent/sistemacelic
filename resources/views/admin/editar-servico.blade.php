@@ -89,6 +89,7 @@
   	$("#licenca_emissao").datepicker();
   	$("#licenca_validade").datepicker();
   	$("#laudo_emissao").datepicker();
+	$("#dataFinal").datepicker();
 
   		
 

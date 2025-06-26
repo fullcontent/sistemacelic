@@ -579,8 +579,8 @@ class AdminController extends Controller
                             ->whereNotIn('responsavel_id',[1])
                             ->orderBy('id','DESC')
                             ->with('responsavel','coresponsavel','financeiro','historico')
-                            ->select('id', 'nome', 'os', 'unidade_id', 'tipo', 'protocolo_anexo', 'laudo_anexo', 'solicitante', 'responsavel_id', 'coresponsavel_id', 'licenciamento', 'departamento', 'situacao', 'created_at') // Add 'situacao' and 'created_at' to the select list
-                            // ->take(200)
+                            ->select('id', 'nome', 'os', 'unidade_id', 'tipo', 'protocolo_anexo', 'laudo_anexo', 'solicitante', 'responsavel_id', 'coresponsavel_id', 'licenciamento', 'departamento', 'situacao', 'created_at','dataFinal') // Add 'situacao' and 'created_at' to the select list
+                            ->take(3)
                             ->get();
 
         // $servicos = Pendencia::all();
@@ -623,6 +623,7 @@ class AdminController extends Controller
             'Responsabilidade',
             'Data Criação',
             'Data Limite',
+            'Data final do Serviço',
             'Status',
             'Vinculo',
             'ServicoID',
@@ -792,6 +793,15 @@ class AdminController extends Controller
                              
                         
                     }
+
+
+                    if($s->dataFinal)
+                    {
+                        $dataFinal = date('d/m/Y',strtotime($s->dataFinal));
+                    }
+                    else{
+                        $dataFinal = null;
+                    }
                     
                     
                 
@@ -826,6 +836,7 @@ class AdminController extends Controller
                     $p->responsavel_tipo,
                     \Carbon\Carbon::parse($p->created_at)->format('d/m/Y') ?? '',
                     \Carbon\Carbon::parse($p->vencimento)->format('d/m/Y') ?? '',
+                    $dataFinal,
                     $p->status,
                     $vinculo,
                     $s->id,
