@@ -54,9 +54,12 @@
                             <td>{{$unidade->bairro}}</td>
                             <td>{{$unidade->cidade}}/{{$unidade->uf}}</td>
                             <td>
+
+                                @if($unidade->licencas_processadas)
                                 @foreach($unidade->licencas_processadas as $licenca)
                                     <a href='/admin/servicos/{{$licenca['id']}}' type="button" class="{{$licenca['label']}}">{{$licenca['name']}}</a>
                                 @endforeach
+                                @endif
                             </td>
                             <td>
                                 <div class="btn-group">

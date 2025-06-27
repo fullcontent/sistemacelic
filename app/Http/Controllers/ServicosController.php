@@ -801,6 +801,10 @@ class ServicosController extends Controller
         {
             $servico->dataFinal = date('d/m/Y',strtotime($servico->dataFinal));
         }
+        if($servico->dataLimiteCiclo)
+        {
+            $servico->dataLimiteCiclo = date('d/m/Y',strtotime($servico->dataLimiteCiclo));
+        }
 
         
 
@@ -1002,9 +1006,19 @@ class ServicosController extends Controller
         {
             $servico->dataFinal = null;
         }
+
+        if($request->dataLimiteCiclo == null)
+        {
+            $servico->dataLimiteCiclo = null;
+        }
         if($request->dataFinal)
         {
             $servico->dataFinal = Carbon::createFromFormat('d/m/Y', $request->dataFinal)->toDateString();
+        }
+
+        if($request->dataLimiteCiclo)
+        {
+            $servico->dataLimiteCiclo = Carbon::createFromFormat('d/m/Y', $request->dataLimiteCiclo)->toDateString();
         }
 
         if($request->licenca_emissao)

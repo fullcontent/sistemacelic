@@ -105,6 +105,7 @@
   	$("#laudo_emissao").datepicker();
 
 	$("#dataFinal").datepicker();
+	$("#dataLimiteCiclo").datepicker();
 
   	$("#os").val("{!! $os !!}");  	
 				

@@ -562,7 +562,8 @@ class AdminController extends Controller
             'Data Criação',
             'Data Inicio',
             'Data Limite',
-            'Data final do Serviço',
+            'Data Final Serviço',
+            'Data Limite Ciclo',
             'Status',
             'Vinculo',
             'ServicoID',
@@ -699,9 +700,15 @@ class AdminController extends Controller
                     }
 
                     if ($s->dataFinal) {
-                        $dataFinalServico = date('d/m/Y', strtotime($s->Servico));
+                        $dataFinalServico = date('d/m/Y', strtotime($s->dataFinal));
                     } else {
                         $dataFinalServico = null;
+                    }
+
+                    if ($s->dataLimiteCiclo) {
+                        $dataLimiteCiclo = date('d/m/Y', strtotime($s->dataLimiteCiclo));
+                    } else {
+                        $dataLimiteCiclo = null;
                     }
 
                     if ($p->created_at)
@@ -758,6 +765,7 @@ class AdminController extends Controller
                         $dataInicio,
                         $dataLimite,
                         $dataFinalServico,
+                        $dataLimiteCiclo,
                         $p->status,
                         $vinculo,
                         $s->id,

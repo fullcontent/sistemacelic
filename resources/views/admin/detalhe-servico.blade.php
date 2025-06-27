@@ -217,6 +217,12 @@
                      
                  @endunless
 
+                 @unless (empty($servico->dataLimiteCiclo))
+
+                 <p><b>Data Limite Ciclo: </b>{{\Carbon\Carbon::parse($servico->dataLimiteCiclo)->format('d/m/Y')}}</p>
+                     
+                 @endunless
+
 
                   @if(empty($servico->laudo_numero))
                   <p><b>Laudo:</b> <button type="button" class="btn btn-default" data-toggle="modal"

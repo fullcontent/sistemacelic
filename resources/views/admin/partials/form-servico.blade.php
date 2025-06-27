@@ -232,12 +232,21 @@
 	</div>
 </div>
 
-<div class="col-md-4">
+<div class="col-md-3">
 	
 	<div class="form-group">
 		
 		{!! Form::label('dataFinal', 'Data Final', array('class'=>'control-label')) !!}
 		{!! Form::text('dataFinal', null, ['class'=>'form-control','id'=>'dataFinal','data-date-format'=>'dd/mm/yyyy']) !!}
+		
+	</div>
+</div>
+<div class="col-md-3">
+	
+	<div class="form-group">
+		
+		{!! Form::label('dataLimiteCiclo', 'Data Limite Ciclo', array('class'=>'control-label')) !!}
+		{!! Form::text('dataLimiteCiclo', null, ['class'=>'form-control','id'=>'dataLimiteCiclo','data-date-format'=>'dd/mm/yyyy']) !!}
 		
 	</div>
 </div>
