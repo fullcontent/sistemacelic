@@ -32,14 +32,59 @@ class UnidadesController extends Controller
     }
 
 
-    public function index()
+   public function index()
     {
-        
-        $access = UserAccess::where('user_id',Auth::id())->whereNull('unidade_id')->pluck('empresa_id');
+        $access = UserAccess::where('user_id', Auth::id())->whereNull('unidade_id')->pluck('empresa_id');
 
-        $unidades = Unidade::with('servicos','empresa')->whereIn('empresa_id',$access)->get();
+        // Otimização: Carrega 'servicos' e 'empresa' com Eager Loading.
+        // Além disso, filtra e seleciona apenas os campos necessários dos serviços.
+        $unidades = Unidade::with([
+            'empresa',
+            'servicos' => function ($query) {
+                $query->where('tipo', 'licencaOperacao')
+                      ->select('id', 'unidade_id', 'nome', 'licenca_validade', 'created_at') // Seleciona apenas os campos necessários
+                      ->orderByDesc('created_at'); // Ordena para pegar as mais recentes
+            }
+        ])
+        ->whereIn('empresa_id', $access)
+        ->get();
 
-        return view('admin.lista-unidades')->with('unidades',$unidades);
+        // Pré-processamento das licenças para evitar lógica complexa no Blade
+        // e otimizar o acesso aos dados dentro do loop
+        $unidades->each(function ($unidade) {
+            $licencasProcessadas = collect();
+            
+            // Usamos unique('nome') aqui para pegar a licença mais recente de cada tipo
+            // após ordenar por created_at de forma decrescente na query acima.
+            $unidade->servicos->unique('nome')->each(function ($l) use ($licencasProcessadas) {
+                $label = "btn btn-success btn-xs";
+                if ($l->licenca_validade && Carbon::parse($l->licenca_validade)->isPast()) { // Usando Carbon para checar se a data é passada
+                    $label = "btn btn-danger btn-xs";
+                }
+
+                $name = "n/a";
+                switch ($l->nome) {
+                    case 'Alvará de Publicidade': $name = "AP"; break;
+                    case 'Alvará Sanitário': $name = "AS"; break;
+                    case 'Alvará da Polícia Civil': $name = "PC"; break;
+                    case 'AVCB': $name = "CB"; break;
+                    case 'Alvará de Funcionamento': $name = "AF"; break;
+                    case 'Licença Ambiental': $name = "LA"; break;
+                    case 'Licença de Elevador': $name = "LE"; break;
+                    case 'AMLURB': $name = "AL"; break;
+                    case 'CREFITO': $name = "CR"; break;
+                }
+
+                $licencasProcessadas->push([
+                    'id' => $l->id,
+                    'label' => $label,
+                    'name' => $name,
+                ]);
+            });
+            $unidade->setRelation('licencas_processadas', $licencasProcessadas); // Adiciona como uma nova relação
+        });
+
+        return view('admin.lista-unidades')->with('unidades', $unidades);
     }
 
    
