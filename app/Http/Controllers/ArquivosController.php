@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Arquivo;
 use App\Models\Historico;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\StreamedResponse; // <<-- Adicione esta linha!
 use Auth;
 use App\User;
 
@@ -293,4 +294,60 @@ class ArquivosController extends Controller
         $history->save();
 
     }
+
+
+
+    public function exportCsv()
+{
+    // Define um nome de arquivo dinâmico
+    $fileName = 'RelatorioArquivos -' . now()->format('Y-m-d_H-i-s') . '.csv';
+
+    // Define os cabeçalhos HTTP para indicar que é um download de CSV
+    $headers = [
+        'Content-Type' => 'text/csv',
+        'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+        'Pragma' => 'no-cache',
+        'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+        'Expires' => '0',
+    ];
+
+    // O `callback` é a função que gera o conteúdo do CSV
+    $callback = function() {
+        $file = fopen('php://output', 'w');
+
+        // Cabeçalhos do CSV
+        fputcsv($file, ['ID do Arquivo', 'Nome do Arquivo', 'ID da Unidade', 'URL Completa']);
+        
+        // Usamos o `cursor()` para lidar com muitos arquivos de forma eficiente
+        Arquivo::whereHas('unidade')
+                    // ->take(10) //Remover antes de colocar em produção
+                    ->cursor()
+                    ->each(
+                        function ($arquivo) use ($file) {
+            $appUrl = config('app.url');
+            $caminhoArquivo = 'public/uploads/' . $arquivo->arquivo; 
+            
+            // Note que `public/uploads` não deve ser acessado diretamente na URL,
+            // mas sim o conteúdo que está dentro da pasta `public`.
+            // O caminho correto para a URL deve ser somente `uploads/`
+            $caminhoRelativo = 'uploads/' . $arquivo->arquivo;
+
+            $urlCompleta = rtrim($appUrl, '/') . '/' . ltrim($caminhoArquivo, '/');
+            
+            $data = [
+                $arquivo->id, 
+                $arquivo->nome,
+                $arquivo->unidade_id, 
+                $urlCompleta
+            ];
+            
+            fputcsv($file, $data);
+        });
+        
+        fclose($file);
+    };
+
+    return new StreamedResponse($callback, 200, $headers);
+}
+
 }

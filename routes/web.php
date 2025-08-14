@@ -35,6 +35,7 @@ Route::get('/', function () {
 		Route::get('/relatorioCompleto','AdminController@completoCSV'); 
 		Route::get('/relatorioTaxas','AdminController@taxasCSV')->name('relatorio.taxas');
 		Route::get('/relatorioPendencias','AdminController@pendenciasCSV')->name('relatorio.pendencias');
+		Route::get('/relatorioArquivos','ArquivosController@exportCSV')->name('relatorio.arquivos');
 		Route::post('/relatorioPendenciasFilter','AdminController@pendenciasFilter')->name('relatorioPendenciasFilter');
 		Route::post('/relatorioServicosFilter','AdminController@servicosFilterCSV')->name('relatorioServicosFilter');
 		

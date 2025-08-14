@@ -29,6 +29,9 @@
             <a href="{{route('relatorio.pendencias')}}" target="_blank"
                 class="btn btn-block btn-default btn-lg">Pendências</a>
 
+                <a href="{{route('relatorio.arquivos')}}" target="_blank"
+                class="btn btn-block btn-default btn-lg">Arquivos</a>
+
 
         </div>
 
