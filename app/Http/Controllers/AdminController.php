@@ -2,11 +2,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Empresa;
+use App\Models\Faturamento;
 use App\Models\Pendencia;
+use App\Models\Proposta;
+use App\Models\Reembolso;
 use App\Models\Servico;
 use App\Models\ServicoFinanceiro;
 use App\Models\Unidade;
 use Auth;
+use Carbon\Carbon;
 use File;
 use Illuminate\Http\Request;
 
@@ -519,7 +523,7 @@ class AdminController extends Controller
             ->orderBy('id', 'DESC')
             ->with('responsavel', 'coresponsavel', 'financeiro', 'historico')
             ->select('id', 'nome', 'os', 'unidade_id', 'tipo', 'protocolo_anexo', 'laudo_anexo', 'solicitante', 'responsavel_id', 'coresponsavel_id', 'licenciamento', 'departamento', 'situacao', 'created_at', 'dataFinal') // Add 'situacao' and 'created_at' to the select list
-            // ->take(30)
+                                                                                                                                                                                                                          // ->take(30)
             ->get();
 
         // $servicos = Pendencia::all();
@@ -711,28 +715,23 @@ class AdminController extends Controller
                         $dataLimiteCiclo = null;
                     }
 
-                    if ($p->created_at)
-                    {
+                    if ($p->created_at) {
                         $dataCriacaoPendencia = \Carbon\Carbon::parse($p->created_at)->format('d/m/Y');
-                    } else{
+                    } else {
                         $dataCriacaoPendencia = null;
                     }
 
-                    if($p->vencimento)
-                    {
+                    if ($p->vencimento) {
                         $dataInicio = \Carbon\Carbon::parse($p->vencimento)->format('d/m/Y') ?? null;
-                    } else{
+                    } else {
                         $dataInicio = null;
                     }
 
-                    if($p->dataLimite)
-                    {
+                    if ($p->dataLimite) {
                         $dataLimite = \Carbon\Carbon::parse($p->dataLimite)->format('d/m/Y') ?? null;
-                    } else{
+                    } else {
                         $dataLimite = null;
                     }
-
-
 
                     fputcsv($file, [
                         $p->id,
@@ -1172,5 +1171,395 @@ class AdminController extends Controller
             return response()->json(['message' => 'Arquivo não encontrado!'], 404);
         }
     }
+
+    public function empresasCSV()
+    {
+        $fileName = 'Celic_Relatorio_Empresas' . date('d-m-Y') . '.csv';
+
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0",
+        ];
+
+        $columns = [
+            'CNPJ',
+            'Nome Fantasia',
+            'Razão Social',
+            'Código',
+            'Inscrição Estadual',
+            'Inscrição Municipal',
+            'Inscrição Imobiliária',
+            'Endereço',
+            'Número',
+            'Complemento',
+            'Bairro',
+            'Cidade',
+            'UF',
+            'CEP',
+        ];
+
+        $callback = function () use ($columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            Empresa::cursor()->each(function ($e) use ($file) {
+                fputcsv($file, [
+                    $e->cnpj,
+                    $e->nomeFantasia,
+                    $e->razaoSocial,
+                    $e->codigo,
+                    $e->inscricaoEst,
+                    $e->inscricaoMun,
+                    $e->inscricaoImo,
+                    $e->endereco,
+                    $e->numero,
+                    $e->complemento,
+                    $e->bairro,
+                    $e->cidade,
+                    $e->uf,
+                    $e->cep,
+                ]);
+            });
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function propostasCSV()
+{
+    $fileName = 'Celic_Relatorio_Propostas' . date('d-m-Y') . '.csv';
+
+    $headers = [
+        "Content-type"        => "text/csv",
+        "Content-Disposition" => "attachment; filename=$fileName",
+        "Pragma"              => "no-cache",
+        "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+        "Expires"             => "0",
+    ];
+
+    $columns = [
+        'Nº da proposta', 'Empresa', 'Código', 'Unidade', 'Total', 'Status', 'Servico faturado',
+        'Link do documento', 'Item', 'Serviço', 'Escopo', 'Valor unitário', 'Valor total',
+        'Documentos a serem fornecidos', 'Condições gerais', 'Condições de pagamento', 'Dados para pagamento',
+    ];
+
+    $data = [];
+
+    Proposta::with(['unidade.empresa', 'servicos.servicoCriado', 'servicosFaturados'])
+        ->cursor()
+        // ->take(100)
+        ->each(function ($p) use (&$data) {
+            // Prepara os dados básicos da proposta
+            $propostaNumero  = $p->id;
+            $empresaNome     = $p->unidade->empresa->nomeFantasia ?? null;
+            $codigo          = $p->unidade->codigo ?? null;
+            $unidadeNome     = $p->unidade->nomeFantasia ?? null;
+            // Calcula o total usando 'servicos' e a coluna 'valor'
+            $propostaTotal   = ($p->servicos ?? collect())->sum('valor');
+            $propostaTotalFormatado = number_format($propostaTotal, 2, ",", ".");
+            $status          = $p->status;
+            // AQUI ESTÁ O AJUSTE: Coleta os IDs dos serviços faturados
+                        
+            
+            // Coleta os IDs dos serviços que foram faturados
+            $servicosFaturadosIds = ($p->servicosFaturados ?? collect())->pluck('id');
+
+            
+            $linkDocumento   = route('propostaPDF', ['id' => $propostaNumero]);;
+
+            // Limpa o conteúdo das variáveis, removendo tags HTML e decodificando entidades
+            $docFornecidos   = html_entity_decode(strip_tags($p->documentos));
+            $condicoesGerais = html_entity_decode(strip_tags($p->condicoesGerais));
+            $condicoesPagto  = html_entity_decode(strip_tags($p->condicoesPagamento));
+            $dadosPagto      = html_entity_decode(strip_tags($p->dadosPagamento));
+
+            // Garante que 'servicos' é uma coleção
+            $itens = $p->servicos ?? collect();
+
+            if ($itens->isNotEmpty()) {
+                foreach ($itens as $item) {
+
+                    $servicoCriado = $item->servicoCriado ?? null;
+
+                    // Agora a comparação é feita corretamente entre IDs de Servico
+                    $faturadoStatus = null;
+                    if ($servicoCriado && $servicosFaturadosIds->contains($servicoCriado->id)) {
+                        $faturadoStatus = $servicoCriado->id;
+                    }
+
+                    $data[] = [
+                        $propostaNumero,
+                        $empresaNome,
+                        $codigo,
+                        $unidadeNome,
+                        $propostaTotalFormatado,
+                        $status,
+                        $faturadoStatus, // <<-- AQUI ESTÁ O AJUSTE
+                        $linkDocumento,
+                        $item->id,
+                        $item->servico,
+                        $item->escopo,
+                        number_format($item->valor, 2, ",", "."),
+                        number_format($item->valorTotal, 2, ",", "."),
+                        $docFornecidos,
+                        $condicoesGerais,
+                        $condicoesPagto,
+                        $dadosPagto,
+                    ];
+                }
+            } else {
+                $data[] = [
+                    $propostaNumero, $empresaNome, $codigo, $unidadeNome, $propostaTotalFormatado,
+                    $status, null, $linkDocumento, null, null, null, null, null,
+                    $docFornecidos, $condicoesGerais, $condicoesPagto, $dadosPagto,
+                ];
+            }
+        });
+
+    // Se o modo de teste estiver ativado, retorna JSON em vez de CSV
+    
+        // return response()->json($data);
+   
+    
+    $callback = function () use ($columns, $data) {
+        $file = fopen('php://output', 'w');
+        fputcsv($file, $columns, ';');
+        
+        foreach ($data as $row) {
+            fputcsv($file, $row, ';');
+        }
+
+        fclose($file);
+    };
+
+    return response()->stream($callback, 200, $headers);
+}
+
+
+
+    public function faturamentosCSV()
+    {
+        $fileName = 'Celic_Relatorio_Faturamentos' . date('d-m-Y') . '.csv';
+
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0",
+        ];
+
+        $columns = [
+            'ID faturamento',
+            'Nº do faturamento',
+            'Cliente',
+            'Data',
+            'Total',
+            'Código',
+            'Unidade',
+            'Cidade',
+            'CNPJ',
+            'Serviço',
+            'Valor',
+            'NF',
+            'ID serviço',
+            'Referência',
+        ];
+
+        // Array para coletar os dados no modo de teste
+        $data = [];
+
+        // Carregamos os faturamentos e seus serviços relacionados, bem como a empresa e a unidade de cada serviço
+        // Usando os nomes de relacionamento corretos dos models: 'servicosFaturados' e 'detalhes'
+        $faturamentos = Faturamento::with('servicosFaturados.detalhes.unidade.empresa')
+            ->cursor();
+            // ->take(50); //Testes
+
+        foreach ($faturamentos as $faturamento) {
+            // Para cada faturamento, iteramos sobre seus serviços associados
+            foreach ($faturamento->servicosFaturados as $fs) {
+                $servico = $fs->detalhes; // Usando a relação 'detalhes()'
+                $unidade = $servico->unidade;
+                $empresa = $unidade->empresa;
+
+                // Adiciona uma linha de dados ao array
+                $data[] = [
+                    'id_faturamento'     => $faturamento->id,
+                    'numero_faturamento' => $faturamento->nome,
+                    'cliente'            => $empresa->nomeFantasia ?? null,
+                    'data'               => $faturamento->created_at ?? null,
+                    'total'              => number_format($faturamento->valorTotal, 2, ",", "."),
+                    'codigo_unidade'     => $unidade->codigo ?? null,
+                    'nome_unidade'       => $unidade->nomeFantasia ?? null,
+                    'cidade'             => $unidade->cidade ?? null,
+                    'cnpj'               => $empresa->cnpj ?? null,
+                    'servico'            => $servico->nome ?? null,
+                    'valor_faturado'     => number_format($fs->valorFaturado, 2, ",", "."),
+                    'nf'                 => $faturamento->nf,
+                    'id_servico'         => $servico->id,
+                    'referencia'         => $faturamento->obs
+                ];
+            }
+        }
+
+        // Ambiente de teste para exibir os dados como JSON
+        // Remova o comentário da linha abaixo para testar no navegador
+        // return response()->json($data);
+
+        // Abaixo, o código original para download do CSV
+        $callback = function () use ($columns, $data) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($data as $row) {
+                fputcsv($file, $row);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+        public function reembolsosCSV(Request $request)
+    {
+        $fileName = 'Celic_Relatorio_Reembolsos_' . date('d-m-Y') . '.csv';
+
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0",
+        ];
+
+        $columns = [
+            'ID reembolso',
+            'Nº do reembolso',
+            'Cliente',
+            'Data',
+            'Total',
+            'Link do reembolso (Recibo e relatório)',
+            'Link da pasta zipada',
+            'Código',
+            'Unidade',
+            'Cidade',
+            'Serviço',
+            'Descrição da Taxa',
+            'Solicitante',
+            'Valor',
+            'Data do Vencimento',
+            'Data do Pagamento',
+            'ID serviço',
+        ];
+
+        $data = [];
+
+        Reembolso::with(['empresa', 'taxas.taxa.servico.unidade'])
+            ->cursor()
+            // ->take(50) //testes!
+            ->each(function ($reembolso) use (&$data) {
+                // Prepara os dados básicos do reembolso
+            $linkReembolso = route('reembolso.download', ['id' => $reembolso->id]);
+            $linkPastaZipada = route('reembolso.downloadZip', ['id' => $reembolso->id]);
+
+                $reembolsoTaxas = $reembolso->taxas ?? collect();
+
+                if ($reembolsoTaxas->isNotEmpty()) {
+                    foreach ($reembolsoTaxas as $reembolsoTaxa) {
+                        $taxa    = $reembolsoTaxa->taxa ?? null;
+                        $servico = $taxa->servico ?? null;
+                        $unidade = $servico->unidade ?? null;
+                        $empresa = $reembolso->empresa ?? null;
+
+                    // LÓGICA CONDICIONAL PARA O SOLICITANTE
+                    $solicitante = null;
+                    if ($servico->solicitanteServico) {
+                        $solicitante = $servico->solicitanteServico->nome;
+                    }
+                    else
+                    {
+                        $solicitante = $servico->solicitante;
+                    }
+
+
+                        $data[] = [
+                            'id_reembolso'      => $reembolso->id,
+                        'numero_reembolso'  => $this->fillWithZeros($reembolso->id),
+                            'cliente'           => $empresa->nomeFantasia ?? null,
+                            'data'              => ($reembolso->created_at) ? Carbon::parse($reembolso->created_at)->format('d/m/Y') : null,
+                            'total_reembolso'   => number_format($reembolso->valorTotal ?? 0, 2, ",", "."),
+                            'link_reembolso'    => $linkReembolso,
+                            'link_pasta_zipada' => $linkPastaZipada,
+                            'codigo_unidade'    => $unidade->codigo ?? null,
+                            'nome_unidade'      => $unidade->nomeFantasia ?? null,
+                            'cidade'            => $unidade->cidade ?? null,
+                            'servico'           => $servico->nome ?? null,
+                            'descricao_taxa'    => $taxa->nome ?? null,
+                            'solicitante'       => $solicitante,
+                            'valor_taxa'        => number_format($taxa->valor ?? 0, 2, ",", "."),
+                            'data_vencimento'   => ($taxa->vencimento) ? Carbon::parse($taxa->vencimento)->format('d/m/Y') : null,
+                            'data_pagamento'    => ($taxa->pagamento) ? Carbon::parse($taxa->pagamento)->format('d/m/Y') : null,
+                            'id_servico'        => $servico->id ?? null,
+                        ];
+                    }
+                } else {
+                    $data[] = [
+                        'id_reembolso'      => $reembolso->id,
+                        'numero_reembolso'  => $this->fillWithZeros($reembolso->id),
+                        'cliente'           => ($reembolso->empresa->nomeFantasia ?? null),
+                        'data'              => ($reembolso->created_at) ? Carbon::parse($reembolso->created_at)->format('d/m/Y') : null,
+                        'total_reembolso'   => number_format($reembolso->valorTotal ?? 0, 2, ",", "."),
+                        'link_reembolso'    => $linkReembolso,
+                        'link_pasta_zipada' => $linkPastaZipada,
+                        'codigo_unidade'    => null,
+                        'nome_unidade'      => null,
+                        'cidade'            => null,
+                        'servico'           => null,
+                        'descricao_taxa'    => null,
+                        'solicitante'       => null,
+                        'valor_taxa'        => null,
+                        'data_vencimento'   => null,
+                        'data_pagamento'    => null,
+                        'id_servico'        => null,
+                    ];
+                }
+            });
+
+        if ($request->query('test')) {
+            return response()->json($data);
+        }
+
+        $callback = function () use ($columns, $data) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns, ';');
+            foreach ($data as $row) {
+                fputcsv($file, $row, ';');
+            }
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    // Este é o método auxiliar que você pode copiar para o seu AdminController
+private function fillWithZeros($number) {
+    if ($number <= 999) {
+        if ($number <= 100) {
+            $number = str_pad($number, 4, "10", STR_PAD_LEFT);
+        } else {
+            $number = str_pad($number, 4, "1", STR_PAD_LEFT);
+        }
+    } else {
+        $number = $number;
+    }
+    return $number;
+}
+
 
 }

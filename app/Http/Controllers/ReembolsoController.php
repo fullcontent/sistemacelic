@@ -591,21 +591,13 @@ class ReembolsoController extends Controller
     }
 
     public function fillWithZeros($number) {
-         if ($number <= 999) {
-
-            if($number <= 100)
-            {
-                $number = str_pad($number, 4, "10", STR_PAD_LEFT);
-            }
-            else{
-                $number = str_pad($number, 4, "1", STR_PAD_LEFT);
-            }
-                 
-         }
-         else{
-            $number = $number;
-         }
-         return $number;
+          // Se o número for menor que um limite (ex: 1000) adicionamos o offset
+    // Para que 14 vire 1014
+    
+        return (string) ($number + 1000);
+   
+       
+   
        }
 
     public function alterarEmpresa(Request $request)

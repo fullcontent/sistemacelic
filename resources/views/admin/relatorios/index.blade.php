@@ -29,9 +29,27 @@
             <a href="{{route('relatorio.pendencias')}}" target="_blank"
                 class="btn btn-block btn-default btn-lg">Pendências</a>
 
-                <a href="{{route('relatorio.arquivos')}}" target="_blank"
-                class="btn btn-block btn-default btn-lg">Arquivos</a>
+               <a href="{{route('relatorio.arquivos')}}" target="_blank"
+   class="btn btn-block btn-default btn-lg">
+   <i class="fa fa-folder-open"></i> Arquivos
+</a>
+<a href="{{route('relatorioEmpresasCSV')}}" target="_blank"
+   class="btn btn-block btn-default btn-lg">
+   <i class="fa fa-building"></i> Empresas
+</a>
+<a href="{{route('relatorioPropostasCSV')}}" target="_blank"
+   class="btn btn-block btn-default btn-lg">
+   <i class="fa fa-file-signature"></i> Propostas
+</a>
+<a href="{{route('relatorioFaturamentosCSV')}}" target="_blank"
+   class="btn btn-block btn-default btn-lg">
+   <i class="fa fa-dollar-sign"></i> Faturamentos
+</a>
 
+<a href="{{route('relatorioReembolsosCSV')}}" target="_blank"
+   class="btn btn-block btn-default btn-lg">
+   <i class="fa fa-money-bill-wave-alt"></i> Reembolsos
+</a>
 
         </div>
 

@@ -38,6 +38,12 @@ Route::get('/', function () {
 		Route::get('/relatorioArquivos','ArquivosController@exportCSV')->name('relatorio.arquivos');
 		Route::post('/relatorioPendenciasFilter','AdminController@pendenciasFilter')->name('relatorioPendenciasFilter');
 		Route::post('/relatorioServicosFilter','AdminController@servicosFilterCSV')->name('relatorioServicosFilter');
+
+		Route::get('/relatorioEmpresas','AdminController@empresasCSV')->name('relatorioEmpresasCSV');
+		Route::get('/relatorioPropostas','AdminController@propostasCSV')->name('relatorioPropostasCSV');
+		Route::get('/relatorioFaturamentos','AdminController@faturamentosCSV')->name('relatorioFaturamentosCSV');
+		Route::get('/relatorioReembolsos','AdminController@reembolsosCSV')->name('relatorioReembolsosCSV');
+
 		
 		Route::get('/gerar-relatorio', 'AdminController@gerarRelatorioCompletoCSV')->name('relatorio.completo'); 
 		Route::delete('/deleteRelatorio/{filename}', 'AdminController@deleteRelatorio');
