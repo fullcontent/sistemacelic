@@ -17,4 +17,3 @@ composer.phar
 /public/uploads
 
 config/app.php
-routes/web.php
