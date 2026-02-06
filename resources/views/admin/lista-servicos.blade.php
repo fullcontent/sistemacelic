@@ -107,8 +107,14 @@
 								<button type="button" class="btn btn-xs btn-gray">Stand By</button>
 	              				@break
 
+	              				@break
+
 								  @case('nRenovado')
 								<button type="button" class="btn btn-xs btn-default">Não renovado</button>
+	              				@break
+
+								  @case('cancelado')
+								<button type="button" class="btn btn-xs btn-danger">Cancelado</button>
 	              				@break
 
 	              		@endswitch

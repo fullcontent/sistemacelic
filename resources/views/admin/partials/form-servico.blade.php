@@ -73,6 +73,7 @@
 				'arquivado'=>'Arquivado',
 				'standBy'=>'Stand By',
 				'nRenovado'=>'Não renovado',
+				'cancelado'=>'Cancelado',
 				), null, ['class'=>'form-control'])!!}
 
 		@endif
