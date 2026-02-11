@@ -47,12 +47,7 @@ class AppServiceProvider extends ServiceProvider
         $events->listen(BuildingMenu::class, function (BuildingMenu $event) {
                 
 
-                        
-
-
-
-
-                        
+                                               
 
                             if(Auth::user()->privileges == 'admin')
                             {
@@ -176,37 +171,51 @@ class AppServiceProvider extends ServiceProvider
 
                             );
 
-                            if(Auth::id() <= 3)
+                            if(Auth::id() <= 3 || in_array(Auth::id(), [8, 27]))
                             {
                                 $event->menu->add(
-                                    ['header'=> 'Administração'],
-                                    [
-                                    'text' => 'Usuários',
-                                    'url'  =>  ''.Auth::user()->privileges.'/usuarios',
-                                    'icon' => 'fa fa-users'
-                                    ],
-                                    [
-                                        'text'=>'Solicitantes',
-                                        'url' => ''.Auth::user()->privileges.'/solicitantes',
-                                        'icon' => 'glyphicon glyphicon-user'
-                                    ],
+                                    ['header'=> 'Administração']
+                                );
+
+                                if(Auth::id() <= 3)
+                                {
+                                    $event->menu->add(
+                                        [
+                                            'text' => 'Usuários',
+                                            'url'  =>  ''.Auth::user()->privileges.'/usuarios',
+                                            'icon' => 'fa fa-users'
+                                        ],
+                                        [
+                                            'text'=>'Solicitantes',
+                                            'url' => ''.Auth::user()->privileges.'/solicitantes',
+                                            'icon' => 'glyphicon glyphicon-user'
+                                        ]
+                                    );
+                                }
+
+                                $event->menu->add(
                                     [
                                         'text' => 'Listagem geral dos serviços',
                                         'url'  =>  ''.Auth::user()->privileges.'/servicos',
                                         'icon'  =>  'glyphicon glyphicon-th-list',
-                                    ],
-                                    [
-                                        'text' => 'Faturamentos',
-                                        'url'  =>  ''.Auth::user()->privileges.'/faturamentos',
-                                        'icon'  =>  'glyphicon glyphicon glyphicon-barcode',
-                                    ],
-                                    [
-                                        'text' => 'Reembolsos',
-                                        'url'  =>  ''.Auth::user()->privileges.'/reembolsos',
-                                        'icon'  =>  'glyphicon glyphicon glyphicon-usd',
                                     ]
-                                    
                                 );
+
+                                if(Auth::id() <= 3)
+                                {
+                                    $event->menu->add(
+                                        [
+                                            'text' => 'Faturamentos',
+                                            'url'  =>  ''.Auth::user()->privileges.'/faturamentos',
+                                            'icon'  =>  'glyphicon glyphicon glyphicon-barcode',
+                                        ],
+                                        [
+                                            'text' => 'Reembolsos',
+                                            'url'  =>  ''.Auth::user()->privileges.'/reembolsos',
+                                            'icon'  =>  'glyphicon glyphicon glyphicon-usd',
+                                        ]
+                                    );
+                                }
                             }
                             
                             
