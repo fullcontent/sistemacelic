@@ -71,31 +71,40 @@
               <i class="glyphicon glyphicon-comment"></i>
               <span class="label label-info">{{count(auth()->user()->unreadNotifications->where('type','App\Notifications\UserMentioned'))}}</span>
             </a>
-                <ul class="dropdown-menu">
-                       
-
-              <li class="header">Você foi mencionado {{count(auth()->user()->unreadNotifications->where('type','App\Notifications\UserMentioned'))}} vezes.</li>
+            <ul class="dropdown-menu">
+              <li class="header">Você tem {{count(auth()->user()->unreadNotifications->where('type','App\Notifications\UserMentioned'))}} nova(s) menção(ões)</li>
               <li>
                 <!-- inner menu: contains the actual data -->
                 <ul class="menu">
-                  
-                  <!--
-                        List notifications
-                   -->
-                
-                   @foreach(auth()->user()->unreadNotifications->where('type','App\Notifications\UserMentioned') as $n)
-                        <li>
-                    <a href="{{$n->data['action']}}" data-notif-id="{{$n->id}}">
-                      <i class="glyphicon glyphicon-comment text-info"></i> {{$n->data['mensagem']}} #{{$n->data['servico']}}
-                    </a></li>
-
-
+                  @foreach(auth()->user()->unreadNotifications->where('type','App\Notifications\UserMentioned') as $n)
+                    <li>
+                      <a href="{{$n->data['action']}}" data-notif-id="{{$n->id}}">
+                        <i class="glyphicon glyphicon-comment text-info"></i> <small class="text-muted">({{ substr($n->id, 0, 8) }})</small> {{$n->data['mensagem']}} #{{$n->data['servico']}}
+                      </a>
+                    </li>
                    @endforeach
-                  
                 </ul>
               </li>
-              
-              <li class="footer"><a href="{{route('clearMentions')}}">Limpar notificações</a></li>
+              @if(count(auth()->user()->unreadNotifications->where('type','App\Notifications\UserMentioned')) > 0)
+                <li class="footer"><a href="{{route('clearMentions')}}">Limpar notificações</a></li>
+              @endif
+
+              <li class="header" style="background-color: #f4f4f4;"><b>Histórico (Últimas 10)</b></li>
+              <li>
+                <ul class="menu">
+                  @foreach(auth()->user()->notifications->where('type','App\Notifications\UserMentioned')->take(10) as $n)
+                    <li style="{{ $n->read_at ? 'opacity: 0.6;' : '' }}">
+                      <a href="{{$n->data['action']}}" data-notif-id="{{$n->id}}">
+                        <i class="glyphicon glyphicon-comment {{ $n->read_at ? 'text-default' : 'text-info' }}"></i> 
+                        <small class="text-muted">({{ substr($n->id, 0, 8) }})</small> {{$n->data['mensagem']}} #{{$n->data['servico']}}
+                        @if($n->read_at)
+                          <small class="pull-right" title="Visualizada"><i class="fa fa-check text-success"></i></small>
+                        @endif
+                      </a>
+                    </li>
+                  @endforeach
+                </ul>
+              </li>
             </ul>
           </li>
           
@@ -268,21 +277,15 @@
         </script>
     
     <script>
-        $('a[data-notif-id]').click(function () {
+        $('a[data-notif-id]').click(function (e) {
+            e.preventDefault();
+            var notif_id = $(this).data('notifId');
+            var targetHref = $(this).attr('href');
 
-        var notif_id   = $(this).data('notifId');
-        var targetHref = $(this).data('href');
-        
-
-
-        
-
-        $.get('/markAsRead', {'notif_id': notif_id}, function (data) {
-            data.success ? (window.location.href = targetHref) : false;
-        }, 'json');
-        
-        return true;
-});
+            $.get('/markAsRead', {'notif_id': notif_id}, function (data) {
+                window.location.href = targetHref;
+            }, 'json');
+        });
     </script>
     
     @stack('js')

@@ -326,7 +326,7 @@ Route::get('/markAsRead', function()
 	
 	$notif_id = $_GET['notif_id'];
 	auth()->user()->unreadNotifications->where('id', $notif_id)->markAsRead();
-	return \Response::json($notif_id, 200);
+	return \Response::json(['success' => true, 'id' => $notif_id], 200);
 
 });
 
@@ -338,7 +338,7 @@ Route::get('clearNotifications', function(){
 
 Route::get('clearMentions', function(){
 
-	auth()->user()->notifications()->where('type','App\Notifications\UserMentioned')->delete();
+	auth()->user()->unreadNotifications()->where('type','App\Notifications\UserMentioned')->get()->markAsRead();
 	return redirect()->back();
 })->name('clearMentions');
 
