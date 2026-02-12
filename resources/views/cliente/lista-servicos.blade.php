@@ -107,6 +107,10 @@
                       <button type="button" class="btn btn-xs btn-default">Stand By</button>
                       @break
 
+							@case('cancelado')
+                      <button type="button" class="btn btn-xs btn-danger">Cancelado</button>
+                      @break
+
 	              		@endswitch</td>
 	              	<td>{{$servico->responsavel->name ?? ''}}</td>
 

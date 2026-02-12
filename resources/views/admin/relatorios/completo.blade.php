@@ -72,7 +72,7 @@
 
                     
                     <td>{{$s->os}}</td>
-                    <td>{{$s->situacao}}</td>
+                    <td>{{ucfirst($s->situacao)}}</td>
                     <td>{{$s->responsavel->name}}</td>
                     <td>{{$s->coresponsavel->name ?? ''}}</td>
                     <td>{{$s->nome}}</td>

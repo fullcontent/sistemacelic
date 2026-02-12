@@ -64,6 +64,40 @@
                       
                   @endswitch</p>
                   <p><b>Nome: </b>{{$servico->nome}}</p>
+                  <p><b>Situação: </b>
+                    @switch($servico->situacao)
+                      @case('andamento')
+                          @if(($servico->licenca_validade >= date('Y-m-d')) && ($servico->tipo == 'licencaOperacao'))
+                              <button type="button" class="btn btn-xs btn-success">Andamento</button>
+                          @elseif(($servico->licenca_validade < date('Y-m-d'))&& ($servico->tipo == 'licencaOperacao'))
+                              <button type="button" class="btn btn-xs btn-danger">Andamento</button>
+                          @elseif($servico->tipo == 'nRenovaveis')
+                              <button type="button" class="btn btn-xs btn-warning">Andamento</button>
+                          @endif
+                          @break
+                      @case('finalizado')
+                          @if(($servico->licenca_validade >= date('Y-m-d')) && ($servico->tipo == 'licencaOperacao'))
+                              <button type="button" class="btn btn-xs btn-success">Finalizado</button>
+                          @elseif(($servico->licenca_validade < date('Y-m-d'))&& ($servico->tipo == 'licencaOperacao'))
+                              <button type="button" class="btn btn-xs btn-danger">Finalizado</button>
+                          @elseif($servico->tipo == 'nRenovaveis')
+                              <button type="button" class="btn btn-xs btn-warning">Finalizado</button>
+                          @endif
+                          @break
+                      @case('arquivado')
+                          <button type="button" class="btn btn-xs btn-default">Arquivado</button>
+                          @break
+                      @case('standBy')
+                          <button type="button" class="btn btn-xs btn-default">Stand By</button>
+                          @break
+                      @case('nRenovado')
+                          <button type="button" class="btn btn-xs btn-default">Não renovado</button>
+                          @break
+                      @case('cancelado')
+                          <button type="button" class="btn btn-xs btn-danger">Cancelado</button>
+                          @break
+                    @endswitch
+                  </p>
                   <p><b>Responsável: </b>{{$servico->responsavel->name}}</p>
                   <p><b>Início do processo: </b>{{\Carbon\Carbon::parse($servico->created_at)->format('d/m/Y')}}</p>
                   

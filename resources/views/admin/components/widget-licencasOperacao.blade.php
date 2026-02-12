@@ -59,6 +59,10 @@
                       <button type="button" class="btn btn-xs btn-default">Stand By</button>
                       @break
 
+                      @case('cancelado')
+                      <button type="button" class="btn btn-xs btn-danger">Cancelado</button>
+                      @break
+
                     @endswitch
                     </td>
                     <td>@if($servico->licenca_anexo) <a href="{{ route('servico.downloadFile', ['servico_id'=> $servico->id,'tipo'=>'licenca']) }}" class="btn btn-xs btn-warning" target="_blank">Ver Licença</a> @endif</td>

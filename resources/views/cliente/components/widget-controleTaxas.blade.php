@@ -55,6 +55,10 @@
                 <button type="button" class="btn btn-xs btn-default">Arquivado</button>
                         @break
 
+                      @case('cancelado')
+                <button type="button" class="btn btn-xs btn-danger">Cancelado</button>
+                        @break
+
                     @endswitch
                     </td>
                     
