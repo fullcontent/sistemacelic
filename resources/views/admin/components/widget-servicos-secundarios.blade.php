@@ -37,6 +37,10 @@
                             <span class="label label-success">Finalizado</span>
                         @break
 
+                        @case('cancelado')
+                            <span class="label label-danger">Cancelado</span>
+                        @break
+
                       @endswitch
                     </td>
                     <td><a href="{{route('servico.delete', $servico->id)}}" class="confirmation danger"> <i class="glyphicon glyphicon-trash

@@ -54,6 +54,10 @@
                 <button type="button" class="btn btn-xs btn-default">Arquivado</button>
                         @break
 
+                      @case('cancelado')
+                <button type="button" class="btn btn-xs btn-danger">Cancelado</button>
+                        @break
+
                     @endswitch
                     </td>
                     <td><a href="{{route('servico.delete', $servico->id)}}" class="confirmation danger" alt="Excluir serviço"> <i class="glyphicon glyphicon-trash

@@ -116,6 +116,10 @@
 								<button type="button" class="btn btn-xs btn-default">Não renovado</button>
 	              				@break
 
+                        @case('cancelado')
+								<button type="button" class="btn btn-xs btn-danger">Cancelado</button>
+	              				@break
+
 
 	              		@endswitch</p>
                   <p><b>Ordem de serviço: </b>{{$servico->os}}</p>
