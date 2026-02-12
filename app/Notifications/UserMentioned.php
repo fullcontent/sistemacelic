@@ -34,7 +34,7 @@ class UserMentioned extends Notification
      */
     public function via($notifiable)
     {
-        return ['database'];
+        return ['database', 'mail'];
     }
 
     /**
@@ -46,23 +46,24 @@ class UserMentioned extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+            ->subject('Nova interação no serviço #' . $this->servico->id)
+            ->markdown('emails.usuarioMencionado', [
+                'servico' => $this->servico,
+                'route' => $this->route
+            ]);
     }
 
-   
+
     public function toDatabase($notifiable)
-    {   
-        
+    {
 
 
 
         return [
             //
-            'mensagem'=>'Voce foi mencionado nesse servico',
-            'servico'=>$this->servico,
-            'action'=> route($this->route, $this->servico),
+            'mensagem' => 'Voce foi mencionado nesse servico',
+            'servico' => $this->servico->id,
+            'action' => route($this->route, $this->servico->id),
 
         ];
     }

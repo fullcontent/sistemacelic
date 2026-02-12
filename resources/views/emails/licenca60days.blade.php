@@ -9,10 +9,10 @@
 A licença vencerá em 60 dias.
 
 
-@component('mail::button', ['url' => route('servicos.show',$servico->id),'color'=>'red'])
+@component('mail::button', ['url' => route('servicos.show', $servico->id), 'color' => 'red'])
 Iniciar renovação
 @endcomponent
 
 Salve,<br>
-Castro Empresarial
+Castro Licenciamentos - Consultoria e Legalização Imobiliária
 @endcomponent

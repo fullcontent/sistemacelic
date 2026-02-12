@@ -9,13 +9,13 @@
 
 
 
-@component('mail::button', ['url' => route($route,$servico->id),'color'=>'red'])
+@component('mail::button', ['url' => route($route, $servico->id), 'color' => 'red'])
 Acesse para saber mais
 @endcomponent
 
 
 <br>
-Castro Empresarial | Consultoria e Legalização Imobiliária
-www.sistemacelic.net
+Castro Licenciamentos - Consultoria e Legalização Imobiliária
+www.sistemacelic.com
 www.castroli.com.br
 @endcomponent
