@@ -30,11 +30,11 @@ return [
     |
     */
 
-    'logo' => '<img src="/img/logoCelicLogin.png">',
+    'logo' => '<img src="/public/img/logoCelicLogin.png">',
 
-    'login_logo' => '<img src="/img/logoCelicLogin.png" width="280">',
+    'login_logo' => '<img src="/public/img/logoCelicLogin.png" width="280">',
 
-    'logo_mini' => '<img src="/img/logoCelicMini.png">',
+    'logo_mini' => '<img src="/public/img/logoCelicMini.png">',
 
     /*
     |--------------------------------------------------------------------------
