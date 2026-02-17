@@ -84,16 +84,16 @@ tfoot { display:table-footer-group }
     <body>
         <!-- Define header and footer blocks before your content -->
         <header>
-            <img src="{{url('public/uploads/headerCastro.png')}}" width="100%"/>
+            <img src="{{public_path('img/headerCastro.png')}}" width="100%"/>
         </header>
 
-        <section>
-            <img src="{{url('public/uploads/bgCastro.png')}}" width="100%"/>
-        </section>
+        {{-- <section>
+            <img src="{{public_path('img/bgCastro.png')}}" width="100%"/>
+        </section> --}}
 
         <footer>
             
-            <img src="{{url('public/uploads/footerCastro.png')}}" width="100%"/>
+            <img src="{{public_path('img/footerCastro.png')}}" width="100%"/>
         </footer>
 
         <!-- Wrap the content of your PDF inside a main tag -->
