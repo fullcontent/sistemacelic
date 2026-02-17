@@ -46,6 +46,7 @@
 
         @elseif($proposta->status == 'Recusada')
             <a href="#" class="btn btn-danger ">Recusada</a>
+            <a href="#" data-id="{{$proposta->id}}" class="btn btn-info revisar"><i class="fa fa-undo"></i></a>
         @elseif($proposta->status == 'Arquivada')
             <a href="#" class="btn btn-default ">Arquivada</a>
 
@@ -380,6 +381,33 @@
                         location.reload();
 
 
+
+                    },
+                    error: function (result) {
+                        console.log(result)
+                    }
+                });
+            })
+        })
+
+        $(function () {
+            $('.revisar').click(function (e) {
+
+                e.preventDefault();
+
+                var proposta_id = $(this).data('id');
+
+                $.ajax({
+                    type: "GET",
+                    url: "/admin/proposta/revisar/" + proposta_id + "",
+                    data: {
+                        id: proposta_id,
+                        _token: CSRF_TOKEN
+                    },
+                    success: function (data) {
+
+                        console.log(data)
+                        location.reload();
 
                     },
                     error: function (result) {

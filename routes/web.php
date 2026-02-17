@@ -140,6 +140,8 @@ Route::prefix('admin')->group(function () {
 
 	Route::get('/proposta/pdf/{id}', 'PropostasController@printPDF')->name('propostaPDF');
 
+	Route::get('/proposta/revisar/{id}', 'PropostasController@revisar')->name('proposta.revisar');
+
 
 
 	Route::get('/reembolsos', 'ReembolsoController@index')->name('reembolsos.index');

@@ -25,22 +25,55 @@ class PropostasController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {   
+    public function index(Request $request)
+    {
+        $hoje = Carbon::now();
+        $periodo = $request->get('periodo', 'todos');
+        $statusFiltro = $request->get('status');
 
-        $propostas = Proposta::select(['id','proposta','empresa_id','unidade_id','status'])
-                                    ->with(['empresa','unidade'])
-                                    ->whereNotIn('empresa_id',[16])
-                                    ->orderBy('created_at','DESC')
-                                    // ->withCount('servicosFaturados','servicosCriados')
-                                    // ->take(10)
-                                    ->get();
+        $query = Proposta::select(['id', 'proposta', 'empresa_id', 'unidade_id', 'status', 'created_at'])
+            ->with(['empresa', 'unidade', 'servicos'])
+            ->withCount(['servicosFaturados', 'servicosCriados'])
+            ->whereNotIn('empresa_id', [16]);
 
-        // dd($propostas);
-                          
+        // Period Filtering
+        if ($periodo == 'mes_vigente') {
+            $query->whereYear('created_at', $hoje->year)->whereMonth('created_at', $hoje->month);
+        } elseif ($periodo == 'mes_anterior') {
+            $mesAnterior = $hoje->copy()->subMonth();
+            $query->whereYear('created_at', $mesAnterior->year)->whereMonth('created_at', $mesAnterior->month);
+        } elseif ($periodo == 'ano_atual') {
+            $query->whereYear('created_at', $hoje->year);
+        }
 
+        if ($statusFiltro) {
+            $query->where('status', $statusFiltro);
+        }
 
-        return view('admin.proposta.lista-propostas')->with('propostas',$propostas);
+        $propostas = $query->orderBy('created_at', 'DESC')
+            ->paginate(25);
+
+        // Dashboard Stats (Indices Only)
+        $stats = [];
+        $stats['elaboracao_count'] = Proposta::where('status', 'Revisando')->whereNotIn('empresa_id', [16])->count();
+        $stats['analise_count'] = Proposta::where('status', 'Em análise')->whereNotIn('empresa_id', [16])->count();
+        $stats['aprovadas_mes_count'] = Proposta::where('status', 'Aprovada')
+            ->whereMonth('created_at', date('m'))
+            ->whereYear('created_at', date('Y'))
+            ->whereNotIn('empresa_id', [16])
+            ->count();
+        $stats['recusadas_count'] = Proposta::where('status', 'Recusada')->whereNotIn('empresa_id', [16])->count();
+
+        $totalAtivas = Proposta::whereNotIn('status', ['Arquivada'])->whereNotIn('empresa_id', [16])->count();
+        $totalAprovadas = Proposta::where('status', 'Aprovada')->whereNotIn('empresa_id', [16])->count();
+        $stats['conversao'] = $totalAtivas > 0 ? ($totalAprovadas / $totalAtivas) * 100 : 0;
+
+        $stats['status_atual'] = $statusFiltro;
+        $stats['periodo_atual'] = $periodo;
+
+        return view('admin.proposta.lista-propostas')
+            ->with('propostas', $propostas)
+            ->with('stats', $stats);
     }
 
     /**
@@ -49,20 +82,21 @@ class PropostasController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create()
-    {   
+    {
 
-        
+
         $u = Proposta::pluck('id')->last();
-        $ultimaProposta = $u+1;
+        $ultimaProposta = $u + 1;
 
-        $solicitantes = Solicitante::orderBy('nome')->get()->unique('nome')->pluck('nome','id');
+        $solicitantes = Solicitante::orderBy('nome')->get()->unique('nome')->pluck('nome', 'id');
 
 
         return view('admin.proposta.step1')->with(
             [
-                'ultimaProposta'=>$ultimaProposta,
-                'solicitantes'=>$solicitantes,
-            ]);
+                'ultimaProposta' => $ultimaProposta,
+                'solicitantes' => $solicitantes,
+            ]
+        );
     }
 
     /**
@@ -74,11 +108,11 @@ class PropostasController extends Controller
 
     public function step2($proposta)
     {
-        
-        $propostaServicos = PropostaServico::where('proposta_id',$proposta->id)->get();
-        
 
-        return view('admin.proposta.step2')->with(['proposta'=>$proposta,'propostaServicos'=>$propostaServicos]);
+        $propostaServicos = PropostaServico::where('proposta_id', $proposta->id)->get();
+
+
+        return view('admin.proposta.step2')->with(['proposta' => $proposta, 'propostaServicos' => $propostaServicos]);
     }
 
     public function step3(Type $var = null)
@@ -88,37 +122,34 @@ class PropostasController extends Controller
 
 
     public function store(Request $request)
-    {   
-        
-        
-               
+    {
+
+
+
         // dd($request->all());
 
-        if($request->proposta_id)
-        {
+        if ($request->proposta_id) {
             $proposta = Proposta::find($request->proposta_id);
-            
 
-        }
 
-        else{
+        } else {
 
             $proposta = new Proposta;
 
             // $proposta->id = $request->proposta_id;
-    
+
             $proposta->unidade_id = $request->unidade_id;
             $proposta->status = "Revisando";
-    
-    
-            
-    
+
+
+
+
             $unidade = Unidade::find($request->unidade_id);
             $proposta->empresa_id = $unidade->empresa_id;
-    
+
             // $proposta->responsavel_id = $request->responsavel_id;
             $proposta->solicitante = $request->solicitante;
-    
+
             $proposta->documentos = $request->documentos;
             $proposta->condicoesGerais = $request->condicoesGerais;
             $proposta->condicoesPagamento = $request->condicoesPagamento;
@@ -129,92 +160,89 @@ class PropostasController extends Controller
 
             //remove class and style attributes from coppied text
 
-        $proposta->dadosPagamento = preg_replace('/(<[^>]+) style=("|\').*?("|\')/i','$1',$proposta->dadosPagamento);
-        $proposta->dadosPagamento = preg_replace('/(<[^>]+) class=("|\').*?("|\')/i','$1',$proposta->dadosPagamento);
+            $proposta->dadosPagamento = preg_replace('/(<[^>]+) style=("|\').*?("|\')/i', '$1', $proposta->dadosPagamento);
+            $proposta->dadosPagamento = preg_replace('/(<[^>]+) class=("|\').*?("|\')/i', '$1', $proposta->dadosPagamento);
 
 
-        $proposta->condicoesGerais = preg_replace('/(<[^>]+) style=("|\').*?("|\')/i','$1',$proposta->condicoesGerais);
-        $proposta->condicoesGerais = preg_replace('/(<[^>]+) class=("|\').*?("|\')/i','$1',$proposta->condicoesGerais);
+            $proposta->condicoesGerais = preg_replace('/(<[^>]+) style=("|\').*?("|\')/i', '$1', $proposta->condicoesGerais);
+            $proposta->condicoesGerais = preg_replace('/(<[^>]+) class=("|\').*?("|\')/i', '$1', $proposta->condicoesGerais);
 
-        $proposta->condicoesPagamento = preg_replace('/(<[^>]+) style=("|\').*?("|\')/i','$1',$proposta->condicoesPagamento);
-        $proposta->condicoesPagamento = preg_replace('/(<[^>]+) class=("|\').*?("|\')/i','$1',$proposta->condicoesPagamento);
+            $proposta->condicoesPagamento = preg_replace('/(<[^>]+) style=("|\').*?("|\')/i', '$1', $proposta->condicoesPagamento);
+            $proposta->condicoesPagamento = preg_replace('/(<[^>]+) class=("|\').*?("|\')/i', '$1', $proposta->condicoesPagamento);
 
-        $proposta->documentos = preg_replace('/(<[^>]+) style=("|\').*?("|\')/i','$1',$proposta->documentos);
-        $proposta->documentos = preg_replace('/(<[^>]+) class=("|\').*?("|\')/i','$1',$proposta->documentos);
+            $proposta->documentos = preg_replace('/(<[^>]+) style=("|\').*?("|\')/i', '$1', $proposta->documentos);
+            $proposta->documentos = preg_replace('/(<[^>]+) class=("|\').*?("|\')/i', '$1', $proposta->documentos);
 
-    
+
             $proposta->save();
 
         }
-     
-        
-        
+
+
+
 
         // dump($proposta);
-        
-        foreach($request->servico as $key => $s)
-        {   
-            
+
+        foreach ($request->servico as $key => $s) {
 
 
-            if(strlen($key) <= 1)
-            {
+
+            if (strlen($key) <= 1) {
                 $propostaServico = new PropostaServico;
                 $propostaServico->servico = $s['nome'];
                 $propostaServico->escopo = $s['escopo'];
                 $propostaServico->valor = $s['valor'];
                 $propostaServico->posicao = $key;
-    
+
                 $propostaServico->proposta_id = $proposta->id;
 
                 $propostaServico->responsavel_id = $s['responsavel_id'];
 
                 $propostaServico->servicoLpu_id = $s['id'];
-    
+
                 $propostaServico->save();
-    
+
                 // dump($propostaServico);
             }
-            
-            
-            
-            
-            if(strlen($key) > 1)
-            {
+
+
+
+
+            if (strlen($key) > 1) {
                 // dump($key);
-                   
-                    $propostaServicoSub = new PropostaServico;
-                    $propostaServicoSub->servico = $s['nome'];
-                    $propostaServicoSub->escopo = $s['escopo'];
-                    $propostaServicoSub->valor = $s['valor'];
-                    $propostaServicoSub->servicoLpu_id = $s['id'];
-                    $propostaServicoSub->posicao = substr($key,-1);
-                    $propostaServicoSub->servicoPrincipal = $propostaServico->id;
 
-                    $propostaServicoSub->proposta_id = $proposta->id;
+                $propostaServicoSub = new PropostaServico;
+                $propostaServicoSub->servico = $s['nome'];
+                $propostaServicoSub->escopo = $s['escopo'];
+                $propostaServicoSub->valor = $s['valor'];
+                $propostaServicoSub->servicoLpu_id = $s['id'];
+                $propostaServicoSub->posicao = substr($key, -1);
+                $propostaServicoSub->servicoPrincipal = $propostaServico->id;
 
-                    $propostaServicoSub->responsavel_id = $s['responsavel_id'];
+                $propostaServicoSub->proposta_id = $proposta->id;
+
+                $propostaServicoSub->responsavel_id = $s['responsavel_id'];
 
 
-                    $propostaServicoSub->save();
+                $propostaServicoSub->save();
 
-                    // dump($propostaServicoSub);
+                // dump($propostaServicoSub);
 
 
 
             }
-            
-                      
-            
-            
-                       
+
+
+
+
+
         }
 
-        
 
 
-        return redirect(route('proposta.edit',$proposta->id));
-        
+
+        return redirect(route('proposta.edit', $proposta->id));
+
 
     }
 
@@ -236,13 +264,13 @@ class PropostasController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
-    {   
-        
+    {
+
         $proposta = Proposta::with('servicos')->find($id);
         $this->reOrderServices($proposta->id); //Reordenar indice dos servicos da proposta
-          
 
-        return view('admin.proposta.editar-proposta')->with(['proposta'=>$proposta]);
+
+        return view('admin.proposta.editar-proposta')->with(['proposta' => $proposta]);
     }
 
     /**
@@ -254,7 +282,7 @@ class PropostasController extends Controller
      */
     public function update(Request $request, $id)
     {
-        
+
         $proposta = Proposta::find($id);
 
         $proposta->dadosPagamento = $request->dadosPagamento;
@@ -266,18 +294,18 @@ class PropostasController extends Controller
 
         //remove class and style attributes from coppied text
 
-        $proposta->dadosPagamento = preg_replace('/(<[^>]+) style=("|\').*?("|\')/i','$1',$proposta->dadosPagamento);
-        $proposta->dadosPagamento = preg_replace('/(<[^>]+) class=("|\').*?("|\')/i','$1',$proposta->dadosPagamento);
+        $proposta->dadosPagamento = preg_replace('/(<[^>]+) style=("|\').*?("|\')/i', '$1', $proposta->dadosPagamento);
+        $proposta->dadosPagamento = preg_replace('/(<[^>]+) class=("|\').*?("|\')/i', '$1', $proposta->dadosPagamento);
 
 
-        $proposta->condicoesGerais = preg_replace('/(<[^>]+) style=("|\').*?("|\')/i','$1',$proposta->condicoesGerais);
-        $proposta->condicoesGerais = preg_replace('/(<[^>]+) class=("|\').*?("|\')/i','$1',$proposta->condicoesGerais);
+        $proposta->condicoesGerais = preg_replace('/(<[^>]+) style=("|\').*?("|\')/i', '$1', $proposta->condicoesGerais);
+        $proposta->condicoesGerais = preg_replace('/(<[^>]+) class=("|\').*?("|\')/i', '$1', $proposta->condicoesGerais);
 
-        $proposta->condicoesPagamento = preg_replace('/(<[^>]+) style=("|\').*?("|\')/i','$1',$proposta->condicoesPagamento);
-        $proposta->condicoesPagamento = preg_replace('/(<[^>]+) class=("|\').*?("|\')/i','$1',$proposta->condicoesPagamento);
+        $proposta->condicoesPagamento = preg_replace('/(<[^>]+) style=("|\').*?("|\')/i', '$1', $proposta->condicoesPagamento);
+        $proposta->condicoesPagamento = preg_replace('/(<[^>]+) class=("|\').*?("|\')/i', '$1', $proposta->condicoesPagamento);
 
-        $proposta->documentos = preg_replace('/(<[^>]+) style=("|\').*?("|\')/i','$1',$proposta->documentos);
-        $proposta->documentos = preg_replace('/(<[^>]+) class=("|\').*?("|\')/i','$1',$proposta->documentos);
+        $proposta->documentos = preg_replace('/(<[^>]+) style=("|\').*?("|\')/i', '$1', $proposta->documentos);
+        $proposta->documentos = preg_replace('/(<[^>]+) class=("|\').*?("|\')/i', '$1', $proposta->documentos);
 
 
 
@@ -285,7 +313,7 @@ class PropostasController extends Controller
 
         $proposta->save();
 
-        return view('admin.proposta.editar-proposta')->with(['proposta'=>$proposta]);
+        return view('admin.proposta.editar-proposta')->with(['proposta' => $proposta]);
     }
 
     /**
@@ -295,7 +323,7 @@ class PropostasController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
-    {   
+    {
 
         return "Deletendo";
         // $proposta = Proposta::find($id);
@@ -314,19 +342,16 @@ class PropostasController extends Controller
 
     public function removerProposta($id)
     {
-        
+
         $proposta = Proposta::find($id);
-        
-        
+
+
         //Verificar se já foram criados os serviços
-        if($proposta->servicos)
-        {
-            foreach($proposta->servicos as $s)
-            {   
+        if ($proposta->servicos) {
+            foreach ($proposta->servicos as $s) {
 
                 //Arquivar servico
-                if($s->servicoCriado)
-                {
+                if ($s->servicoCriado) {
                     // dump("Servico ja criado - ".$s->servicoCriado->os."");
                     // dump($s->servicoCriado->financeiro);
 
@@ -344,14 +369,14 @@ class PropostasController extends Controller
         $proposta->save();
 
         // dump($proposta);
-        
+
 
 
     }
 
     public function editarServico(Request $request)
     {
-        
+
         $servico = PropostaServico::find($request->servico_id);
 
         $servico->servico = $request->servico;
@@ -360,7 +385,7 @@ class PropostasController extends Controller
         $servico->save();
 
 
-        return redirect(route('proposta.edit',$servico->proposta_id));
+        return redirect(route('proposta.edit', $servico->proposta_id));
 
 
     }
@@ -368,32 +393,29 @@ class PropostasController extends Controller
 
     public function removerServico($id)
     {
-        
-         $servico = PropostaServico::find($id);
 
-        if($servico->financeiro)
-        {
+        $servico = PropostaServico::find($id);
+
+        if ($servico->financeiro) {
             $servico->servicoCriado->financeiro->delete();
         }
 
-        if($servico->servicoCriado)
-        {
+        if ($servico->servicoCriado) {
 
-            if($servico->servicoCriado->pendencias)
-                {
-                    $servico->servicoCriado->pendencias->delete();
-                }
+            if ($servico->servicoCriado->pendencias) {
+                $servico->servicoCriado->pendencias->delete();
+            }
 
-        $servico->servicoCriado->delete();
+            $servico->servicoCriado->delete();
 
         }
 
-        
+
 
         $servico->delete();
-         
+
         //Remover PropostaServico
-        
+
         // $servico->delete();
         // //Remover Servico
         // $servico->servicoCriado->delete();
@@ -402,8 +424,8 @@ class PropostasController extends Controller
         // //Remover Financeiro
         // $servico->servicoCriado->financeiro->delete();
 
-        
-                
+
+
     }
 
     public function analisar($id)
@@ -412,25 +434,34 @@ class PropostasController extends Controller
         $proposta->status = "Em análise";
         $proposta->save();
 
-        return response()->json(['success'=>true, 'status'=>200,'id'=>$id]);
+        return response()->json(['success' => true, 'status' => 200, 'id' => $id]);
 
-        
+
 
     }
 
-    
+
     public function recusar($id)
     {
         $proposta = Proposta::find($id);
         $proposta->status = "Recusada";
         $proposta->save();
 
-        return response()->json(['success'=>true, 'status'=>200,'id'=>$id]);
+        return response()->json(['success' => true, 'status' => 200, 'id' => $id]);
     }
 
-    public function aprovar($id,$s)
-    {   
-        
+    public function revisar($id)
+    {
+        $proposta = Proposta::find($id);
+        $proposta->status = "Revisando";
+        $proposta->save();
+
+        return response()->json(['success' => true, 'status' => 200, 'id' => $id]);
+    }
+
+    public function aprovar($id, $s)
+    {
+
 
         $proposta = Proposta::find($id);
         $proposta->status = "Aprovada";
@@ -438,17 +469,15 @@ class PropostasController extends Controller
 
         $servicos = array();
 
-        
-        
+
+
         // //Criar os serviços automaticamente de acordo com a proposta
 
-        if($s==1)
-        {   
+        if ($s == 1) {
 
-            
-            foreach($proposta->servicos as $key => $s)
-            {
-                    
+
+            foreach ($proposta->servicos as $key => $s) {
+
                 $servico = new Servico;
                 $servico->nome = $s->servico;
                 $servico->tipo = $s->servicoLpu->tipoServico;
@@ -462,9 +491,8 @@ class PropostasController extends Controller
                 $servico->proposta_id = $proposta->id;
                 $servico->proposta = $proposta->id;
 
-                
-                if($s->servicoPrincipal)
-                {
+
+                if ($s->servicoPrincipal) {
                     $servicoPrincipal = Servico::where('propostaServico_id', $s->servicoPrincipal)->pluck('id')->first();
                     $servico->servicoPrincipal = $servicoPrincipal;
                 }
@@ -473,31 +501,31 @@ class PropostasController extends Controller
                 $servico->os = $this->getLastOs($proposta->unidade_id);
 
                 $servico->save();
-                $servicos[$key]=$servico;
+                $servicos[$key] = $servico;
 
 
                 //Inserir financeiro
 
-                        
+
                 $faturamento = new ServicoFinanceiro();
                 $faturamento->servico_id = $servico->id;
 
                 $faturamento->valorTotal = $s->valor;
                 $faturamento->valorAberto = $s->valor;
-                $faturamento->save();  
-                
-                               
-                
+                $faturamento->save();
+
+
+
                 //Salvar historico
 
-                
+
                 $history = new Historico();
                 $history->servico_id = $servico->id;
                 $history->user_id = Auth::id();
-                $history->observacoes = "Serviço ".$servico->id." cadastrado.";
+                $history->observacoes = "Serviço " . $servico->id . " cadastrado.";
                 $history->created_at = Carbon::now('america/sao_paulo');
                 $history->save();
-                
+
 
                 //Criar Pendência principal
 
@@ -509,72 +537,74 @@ class PropostasController extends Controller
                 $pendencia->vencimento = date('Y-m-d');
                 $pendencia->prioridade = 1;
 
-               
+
                 $pendencia->responsavel_tipo = "usuario";
                 $pendencia->responsavel_id = $s->responsavel_id;
                 $pendencia->status = "pendente";
                 $pendencia->observacoes = "Pendência criada automaticamente. Lembrar de criar pendências para esse serviço.";
-                
+
 
                 $pendencia->save();
 
-                    
-    
+
+
             }
-    
-    
-            
+
+
+
         }
 
-        
-        return response()->json(['success'=>true, 'status'=>200,'id'=>$id,'servicos'=>$servicos]);
+
+        return response()->json(['success' => true, 'status' => 200, 'id' => $id, 'servicos' => $servicos]);
 
 
- 
+
 
     }
 
-    public function getLastOs($id) {
+    public function getLastOs($id)
+    {
         // Retrieve unit based on id.
         $unit = Unidade::find($id);
-        
+
         // Get company's full name.
         $fullName = $unit->empresa->razaoSocial;
-        
+
         // Divide name into parts using whitespaces.
         $parts = explode(' ', $fullName);
-        
+
         // Generate OS name by concatenating first letter of each part.
         $os = substr($parts[0], 0, 1) . substr($parts[1], 0, 1);
-    
+
         // Get latest OS in which string starts with generated $os.
         $lastOS = Servico::where('os', 'like', '%' . $os . '%')->orderBy('os', 'DESC')->value('os');
-    
+
         // If there's no such OS, return with default number.
         if (!$lastOS) {
             return $os . "0001";
         }
-    
+
         // Otherwise, increase the archival number by 1.
-        $number = (int)substr($lastOS, 2) + 1;
+        $number = (int) substr($lastOS, 2) + 1;
         return $os . str_pad($number, 4, "0", STR_PAD_LEFT);
     }
 
-  
-    
 
 
-    public function printPDF($id) {
-        
-
-    $proposta = Proposta::find($id);
-    $this->reOrderServices($proposta->id); //Reordenar indice dos servicos da proposta
 
 
-    $pdf = \PDF::loadView('admin.proposta.pdf', ['proposta' => $proposta])->stream("Proposta ".$proposta->id." - ".$proposta->empresa->nomeFantasia." - ".$proposta->unidade->codigo." - ".$proposta->unidade->nomeFantasia.".pdf");
-    return $pdf;
+    public function printPDF($id)
+    {
 
-    // return view('admin.proposta.pdf', ['proposta' => $proposta]);
+
+        $proposta = Proposta::find($id);
+        $this->reOrderServices($proposta->id); //Reordenar indice dos servicos da proposta
+
+
+        $pdf = \PDF::loadView('admin.proposta.pdf', ['proposta' => $proposta])->stream("Proposta " . $proposta->id . " - " . $proposta->empresa->nomeFantasia . " - " . $proposta->unidade->codigo . " - " . $proposta->unidade->nomeFantasia . ".pdf");
+        return $pdf;
+
+        // return view('admin.proposta.pdf', ['proposta' => $proposta]);
 
     }
 
@@ -582,16 +612,14 @@ class PropostasController extends Controller
     {
         $proposta = Proposta::find($id);
 
-        foreach($proposta->servicos->where('servicoPrincipal')->groupBy('servicoPrincipal') as $key =>$s)
-        {
-            foreach($s as $k => $c)
-            {
+        foreach ($proposta->servicos->where('servicoPrincipal')->groupBy('servicoPrincipal') as $key => $s) {
+            foreach ($s as $k => $c) {
                 // dump($k);
                 $serv = PropostaServico::find($c->id);
-                $serv->posicao = $k+1;
+                $serv->posicao = $k + 1;
                 $serv->save();
             }
-            
+
         }
 
 
