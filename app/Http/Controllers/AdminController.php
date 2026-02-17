@@ -34,11 +34,11 @@ class AdminController extends Controller
 
         return view('admin.dashboard')
             ->with([
-                'vencer'                 => $this->servicosVencer(),
-                'finalizados'            => $this->servicosFinalizados(),
-                'andamento'              => $this->servicosAndamento(),
+                'vencer' => $this->servicosVencer(),
+                'finalizados' => $this->servicosFinalizados(),
+                'andamento' => $this->servicosAndamento(),
                 'andamentoCoResponsavel' => $this->servicosAndamentoCoResponsavel(),
-                'pendencias'             => $this->pendencias(),
+                'pendencias' => $this->pendencias(),
 
             ]);
     }
@@ -50,7 +50,7 @@ class AdminController extends Controller
 
         $pendencias = Pendencia::with('servico', 'unidade')
             ->where('responsavel_id', Auth::id())
-        // ->orWhereIn('pendencias.servico_id',$servicos)
+            // ->orWhereIn('pendencias.servico_id',$servicos)
             ->where('status', 'pendente')
             ->whereDoesntHave('vinculos')
             ->get();
@@ -61,7 +61,7 @@ class AdminController extends Controller
     public function servicosVencer()
     {
         $servicos = Servico::with('unidade', 'empresa', 'responsavel')
-        // ->whereIn('unidade_id',$this->getUnidadesList())
+            // ->whereIn('unidade_id',$this->getUnidadesList())
             ->orWhere('responsavel_id', Auth::id())
             ->get();
 
@@ -77,7 +77,7 @@ class AdminController extends Controller
     {
         $servicos = Servico::with('unidade', 'empresa', 'responsavel')
 
-        // ->whereIn('unidade_id',$this->getUnidadesList())
+            // ->whereIn('unidade_id',$this->getUnidadesList())
             ->orWhere('responsavel_id', Auth::id())
             ->get();
 
@@ -92,7 +92,7 @@ class AdminController extends Controller
     {
         $servicos = Servico::with('unidade', 'empresa', 'responsavel')
 
-        // ->whereIn('unidade_id',$this->getUnidadesList())
+            // ->whereIn('unidade_id',$this->getUnidadesList())
             ->orWhere('responsavel_id', Auth::id())
             ->get();
 
@@ -107,7 +107,7 @@ class AdminController extends Controller
     {
         $servicos = Servico::with('unidade', 'empresa', 'responsavel')
 
-        // ->whereIn('unidade_id',$this->getUnidadesList())
+            // ->whereIn('unidade_id',$this->getUnidadesList())
             ->orWhere('coresponsavel_id', Auth::id())
             ->get();
 
@@ -138,21 +138,60 @@ class AdminController extends Controller
 
         // Definindo os cabeçalhos da resposta
         $headers = [
-            "Content-type"        => "text/csv",
+            "Content-type" => "text/csv",
             "Content-Disposition" => "attachment; filename=$fileName",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0",
         ];
 
         // Colunas do CSV
         $columns = [
-            'ID', 'Razão Social', 'Código', 'Nome', 'Licenciamento', 'CNPJ', 'Status', 'Imóvel', 'Ins. Estadual',
-            'Ins. Municipal', 'Ins. Imob.', 'RIP', 'Matrícula RI', 'Área da Loja', 'Área do Terreno', 'Endereço',
-            'Número', 'Complemento', 'Bairro', 'Data Inauguração', 'Cidade', 'UF', 'CEP', 'Tipo', 'O.S.', 'Situação',
-            'Responsável', 'Co-Responsável', 'Analista 1', 'Analista 2', 'Nome', 'Solicitante', 'Departamento',
-            'N° Protocolo', 'Emissão Protocolo', 'Tipo Licença', 'Proposta', 'Emissão Licença', 'Validade Licença',
-            'Valor Total', 'Valor em Aberto', 'Finalizado', 'Criação', 'Pendência(s)', 'Responsável(eis) pela(s) Pendência(s)',
+            'ID',
+            'Razão Social',
+            'Código',
+            'Nome',
+            'Licenciamento',
+            'CNPJ',
+            'Status',
+            'Imóvel',
+            'Ins. Estadual',
+            'Ins. Municipal',
+            'Ins. Imob.',
+            'RIP',
+            'Matrícula RI',
+            'Área da Loja',
+            'Área do Terreno',
+            'Endereço',
+            'Número',
+            'Complemento',
+            'Bairro',
+            'Data Inauguração',
+            'Cidade',
+            'UF',
+            'CEP',
+            'Tipo',
+            'O.S.',
+            'Situação',
+            'Responsável',
+            'Co-Responsável',
+            'Analista 1',
+            'Analista 2',
+            'Nome',
+            'Solicitante',
+            'Departamento',
+            'N° Protocolo',
+            'Emissão Protocolo',
+            'Tipo Licença',
+            'Proposta',
+            'Emissão Licença',
+            'Validade Licença',
+            'Valor Total',
+            'Valor em Aberto',
+            'Finalizado',
+            'Criação',
+            'Pendência(s)',
+            'Responsável(eis) pela(s) Pendência(s)',
         ];
 
         // Callback para gerar o CSV
@@ -175,24 +214,24 @@ class AdminController extends Controller
                 ->each(function ($s) use ($file) {
                     // Processando cada serviço para incluir no CSV
                     $solicitante = is_numeric($s->solicitante)
-                    ? \App\Models\Solicitante::where('id', $s->solicitante)->value('nome')
-                    : $s->solicitante;
+                        ? \App\Models\Solicitante::where('id', $s->solicitante)->value('nome')
+                        : $s->solicitante;
 
-                    $proposta          = $s->proposta_id ?: $s->proposta;
-                    $finalizado        = $s->servicoFinalizado ? \Carbon\Carbon::parse($s->servicoFinalizado->finalizado)->format('d/m/Y') : '';
+                    $proposta = $s->proposta_id ?: $s->proposta;
+                    $finalizado = $s->servicoFinalizado ? \Carbon\Carbon::parse($s->servicoFinalizado->finalizado)->format('d/m/Y') : '';
                     $protocolo_emissao = $s->protocolo_emissao ? \Carbon\Carbon::parse($s->protocolo_emissao)->format('d/m/Y') : null;
-                    $licenca_emissao   = $s->licenca_emissao ? \Carbon\Carbon::parse($s->licenca_emissao)->format('d/m/Y') : null;
-                    $licenca_validade  = $s->licenca_validade ? \Carbon\Carbon::parse($s->licenca_validade)->format('d/m/Y') : null;
-                    $dataInauguracao   = $s->unidade->dataInauguracao ? \Carbon\Carbon::parse($s->unidade->dataInauguracao)->format('d/m/Y') : null;
-                    $licenciamento     = $s->licenciamento ?: null;
+                    $licenca_emissao = $s->licenca_emissao ? \Carbon\Carbon::parse($s->licenca_emissao)->format('d/m/Y') : null;
+                    $licenca_validade = $s->licenca_validade ? \Carbon\Carbon::parse($s->licenca_validade)->format('d/m/Y') : null;
+                    $dataInauguracao = $s->unidade->dataInauguracao ? \Carbon\Carbon::parse($s->unidade->dataInauguracao)->format('d/m/Y') : null;
+                    $licenciamento = $s->licenciamento ?: null;
 
                     // Processamento de pendências e responsáveis
-                    $pendencias           = null;
+                    $pendencias = null;
                     $responsavelPendencia = null;
 
                     if ($s->pendencias) {
                         foreach ($s->pendencias as $p) {
-                            $pendencias           = $p->pendencia;
+                            $pendencias = $p->pendencia;
                             $responsavelPendencia = $p->responsavel->name ?? '';
                         }
                     }
@@ -267,7 +306,7 @@ class AdminController extends Controller
         $filePath = public_path('uploads/relatorios/' . $fileName); // Salvar na pasta uploads/relatorios
 
         // Verifica se a pasta existe, se não, cria a pasta
-        if (! file_exists(public_path('uploads/relatorios'))) {
+        if (!file_exists(public_path('uploads/relatorios'))) {
             mkdir(public_path('uploads/relatorios'), 0755, true);
         }
 
@@ -286,12 +325,12 @@ class AdminController extends Controller
                 $s->solicitante = \App\Models\Solicitante::where('id', $s->solicitante)->value('nome');
             }
 
-            $proposta          = $s->proposta_id ? $s->proposta_id : $s->proposta;
-            $finalizado        = isset($s->servicoFinalizado) ? \Carbon\Carbon::parse($s->servicoFinalizado->finalizado)->format('d/m/Y') : '';
+            $proposta = $s->proposta_id ? $s->proposta_id : $s->proposta;
+            $finalizado = isset($s->servicoFinalizado) ? \Carbon\Carbon::parse($s->servicoFinalizado->finalizado)->format('d/m/Y') : '';
             $protocolo_emissao = isset($s->protocolo_emissao) ? \Carbon\Carbon::parse($s->protocolo_emissao)->format('d/m/Y') : null;
-            $licenca_emissao   = isset($s->licenca_emissao) ? \Carbon\Carbon::parse($s->licenca_emissao)->format('d/m/Y') : null;
-            $licenca_validade  = isset($s->licenca_validade) ? \Carbon\Carbon::parse($s->licenca_validade)->format('d/m/Y') : null;
-            $dataInauguracao   = $s->unidade->dataInauguracao ? \Carbon\Carbon::parse($s->unidade->dataInauguracao)->format('d/m/Y') : null;
+            $licenca_emissao = isset($s->licenca_emissao) ? \Carbon\Carbon::parse($s->licenca_emissao)->format('d/m/Y') : null;
+            $licenca_validade = isset($s->licenca_validade) ? \Carbon\Carbon::parse($s->licenca_validade)->format('d/m/Y') : null;
+            $dataInauguracao = $s->unidade->dataInauguracao ? \Carbon\Carbon::parse($s->unidade->dataInauguracao)->format('d/m/Y') : null;
 
             // Escreve os dados do serviço no CSV
             fputcsv($file, [
@@ -350,7 +389,7 @@ class AdminController extends Controller
     {
         $servicos = Servico::with('unidade', 'responsavel', 'financeiro', 'servicoFinalizado', 'vinculos', 'historico')
             ->whereNotIn('responsavel_id', [1])
-        // ->take(1000)
+            // ->take(1000)
             ->get();
 
         $resultArray = [];
@@ -404,7 +443,7 @@ class AdminController extends Controller
 
             if ($s->pendencias) {
 
-                $pendencias           = null;
+                $pendencias = null;
                 $responsavelPendencia = null;
 
                 foreach ($s->pendencias as $p) {
@@ -420,10 +459,10 @@ class AdminController extends Controller
             // ...
 
             $resultArray[] = [
-                'ID'                                    => $s->id,
-                'Razão Social'                          => $s->unidade->razaoSocial,
+                'ID' => $s->id,
+                'Razão Social' => $s->unidade->razaoSocial,
                 // ... Other fields ...
-                'Pendência(s)'                          => $pendencias,
+                'Pendência(s)' => $pendencias,
                 'Responsável(eis) pela(s) Pendência(s)' => $responsavelPendencia,
                 // ... More fields ...
             ];
@@ -448,15 +487,34 @@ class AdminController extends Controller
         $servicos = Servico::with('unidade', 'financeiro')->whereNotIn('responsavel_id', [1])->orderBy('id', 'DESC')->get();
 
         $headers = [
-            "Content-type"        => "text/csv",
+            "Content-type" => "text/csv",
             "Content-Disposition" => "attachment; filename=$fileName",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0",
         ];
 
-        $columns = ['Empresa', 'Serviço', 'OS', 'ID', 'Código', 'Unidade', 'CNPJ', 'Cidade', 'UF', 'Proposta',
-            'Valor Total', 'Taxa', 'Emissão', 'Vencimento', 'Pagamento', 'Resp. Pgto', 'Reembolso', 'Status', 'Valor'];
+        $columns = [
+            'Empresa',
+            'Serviço',
+            'OS',
+            'ID',
+            'Código',
+            'Unidade',
+            'CNPJ',
+            'Cidade',
+            'UF',
+            'Proposta',
+            'Valor Total',
+            'Taxa',
+            'Emissão',
+            'Vencimento',
+            'Pagamento',
+            'Resp. Pgto',
+            'Reembolso',
+            'Status',
+            'Valor'
+        ];
 
         $callback = function () use ($servicos, $columns) {
             $file = fopen('php://output', 'w');
@@ -523,17 +581,17 @@ class AdminController extends Controller
             ->orderBy('id', 'DESC')
             ->with('responsavel', 'coresponsavel', 'financeiro', 'historico')
             ->select('id', 'nome', 'os', 'unidade_id', 'tipo', 'protocolo_anexo', 'laudo_anexo', 'solicitante', 'responsavel_id', 'coresponsavel_id', 'licenciamento', 'departamento', 'situacao', 'created_at', 'dataFinal') // Add 'situacao' and 'created_at' to the select list
-                                                                                                                                                                                                                          // ->take(30)
+            // ->take(30)
             ->get();
 
         // $servicos = Pendencia::all();
 
         $headers = [
-            "Content-type"        => "text/csv",
+            "Content-type" => "text/csv",
             "Content-Disposition" => "attachment; filename=$fileName",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0",
         ];
 
         $columns = [
@@ -651,10 +709,10 @@ class AdminController extends Controller
 
                     $etapa = null;
 
-                    if (! $s->protocolo_anexo) {
+                    if (!$s->protocolo_anexo) {
                         $etapa = "Em elaboração";
                     } else {
-                        if (! $s->laudo_anexo) {
+                        if (!$s->laudo_anexo) {
                             $etapa = "Em elaboração";
                         } else {
                             $etapa = "1° Análise";
@@ -688,15 +746,15 @@ class AdminController extends Controller
                         $historico = $h->observacoes . " ";
                     }
 
-                    if (! $s->financeiro) {
+                    if (!$s->financeiro) {
 
-                        $financeiro                = new ServicoFinanceiro();
-                        $financeiro->servico_id    = $s->id;
-                        $financeiro->valorTotal    = 0;
+                        $financeiro = new ServicoFinanceiro();
+                        $financeiro->servico_id = $s->id;
+                        $financeiro->valorTotal = 0;
                         $financeiro->valorFaturado = 0;
-                        $financeiro->valorFaturar  = 0;
-                        $financeiro->valorAberto   = 0;
-                        $financeiro->status        = 'aberto';
+                        $financeiro->valorFaturar = 0;
+                        $financeiro->valorAberto = 0;
+                        $financeiro->status = 'aberto';
 
                         $financeiro->save();
                         $s->financeiro = $financeiro;
@@ -788,23 +846,25 @@ class AdminController extends Controller
 
         $fileName = 'Celic_RelatorioFiltro_Pendencias' . date('d-m-Y') . '.csv';
 
-        $servicos = Servico::with(['pendencias' => function ($q) use ($request) {
-            $q->where('status', $request->status);
-        }])
+        $servicos = Servico::with([
+            'pendencias' => function ($q) use ($request) {
+                $q->where('status', $request->status);
+            }
+        ])
             ->whereNotIn('responsavel_id', [1])
             ->orderBy('id', 'DESC')
             ->with('responsavel', 'coresponsavel')
             ->select('id', 'nome', 'os', 'unidade_id', 'tipo', 'protocolo_anexo', 'laudo_anexo', 'solicitante', 'responsavel_id', 'coresponsavel_id', 'licenciamento', 'departamento', 'situacao', 'created_at') // Add 'situacao' and 'created_at' to the select list
-                                                                                                                                                                                                             // ->take(200)   //Somente para testes
+            // ->take(200)   //Somente para testes
             ->whereIn('empresa_id', $request->empresa_id)
             ->get();
 
         $headers = [
-            "Content-type"        => "text/csv",
+            "Content-type" => "text/csv",
             "Content-Disposition" => "attachment; filename=$fileName",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0",
         ];
 
         $columns = [
@@ -917,10 +977,10 @@ class AdminController extends Controller
 
                     $etapa = null;
 
-                    if (! $s->protocolo_anexo) {
+                    if (!$s->protocolo_anexo) {
                         $etapa = "Em elaboração";
                     } else {
-                        if (! $s->laudo_anexo) {
+                        if (!$s->laudo_anexo) {
                             $etapa = "Em elaboração";
                         } else {
                             $etapa = "1° Análise";
@@ -954,15 +1014,15 @@ class AdminController extends Controller
                         $historico = $h->observacoes . " ";
                     }
 
-                    if (! $s->financeiro) {
+                    if (!$s->financeiro) {
 
-                        $financeiro                = new ServicoFinanceiro();
-                        $financeiro->servico_id    = $s->id;
-                        $financeiro->valorTotal    = 0;
+                        $financeiro = new ServicoFinanceiro();
+                        $financeiro->servico_id = $s->id;
+                        $financeiro->valorTotal = 0;
                         $financeiro->valorFaturado = 0;
-                        $financeiro->valorFaturar  = 0;
-                        $financeiro->valorAberto   = 0;
-                        $financeiro->status        = 'aberto';
+                        $financeiro->valorFaturar = 0;
+                        $financeiro->valorAberto = 0;
+                        $financeiro->status = 'aberto';
 
                         $financeiro->save();
                         $s->financeiro = $financeiro;
@@ -1021,18 +1081,18 @@ class AdminController extends Controller
         $servicos = Servico::whereNotIn('responsavel_id', [1])
             ->orderBy('id', 'DESC')
             ->with('responsavel', 'coresponsavel')
-        // ->take(200)   //Somente para testes
+            // ->take(200)   //Somente para testes
             ->whereIn('empresa_id', $request->empresa_id)
             ->get();
 
         // dd($servicos);
 
         $headers = [
-            "Content-type"        => "text/csv",
+            "Content-type" => "text/csv",
             "Content-Disposition" => "attachment; filename=$fileName",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0",
         ];
 
         $columns = [
@@ -1136,14 +1196,14 @@ class AdminController extends Controller
     public function listarRelatorios()
     {
         $directory = public_path('uploads/relatorios');
-        $files     = File::files($directory);
+        $files = File::files($directory);
 
         $reports = [];
 
         foreach ($files as $file) {
             $reports[] = [
-                'name'          => $file->getFilename(),
-                'date'          => $file->getMTime(),                                        // Timestamp
+                'name' => $file->getFilename(),
+                'date' => $file->getMTime(),                                        // Timestamp
                 'download_link' => url('public/uploads/relatorios/' . $file->getFilename()), // Link para download
             ];
         }
@@ -1177,11 +1237,11 @@ class AdminController extends Controller
         $fileName = 'Celic_Relatorio_Empresas' . date('d-m-Y') . '.csv';
 
         $headers = [
-            "Content-type"        => "text/csv",
+            "Content-type" => "text/csv",
             "Content-Disposition" => "attachment; filename=$fileName",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0",
         ];
 
         $columns = [
@@ -1231,67 +1291,103 @@ class AdminController extends Controller
     }
 
     public function propostasCSV()
-{
-    $fileName = 'Celic_Relatorio_Propostas' . date('d-m-Y') . '.csv';
+    {
+        $fileName = 'Celic_Relatorio_Propostas' . date('d-m-Y') . '.csv';
 
-    $headers = [
-        "Content-type"        => "text/csv",
-        "Content-Disposition" => "attachment; filename=$fileName",
-        "Pragma"              => "no-cache",
-        "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-        "Expires"             => "0",
-    ];
+        $headers = [
+            "Content-type" => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0",
+        ];
 
-    $columns = [
-        'Nº da proposta', 'Empresa', 'Código', 'Unidade', 'Total', 'Status', 'Servico faturado',
-        'Link do documento', 'Item', 'Serviço', 'Escopo', 'Valor unitário', 'Valor total',
-        'Documentos a serem fornecidos', 'Condições gerais', 'Condições de pagamento', 'Dados para pagamento',
-    ];
+        $columns = [
+            'Nº da proposta',
+            'Empresa',
+            'Código',
+            'Unidade',
+            'Total',
+            'Status',
+            'Servico faturado',
+            'Link do documento',
+            'Item',
+            'Serviço',
+            'Escopo',
+            'Valor unitário',
+            'Valor total',
+            'Documentos a serem fornecidos',
+            'Condições gerais',
+            'Condições de pagamento',
+            'Dados para pagamento',
+        ];
 
-    $data = [];
+        $data = [];
 
-    Proposta::with(['unidade.empresa', 'servicos.servicoCriado', 'servicosFaturados'])
-        ->cursor()
-        // ->take(100)
-        ->each(function ($p) use (&$data) {
-            // Prepara os dados básicos da proposta
-            $propostaNumero  = $p->id;
-            $empresaNome     = $p->unidade->empresa->nomeFantasia ?? null;
-            $codigo          = $p->unidade->codigo ?? null;
-            $unidadeNome     = $p->unidade->nomeFantasia ?? null;
-            // Calcula o total usando 'servicos' e a coluna 'valor'
-            $propostaTotal   = ($p->servicos ?? collect())->sum('valor');
-            $propostaTotalFormatado = number_format($propostaTotal, 2, ",", ".");
-            $status          = $p->status;
-            // AQUI ESTÁ O AJUSTE: Coleta os IDs dos serviços faturados
-                        
-            
-            // Coleta os IDs dos serviços que foram faturados
-            $servicosFaturadosIds = ($p->servicosFaturados ?? collect())->pluck('id');
+        Proposta::with(['unidade.empresa', 'servicos.servicoCriado', 'servicosFaturados'])
+            ->cursor()
+            // ->take(100)
+            ->each(function ($p) use (&$data) {
+                // Prepara os dados básicos da proposta
+                $propostaNumero = $p->id;
+                $empresaNome = $p->unidade->empresa->nomeFantasia ?? null;
+                $codigo = $p->unidade->codigo ?? null;
+                $unidadeNome = $p->unidade->nomeFantasia ?? null;
+                // Calcula o total usando 'servicos' e a coluna 'valor'
+                $propostaTotal = ($p->servicos ?? collect())->sum('valor');
+                $propostaTotalFormatado = number_format($propostaTotal, 2, ",", ".");
+                $status = $p->status;
+                // AQUI ESTÁ O AJUSTE: Coleta os IDs dos serviços faturados
+    
 
-            
-            $linkDocumento   = route('propostaPDF', ['id' => $propostaNumero]);;
+                // Coleta os IDs dos serviços que foram faturados
+                $servicosFaturadosIds = ($p->servicosFaturados ?? collect())->pluck('id');
 
-            // Limpa o conteúdo das variáveis, removendo tags HTML e decodificando entidades
-            $docFornecidos   = html_entity_decode(strip_tags($p->documentos));
-            $condicoesGerais = html_entity_decode(strip_tags($p->condicoesGerais));
-            $condicoesPagto  = html_entity_decode(strip_tags($p->condicoesPagamento));
-            $dadosPagto      = html_entity_decode(strip_tags($p->dadosPagamento));
 
-            // Garante que 'servicos' é uma coleção
-            $itens = $p->servicos ?? collect();
+                $linkDocumento = route('propostaPDF', ['id' => $propostaNumero]);
+                ;
 
-            if ($itens->isNotEmpty()) {
-                foreach ($itens as $item) {
+                // Limpa o conteúdo das variáveis, removendo tags HTML e decodificando entidades
+                $docFornecidos = html_entity_decode(strip_tags($p->documentos));
+                $condicoesGerais = html_entity_decode(strip_tags($p->condicoesGerais));
+                $condicoesPagto = html_entity_decode(strip_tags($p->condicoesPagamento));
+                $dadosPagto = html_entity_decode(strip_tags($p->dadosPagamento));
 
-                    $servicoCriado = $item->servicoCriado ?? null;
+                // Garante que 'servicos' é uma coleção
+                $itens = $p->servicos ?? collect();
 
-                    // Agora a comparação é feita corretamente entre IDs de Servico
-                    $faturadoStatus = null;
-                    if ($servicoCriado && $servicosFaturadosIds->contains($servicoCriado->id)) {
-                        $faturadoStatus = $servicoCriado->id;
+                if ($itens->isNotEmpty()) {
+                    foreach ($itens as $item) {
+
+                        $servicoCriado = $item->servicoCriado ?? null;
+
+                        // Agora a comparação é feita corretamente entre IDs de Servico
+                        $faturadoStatus = null;
+                        if ($servicoCriado && $servicosFaturadosIds->contains($servicoCriado->id)) {
+                            $faturadoStatus = $servicoCriado->id;
+                        }
+
+                        $data[] = [
+                            $propostaNumero,
+                            $empresaNome,
+                            $codigo,
+                            $unidadeNome,
+                            $propostaTotalFormatado,
+                            $status,
+                            $faturadoStatus, // <<-- AQUI ESTÁ O AJUSTE
+                            $linkDocumento,
+                            $item->id,
+                            $item->servico,
+                            $item->escopo,
+                            number_format($item->valor, 2, ",", "."),
+                            number_format($item->valorTotal, 2, ",", "."),
+                            $docFornecidos,
+                            $condicoesGerais,
+                            $condicoesPagto,
+                            $dadosPagto,
+                        ];
                     }
-
+                } else {
                     $data[] = [
                         $propostaNumero,
                         $empresaNome,
@@ -1299,59 +1395,52 @@ class AdminController extends Controller
                         $unidadeNome,
                         $propostaTotalFormatado,
                         $status,
-                        $faturadoStatus, // <<-- AQUI ESTÁ O AJUSTE
+                        null,
                         $linkDocumento,
-                        $item->id,
-                        $item->servico,
-                        $item->escopo,
-                        number_format($item->valor, 2, ",", "."),
-                        number_format($item->valorTotal, 2, ",", "."),
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
                         $docFornecidos,
                         $condicoesGerais,
                         $condicoesPagto,
                         $dadosPagto,
                     ];
                 }
-            } else {
-                $data[] = [
-                    $propostaNumero, $empresaNome, $codigo, $unidadeNome, $propostaTotalFormatado,
-                    $status, null, $linkDocumento, null, null, null, null, null,
-                    $docFornecidos, $condicoesGerais, $condicoesPagto, $dadosPagto,
-                ];
-            }
-        });
+            });
 
-    // Se o modo de teste estiver ativado, retorna JSON em vez de CSV
-    
+        // Se o modo de teste estiver ativado, retorna JSON em vez de CSV
+
         // return response()->json($data);
-   
-    
-    $callback = function () use ($columns, $data) {
-        $file = fopen('php://output', 'w');
-        fputcsv($file, $columns, ';');
-        
-        foreach ($data as $row) {
-            fputcsv($file, $row, ';');
-        }
-
-        fclose($file);
-    };
-
-    return response()->stream($callback, 200, $headers);
-}
 
 
+        $callback = function () use ($columns, $data) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns, ';');
 
-    public function faturamentosCSV()
+            foreach ($data as $row) {
+                fputcsv($file, $row, ';');
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+
+
+    public function faturamentosCSV(Request $request)
     {
         $fileName = 'Celic_Relatorio_Faturamentos' . date('d-m-Y') . '.csv';
 
         $headers = [
-            "Content-type"        => "text/csv",
+            "Content-type" => "text/csv",
             "Content-Disposition" => "attachment; filename=$fileName",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0",
         ];
 
         $columns = [
@@ -1374,11 +1463,32 @@ class AdminController extends Controller
         // Array para coletar os dados no modo de teste
         $data = [];
 
-        // Carregamos os faturamentos e seus serviços relacionados, bem como a empresa e a unidade de cada serviço
-        // Usando os nomes de relacionamento corretos dos models: 'servicosFaturados' e 'detalhes'
-        $faturamentos = Faturamento::with('servicosFaturados.detalhes.unidade.empresa')
-            ->cursor();
-            // ->take(50); //Testes
+        $query = Faturamento::with('servicosFaturados.detalhes.unidade.empresa');
+
+        // Lógica de Filtro por Período (Reutilizada do FaturamentoController)
+        if ($request->has('periodo')) {
+            $periodo = $request->get('periodo');
+            $hoje = Carbon::now();
+
+            if ($periodo == 'mes_vigente') {
+                $query->whereYear('created_at', $hoje->year)->whereMonth('created_at', $hoje->month);
+            } elseif ($periodo == 'mes_anterior') {
+                $mesAnterior = $hoje->copy()->subMonth();
+                $query->whereYear('created_at', $mesAnterior->year)->whereMonth('created_at', $mesAnterior->month);
+            } elseif ($periodo == 'trimestre') {
+                $dataInicioFiltro = $hoje->copy()->subMonths(3)->startOfDay();
+                $dataFimFiltro = $hoje->copy()->endOfDay();
+                $query->whereBetween('created_at', [$dataInicioFiltro, $dataFimFiltro]);
+            } elseif ($periodo == 'ano_atual') {
+                $query->whereYear('created_at', $hoje->year);
+            } elseif ($periodo == 'ano_passado') {
+                $anoPassado = $hoje->copy()->subYear();
+                $query->whereYear('created_at', $anoPassado->year);
+            }
+        }
+
+        // Carregamos os faturamentos e seus serviços relacionados
+        $faturamentos = $query->cursor();
 
         foreach ($faturamentos as $faturamento) {
             // Para cada faturamento, iteramos sobre seus serviços associados
@@ -1389,20 +1499,20 @@ class AdminController extends Controller
 
                 // Adiciona uma linha de dados ao array
                 $data[] = [
-                    'id_faturamento'     => $faturamento->id,
+                    'id_faturamento' => $faturamento->id,
                     'numero_faturamento' => $faturamento->nome,
-                    'cliente'            => $empresa->nomeFantasia ?? null,
-                    'data'               => $faturamento->created_at ?? null,
-                    'total'              => number_format($faturamento->valorTotal, 2, ",", "."),
-                    'codigo_unidade'     => $unidade->codigo ?? null,
-                    'nome_unidade'       => $unidade->nomeFantasia ?? null,
-                    'cidade'             => $unidade->cidade ?? null,
-                    'cnpj'               => $empresa->cnpj ?? null,
-                    'servico'            => $servico->nome ?? null,
-                    'valor_faturado'     => number_format($fs->valorFaturado, 2, ",", "."),
-                    'nf'                 => $faturamento->nf,
-                    'id_servico'         => $servico->id,
-                    'referencia'         => $faturamento->obs
+                    'cliente' => $empresa->nomeFantasia ?? null,
+                    'data' => $faturamento->created_at ?? null,
+                    'total' => number_format($faturamento->valorTotal, 2, ",", "."),
+                    'codigo_unidade' => $unidade->codigo ?? null,
+                    'nome_unidade' => $unidade->nomeFantasia ?? null,
+                    'cidade' => $unidade->cidade ?? null,
+                    'cnpj' => $empresa->cnpj ?? null,
+                    'servico' => $servico->nome ?? null,
+                    'valor_faturado' => number_format($fs->valorFaturado, 2, ",", "."),
+                    'nf' => $faturamento->nf,
+                    'id_servico' => $servico->id,
+                    'referencia' => $faturamento->obs
                 ];
             }
         }
@@ -1414,10 +1524,10 @@ class AdminController extends Controller
         // Abaixo, o código original para download do CSV
         $callback = function () use ($columns, $data) {
             $file = fopen('php://output', 'w');
-            fputcsv($file, $columns);
+            fputcsv($file, $columns, ';'); // Using semicolon as separator for Excel in Brazil
 
             foreach ($data as $row) {
-                fputcsv($file, $row);
+                fputcsv($file, $row, ';');
             }
 
             fclose($file);
@@ -1426,16 +1536,16 @@ class AdminController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 
-        public function reembolsosCSV(Request $request)
+    public function reembolsosCSV(Request $request)
     {
         $fileName = 'Celic_Relatorio_Reembolsos_' . date('d-m-Y') . '.csv';
 
         $headers = [
-            "Content-type"        => "text/csv",
+            "Content-type" => "text/csv",
             "Content-Disposition" => "attachment; filename=$fileName",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0",
         ];
 
         $columns = [
@@ -1465,68 +1575,66 @@ class AdminController extends Controller
             // ->take(50) //testes!
             ->each(function ($reembolso) use (&$data) {
                 // Prepara os dados básicos do reembolso
-            $linkReembolso = route('reembolso.download', ['id' => $reembolso->id]);
-            $linkPastaZipada = route('reembolso.downloadZip', ['id' => $reembolso->id]);
+                $linkReembolso = route('reembolso.download', ['id' => $reembolso->id]);
+                $linkPastaZipada = route('reembolso.downloadZip', ['id' => $reembolso->id]);
 
                 $reembolsoTaxas = $reembolso->taxas ?? collect();
 
                 if ($reembolsoTaxas->isNotEmpty()) {
                     foreach ($reembolsoTaxas as $reembolsoTaxa) {
-                        $taxa    = $reembolsoTaxa->taxa ?? null;
+                        $taxa = $reembolsoTaxa->taxa ?? null;
                         $servico = $taxa->servico ?? null;
                         $unidade = $servico->unidade ?? null;
                         $empresa = $reembolso->empresa ?? null;
 
-                    // LÓGICA CONDICIONAL PARA O SOLICITANTE
-                    $solicitante = null;
-                    if ($servico->solicitanteServico) {
-                        $solicitante = $servico->solicitanteServico->nome;
-                    }
-                    else
-                    {
-                        $solicitante = $servico->solicitante;
-                    }
+                        // LÓGICA CONDICIONAL PARA O SOLICITANTE
+                        $solicitante = null;
+                        if ($servico->solicitanteServico) {
+                            $solicitante = $servico->solicitanteServico->nome;
+                        } else {
+                            $solicitante = $servico->solicitante;
+                        }
 
 
                         $data[] = [
-                            'id_reembolso'      => $reembolso->id,
-                        'numero_reembolso'  => $this->fillWithZeros($reembolso->id),
-                            'cliente'           => $empresa->nomeFantasia ?? null,
-                            'data'              => ($reembolso->created_at) ? Carbon::parse($reembolso->created_at)->format('d/m/Y') : null,
-                            'total_reembolso'   => number_format($reembolso->valorTotal ?? 0, 2, ",", "."),
-                            'link_reembolso'    => $linkReembolso,
+                            'id_reembolso' => $reembolso->id,
+                            'numero_reembolso' => $this->fillWithZeros($reembolso->id),
+                            'cliente' => $empresa->nomeFantasia ?? null,
+                            'data' => ($reembolso->created_at) ? Carbon::parse($reembolso->created_at)->format('d/m/Y') : null,
+                            'total_reembolso' => number_format($reembolso->valorTotal ?? 0, 2, ",", "."),
+                            'link_reembolso' => $linkReembolso,
                             'link_pasta_zipada' => $linkPastaZipada,
-                            'codigo_unidade'    => $unidade->codigo ?? null,
-                            'nome_unidade'      => $unidade->nomeFantasia ?? null,
-                            'cidade'            => $unidade->cidade ?? null,
-                            'servico'           => $servico->nome ?? null,
-                            'descricao_taxa'    => $taxa->nome ?? null,
-                            'solicitante'       => $solicitante,
-                            'valor_taxa'        => number_format($taxa->valor ?? 0, 2, ",", "."),
-                            'data_vencimento'   => ($taxa->vencimento) ? Carbon::parse($taxa->vencimento)->format('d/m/Y') : null,
-                            'data_pagamento'    => ($taxa->pagamento) ? Carbon::parse($taxa->pagamento)->format('d/m/Y') : null,
-                            'id_servico'        => $servico->id ?? null,
+                            'codigo_unidade' => $unidade->codigo ?? null,
+                            'nome_unidade' => $unidade->nomeFantasia ?? null,
+                            'cidade' => $unidade->cidade ?? null,
+                            'servico' => $servico->nome ?? null,
+                            'descricao_taxa' => $taxa->nome ?? null,
+                            'solicitante' => $solicitante,
+                            'valor_taxa' => number_format($taxa->valor ?? 0, 2, ",", "."),
+                            'data_vencimento' => ($taxa->vencimento) ? Carbon::parse($taxa->vencimento)->format('d/m/Y') : null,
+                            'data_pagamento' => ($taxa->pagamento) ? Carbon::parse($taxa->pagamento)->format('d/m/Y') : null,
+                            'id_servico' => $servico->id ?? null,
                         ];
                     }
                 } else {
                     $data[] = [
-                        'id_reembolso'      => $reembolso->id,
-                        'numero_reembolso'  => $this->fillWithZeros($reembolso->id),
-                        'cliente'           => ($reembolso->empresa->nomeFantasia ?? null),
-                        'data'              => ($reembolso->created_at) ? Carbon::parse($reembolso->created_at)->format('d/m/Y') : null,
-                        'total_reembolso'   => number_format($reembolso->valorTotal ?? 0, 2, ",", "."),
-                        'link_reembolso'    => $linkReembolso,
+                        'id_reembolso' => $reembolso->id,
+                        'numero_reembolso' => $this->fillWithZeros($reembolso->id),
+                        'cliente' => ($reembolso->empresa->nomeFantasia ?? null),
+                        'data' => ($reembolso->created_at) ? Carbon::parse($reembolso->created_at)->format('d/m/Y') : null,
+                        'total_reembolso' => number_format($reembolso->valorTotal ?? 0, 2, ",", "."),
+                        'link_reembolso' => $linkReembolso,
                         'link_pasta_zipada' => $linkPastaZipada,
-                        'codigo_unidade'    => null,
-                        'nome_unidade'      => null,
-                        'cidade'            => null,
-                        'servico'           => null,
-                        'descricao_taxa'    => null,
-                        'solicitante'       => null,
-                        'valor_taxa'        => null,
-                        'data_vencimento'   => null,
-                        'data_pagamento'    => null,
-                        'id_servico'        => null,
+                        'codigo_unidade' => null,
+                        'nome_unidade' => null,
+                        'cidade' => null,
+                        'servico' => null,
+                        'descricao_taxa' => null,
+                        'solicitante' => null,
+                        'valor_taxa' => null,
+                        'data_vencimento' => null,
+                        'data_pagamento' => null,
+                        'id_servico' => null,
                     ];
                 }
             });
@@ -1548,18 +1656,19 @@ class AdminController extends Controller
     }
 
     // Este é o método auxiliar que você pode copiar para o seu AdminController
-private function fillWithZeros($number) {
-    if ($number <= 999) {
-        if ($number <= 100) {
-            $number = str_pad($number, 4, "10", STR_PAD_LEFT);
+    private function fillWithZeros($number)
+    {
+        if ($number <= 999) {
+            if ($number <= 100) {
+                $number = str_pad($number, 4, "10", STR_PAD_LEFT);
+            } else {
+                $number = str_pad($number, 4, "1", STR_PAD_LEFT);
+            }
         } else {
-            $number = str_pad($number, 4, "1", STR_PAD_LEFT);
+            $number = $number;
         }
-    } else {
-        $number = $number;
+        return $number;
     }
-    return $number;
-}
 
 
 }

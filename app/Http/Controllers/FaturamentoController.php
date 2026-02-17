@@ -23,30 +23,207 @@ class FaturamentoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request = null)
     {
-        $faturamentos = Faturamento::query()
-            ->select('id', 'valorTotal', 'created_at', 'nf', 'nome', 'empresa_id', 'obs')
+        $request = $request ?: request();
+        $hoje = Carbon::now();
+
+        // Filtros de período
+        $periodo = $request->get('periodo', 'mes_vigente');
+        $query = Faturamento::query();
+
+        // Datas de referência baseadas no filtro
+        $dataInicioFiltro = $hoje->copy()->startOfMonth();
+        $dataFimFiltro = $hoje->copy()->endOfMonth();
+        $labelPeriodo = $hoje->translatedFormat('F/Y');
+        $anoReferencia = $hoje->year;
+
+        if ($periodo == 'mes_vigente') {
+            $query->whereYear('created_at', $hoje->year)->whereMonth('created_at', $hoje->month);
+            $dataInicioFiltro = $hoje->copy()->startOfMonth();
+            $dataFimFiltro = $hoje->copy()->endOfMonth();
+        } elseif ($periodo == 'mes_anterior') {
+            $mesAnterior = $hoje->copy()->subMonth();
+            $query->whereYear('created_at', $mesAnterior->year)->whereMonth('created_at', $mesAnterior->month);
+            $dataInicioFiltro = $mesAnterior->copy()->startOfMonth();
+            $dataFimFiltro = $mesAnterior->copy()->endOfMonth();
+            $labelPeriodo = $mesAnterior->translatedFormat('F/Y');
+            $anoReferencia = $mesAnterior->year;
+        } elseif ($periodo == 'trimestre') {
+            $dataInicioFiltro = $hoje->copy()->subMonths(3)->startOfDay();
+            $dataFimFiltro = $hoje->copy()->endOfDay();
+            $query->whereBetween('created_at', [$dataInicioFiltro, $dataFimFiltro]);
+            $labelPeriodo = 'Últimos 3 Meses';
+            $anoReferencia = $hoje->year;
+        } elseif ($periodo == 'ano_atual') {
+            $query->whereYear('created_at', $hoje->year);
+            $dataInicioFiltro = $hoje->copy()->startOfYear();
+            $dataFimFiltro = $hoje->copy()->endOfYear();
+            $labelPeriodo = 'Ano ' . $hoje->year;
+            $anoReferencia = $hoje->year;
+        } elseif ($periodo == 'ano_passado') {
+            $anoPassado = $hoje->copy()->subYear();
+            $query->whereYear('created_at', $anoPassado->year);
+            $dataInicioFiltro = $anoPassado->copy()->startOfYear();
+            $dataFimFiltro = $anoPassado->copy()->endOfYear();
+            $labelPeriodo = 'Ano ' . $anoPassado->year;
+            $anoReferencia = $anoPassado->year;
+        }
+
+        // Função auxiliar para calcular porcentagem segura
+        $calculaPorcentagem = function ($atual, $anterior) {
+            if ($anterior == 0) {
+                return $atual > 0 ? 100 : 0;
+            }
+            return (($atual - $anterior) / $anterior) * 100;
+        };
+
+        // Estatísticas Dinâmicas do Dashboard
+        $totalNoAno = Faturamento::whereYear('created_at', $anoReferencia)->sum('valorTotal');
+        $totalNoPeriodo = Faturamento::whereBetween('created_at', [$dataInicioFiltro, $dataFimFiltro])->sum('valorTotal');
+
+        $totalAnoAnterior = Faturamento::whereYear('created_at', $anoReferencia - 1)->sum('valorTotal');
+        $percentualTotalAno = $calculaPorcentagem($totalNoAno, $totalAnoAnterior);
+
+        // Ranking de Clientes (Top 5 no período filtrado)
+        $topClientesPeriodo = Faturamento::whereBetween('created_at', [$dataInicioFiltro, $dataFimFiltro])
+            ->with('empresa')
+            ->select('empresa_id', DB::raw('SUM(valorTotal) as total'))
+            ->groupBy('empresa_id')
+            ->orderBy('total', 'desc')
+            ->take(5)
+            ->get();
+
+        // Cliente que mais faturou (Mês/Período e Ano)
+        $clienteTopPeriodo = Faturamento::whereBetween('created_at', [$dataInicioFiltro, $dataFimFiltro])
+            ->with('empresa')
+            ->select('empresa_id', DB::raw('SUM(valorTotal) as total'))
+            ->groupBy('empresa_id')
+            ->orderBy('total', 'desc')
+            ->first();
+
+        $clienteTopAno = Faturamento::whereYear('created_at', $anoReferencia)
+            ->with('empresa')
+            ->select('empresa_id', DB::raw('SUM(valorTotal) as total'))
+            ->groupBy('empresa_id')
+            ->orderBy('total', 'desc')
+            ->first();
+
+        // Total de Notas Emitidas (Lógica refinada para contar números de NF separados por vírgula)
+        $notasPeriodo = $this->calculateNfsCount($dataInicioFiltro, $dataFimFiltro);
+        $notasAno = $this->calculateNfsCount($hoje->copy()->startOfYear(), $hoje->copy()->endOfYear());
+
+        // Cálculo Comparativo com Período Anterior
+        $dataInicioAnterior = null;
+        $dataFimAnterior = null;
+
+        if ($periodo == 'mes_vigente') {
+            $dataInicioAnterior = $hoje->copy()->subMonth()->startOfMonth();
+            $dataFimAnterior = $hoje->copy()->subMonth()->endOfMonth();
+        } elseif ($periodo == 'mes_anterior') {
+            $dataInicioAnterior = $hoje->copy()->subMonths(2)->startOfMonth();
+            $dataFimAnterior = $hoje->copy()->subMonths(2)->endOfMonth();
+        } elseif ($periodo == 'trimestre') {
+            $dataInicioAnterior = $hoje->copy()->subMonths(6)->startOfDay();
+            $dataFimAnterior = $hoje->copy()->subMonths(3)->subDay()->endOfDay();
+        } elseif ($periodo == 'ano_atual') {
+            $dataInicioAnterior = $hoje->copy()->subYear()->startOfYear();
+            $dataFimAnterior = $hoje->copy()->subYear()->endOfYear();
+        } elseif ($periodo == 'ano_passado') {
+            $dataInicioAnterior = $hoje->copy()->subYears(2)->startOfYear();
+            $dataFimAnterior = $hoje->copy()->subYears(2)->endOfYear();
+        }
+
+        $totalAnterior = Faturamento::whereBetween('created_at', [$dataInicioAnterior, $dataFimAnterior])->sum('valorTotal');
+        $notasAnterior = $this->calculateNfsCount($dataInicioAnterior, $dataFimAnterior);
+
+        $percentualFaturamento = $calculaPorcentagem($totalNoPeriodo, $totalAnterior);
+        $percentualNotas = $calculaPorcentagem($notasPeriodo, $notasAnterior);
+
+        $faturamentos = $query->select('id', 'valorTotal', 'created_at', 'nf', 'nome', 'empresa_id', 'obs', 'dataPagamento', 'dadosCastro_id')
             ->with([
                 'empresa' => function ($query) {
                     $query->select('id', 'nomeFantasia');
                 },
                 'servicos' => function ($query) {
-                    $query->select('proposta');
+                    $query->select('servicos.id', 'proposta_id', 'nf', 'tipo')->with('financeiro');
                 }
             ])
             ->orderBy('created_at', 'desc')
             ->get();
 
-
-        //    return $faturamentos;
-        //    dd($faturamentos);
-        // $faturamentos = Faturamento::where('empresa_id',16)->get();
-
         return view('admin.faturamento.lista-faturamentos')->with([
             'faturamentos' => $faturamentos,
+            'stats' => [
+                'totalAno' => $totalNoAno,
+                'totalPeriodo' => $totalNoPeriodo,
+                'anoReferencia' => $anoReferencia,
+                'labelPeriodo' => $labelPeriodo,
+                'topClientesPeriodo' => $topClientesPeriodo,
+                'clienteTopPeriodo' => $clienteTopPeriodo,
+                'clienteTopAno' => $clienteTopAno,
+                'notasPeriodo' => $notasPeriodo,
+                'notasAno' => $notasAno,
+                'periodo' => $periodo,
+                'percentualFaturamento' => $percentualFaturamento,
+                'percentualNotas' => $percentualNotas,
+                'percentualTotalAno' => $percentualTotalAno
+            ]
         ]);
+    }
 
+    /**
+     * Helper para calcular quantidade de notas fiscais considerando múltiplos números
+     */
+    private function calculateNfsCount($startDate, $endDate)
+    {
+        $faturamentos = Faturamento::whereBetween('created_at', [$startDate, $endDate])
+            ->with([
+                'servicos' => function ($q) {
+                    $q->select('servicos.id', 'nf'); // Pivot/Join might require care, but belongsToMany usually handles it. 
+                    // Wait, logical check: servicos relationship is BelongsToMany via FaturamentoServico? 
+                    // Model says hasManyThrough. 
+                    // Faturamento hasMany servicosFaturados (FaturamentoServico). 
+                    // FaturamentoServico belongsTo Servico.
+                    // hasManyThrough: Faturamento -> FaturamentoServico -> Servico.
+                    // The relationship 'servicos' in Faturamento.php: return $this->hasManyThrough('App\Models\Servico','App\Models\FaturamentoServico','faturamento_id','id');
+                    // The intermediate keys might be tricky for hasManyThrough with select, but let's try standard relation first.
+                }
+            ])
+            ->get(['id', 'nf']);
+
+        $count = 0;
+
+        foreach ($faturamentos as $f) {
+            $nfs = [];
+
+            // Adiciona NFs do faturamento (legado ou agrupado)
+            if (!empty($f->nf)) {
+                $f_nfs = explode(',', $f->nf);
+                foreach ($f_nfs as $nf) {
+                    $nf = trim($nf);
+                    if (!empty($nf))
+                        $nfs[] = $nf;
+                }
+            }
+
+            // Adiciona NFs dos serviços (novo padrão)
+            foreach ($f->servicos as $s) {
+                if (!empty($s->nf)) {
+                    $s_nfs = explode(',', $s->nf);
+                    foreach ($s_nfs as $nf) {
+                        $nf = trim($nf);
+                        if (!empty($nf))
+                            $nfs[] = $nf;
+                    }
+                }
+            }
+
+            // Conta apenas NFs únicas para este faturamento
+            $count += count(array_unique($nfs));
+        }
+
+        return $count;
     }
 
     /**
@@ -593,7 +770,7 @@ class FaturamentoController extends Controller
         $faturamento->destroy($faturamento->id);
 
 
-        return $this->index();
+        return redirect()->route('faturamentos.index');
 
     }
 
