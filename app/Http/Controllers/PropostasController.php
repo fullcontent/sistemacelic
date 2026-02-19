@@ -32,7 +32,18 @@ class PropostasController extends Controller
         $statusFiltro = $request->get('status');
 
         $query = Proposta::select(['id', 'proposta', 'empresa_id', 'unidade_id', 'status', 'created_at'])
-            ->with(['empresa', 'unidade', 'servicos'])
+            ->addSelect([
+                'valor_total' => \App\Models\PropostaServico::selectRaw('sum(valor)')
+                    ->whereColumn('proposta_id', 'propostas.id')
+            ])
+            ->with([
+                'empresa' => function ($q) {
+                    $q->select('id', 'nomeFantasia');
+                },
+                'unidade' => function ($q) {
+                    $q->select('id', 'nomeFantasia', 'codigo');
+                }
+            ])
             ->withCount(['servicosFaturados', 'servicosCriados'])
             ->whereNotIn('empresa_id', [16]);
 
@@ -51,7 +62,7 @@ class PropostasController extends Controller
         }
 
         $propostas = $query->orderBy('created_at', 'DESC')
-            ->get();
+            ->paginate(50);
 
         // Base query for stats with standard exclusions
         $baseStatsQuery = Proposta::whereNotIn('empresa_id', [16])->where('status', '!=', 'Arquivada');

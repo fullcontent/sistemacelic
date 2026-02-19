@@ -212,7 +212,7 @@
 								({{$p->unidade->codigo ?? ''}})</small>
 						</td>
 						<td style="vertical-align: middle;">
-							<span style="font-weight: 600;">R$ {{number_format($p->servicos->sum('valor'), 2, ',', '.')}}</span>
+							<span style="font-weight: 600;">R$ {{number_format($p->valor_total, 2, ',', '.')}}</span>
 						</td>
 						<td style="vertical-align: middle;">
 							@php
@@ -287,6 +287,11 @@
 			</tbody>
 		</table>
 
+		<div class="row" style="margin-top: 20px;">
+			<div class="col-sm-12 text-center">
+				{{ $propostas->appends(request()->input())->links() }}
+			</div>
+		</div>
 	</div>
 
 @endsection
@@ -297,13 +302,13 @@
 		var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
 
 		$('#lista-propostas').DataTable({
-			"paging": true,
-			"pageLength": 25,
-			"lengthChange": true,
+			"paging": false,
+			"lengthChange": false,
 			"searching": true,
 			"ordering": true,
-			"info": true,
+			"info": false,
 			"autoWidth": true,
+			"deferRender": true,
 			"language": {
 				"url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
 			},
