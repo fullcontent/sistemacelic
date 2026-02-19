@@ -318,7 +318,13 @@
 			e.preventDefault();
 			var url = $(this).attr('href');
 			if (confirm('Você deseja excluir a proposta?')) {
-				window.location.href = url;
+				$.get(url, function (response) {
+					if (response.success) {
+						location.reload();
+					} else {
+						alert('Erro ao excluir a proposta.');
+					}
+				});
 			};
 		});
 

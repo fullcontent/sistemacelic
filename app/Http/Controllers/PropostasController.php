@@ -370,8 +370,7 @@ class PropostasController extends Controller
 
         // dump($proposta);
 
-
-
+        return response()->json(['success' => true]);
     }
 
     public function editarServico(Request $request)
