@@ -13,6 +13,16 @@
 
 Auth::routes();
 
+Auth::routes();
+
+Route::get('api/servico/{id}/data', 'ApiController@getServicoData')->name('api.servico.data');
+
+Route::get('/test-api', function () {
+	return 'API Working';
+});
+
+Route::get('/apresentacao', 'LandingPageController@index')->name('landing');
+
 Route::get('/', function () {
 
 	return view('auth.login');
@@ -25,11 +35,7 @@ Route::prefix('admin')->group(function () {
 
 
 	Route::get('/home', 'AdminController@index')->name('dashboard');
-
-	Route::get('/dashboard', function () {
-
-		return view('admin.dashboard.v1');
-	});
+	Route::get('/dashboard', 'DashboardController@index');
 
 
 	Route::get('/relatorioCompleto', 'AdminController@completoCSV');
@@ -141,6 +147,7 @@ Route::prefix('admin')->group(function () {
 	Route::get('/proposta/pdf/{id}', 'PropostasController@printPDF')->name('propostaPDF');
 
 	Route::get('/proposta/revisar/{id}', 'PropostasController@revisar')->name('proposta.revisar');
+	Route::get('/propostas-list-data', 'PropostasController@listData')->name('proposta.listData');
 
 
 
@@ -177,6 +184,7 @@ Route::prefix('admin')->group(function () {
 	Route::get('/usuario/delete/{id}', 'UsersController@delete')->name('usuario.delete');
 
 	Route::get('/servico/delete/{id}', 'ServicosController@delete')->name('servico.delete');
+	Route::get('/servico/ai-summary/{id}', 'ServicosController@getAISummary')->name('servico.ai-summary');
 
 	Route::get('/pendencia/done/{id}', 'PendenciasController@done')->name('pendencia.done');
 	Route::get('/pendencia/undone/{id}', 'PendenciasController@undone')->name('pendencia.undone');
@@ -253,6 +261,10 @@ Route::prefix('admin')->group(function () {
 
 	Route::get('/api/getLicencasEmitidasMes', 'DashboardController@getLicencasEmitidasMes')->name('getLicencasEmitidasMes');
 	Route::get('/api/usersMoreActive', 'DashboardController@usersMoreActive')->name('usersMoreActive');
+
+	Route::get('/api/propostas/stats', 'DashboardController@getPropostasStats')->name('api.propostas.stats');
+	Route::get('/api/faturamento/trends', 'DashboardController@getFaturamentoTrends')->name('api.faturamento.trends');
+	Route::get('/api/unidades/mapa', 'DashboardController@getUnidadesMapa')->name('api.unidades.mapa');
 
 
 
@@ -370,6 +382,8 @@ Route::get('api/getDadosCastro', 'ApiController@getDadosCastro')->name('api.getD
 Route::get('api/saveDadosCastro', 'ApiController@saveDadosCastro')->name('api.saveDadosCastro');
 
 Route::get('api/getPrestadorInfo', 'ApiController@getPrestadorInfo')->name('api.getPrestadorInfo');
+
+
 
 
 

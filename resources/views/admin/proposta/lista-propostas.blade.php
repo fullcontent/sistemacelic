@@ -200,98 +200,9 @@
 				</tr>
 			</thead>
 			<tbody>
-				@foreach($propostas as $p)
-					<tr>
-						<td style="vertical-align: middle;">
-							<a href="{{route('proposta.edit', $p->id)}}"
-								style="font-weight: 700; color: #3c8dbc;">#{{$p->id}}</a>
-						</td>
-						<td style="vertical-align: middle;">
-							<div style="font-weight: 600; color: #333;">{{$p->empresa->nomeFantasia ?? 'N/A'}}</div>
-							<small style="color: #7f8c8d;">{{$p->unidade->nomeFantasia ?? ''}}
-								({{$p->unidade->codigo ?? ''}})</small>
-						</td>
-						<td style="vertical-align: middle;">
-							<span style="font-weight: 600;">R$ {{number_format($p->valor_total, 2, ',', '.')}}</span>
-						</td>
-						<td style="vertical-align: middle;">
-							@php
-								$badgeClass = 'label-default';
-								if ($p->status == 'Em análise')
-									$badgeClass = 'label-info';
-								elseif ($p->status == 'Aprovada')
-									$badgeClass = 'label-success';
-								elseif ($p->status == 'Recusada')
-									$badgeClass = 'label-danger';
-							@endphp
-							<span class="label {{ $badgeClass }}"
-								style="padding: 5px 10px; border-radius: 4px;">{{ $p->status }}</span>
-						</td>
-						<td style="vertical-align: middle;">
-							@if($p->servicosFaturados_count == 0)
-								<span class="label label-default" style="font-size: 0.9em;"><i class="fa fa-clock-o"></i>
-									Aberto</span>
-							@elseif($p->servicosFaturados_count < $p->servicosCriados_count)
-								<span class="label label-warning" style="font-weight: 600; font-size: 0.9em;"><i
-										class="fa fa-adjust"></i> Parcial</span>
-							@elseif($p->servicosFaturados_count >= $p->servicosCriados_count && $p->servicosCriados_count > 0)
-								<span class="label label-success" style="font-weight: 600; font-size: 0.9em;"><i
-										class="fa fa-check-circle"></i> Faturado</span>
-							@else
-								<span class="label label-default" style="font-size: 0.9em;">Sem Serviços</span>
-							@endif
-						</td>
-						<td style="vertical-align: middle;" class="text-center">
-							<a href="{{route('propostaPDF', $p->id)}}" class="btn btn-default btn-action" title="PDF"
-								target="_blank">
-								<i class="fa fa-file-pdf text-danger"></i>
-							</a>
-
-							@if($p->status == 'Revisando' || $p->status == 'Recusada')
-								<a href="{{route('proposta.edit', $p->id)}}" class="btn btn-default btn-action" title="Editar">
-									<i class="fa fa-edit text-primary"></i>
-								</a>
-							@endif
-
-							@if($p->status == 'Recusada')
-								<a href="#" data-id="{{$p->id}}" class="btn btn-default btn-action revisar" title="Revisar">
-									<i class="fa fa-undo text-info"></i>
-								</a>
-							@endif
-
-							@if($p->status == 'Revisando')
-								<a href="#" data-id="{{$p->id}}" class="btn btn-default btn-action analisar"
-									title="Enviar para Análise">
-									<i class="fa fa-paper-plane text-info"></i>
-								</a>
-							@endif
-
-							@if($p->status == 'Em análise')
-								<a href="#" class="btn btn-default btn-action aprovar" data-id="{{$p->id}}" title="Aprovar">
-									<i class="fa fa-check text-success"></i>
-								</a>
-								<a href="#" class="btn btn-default btn-action recusar" data-id="{{$p->id}}" title="Recusar">
-									<i class="fa fa-thumbs-down text-warning"></i>
-								</a>
-							@endif
-
-							@if($p->status != "Arquivada")
-								<a href="{{route('removerProposta', $p->id)}}" class="btn btn-default btn-action confirmation"
-									data-id="{{$p->id}}" title="Excluir">
-									<i class="fa fa-trash text-danger"></i>
-								</a>
-							@endif
-						</td>
-					</tr>
-				@endforeach
+				{{-- DataTables Server-Side will populate this --}}
 			</tbody>
 		</table>
-
-		<div class="row" style="margin-top: 20px;">
-			<div class="col-sm-12 text-center">
-				{{ $propostas->appends(request()->input())->links() }}
-			</div>
-		</div>
 	</div>
 
 @endsection
@@ -301,27 +212,114 @@
 	$(function () {
 		var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
 
-		$('#lista-propostas').DataTable({
-			"paging": false,
-			"lengthChange": false,
-			"searching": true,
+		var table = $('#lista-propostas').DataTable({
+			"processing": true,
+			"serverSide": true,
+			"pageLength": 25,
+			"ajax": {
+				"url": "{{ route('proposta.listData') }}",
+				"data": function (d) {
+					d.periodo = "{{ $stats['periodo_atual'] }}";
+					d.status = "{{ $stats['status_atual'] }}";
+				}
+			},
+			"columns": [
+				{
+					"data": "id",
+					"render": function (data, type, row) {
+						return '<a href="' + row.edit_url + '" style="font-weight: 700; color: #3c8dbc;">#' + data + '</a>';
+					}
+				},
+				{
+					"data": "empresa_nome",
+					"render": function (data, type, row) {
+						return '<div style="font-weight: 600; color: #333;">' + data + '</div>' +
+							'<small style="color: #7f8c8d;">' + row.unidade_nome + ' (' + row.unidade_codigo + ')</small>';
+					}
+				},
+				{
+					"data": "valor_total",
+					"render": function (data, type, row) {
+						return '<span style="font-weight: 600;">R$ ' + data + '</span>';
+					}
+				},
+				{
+					"data": "status",
+					"render": function (data, type, row) {
+						var badgeClass = 'label-default';
+						if (data == 'Em análise') badgeClass = 'label-info';
+						else if (data == 'Aprovada') badgeClass = 'label-success';
+						else if (data == 'Recusada') badgeClass = 'label-danger';
+
+						return '<span class="label ' + badgeClass + '" style="padding: 5px 10px; border-radius: 4px;">' + data + '</span>';
+					}
+				},
+				{
+					"data": "id",
+					"orderable": false,
+					"render": function (data, type, row) {
+						if (row.servicosFaturados_count == 0) {
+							return '<span class="label label-default" style="font-size: 0.9em;"><i class="fa fa-clock-o"></i> Aberto</span>';
+						} else if (row.servicosFaturados_count < row.servicosCriados_count) {
+							return '<span class="label label-warning" style="font-weight: 600; font-size: 0.9em;"><i class="fa fa-adjust"></i> Parcial</span>';
+						} else if (row.servicosFaturados_count >= row.servicosCriados_count && row.servicosCriados_count > 0) {
+							return '<span class="label label-success" style="font-weight: 600; font-size: 0.9em;"><i class="fa fa-check-circle"></i> Faturado</span>';
+						} else {
+							return '<span class="label label-default" style="font-size: 0.9em;">Sem Serviços</span>';
+						}
+					}
+				},
+				{
+					"data": "id",
+					"orderable": false,
+					"className": "text-center",
+					"render": function (data, type, row) {
+						var actions = '<a href="' + row.pdf_url + '" class="btn btn-default btn-action" title="PDF" target="_blank"><i class="fa fa-file-pdf text-danger"></i></a>';
+
+						if (row.can_edit) {
+							actions += ' <a href="' + row.edit_url + '" class="btn btn-default btn-action" title="Editar"><i class="fa fa-edit text-primary"></i></a>';
+						}
+
+						if (row.is_recusada) {
+							actions += ' <a href="#" data-id="' + data + '" class="btn btn-default btn-action revisar" title="Revisar"><i class="fa fa-undo text-info"></i></a>';
+						}
+
+						if (row.is_revisando) {
+							actions += ' <a href="#" data-id="' + data + '" class="btn btn-default btn-action analisar" title="Enviar para Análise"><i class="fa fa-paper-plane text-info"></i></a>';
+						}
+
+						if (row.is_em_analise) {
+							actions += ' <a href="#" class="btn btn-default btn-action aprovar" data-id="' + data + '" title="Aprovar"><i class="fa fa-check text-success"></i></a>' +
+								' <a href="#" class="btn btn-default btn-action recusar" data-id="' + data + '" title="Recusar"><i class="fa fa-thumbs-down text-warning"></i></a>';
+						}
+
+						if (!row.is_arquivada) {
+							actions += ' <a href="' + row.remove_url + '" class="btn btn-default btn-action confirmation" data-id="' + data + '" title="Excluir"><i class="fa fa-trash text-danger"></i></a>';
+						}
+
+						return actions;
+					}
+				}
+			],
 			"ordering": true,
-			"info": false,
+			"info": true,
+			"lengthChange": false,
 			"autoWidth": true,
 			"deferRender": true,
 			"language": {
-				"url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
+				"url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json",
+				"search": "Buscar:"
 			},
 			"order": [[0, 'desc']],
 		});
 
-		$('.confirmation').on('click', function (e) {
+		$(document).on('click', '.confirmation', function (e) {
 			e.preventDefault();
 			var url = $(this).attr('href');
 			if (confirm('Você deseja excluir a proposta?')) {
 				$.get(url, function (response) {
 					if (response.success) {
-						location.reload();
+						table.ajax.reload(null, false); // Reload table without resetting pagination
 					} else {
 						alert('Erro ao excluir a proposta.');
 					}

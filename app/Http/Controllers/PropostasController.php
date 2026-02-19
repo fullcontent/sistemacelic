@@ -61,8 +61,9 @@ class PropostasController extends Controller
             $query->where('status', $statusFiltro);
         }
 
-        $propostas = $query->orderBy('created_at', 'DESC')
-            ->paginate(50);
+        // For server-side, we don't need to fetch propostas here anymore.
+        // DataTables will call listData() via AJAX.
+        $propostas = collect([]);
 
         // Base query for stats with standard exclusions
         $baseStatsQuery = Proposta::whereNotIn('empresa_id', [16])->where('status', '!=', 'Arquivada');
@@ -641,6 +642,109 @@ class PropostasController extends Controller
         }
 
 
+    }
+
+    public function listData(Request $request)
+    {
+        $hoje = Carbon::now();
+        $peri = $request->get('periodo', 'todos');
+        $statusFiltro = $request->get('status');
+
+        $query = Proposta::select(['propostas.id', 'propostas.proposta', 'propostas.empresa_id', 'propostas.unidade_id', 'propostas.status', 'propostas.created_at'])
+            ->addSelect([
+                'valor_total' => \App\Models\PropostaServico::selectRaw('sum(valor)')
+                    ->whereColumn('proposta_id', 'propostas.id')
+            ])
+            ->with([
+                'empresa' => function ($q) {
+                    $q->select('id', 'nomeFantasia');
+                },
+                'unidade' => function ($q) {
+                    $q->select('id', 'nomeFantasia', 'codigo');
+                }
+            ])
+            ->withCount(['servicosFaturados', 'servicosCriados'])
+            ->whereNotIn('empresa_id', [16]);
+
+        // Period Filtering (Match index logic)
+        if ($peri == 'mes_vigente') {
+            $query->whereYear('propostas.created_at', $hoje->year)->whereMonth('propostas.created_at', $hoje->month);
+        } elseif ($peri == 'mes_anterior') {
+            $mesAnterior = $hoje->copy()->subMonth();
+            $query->whereYear('propostas.created_at', $mesAnterior->year)->whereMonth('propostas.created_at', $mesAnterior->month);
+        } elseif ($peri == 'ano_atual') {
+            $query->whereYear('propostas.created_at', $hoje->year);
+        }
+
+        if ($statusFiltro) {
+            $query->where('propostas.status', $statusFiltro);
+        }
+
+        // Global Search
+        if ($search = $request->input('search.value')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('propostas.id', 'like', "%{$search}%")
+                    ->orWhere('propostas.proposta', 'like', "%{$search}%")
+                    ->orWhereHas('empresa', function ($sub) use ($search) {
+                        $sub->where('nomeFantasia', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('unidade', function ($sub) use ($search) {
+                        $sub->where('nomeFantasia', 'like', "%{$search}%")
+                            ->orWhere('codigo', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $recordsFiltered = (clone $query)->count();
+
+        // Ordering (Columns index mapping from blade)
+        // 0: ID, 1: Empresa/Unidade, 2: Total, 3: Status, 4: Invoicing, 5: Actions
+        $columns = ['propostas.id', 'propostas.empresa_id', 'valor_total', 'propostas.status', 'propostas.created_at'];
+        $orderColumnIndex = $request->input('order.0.column', 0);
+        $orderDir = $request->input('order.0.dir', 'desc');
+        $orderField = $columns[$orderColumnIndex] ?? 'propostas.created_at';
+
+        $query->orderBy($orderField, $orderDir);
+
+        // Pagination
+        $start = $request->input('start', 0);
+        $length = $request->input('length', 25);
+
+        $propostas = $query->offset($start)->limit($length)->get();
+
+        // Format data for response
+        $data = $propostas->map(function ($p) {
+            // Replicate the badge logic from blade to return as formatted strings or needed values
+            // Alternatively, return raw values and handle formatting in DataTables 'render' property
+            return [
+                'id' => $p->id,
+                'proposta' => $p->proposta,
+                'empresa_nome' => $p->empresa->nomeFantasia ?? 'N/A',
+                'unidade_nome' => $p->unidade->nomeFantasia ?? '',
+                'unidade_codigo' => $p->unidade->codigo ?? '',
+                'valor_total' => number_format($p->valor_total, 2, ',', '.'),
+                'status' => $p->status,
+                'servicosFaturados_count' => $p->servicosFaturados_count,
+                'servicosCriados_count' => $p->servicosCriados_count,
+                'created_at' => $p->created_at->format('d/m/Y'),
+                // Action URLs
+                'edit_url' => route('proposta.edit', $p->id),
+                'pdf_url' => route('propostaPDF', $p->id),
+                'remove_url' => route('removerProposta', $p->id),
+                'can_edit' => ($p->status == 'Revisando' || $p->status == 'Recusada'),
+                'is_recusada' => $p->status == 'Recusada',
+                'is_revisando' => $p->status == 'Revisando',
+                'is_em_analise' => $p->status == 'Em análise',
+                'is_arquivada' => $p->status == 'Arquivada',
+            ];
+        });
+
+        return response()->json([
+            'draw' => intval($request->input('draw')),
+            'recordsTotal' => Proposta::whereNotIn('empresa_id', [16])->count(),
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $data
+        ]);
     }
 
 }
