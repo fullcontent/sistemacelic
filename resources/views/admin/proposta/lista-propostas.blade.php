@@ -287,11 +287,6 @@
 			</tbody>
 		</table>
 
-		<div class="row" style="margin-top: 20px;">
-			<div class="col-sm-12 text-center">
-				{{ $propostas->appends(request()->input())->links() }}
-			</div>
-		</div>
 	</div>
 
 @endsection
@@ -302,11 +297,12 @@
 		var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
 
 		$('#lista-propostas').DataTable({
-			"paging": false,
-			"lengthChange": false,
+			"paging": true,
+			"pageLength": 25,
+			"lengthChange": true,
 			"searching": true,
 			"ordering": true,
-			"info": false,
+			"info": true,
 			"autoWidth": true,
 			"language": {
 				"url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"

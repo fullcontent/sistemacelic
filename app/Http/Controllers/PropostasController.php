@@ -51,22 +51,30 @@ class PropostasController extends Controller
         }
 
         $propostas = $query->orderBy('created_at', 'DESC')
-            ->paginate(25);
+            ->get();
 
-        // Dashboard Stats (Indices Only)
+        // Base query for stats with standard exclusions
+        $baseStatsQuery = Proposta::whereNotIn('empresa_id', [16])->where('status', '!=', 'Arquivada');
+
+        // Apply period filtering to stats queries
+        if ($periodo == 'mes_vigente') {
+            $baseStatsQuery->whereYear('created_at', $hoje->year)->whereMonth('created_at', $hoje->month);
+        } elseif ($periodo == 'mes_anterior') {
+            $mesAnterior = $hoje->copy()->subMonth();
+            $baseStatsQuery->whereYear('created_at', $mesAnterior->year)->whereMonth('created_at', $mesAnterior->month);
+        } elseif ($periodo == 'ano_atual') {
+            $baseStatsQuery->whereYear('created_at', $hoje->year);
+        }
+
         $stats = [];
-        $stats['elaboracao_count'] = Proposta::where('status', 'Revisando')->whereNotIn('empresa_id', [16])->count();
-        $stats['analise_count'] = Proposta::where('status', 'Em análise')->whereNotIn('empresa_id', [16])->count();
-        $stats['aprovadas_mes_count'] = Proposta::where('status', 'Aprovada')
-            ->whereMonth('created_at', date('m'))
-            ->whereYear('created_at', date('Y'))
-            ->whereNotIn('empresa_id', [16])
-            ->count();
-        $stats['recusadas_count'] = Proposta::where('status', 'Recusada')->whereNotIn('empresa_id', [16])->count();
+        $stats['elaboracao_count'] = (clone $baseStatsQuery)->where('status', 'Revisando')->count();
+        $stats['analise_count'] = (clone $baseStatsQuery)->where('status', 'Em análise')->count();
+        $stats['aprovadas_mes_count'] = (clone $baseStatsQuery)->where('status', 'Aprovada')->count();
+        $stats['recusadas_count'] = (clone $baseStatsQuery)->where('status', 'Recusada')->count();
 
-        $totalAtivas = Proposta::whereNotIn('status', ['Arquivada'])->whereNotIn('empresa_id', [16])->count();
-        $totalAprovadas = Proposta::where('status', 'Aprovada')->whereNotIn('empresa_id', [16])->count();
-        $stats['conversao'] = $totalAtivas > 0 ? ($totalAprovadas / $totalAtivas) * 100 : 0;
+        $totalNoPeriodo = (clone $baseStatsQuery)->count();
+        $totalAprovadasNoPeriodo = $stats['aprovadas_mes_count'];
+        $stats['conversao'] = $totalNoPeriodo > 0 ? ($totalAprovadasNoPeriodo / $totalNoPeriodo) * 100 : 0;
 
         $stats['status_atual'] = $statusFiltro;
         $stats['periodo_atual'] = $periodo;
