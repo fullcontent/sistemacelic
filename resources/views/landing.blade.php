@@ -214,7 +214,7 @@
 
     <header class="hero text-center">
         <div class="container">
-            <img src="/img/logoCelicNew.png" alt="Celic Logo" class="mb-5"
+            <img src="{{ asset('img/logoCelicNew.png') }}" alt="Celic Logo" class="mb-5"
                 style="height: 80px; filter: brightness(0) invert(1);">
             <h1 class="display-3 fw-bold mb-4">A Plataforma Definitiva para <br>Gestão de Licenciamento</h1>
             <p class="lead mb-5 opacity-75 mx-auto" style="max-width: 700px;">
@@ -279,46 +279,6 @@
         </div>
     </section>
 
-    <section id="bi-duration" class="bi-section">
-        <div class="container">
-            <div class="row g-5 align-items-center">
-                <div class="col-lg-6">
-                    <div class="bi-card">
-                        <h4 class="fw-bold mb-4"><i class="fas fa-chart-line text-primary me-2"></i> Inteligência de
-                            Prazos</h4>
-                        <p class="text-muted mb-4">Análise preditiva baseada em dados históricos por categoria de
-                            serviço. Saiba exatamente quanto tempo cada etapa custa para sua operação.</p>
-                        <canvas id="durationChart"></canvas>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="ps-lg-5">
-                        <h2 class="fw-bold mb-4">BI: Tempo Médio por Especialidade</h2>
-                        <p class="lead text-muted mb-5">O sistema Celic utiliza o histórico de milhares de processos
-                            para prever o tempo de entrega com precisão cirúrgica.</p>
-
-                        <div class="row g-4">
-                            @foreach($avgTimePerType as $bi)
-                                <div class="col-6">
-                                    <div class="p-4 bg-white rounded-4 shadow-sm border-top border-primary border-4">
-                                        <h3 class="fw-bold mb-0 text-primary">{{ round($bi->avg_days) }}</h3>
-                                        <small class="text-uppercase fw-bold opacity-75">
-                                            @if($bi->tipo == 'licencaOperacao') Licença Operação
-                                            @elseif($bi->tipo == 'nRenovaveis') Não Renováveis
-                                            @else Projetos & Laudos
-                                            @endif
-                                        </small>
-                                        <div class="mt-2 text-muted" style="font-size: 0.7rem;">Base: {{ $bi->total }}
-                                            processos</div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <section id="mapa-regional" class="map-section">
         <div class="container">
@@ -334,16 +294,73 @@
                         <h5 class="text-center mb-4">Concentração por UF</h5>
                         <canvas id="regionalChart"></canvas>
                         <hr>
-                        <div class="mt-4">
-                            <h6>Ranking de Cidades:</h6>
-                            <ul class="list-unstyled">
-                                @foreach($topCidades as $c)
-                                    <li class="d-flex justify-content-between mb-2">
-                                        <span>{{ $c->cidade }}</span>
-                                        <span class="badge bg-primary">{{ $c->total }}</span>
-                                    </li>
-                                @endforeach
-                            </ul>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    </section>
+
+    <section id="bi-performance" class="py-5 bg-light border-top">
+        <div class="container py-5">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h2 class="section-title text-start mb-4">BI: Performance por Serviço</h2>
+                    <p class="lead text-muted mb-5">Análise profunda do tempo médio de vida de cada processo, desde o
+                        protocolo inicial até a conclusão final.</p>
+
+                    <div class="row g-4">
+                        @foreach($avgTimePerType as $bi)
+                            <div class="col-md-6">
+                                <div class="p-4 bg-white rounded-4 shadow-sm border-start border-primary border-5">
+                                    <h3 class="fw-bold mb-0 text-primary">{{ round($bi->avg_days) }} Dias</h3>
+                                    <small class="text-uppercase fw-bold opacity-75">
+                                        @if($bi->tipo == 'licencaOperacao') Licença Operação
+                                        @else Não Renováveis
+                                        @endif
+                                    </small>
+                                    <div class="mt-2 text-muted" style="font-size: 0.75rem;">Histórico: {{ $bi->total }}
+                                        processos analisados</div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="bi-card p-4">
+                        <h5 class="text-center mb-4">Distribuição por Tipo de Licença</h5>
+                        <canvas id="licenseTypeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-5">
+                <div class="col-12">
+                    <div class="bi-card p-4">
+                        <h5 class="text-center mb-4">Evolução da Eficiência (Média de Dias por Ano)</h5>
+                        <div style="height: 350px;">
+                            <canvas id="yearlyDurationChart"></canvas>
+                        </div>
+                        <div class="mt-4 p-4 rounded-4" style="background: #f8f9fa; border-left: 5px solid #dc3545;">
+                            <h6 class="fw-bold mb-2 text-danger"><i class="fas fa-microscope me-2"></i> Metodologia e
+                                Lógica de Cálculo</h6>
+                            <p class="small text-muted mb-0" style="text-align: justify;">
+                                A <strong>Média de Dias</strong> é calculada através da métrica de <em>Cycle Time</em>.
+                                O sistema identifica o intervalo exato entre a <strong>Data de Criação</strong> do
+                                processo e a sua <strong>Data de Finalização</strong> (exclusivamente para serviços com
+                                situação "Finalizado").
+                                <br><br>
+                                <strong>Por que a queda?</strong> Nos anos iniciais (2019-2022), o sistema processou o
+                                passivo histórico das empresas, computando tempos de vida longos de processos que já
+                                tramitavam fisicamente. A partir de 2024, com a operação 100% digitalizada e o uso de
+                                automações Celic, os processos passaram a ser concluídos dentro de fluxos otimizados,
+                                reduzindo a média drasticamente para níveis de alta performance.
+                            </p>
+                            <div class="mt-3 small text-danger fw-bold">
+                                * Nota: O ano de 2026 foi omitido desta análise para garantir a integridade estatística
+                                frente a dados ainda em processamento.
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -351,32 +368,24 @@
         </div>
     </section>
 
-    <section id="equipe" class="py-5 bg-white">
+    <section id="evolucao-unidades" class="py-5 bg-white border-top">
         <div class="container py-5">
-            <div class="row align-items-center">
-                <div class="col-lg-5">
-                    <h2 class="section-title text-start mb-4">Equipe de Alta Performance</h2>
-                    <p class="text-muted mb-5">O Celic potencializa pessoas. Já registramos
-                        <strong>{{ number_format($historicoCount / 1000, 0) }} mil interações</strong> de auditoria,
-                        garantindo que nada escape ao controle dos gestores.
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-5 order-lg-2">
+                    <h2 class="section-title text-start mb-4">Crescimento Exponencial da Rede</h2>
+                    <p class="text-muted mb-4">Desde 2019, o Celic vem expandindo sua governança por todo o território
+                        nacional. O gráfico ao lado representa o acumulado de unidades protegidas pela nossa tecnologia.
                     </p>
-
-                    @foreach($teamRanking as $index => $collaborator)
-                        <div class="team-card">
-                            <div class="team-rank">#{{ $index + 1 }}</div>
-                            <div class="team-name">{{ $collaborator->user->name }}</div>
-                            <div class="team-stats">
-                                <div class="fw-bold text-primary">{{ number_format($collaborator->total, 0, ',', '.') }}
-                                </div>
-                                <small>Logs</small>
-                            </div>
-                        </div>
-                    @endforeach
+                    <div class="alert alert-primary border-0 rounded-4 p-4">
+                        <h4 class="fw-bold mb-2">Salto de Escala</h4>
+                        <p class="mb-0 small opacity-75">Saímos de uma operação regional em 2019 para uma plataforma
+                            com presença massiva em 2025, triplicando o volume de unidades geridas.</p>
+                    </div>
                 </div>
-                <div class="col-lg-7">
-                    <div class="chart-container" style="height: 450px;">
-                        <h5 class="text-center mb-4">Evolução Histórica de Processos</h5>
-                        <canvas id="evolutionChart"></canvas>
+                <div class="col-lg-7 order-lg-1">
+                    <div class="chart-container" style="height: 400px; padding: 30px;">
+                        <h5 class="text-center mb-4">Unidades Geridas (2019 - 2025)</h5>
+                        <canvas id="unitsEvolutionChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -452,28 +461,28 @@
             options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
         });
 
-        // Duration BI Chart
-        const durationData = {!! json_encode($avgTimePerType) !!};
-        new Chart(document.getElementById('durationChart'), {
-            type: 'bar',
+        // License Type Distribution Pie Chart
+        const licenseDistData = {!! json_encode($licenseDistribution) !!};
+        new Chart(document.getElementById('licenseTypeChart'), {
+            type: 'pie',
             data: {
-                labels: durationData.map(d => d.tipo == 'licencaOperacao' ? 'Licença Op.' : (d.tipo == 'nRenovaveis' ? 'Não Renov.' : 'Proj/Laudos')),
+                labels: licenseDistData.map(d => d.nome),
                 datasets: [{
-                    label: 'Média de Dias',
-                    data: durationData.map(d => Math.round(d.avg_days)),
-                    backgroundColor: ['#004a99', '#28a745', '#ffc107'],
-                    borderRadius: 10
+                    data: licenseDistData.map(d => d.total),
+                    backgroundColor: [
+                        '#004a99', '#28a745', '#ffc107', '#17a2b8', '#6610f2', '#e83e8c'
+                    ]
                 }]
             },
             options: {
-                indexAxis: 'y',
                 responsive: true,
-                plugins: { legend: { display: false } },
-                scales: { x: { beginAtZero: true } }
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }
+                }
             }
         });
 
-        // Evolution Chart
+        // Volume de Processos Chart
         const evolutionData = {!! json_encode($processosPorAno) !!};
         new Chart(document.getElementById('evolutionChart'), {
             type: 'line',
@@ -495,6 +504,69 @@
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        // Units Evolution Chart
+        const unitsEvolutionData = {!! json_encode($unitsEvolution) !!};
+        new Chart(document.getElementById('unitsEvolutionChart'), {
+            type: 'line',
+            data: {
+                labels: unitsEvolutionData.map(d => d.year),
+                datasets: [{
+                    label: 'Total de Unidades',
+                    data: unitsEvolutionData.map(d => d.total),
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 6,
+                    pointBackgroundColor: '#28a745'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+        // Yearly Duration Evolution Chart
+        const yearlyDurData = {!! json_encode($yearlyDuration) !!};
+        new Chart(document.getElementById('yearlyDurationChart'), {
+            type: 'line',
+            data: {
+                labels: yearlyDurData.map(d => d.year),
+                datasets: [{
+                    label: 'Média de Dias',
+                    data: yearlyDurData.map(d => Math.round(d.avg_days)),
+                    borderColor: '#dc3545',
+                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 6,
+                    pointBackgroundColor: '#dc3545'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return context.parsed.y + ' dias em média';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Dias p/ Conclusão' }
+                    }
+                }
             }
         });
     </script>
