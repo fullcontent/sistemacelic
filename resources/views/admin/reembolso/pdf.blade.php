@@ -509,6 +509,7 @@
               <p>{{$empresa->bairro}} {{$empresa->cidade}}/{{$empresa->uf}}</p>
               <p>{{$empresa->cep}}</p>
               <p>{{$empresa->telefone}}</p>
+              <h3>N° {{$id}}</h3>
 
             </div>
           </div>

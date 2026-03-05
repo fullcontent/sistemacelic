@@ -145,6 +145,9 @@
           <p>{{$empresa->cep}}</p>
           <p>{{$empresa->telefone}}</p>
 
+          <h3>N° {{$id}}</h3>
+
+
         </div>
 
       </div>
@@ -153,8 +156,10 @@
         <div class="text-center">
           <h3>RECIBO</h3>
           <p style="padding: 20px">Recebemos da {{$empresa->razaoSocial}} a importância de R$
-            {{number_format($totalReembolso, 2, '.', ',')}} referente ao pagamento de taxas para o processo de legalização,
-            conforme demonstrativo comprovante em anexo.</p>
+            {{number_format($totalReembolso, 2, '.', ',')}} referente ao pagamento de taxas para o processo de
+            legalização,
+            conforme demonstrativo comprovante em anexo.
+          </p>
         </div>
 
       </div>
