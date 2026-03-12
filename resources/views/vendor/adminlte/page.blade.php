@@ -110,7 +110,7 @@
 
                 <!-- Breadcrumb: Onde estou -->
                 <div class="navbar-unit-name">
-                    @if (Breadcrumbs::exists())
+                    @if (Route::currentRouteName() && Breadcrumbs::exists(Route::currentRouteName()))
                         {!! Breadcrumbs::render() !!}
                     @endif
                 </div>
@@ -279,7 +279,9 @@
             <section class="content-header">
 
                 @yield('content_header')
-                {{ Breadcrumbs::render() }}
+                @if (Route::currentRouteName() && Breadcrumbs::exists(Route::currentRouteName()))
+                    {{ Breadcrumbs::render() }}
+                @endif
 
             </section>
 

@@ -163,7 +163,7 @@
             <div class="col-xs-12">
                 <h2 class="text-center">
 
-                    <img src="{{asset('img/headerCastro.png')}}" class="img-responsive">
+                    <img src="{{asset('public/img/headerCastro.png')}}" class="img-responsive">
 
 
                 </h2>
@@ -852,9 +852,7 @@
             vertical-align: middle;
         }
 
-        header {
-            display: none;
-        }
+
 
         footer {
             display: none;
