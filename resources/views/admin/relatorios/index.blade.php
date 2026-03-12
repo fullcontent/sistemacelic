@@ -57,11 +57,11 @@
 
 </div>
 
-<div class="col-md-4">
+<div class="col-md-3">
     <div class="box box-default">
         <div class="box-header with-border">
 
-            <h3 class="box-title">Relatórios de pendências</h3>
+            <h3 class="box-title">Pendências</h3>
             <p>Download em formato .csv</p>
         </div>
 
@@ -71,17 +71,18 @@
             {!! Form::open(['route'=>'relatorioPendenciasFilter','method'=>"post"]) !!}
 
 
-            <div class="col-md-6">
-                {!! Form::label('empresa_id', 'Selecione a empresa:', array('class'=>'control-label')) !!}
+            <div class="col-md-12">
+                {!! Form::label('empresa_id', 'Empresas:', array('class'=>'control-label')) !!}
                 
-                {{ Form::select('empresa_id[]', $empresas, null,['multiple'=>'multiple','class'=>'form-control','id'=>'empresas']) }}
-                <a href="#" id="selectAll">Selecionar Todas</a> | 
-                <a href="#" id="selectNone">Limpar seleção</a>
-            
+                {{ Form::select('empresa_id[]', $empresas, null,['multiple'=>'multiple','class'=>'form-control','id'=>'empresas','style'=>'width:100%']) }}
+                <div style="margin-top:5px;">
+                    <a href="#" id="selectAll" class="btn btn-xs btn-default">Todas</a> 
+                    <a href="#" id="selectNone" class="btn btn-xs btn-default">Limpar</a>
+                </div>
             </div>
 
-            <div class="col-md-6">
-                <div class="form-group">
+            <div class="col-md-12">
+                <div class="form-group" style="margin-top:10px;">
                 {!! Form::label('status', 'Status', array('class'=>'control-label')) !!}
                 {!! Form::select('status', array('pendente' => 'Pendente', 'concluido' => 'Concluido'), null, ['class'=>'form-control','id'=>'status']) !!}
                 </div>
@@ -110,11 +111,11 @@
 </div>
 
 
-<div class="col-md-4">
+<div class="col-md-3">
     <div class="box box-default">
         <div class="box-header with-border">
 
-            <h3 class="box-title">Relatórios de Serviços</h3>
+            <h3 class="box-title">Serviços</h3>
             <p>Download em formato .csv</p>
         </div>
 
@@ -124,13 +125,14 @@
             {!! Form::open(['route'=>'relatorioServicosFilter','method'=>"post"]) !!}
 
 
-            <div class="col-md-6">
-                {!! Form::label('empresa_id', 'Selecione a empresa:', array('class'=>'control-label')) !!}
+            <div class="col-md-12">
+                {!! Form::label('empresa_id', 'Empresas:', array('class'=>'control-label')) !!}
                 
-                {{ Form::select('empresa_id[]', $empresas, null,['multiple'=>'multiple','class'=>'form-control','id'=>'empresas2']) }}
-                <a href="#" id="selectAll">Selecionar Todas</a> | 
-                <a href="#" id="selectNone">Limpar seleção</a>
-            
+                {{ Form::select('empresa_id[]', $empresas, null,['multiple'=>'multiple','class'=>'form-control','id'=>'empresas2','style'=>'width:100%']) }}
+                <div style="margin-top:5px;">
+                    <a href="#" id="selectAll2" class="btn btn-xs btn-default">Todas</a> 
+                    <a href="#" id="selectNone2" class="btn btn-xs btn-default">Limpar</a>
+                </div>
             </div>
 
             
@@ -162,10 +164,10 @@
 
 <div class="col-md-12">
 
-<div class="box box-default">
+<div class="box box-info">
 <div class="box-header with-border">
 
-<h3 class="box-title">Últimos relatórios gerados</h3>
+<h3 class="box-title"><i class="fa fa-history"></i> Últimos 25 relatórios gerados</h3>
 </div>
 <table id="reports-table" class="table table-bordered table-hover">
                 <thead>

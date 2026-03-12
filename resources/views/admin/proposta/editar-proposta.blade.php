@@ -6,6 +6,8 @@
 
 @if($proposta->status == "Revisando")
     <h1>Revisar Proposta {{$proposta->id}}</h1>
+@else
+    <h1>Editar Proposta {{$proposta->id}}</h1>
 @endif
 
 @stop

@@ -3,11 +3,6 @@
 @section('content_header')
     <h1>
         {{$servico->os}} <small>{{$servico->nome}}</small>
-        <div class="pull-right">
-            <button id="webhookServiceBtn" class="btn btn-info">
-                <i class="fa fa-dashboard"></i> Auditoria do Serviço
-            </button>
-        </div>
     </h1>
 @stop
 
@@ -214,7 +209,18 @@
     });
 </script>
 
+<div class="row">
 
+<div class="col-md-12">
+
+<div class="pull-right">
+            <button id="webhookServiceBtn" class="btn btn-info">
+                <i class="fa fa-gear"></i> Auditoria do Serviço
+            </button>
+        </div>
+
+    </div>
+</div>
 
 <div class="row">
 
@@ -222,10 +228,6 @@
     <div class="col-md-12">
 
         @include('admin.components.widget-detalhes')
-
-
-    </div>
-</div>
 
 
 @if($servico->servicoPrincipal)
@@ -244,9 +246,9 @@
             <div class="box-header with-border">
               <h3 class="box-title"><b>Detalhes do serviço {{$servico->nome}} @if($servico->servicoPrincipal) <small class="label pull-right bg-red">S</small>@endif</b></h3>
 
-                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                </button>
-                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                    </button>
+                    <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
             </div>
             <!-- /.box-header -->
             <div class="box-body">

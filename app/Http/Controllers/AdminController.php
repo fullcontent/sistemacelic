@@ -1213,6 +1213,9 @@ class AdminController extends Controller
             return $b['date'] <=> $a['date'];
         });
 
+        // Retornar apenas os últimos 25
+        $reports = array_slice($reports, 0, 25);
+
         return response()->json($reports);
     }
 

@@ -65,7 +65,7 @@ Route::prefix('admin')->group(function () {
 
 
 		return view('admin.relatorios.index')->with(['empresas' => $empresas]);
-	});
+	})->name('relatorios.index');
 
 
 
@@ -267,7 +267,12 @@ Route::prefix('admin')->group(function () {
 	Route::get('/api/unidades/mapa', 'DashboardController@getUnidadesMapa')->name('api.unidades.mapa');
 
 
-
+	Route::get('/github', 'GitHubDashboardController@index')->name('admin.github');
+	Route::get('/github/{number}', 'GitHubDashboardController@showIssue')->name('admin.github.show');
+	Route::post('/github/status', 'GitHubDashboardController@updateStatus')->name('admin.github.status');
+	Route::post('/github/issues', 'GitHubDashboardController@storeIssue')->name('admin.github.issues.store');
+	Route::patch('/github/issues/{number}', 'GitHubDashboardController@patchIssue')->name('admin.github.issues.patch');
+	Route::post('/github/projects/link', 'GitHubDashboardController@linkToProject')->name('admin.github.projects.link');
 
 });
 
