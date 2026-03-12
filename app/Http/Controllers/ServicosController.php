@@ -32,6 +32,7 @@ use Illuminate\Support\Facades\Notification;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Services\OpenAIService;
 
 
 class ServicosController extends Controller
@@ -731,10 +732,63 @@ class ServicosController extends Controller
 
 
 
+    }
 
+    /**
+     * Get AI summary for a service.
+     * 
+     * @param int $id
+     * @param GeminiService $geminiService
+     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAISummary($id, OpenAIService $aiService)
+    {
+        $servico = Servico::with([
+            'unidade.empresa',
+            'empresa',
+            'taxas',
+            'reembolsos',
+            'historico.user',
+            'interacoes',
+            'pendencias',
+            'arquivos',
+            'faturamento',
+            'ordensCompra',
+            'financeiro',
+            'responsavel',
+            'coresponsavel',
+            'analista1',
+            'analista2',
+            'solicitanteServico',
+            'servicoPrincipal.unidade',
+            'servicoPrincipal.empresa',
+            'servicoPrincipal.financeiro',
+            'subServicos.unidade',
+            'subServicos.empresa',
+            'subServicos.financeiro'
+        ])->find($id);
 
+        if (!$servico) {
+            return response()->json(['error' => 'Serviço não encontrado.'], 404);
+        }
 
+        // Check access (similar to show method)
+        $access = UserAccess::where('user_id', Auth::id())->whereNull('unidade_id')->pluck('empresa_id');
+        $empresa = Empresa::where('id', $servico->unidade->empresa_id)->pluck('id');
 
+        if (!$access->contains($empresa[0])) {
+            return response()->json(['error' => 'Não autorizado.'], 403);
+        }
+        if ($access->contains($empresa[0])) {
+            $summary = $aiService->generateServiceSummary($servico->toArray());
+
+            return response()->json([
+                'summary' => $summary,
+            ]);
+        } else {
+            return response()->json(['error' => 'Não autorizado.'], 403);
+        }
     }
 
     /**
@@ -1117,17 +1171,42 @@ class ServicosController extends Controller
         // Find the associated service
         $servico = Servico::find($request->servico_id);
 
-        // Check for mentions in the observacoes
-        $mentions = preg_match_all('[\B@[a-zA-Z\wÀ-ú]+\s\w+]', $request->observacoes, $users);
+        $mentions = preg_match_all('/\B@[a-zA-Z\wÀ-ú]+\s\w+/', $request->observacoes, $users);
+
         if ($mentions > 0) {
-            foreach ($users[0] as $u) {
+            $openAIService = new \App\Services\OpenAIService();
+            $resumo = $openAIService->generateContextualSummary([
+                'nome' => $servico->nome,
+                'unidade' => $servico->unidade->nomeFantasia,
+                'situacao' => $servico->situacao,
+                'tipo' => $servico->tipo
+            ], $request->observacoes);
+
+            $emailErrors = [];
+            foreach ($users[0] as $index => $u) {
                 $u = ltrim($u, "@");
                 $user = User::where('name', 'like', '%' . $u . '%')->first();
                 if ($user) {
-                    $route = $user->privileges == 'admin' ? 'servicos.show' : 'cliente.servico.show';
-                    Notification::send($user, new UserMentioned($servico, $route));
+                    try {
+                        $route = $user->privileges == 'admin' ? 'servicos.show' : 'cliente.servico.show';
+                        // We dispatch with delay to avoid SMTP rate limits (approx 10s between each email)
+                        $notification = (new UserMentioned($servico, $route, $resumo))->delay(now()->addSeconds($index * 10));
+                        $user->notify($notification);
+                    } catch (\Exception $e) {
+                        \Log::error('Erro ao enviar e-mail para ' . $user->email . ': ' . $e->getMessage());
+                        $emailErrors[] = $user->name;
+                    }
                 }
             }
+
+            if (!empty($emailErrors)) {
+                $names = implode(', ', $emailErrors);
+                session()->flash('error', "A interação foi salva, mas ocorreu um erro ao processar a notificação para: {$names}.");
+            } else {
+                session()->flash('success', "Interação salva e notificações enfileiradas com sucesso.");
+            }
+        } else {
+            session()->flash('success', "Interação salva com sucesso.");
         }
 
         // Redirect to the show route for the service

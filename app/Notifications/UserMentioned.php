@@ -8,22 +8,23 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Queue\SerializesModels;
 
-class UserMentioned extends Notification
+class UserMentioned extends Notification implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
-    public $servico, $route;
+    public $servico, $route, $resumo;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($servico, $route)
+    public function __construct($servico, $route, $resumo = null)
     {
         //
         $this->servico = $servico;
         $this->route = $route;
+        $this->resumo = $resumo;
     }
 
     /**
@@ -49,7 +50,8 @@ class UserMentioned extends Notification
             ->subject('Nova interação no serviço #' . $this->servico->id)
             ->markdown('emails.usuarioMencionado', [
                 'servico' => $this->servico,
-                'route' => $this->route
+                'route' => $this->route,
+                'resumo' => $this->resumo
             ]);
     }
 

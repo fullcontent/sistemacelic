@@ -395,33 +395,45 @@ class ClienteController extends Controller
         $interacao->user_id = Auth::id();
 
         $interacao->save();
-        $servico = Servico::find($request->servico_id);
+        $servico = Servico::with('unidade')->find($request->servico_id);
 
-        //Notify users
-        $mentions = preg_match_all('[\B@\w+\s\w+]', $request->observacoes, $users);
-
+        $mentions = preg_match_all('/\B@[a-zA-Z\wÀ-ú]+\s\w+/', $request->observacoes, $users);
 
         if ($mentions > 0) {
+            $openAIService = new \App\Services\OpenAIService();
+            $resumo = $openAIService->generateContextualSummary([
+                'nome' => $servico->nome,
+                'unidade' => $servico->unidade ? $servico->unidade->nomeFantasia : 'N/A',
+                'situacao' => $servico->situacao,
+                'tipo' => $servico->tipo
+            ], $request->observacoes);
 
-            foreach ($users as $users2) {
+            $emailErrors = [];
+            foreach ($users[0] as $index => $u) {
+                $u = ltrim($u, "@");
 
-                foreach ($users2 as $u) {
-                    $u = ltrim($u, "@");
-
-                    $user = User::where('name', 'like', '%' . $u . '%')->first();
-
-                    if ($user) {
-                        if ($user->privileges == 'admin') {
-                            $route = 'servicos.show';
-                        } elseif ($user->privileges == 'cliente') {
-                            $route = 'cliente.servico.show';
-                        }
-
-
-                        Notification::send($user, new UserMentioned($servico, $route));
+                $user = User::where('name', 'like', '%' . $u . '%')->first();
+                if ($user) {
+                    try {
+                        $route = $user->privileges == 'admin' ? 'servicos.show' : 'cliente.servico.show';
+                        // Delayed notifications to prevent SMTP blocking
+                        $notification = (new UserMentioned($servico, $route, $resumo))->delay(now()->addSeconds($index * 10));
+                        $user->notify($notification);
+                    } catch (\Exception $e) {
+                        \Log::error('ClienteController: Erro ao enviar e-mail para ' . $user->email . ': ' . $e->getMessage());
+                        $emailErrors[] = $user->name;
                     }
                 }
             }
+
+            if (!empty($emailErrors)) {
+                $names = implode(', ', $emailErrors);
+                session()->flash('error', "A interação foi salva, mas ocorreu um erro ao enviar notificação para: {$names}.");
+            } else {
+                session()->flash('success', "Interação salva e notificações enfileiradas com sucesso.");
+            }
+        } else {
+            session()->flash('success', "Interação salva com sucesso.");
         }
 
 
