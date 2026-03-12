@@ -1,12 +1,12 @@
 <?php
 
 Breadcrumbs::for('dashboard', function ($trail) {
-    $trail->push('Dashboard', route('dashboard'));
+    $trail->push('<i class="fas fa-home"></i> Dashboard', route('dashboard'));
 });
 
 Breadcrumbs::for('empresas.index', function ($trail) {
     $trail->parent('dashboard');
-    $trail->push('Empresas', route('empresas.index'));
+    $trail->push('<i class="fas fa-building"></i> Empresas', route('empresas.index'));
 });
 
 
@@ -21,7 +21,7 @@ Breadcrumbs::for('empresa.unidades', function ($trail, $id) {
 
 Breadcrumbs::for('unidades.index', function ($trail) {
     $trail->parent('dashboard');
-    $trail->push('Unidades', route('unidades.index'));
+    $trail->push('<i class="fas fa-store"></i> Unidades', route('unidades.index'));
 });
 
 
@@ -41,7 +41,7 @@ Breadcrumbs::for('unidades.edit', function ($trail,$id) {
 
 Breadcrumbs::for('servico.lista', function ($trail) {
     $trail->parent('dashboard');
-    $trail->push('Serviços', route('servico.lista'));
+    $trail->push('<i class="fas fa-tools"></i> Serviços', route('servico.lista'));
 });
 
 Breadcrumbs::for('servico.andamento', function ($trail) {
@@ -107,7 +107,7 @@ Breadcrumbs::for('taxas.show', function ($trail, $id) {
 
 Breadcrumbs::for('faturamentos.index', function ($trail) {
     $trail->parent('dashboard');
-    $trail->push('Faturamentos', route('faturamentos.index'));
+    $trail->push('<i class="fas fa-file-invoice-dollar"></i> Faturamentos', route('faturamentos.index'));
 });
 
 Breadcrumbs::for('faturamento.create', function ($trail) {
@@ -125,8 +125,7 @@ Breadcrumbs::for('faturamento.show', function ($trail, $id) {
 
 
 Breadcrumbs::for('cliente.home', function($trail){
-
-    $trail->push('Dashboard', route('cliente.home'));
+    $trail->push('<i class="fas fa-home"></i> Dashboard', route('cliente.home'));
 });
 
 Breadcrumbs::for('cliente.empresa.unidades',function($trail, $id){
@@ -137,15 +136,13 @@ Breadcrumbs::for('cliente.empresa.unidades',function($trail, $id){
 });
 
 Breadcrumbs::for('cliente.unidades',function($trail){
-
     $trail->parent('cliente.home');
-    $trail->push('Unidades', route('cliente.unidades'));
+    $trail->push('<i class="fas fa-store"></i> Unidades', route('cliente.unidades'));
 });
 
 Breadcrumbs::for('cliente.empresas',function($trail){
-
     $trail->parent('cliente.home');
-    $trail->push('Empresas', route('cliente.empresas'));
+    $trail->push('<i class="fas fa-building"></i> Empresas', route('cliente.empresas'));
 });
 
 

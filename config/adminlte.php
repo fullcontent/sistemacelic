@@ -30,11 +30,11 @@ return [
     |
     */
 
-    'logo' => '<img src="/img/logoCelicLogin.png">',
+    'logo' => '<img src="' . env('APP_URL') . '/public/img/logoCelicLogin.png">',
 
-    'login_logo' => '<img src="/img/logoCelicLogin.png" width="280">',
+    'login_logo' => '<img src="' . env('APP_URL') . '/public/img/logoCelicLogin.png" width="280">',
 
-    'logo_mini' => '<img src="/img/logoCelicMini.png">',
+    'logo_mini' => '<img src="' . env('APP_URL') . '/public/img/logoCelicMini.png">',
 
     /*
     |--------------------------------------------------------------------------
@@ -60,7 +60,7 @@ return [
     |
     */
 
-    'layout' => null,
+    'layout' => 'fixed',
 
     /*
     |--------------------------------------------------------------------------
