@@ -105,7 +105,9 @@
 	<div class="col-sm-6">
 		<h1 style="margin: 0; font-weight: 700; color: #333;">Listagem de Propostas</h1>
 	</div>
-	<div class="col-sm-6 text-right">
+</div>
+<div class="row">
+	<div class="pull-right">
 		<a class="btn btn-primary" href="{{route('proposta.create')}}"
 			style="border-radius: 50px; padding: 8px 25px; font-weight: 600;">
 			<i class="fa fa-plus"></i> Nova Proposta
