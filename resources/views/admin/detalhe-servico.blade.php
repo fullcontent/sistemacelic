@@ -1,12 +1,218 @@
 @extends('adminlte::page')
 
 @section('content_header')
-    <h1>{{$servico->os}}</h1>
+    <h1>
+        {{$servico->os}} <small>{{$servico->nome}}</small>
+        <div class="pull-right">
+            <button id="webhookServiceBtn" class="btn btn-info">
+                <i class="fa fa-dashboard"></i> Auditoria do Serviço
+            </button>
+        </div>
+    </h1>
 @stop
 
 
 
 @section('content')
+
+<script>
+    // Colocando o script no início do content para garantir execução imediata se o JS section falhar
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Script de Webhook carregado.');
+        
+        const serviceId = '{{$servico->id}}';
+        const userNotify = @json(Auth::user()->name);
+
+        const callWebhook = (url, actionName, loadingText) => {
+            Swal.fire({
+                title: 'Processando...',
+                text: loadingText || 'Coletando dados e enviando para o n8n',
+                allowOutsideClick: false,
+                onBeforeOpen: () => { Swal.showLoading(); }
+            });
+
+            fetch(`/api/servico/${serviceId}/data`)
+                .then(res => res.json())
+                .then(data => {
+                    return fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: actionName,
+                            service: data,
+                            timestamp: new Date().toISOString(),
+                            triggered_by: userNotify
+                        })
+                    });
+                })
+                .then(res => {
+                    return res.text().then(text => {
+                        try {
+                            return JSON.parse(text);
+                        } catch (e) {
+                            return { message: text };
+                        }
+                    });
+                })
+                .then(result => {
+                    console.log(`Resultado do ${actionName}:`, result);
+                    
+                    let contentHtml = '';
+                    let parsedData = null;
+                    let rawMessage = '';
+
+                    if (Array.isArray(result) && result.length > 0) {
+                        rawMessage = result[0].output || result[0].message || JSON.stringify(result[0]);
+                    } else if (result) {
+                        rawMessage = result.output || result.message || JSON.stringify(result);
+                    }
+
+                    const extractJson = (text) => {
+                        if (typeof text !== 'string') return null;
+                        const match = text.match(/```json\n([\s\S]*?)\n```/) || text.match(/\{[\s\S]*\}/);
+                        if (match) {
+                            try {
+                                const clean = match[1] ? match[1] : match[0];
+                                const parsed = JSON.parse(clean);
+                                if (parsed.message || parsed.output) return extractJson(parsed.message || parsed.output) || parsed;
+                                return parsed;
+                            } catch (e) { return null; }
+                        }
+                        return null;
+                    };
+
+                    parsedData = extractJson(rawMessage);
+
+                    if (parsedData && (parsedData.header || parsedData.scorecard)) {
+                         const head = parsedData.header || {};
+                         const score = parsedData.scorecard || [];
+                         const crono = parsedData.cronologia || [];
+                         const diag = parsedData.diagnostico || {};
+
+                         contentHtml = `
+                             <div style="text-align: left; font-family: 'Source Sans Pro', sans-serif;">
+                                 <!-- 1. Data Header -->
+                                 <div style="background: #222d32; color: #fff; padding: 12px; border-radius: 4px; border-left: 5px solid #00c0ef; margin-bottom: 15px;">
+                                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; font-size: 11px;">
+                                         <div><strong>ID/OS:</strong> ${head.id_os || '---'}</div>
+                                         <div><strong>UNID/UF:</strong> ${head.unidade_uf || '---'}</div>
+                                         <div style="grid-column: span 2;"><strong>PRAZO TOTAL:</strong> <span class="label label-warning">${head.lead_time || '---'}</span></div>
+                                     </div>
+                                 </div>
+
+                                 <!-- 2. Matriz de Performance -->
+                                 <h5 style="font-weight: bold; color: #333;"><i class="fa fa-dashboard"></i> INDICADORES DE PERFORMANCE</h5>
+                                 <table class="table table-bordered table-condensed" style="font-size: 13px; background: #fff; margin-bottom: 20px;">
+                                     <thead style="background: #f4f4f4;">
+                                         <tr>
+                                             <th>Item</th>
+                                             <th>Resultado</th>
+                                             <th>Referência</th>
+                                             <th>Status</th>
+                                         </tr>
+                                     </thead>
+                                     <tbody>
+                                         ${score.map(s => `
+                                             <tr>
+                                                 <td><strong>${s.kpi}</strong></td>
+                                                 <td>${s.resultado}</td>
+                                                 <td>${s.benchmark || '---'}</td>
+                                                 <td><span class="label label-${(s.status||'').toLowerCase().includes('atrasado') || (s.status||'').toLowerCase().includes('atraso') || (s.status||'').toLowerCase().includes('complexo') || (s.status||'').toLowerCase().includes('critico') ? 'danger' : 'success'}">${s.status}</span></td>
+                                             </tr>
+                                         `).join('')}
+                                     </tbody>
+                                 </table>
+
+                                 <!-- 3. Cronologia de Etapas -->
+                                 <h5 style="font-weight: bold; color: #333;"><i class="fa fa-clock-o"></i> HISTÓRICO DE ETAPAS</h5>
+                                 <div style="display: flex; justify-content: space-between; background: #f9f9f9; padding: 10px; border-radius: 4px; margin-bottom: 20px; border: 1px dashed #ddd;">
+                                     ${crono.map((c, i) => `
+                                         <div style="text-align: center; flex: 1; position: relative;">
+                                             <div style="font-size: 11px; font-weight: bold; color: #777; text-transform: uppercase;">${c.etapa}</div>
+                                             <div style="font-size: 16px; font-weight: bold; color: #3c8dbc; margin-top: 5px;">${c.dias}</div>
+                                             ${i < crono.length - 1 ? '<div style="position: absolute; right: -5px; top: 20px; color: #ccc;"><i class="fa fa-chevron-right"></i></div>' : ''}
+                                         </div>
+                                     `).join('')}
+                                 </div>
+
+                                 <!-- 4. Diagnóstico de Inteligência -->
+                                 <div style="margin-top: 20px; border-top: 2px solid #00c0ef; background: #fff; padding: 15px; border-radius: 0 0 4px 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                     <h5 style="margin-top: 0; margin-bottom: 15px; font-weight: bold; color: #005a71; display: flex; align-items: center; gap: 8px;">
+                                         <i class="fa fa-lightbulb-o" style="font-size: 18px;"></i> ANÁLISE E INSIGHTS
+                                     </h5>
+                                     
+                                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                                         <div style="background: #fdfdfd; padding: 10px; border-radius: 4px; border: 1px solid #eee;">
+                                             <div style="font-size: 10px; font-weight: bold; color: #999; text-transform: uppercase; letter-spacing: 0.5px;">Gargalo Identificado</div>
+                                             <div style="margin-top: 5px;"><span class="label label-danger" style="font-size: 11px; padding: 3px 8px;">${diag.gargalo || 'Analítico'}</span></div>
+                                         </div>
+                                         <div style="background: #fdfdfd; padding: 10px; border-radius: 4px; border: 1px solid #eee;">
+                                             <div style="font-size: 10px; font-weight: bold; color: #999; text-transform: uppercase; letter-spacing: 0.5px;">Vida Útil Restante</div>
+                                             <div style="margin-top: 5px; font-size: 14px; font-weight: bold; color: #333;">${diag.vida_util || '---'}</div>
+                                         </div>
+                                     </div>
+
+                                     <div style="margin-bottom: 15px;">
+                                         <div style="font-size: 11px; font-weight: bold; color: #555; margin-bottom: 4px; text-transform: uppercase;"><i class="fa fa-search"></i> Causa Raiz:</div>
+                                         <div style="font-size: 13px; color: #444; line-height: 1.5; padding-left: 12px; border-left: 3px solid #ddd; background: #fafafa; padding-top: 5px; padding-bottom: 5px; border-radius: 0 4px 4px 0;">
+                                            ${diag.causa_raiz || '---'}
+                                         </div>
+                                     </div>
+
+                                     <div style="margin-bottom: 15px;">
+                                         <div style="font-size: 11px; font-weight: bold; color: #555; margin-bottom: 4px; text-transform: uppercase;"><i class="fa fa-exclamation-triangle"></i> Impacto Operacional:</div>
+                                         <div style="font-size: 13px; color: #444; line-height: 1.5; padding-left: 12px; border-left: 3px solid #f39c12; background: #fffcf5; padding-top: 5px; padding-bottom: 5px; border-radius: 0 4px 4px 0;">
+                                            ${diag.impacto || '---'}
+                                         </div>
+                                     </div>
+
+                                     <div style="background: #e7f3f5; padding: 15px; border-radius: 6px; border-left: 5px solid #00c0ef; box-shadow: inset 0 0 10px rgba(0,0,0,0.02);">
+                                         <div style="font-size: 11px; font-weight: bold; color: #005a71; margin-bottom: 8px; display: flex; align-items: center; gap: 5px; text-transform: uppercase;">
+                                             <i class="fa fa-info-circle"></i> Insight Estratégico (Data BI)
+                                         </div>
+                                         <div style="font-size: 14px; color: #003a47; font-style: italic; font-family: 'Source Sans Pro', sans-serif; line-height: 1.6;">
+                                             "${diag.insight_bi || '---'}"
+                                         </div>
+                                     </div>
+                                 </div>
+                             </div>
+                         `;
+                    }
+                    
+                    if (!contentHtml) {
+                        contentHtml = `
+                            <div style="text-align: left; background: #f4f4f4; padding: 15px; border-radius: 5px; border-left: 5px solid #f39c12; margin-top: 10px;">
+                                <p style="margin-bottom: 8px; font-weight: bold; color: #555;">Resposta do Servidor:</p>
+                                <pre style="font-size: 11px; background: transparent; border: none; padding: 0; color: #333; white-space: pre-wrap; word-break: break-all; margin: 0;">${typeof rawMessage === 'string' ? rawMessage : JSON.stringify(result, null, 2)}</pre>
+                            </div>
+                        `;
+                    }
+
+                    Swal.fire({
+                        title: parsedData && parsedData.header ? 'Auditoria de Performance BI' : 'Ação Concluída!',
+                        type: 'success',
+                        html: contentHtml,
+                        width: parsedData ? '680px' : '600px',
+                        confirmButtonColor: '#3c8dbc',
+                        confirmButtonText: 'FECHAR'
+                    });
+                })
+                .catch(err => {
+                    console.error('Erro no webhook:', err);
+                    Swal.fire('Erro!', `Falha ao processar o webhook: ${err.message}`, 'error');
+                });
+        };
+
+        const btnBI = document.getElementById('webhookServiceBtn');
+
+        if (btnBI) {
+            btnBI.addEventListener('click', function() {
+                const n8nUrl = 'https://n8n.srv1477025.hstgr.cloud/webhook/ac65cd03-e522-4708-a49b-c5a4c681ef4d';
+                callWebhook(n8nUrl, 'service_detail_bi', 'Gerando análise estratégica de BI...');
+            });
+        }
+    });
+</script>
 
 
 
@@ -38,11 +244,9 @@
             <div class="box-header with-border">
               <h3 class="box-title"><b>Detalhes do serviço {{$servico->nome}} @if($servico->servicoPrincipal) <small class="label pull-right bg-red">S</small>@endif</b></h3>
 
-              <div class="box-tools pull-right">
                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
                 </button>
                 <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-              </div>
             </div>
             <!-- /.box-header -->
             <div class="box-body">
@@ -158,7 +362,7 @@
 
                   <p><b>Início do processo: </b>{{\Carbon\Carbon::parse($servico->created_at)->format('d/m/Y')}}</p>
 
-                  @if(empty($servico->protocolo_numero))
+                  @if(empty($servico->protocolo_anexo))
                   <p><b>Protocolo:</b> <button type="button" class="btn btn-default" data-toggle="modal"
                     data-target="#anexar-protocolo">
                     Anexar
