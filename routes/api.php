@@ -16,3 +16,7 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('/search-service', 'ApiController@searchService');
+Route::post('/add-history', 'ApiController@addHistory');
+Route::get('/servicos/ids', 'ApiController@getAllServiceIds');

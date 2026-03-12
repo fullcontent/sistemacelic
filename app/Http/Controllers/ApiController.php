@@ -591,4 +591,103 @@ class ApiController extends Controller
 
         return response()->json($data);
     }
+
+    public function getServicoData($id)
+    {
+        $servico = Servico::with([
+            'unidade',
+            'empresa',
+            'taxas',
+            'reembolsos',
+            'historico',
+            'interacoes',
+            'pendencias',
+            'arquivos',
+            'faturamento',
+            'ordensCompra',
+            'financeiro',
+            'responsavel',
+            'coresponsavel',
+            'analista1',
+            'analista2',
+            'solicitanteServico',
+            'servicoPrincipal.unidade',
+            'servicoPrincipal.empresa',
+            'servicoPrincipal.financeiro',
+            'subServicos.unidade',
+            'subServicos.empresa',
+            'subServicos.financeiro'
+        ])->find($id);
+
+        if (!$servico) {
+            return response()->json(['message' => 'Serviço não encontrado'], 404);
+        }
+
+        return response()->json($servico);
+    }
+
+    public function searchService(Request $request)
+    {
+        $term = $request->input('term');
+        $company = $request->input('company');
+        $unit = $request->input('unit');
+
+        $query = Servico::with(['unidade.empresa', 'responsavel']);
+
+        if ($term) {
+            $query->where(function ($q) use ($term) {
+                $q->where('nome', 'like', "%$term%")
+                    ->orWhere('os', 'like', "%$term%")
+                    ->orWhere('observacoes', 'like', "%$term%");
+            });
+        }
+
+        if ($company) {
+            $query->whereHas('unidade.empresa', function ($q) use ($company) {
+                $q->where('nomeFantasia', 'like', "%$company%")
+                    ->orWhere('razaoSocial', 'like', "%$company%");
+            });
+        }
+
+        if ($unit) {
+            $query->whereHas('unidade', function ($q) use ($unit) {
+                $q->where('nomeFantasia', 'like', "%$unit%")
+                    ->orWhere('razaoSocial', 'like', "%$unit%");
+            });
+        }
+
+        // Se nenhum parâmetro for passado, retorna vazio para evitar despejo de dados
+        if (!$term && !$company && !$unit) {
+            return response()->json([]);
+        }
+
+        $results = $query->take(20)->get();
+
+        return response()->json($results);
+    }
+
+    public function addHistory(Request $request)
+    {
+        $request->validate([
+            'servico_id' => 'required|exists:servicos,id',
+            'observacoes' => 'required|string',
+            'user_id' => 'nullable|exists:users,id'
+        ]);
+
+        $history = new \App\Models\Historico();
+        $history->servico_id = $request->servico_id;
+        $history->user_id = $request->user_id ?? 1; // Usuário padrão se não informado
+        $history->observacoes = $request->observacoes;
+        // Se a data do email for enviada, podemos tentar usar ela, caso contrário usa a atual
+        $history->created_at = $request->data ? \Carbon\Carbon::createFromFormat('d/m/Y, H:i:s', $request->data) : \Carbon\Carbon::now('america/sao_paulo');
+        $history->save();
+
+        return response()->json(['message' => 'Histórico adicionado com sucesso', 'id' => $history->id]);
+    }
+
+    public function getAllServiceIds()
+    {
+        $ids = Servico::pluck('id');
+        return response()->json($ids);
+    }
 }
