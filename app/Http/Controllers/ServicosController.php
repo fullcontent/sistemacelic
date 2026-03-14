@@ -28,6 +28,7 @@ use App\Models\Faturamento;
 use App\Notifications\UserMentioned;
 use App\Mail\UsuarioMencionado;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Session;
 
 
 use Illuminate\Http\Request;
@@ -691,6 +692,15 @@ class ServicosController extends Controller
     {
         //
         $servico = Servico::with('servicoPrincipal')->find($id);
+        
+        Session::put('unidade', $servico->unidade);
+        Session::put('unidade_nome', $servico->unidade->nomeFantasia);
+        Session::put('empresa_nome', $servico->unidade->empresa->nomeFantasia);
+        Session::put('servico_nome', $servico->nome);
+        Session::put('servico_id', $id);
+        Session::put('unidade_id', $servico->unidade_id);
+        Session::put('empresa_id', $servico->unidade->empresa_id);
+        Session::put('is_admin', true);
 
 
 

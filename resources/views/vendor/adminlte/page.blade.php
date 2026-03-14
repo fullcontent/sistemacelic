@@ -38,18 +38,6 @@
             padding: 0 8px;
             color: #999;
         }
-        .navbar-unit-name .breadcrumb {
-            background: transparent;
-            margin-bottom: 0;
-            padding: 0;
-            display: flex;
-            align-items: center;
-        }
-        .navbar-unit-name .breadcrumb > li + li:before {
-            padding: 0 8px;
-            color: #ccc;
-            content: "/\00a0";
-        }
         @media (max-width: 991px) {
             .navbar-unit-name {
                 display: none; /* Hide breadcrumb on smaller screens to avoid overlap */
@@ -108,12 +96,37 @@
                     <span class="sr-only">{{ __('adminlte::adminlte.toggle_navigation') }}</span>
                 </a>
 
-                <!-- Breadcrumb: Onde estou -->
-                <div class="navbar-unit-name">
-                    @if (Route::currentRouteName() && Breadcrumbs::exists(Route::currentRouteName()))
-                        {!! Breadcrumbs::render() !!}
-                    @endif
-                </div>
+                <!-- Onde estou: Breadcrumb -->
+                @php
+                    $isAdminContext = Session::get('is_admin', false);
+                @endphp
+                @if(Session::has('empresa_nome') || Session::has('unidade_nome') || Session::has('servico_nome'))
+                    <div class="navbar-unit-name">
+                        @if(Session::has('empresa_nome') && Session::has('empresa_id'))
+                            <span class="breadcrumb-item">
+                                <a href="{{ route($isAdminContext ? 'empresas.show' : 'cliente.empresa.show', Session::get('empresa_id')) }}">
+                                    <i class="fas fa-building text-muted"></i> {{ Session::get('empresa_nome') }}
+                                </a>
+                            </span>
+                        @endif
+                        
+                        @if(Session::has('unidade_nome') && Session::has('unidade_id'))
+                            <span class="breadcrumb-item">
+                                <a href="{{ route($isAdminContext ? 'unidades.show' : 'cliente.unidade.show', Session::get('unidade_id')) }}">
+                                    <i class="fas fa-store text-muted"></i> {{ Session::get('unidade_nome') }}
+                                </a>
+                            </span>
+                        @endif
+
+                        @if(Session::has('servico_nome') && Session::has('servico_id'))
+                            <span class="breadcrumb-item">
+                                <a href="{{ route($isAdminContext ? 'servicos.show' : 'cliente.servico.show', Session::get('servico_id')) }}">
+                                    <i class="fas fa-clipboard-list text-muted"></i> {{ Session::get('servico_nome') }}
+                                </a>
+                            </span>
+                        @endif
+                    </div>
+                @endif
 
             @endif
                 <!-- Navbar Right Menu -->

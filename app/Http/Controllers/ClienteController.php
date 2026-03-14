@@ -18,6 +18,7 @@ use App\Models\Pendencia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -104,6 +105,14 @@ class ClienteController extends Controller
 
 
         $unidade = Unidade::find($id);
+        Session::put('unidade', $unidade);
+        Session::put('unidade_nome', $unidade->nomeFantasia);
+        Session::put('empresa_nome', $unidade->empresa->nomeFantasia);
+        Session::put('unidade_id', $id);
+        Session::put('empresa_id', $unidade->empresa_id);
+        Session::put('is_admin', false);
+        Session::forget('servico_nome');
+        Session::forget('servico_id');
 
         $access = Unidade::whereIn('empresa_id', UserAccess::where('user_id', Auth::id())->pluck('empresa_id'))->get();
 
@@ -179,6 +188,14 @@ class ClienteController extends Controller
 
 
         $servico = Servico::find($id);
+        Session::put('unidade', $servico->unidade);
+        Session::put('unidade_nome', $servico->unidade->nomeFantasia);
+        Session::put('empresa_nome', $servico->unidade->empresa->nomeFantasia);
+        Session::put('servico_nome', $servico->nome);
+        Session::put('servico_id', $id);
+        Session::put('unidade_id', $servico->unidade_id);
+        Session::put('empresa_id', $servico->unidade->empresa_id);
+        Session::put('is_admin', false);
 
         if ($servico->unidade_id) {
 

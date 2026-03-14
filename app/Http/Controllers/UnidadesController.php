@@ -12,6 +12,7 @@ use App\Models\Pendencia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Session;
 use Carbon\Carbon;
 
 
@@ -176,6 +177,10 @@ class UnidadesController extends Controller
     {
         //
         $unidade = Unidade::find($id);
+        Session::put('unidade', $unidade);
+        Session::put('unidade_nome', $unidade->nomeFantasia);
+        Session::put('empresa_nome', $unidade->empresa->nomeFantasia); Session::put('unidade_id', $id); Session::put('empresa_id', $unidade->empresa_id); Session::put('is_admin', true); Session::forget('servico_id');
+        Session::forget('servico_nome');
         $access = UserAccess::where('user_id',Auth::id())->whereNull('unidade_id')->pluck('empresa_id');
         $unidades = Unidade::whereIn('empresa_id',$access)->pluck('id');
         
@@ -211,6 +216,10 @@ class UnidadesController extends Controller
         //
         $empresas = Empresa::pluck('nomeFantasia','id')->toArray();
         $unidade = Unidade::find($id);
+        Session::put('unidade', $unidade);
+        Session::put('unidade_nome', $unidade->nomeFantasia);
+        Session::put('empresa_nome', $unidade->empresa->nomeFantasia); Session::put('unidade_id', $id); Session::put('empresa_id', $unidade->empresa_id); Session::put('is_admin', true); Session::forget('servico_id');
+        Session::forget('servico_nome');
         return view('admin.editar-unidade')
                     ->with([
                         'unidade'=>$unidade,
