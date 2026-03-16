@@ -386,6 +386,7 @@ Route::get('api/getDadosCastro', 'ApiController@getDadosCastro')->name('api.getD
 
 Route::get('api/saveDadosCastro', 'ApiController@saveDadosCastro')->name('api.saveDadosCastro');
 
+Route::get('api/servico/search', 'ApiController@searchService')->name('api.servico.search');
 Route::get('api/getPrestadorInfo', 'ApiController@getPrestadorInfo')->name('api.getPrestadorInfo');
 
 

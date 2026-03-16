@@ -17,7 +17,7 @@ class OrdemCompraController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View
      */
     public function index()
     {
@@ -30,12 +30,16 @@ class OrdemCompraController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
     public function create($id)
     {   
 
-        $servico = Servico::find($id);
+        $servico = Servico::with(['unidade', 'empresa'])->find($id);
+
+        if (!$servico) {
+            return redirect()->back()->with('error', 'Serviço não encontrado.');
+        }
 
         $prestadores = Prestador::pluck('nome','id')->toArray();
 
@@ -97,40 +101,17 @@ class OrdemCompraController extends Controller
         }
         
 
-        if($request->servicoVinculado_reembolso)
+        $servicosVinculados = [];
+
+        if($request->has('servicoVinculado_id') && is_array($request->servicoVinculado_id))
         {
-            // An empty array is created to hold the linked services.
-            $servicosVinculados = [];
-                    
             // The loop iterates over the servicoVinculado_id array obtained from the request.
             foreach ($request->servicoVinculado_id as $v => $p) {
-                // If the value at a particular index is not false, then it is added as a key-value pair to the servicosVinculados array.
                 if ($p) {
                     $servicosVinculados[$v]['servicoVinculado_id'] = $p;
-                }
-            }
-
-            // The loop iterates over the servicoVinculado_id array obtained from the request.
-            foreach ($request->servicoVinculado_nome as $v => $p) {
-                // If the value at a particular index is not false, then it is added as a key-value pair to the servicosVinculados array.
-                if ($p) {
-                    $servicosVinculados[$v]['servicoVinculado_nome'] = $p;
-                }
-            }
-
-            // The loop iterates over the servicoVinculado_valor array obtained from the request.
-            foreach ($request->servicoVinculado_valor as $v => $p) {
-                // If the value at a particular index is not false, then it is added as a key-value pair to the servicosVinculados array.
-                if ($p) {
-                    $servicosVinculados[$v]['servicoVinculado_valor'] = $p;
-                }
-            }
-
-            // The loop iterates over the servicoVinculado_valor array obtained from the request.
-            foreach ($request->servicoVinculado_reembolso as $v => $p) {
-                // If the value at a particular index is not false, then it is added as a key-value pair to the servicosVinculados array.
-                if ($p) {
-                    $servicosVinculados[$v]['servicoVinculado_reembolso'] = $p;
+                    $servicosVinculados[$v]['servicoVinculado_nome'] = $request->servicoVinculado_nome[$v] ?? '---';
+                    $servicosVinculados[$v]['servicoVinculado_valor'] = $request->servicoVinculado_valor[$v] ?? 0;
+                    $servicosVinculados[$v]['servicoVinculado_reembolso'] = $request->servicoVinculado_reembolso[$v] ?? 'nao';
                 }
             }
         }
@@ -165,7 +146,7 @@ class OrdemCompraController extends Controller
             
             $ordemCompraServicoVinculado = new OrdemCompraVinculo;
             $ordemCompraServicoVinculado->ordemCompra_id = $ordemCompra->id;
-            $ordemCompraServicoVinculado->servico_id = $request->servicoPrincipal_id; //Alterar para servico ID vindo do campo hidden
+            $ordemCompraServicoVinculado->servico_id = $ser['servicoVinculado_id'];
             $ordemCompraServicoVinculado->valor = $ser['servicoVinculado_valor'];
             $ordemCompraServicoVinculado->reembolso = $ser['servicoVinculado_reembolso'];
             $ordemCompraServicoVinculado->save();
@@ -273,14 +254,25 @@ class OrdemCompraController extends Controller
     {
         
 
-        $ordemCompra = OrdemCompra::find($id);
-        $servico = Servico::find($ordemCompra->servico_id);
+        $ordemCompra = OrdemCompra::with(['pagamentos', 'vinculos.servico', 'prestador'])->find($id);
+        
+        if (!$ordemCompra) {
+            return redirect()->back()->with('error', 'Ordem de compra não encontrada.');
+        }
+
+        $servico = Servico::with(['unidade', 'empresa'])->find($ordemCompra->servico_id);
         $prestadores = Prestador::pluck('nome','id')->toArray();
+
+        // Encontrar o vínculo que corresponde ao serviço principal
+        $vinculoPrincipal = $ordemCompra->vinculos->where('servico_id', $ordemCompra->servico_id)->first();
+        $vinculoOutros = $ordemCompra->vinculos->where('servico_id', '!=', $ordemCompra->servico_id);
 
         return view('admin.ordemCompra.editar-ordemCompra')->with([
             'ordemCompra'=>$ordemCompra,
             'servico'=>$servico,
-            'prestadores'=>$prestadores
+            'prestadores'=>$prestadores,
+            'vinculoPrincipal'=>$vinculoPrincipal,
+            'vinculoOutros'=>$vinculoOutros
         ]);
 
 
@@ -295,7 +287,92 @@ class OrdemCompraController extends Controller
      */
     public function update(Request $request, $id)
     {
-        return $request->all();
+        $ordemCompra = OrdemCompra::find($id);
+        
+        if (!$ordemCompra) {
+            return redirect()->back()->with('error', 'Ordem de compra não encontrada.');
+        }
+
+        $ordemCompra->user_id = Auth::id();
+        $ordemCompra->prestador_id = $request->prestador_id;
+        $ordemCompra->valorServico = $request->valorServico;
+        $ordemCompra->escopo = $request->escopo;
+        $ordemCompra->formaPagamento = $request->formaPagamento;
+        $ordemCompra->situacao = $request->situacao ?? $ordemCompra->situacao;
+        $ordemCompra->save();
+
+        // Atualizar vínculos
+        OrdemCompraVinculo::where('ordemCompra_id', $id)->delete();
+
+        // Principal
+        $ordemCompraServicoPrincipal = new OrdemCompraVinculo;
+        $ordemCompraServicoPrincipal->ordemCompra_id = $id;
+        $ordemCompraServicoPrincipal->servico_id = $request->servicoPrincipal_id;
+        $ordemCompraServicoPrincipal->valor = $request->servicoPrincipal_valor;
+        $ordemCompraServicoPrincipal->reembolso = $request->servicoPrincipal_reembolso;
+        $ordemCompraServicoPrincipal->save();
+
+        // Outros
+        if($request->has('servicoVinculado_id') && is_array($request->servicoVinculado_id))
+        {
+            foreach ($request->servicoVinculado_id as $v => $p) {
+                if ($p) {
+                    $ocv = new OrdemCompraVinculo;
+                    $ocv->ordemCompra_id = $id;
+                    $ocv->servico_id = $p;
+                    $ocv->valor = $request->servicoVinculado_valor[$v] ?? 0;
+                    $ocv->reembolso = $request->servicoVinculado_reembolso[$v] ?? 'nao';
+                    $ocv->save();
+                }
+            }
+        }
+
+        // Atualizar pagamentos (simplificado: remove e recria se mudar, ou apenas permite atualizar se for o mesmo número de parcelas)
+        // Para manter a simplicidade e consistência com o store:
+        OrdemCompraPagamento::where('ordemCompra_id', $id)->delete();
+        
+        if($request->valorParcela) {
+            foreach($request->valorParcela as $p => $vParcela) {
+                $pag = new OrdemCompraPagamento;
+                $pag->ordemCompra_id = $id;
+                $pag->formaPagamento = $ordemCompra->formaPagamento;
+                $pag->parcela = $p + 1;
+                $pag->valor = $vParcela;
+                
+                if(isset($request->dataVencimento[$p]) && $request->dataVencimento[$p]) {
+                    $pag->dataVencimento = Carbon::createFromFormat('d/m/Y', $request->dataVencimento[$p])->toDateString();
+                }
+                
+                if(isset($request->dataPagamento[$p]) && $request->dataPagamento[$p]) {
+                    $pag->dataPagamento = Carbon::createFromFormat('d/m/Y', $request->dataPagamento[$p])->toDateString();
+                }
+                
+                $pag->obs = $request->obs[$p] ?? null;
+
+                // Lógica de Comprovante
+                if($request->hasFile("comprovante.$p"))
+                {
+                    $file = $request->file("comprovante.$p");
+                    if ($file->isValid()) {
+                        $name = uniqid(date('HisYmd'));
+                        $extension = $file->extension();
+                        $nameFile = "{$name}.{$extension}";
+                        $upload = $file->storeAs('comprovantes', $nameFile);
+                        $pag->comprovante = $upload;
+                    }
+                }
+                elseif(isset($request->comprovante_atual[$p]))
+                {
+                    // Mantém o arquivo antigo se não subiu um novo
+                    $pag->comprovante = $request->comprovante_atual[$p];
+                }
+
+                $pag->situacao = $pag->comprovante ? 'pago' : 'aberto';
+                $pag->save();
+            }
+        }
+
+        return redirect()->route('servicos.show', $ordemCompra->servico_id)->with('message', 'Ordem de compra atualizada com sucesso!');
     }
 
     /**
@@ -306,6 +383,20 @@ class OrdemCompraController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $ordemCompra = OrdemCompra::find($id);
+        
+        if (!$ordemCompra) {
+            return redirect()->back()->with('error', 'Ordem de compra não encontrada.');
+        }
+
+        $servico_id = $ordemCompra->servico_id;
+
+        // Deletar dependências manually se não tiver cascade no DB
+        OrdemCompraPagamento::where('ordemCompra_id', $id)->delete();
+        OrdemCompraVinculo::where('ordemCompra_id', $id)->delete();
+        
+        $ordemCompra->delete();
+
+        return redirect()->route('servicos.show', $servico_id)->with('message', 'Ordem de compra removida com sucesso!');
     }
 }

@@ -31,6 +31,9 @@ class OrdemCompra extends Model
     {
         return $this->hasMany('App\Models\PrestadorComentario','ordemCompra_id');
     }
-    
+    public function vinculos()
+    {
+        return $this->hasMany('App\Models\OrdemCompraVinculo', 'ordemCompra_id');
+    }
 
 }

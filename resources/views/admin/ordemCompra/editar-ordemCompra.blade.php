@@ -12,7 +12,7 @@
 
 	
 	
-	{!! Form::model($ordemCompra,['route'=>['ordemCompra.update', $ordemCompra->id],'method'=>'PUT']) !!}
+	{!! Form::model($ordemCompra,['route'=>['ordemCompra.update', $ordemCompra->id],'method'=>'PUT', 'enctype'=>'multipart/form-data']) !!}
 
 	@include('admin.ordemCompra.form-ordemCompra')
 

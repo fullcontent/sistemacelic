@@ -579,8 +579,8 @@
   @include('admin.components.widget-pendencias')
 </div>
 
-<div class="col-md-7">
-
+<div class="col-md-12">
+  @include('admin.components.widget-ordemCompra')
 </div>
 
 
