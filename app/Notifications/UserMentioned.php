@@ -8,7 +8,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Queue\SerializesModels;
 
-class UserMentioned extends Notification implements ShouldQueue
+class UserMentioned extends Notification
 {
     use Queueable, SerializesModels;
 
@@ -35,7 +35,7 @@ class UserMentioned extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['database', 'mail'];
+        return ['database'];
     }
 
     /**
@@ -58,15 +58,12 @@ class UserMentioned extends Notification implements ShouldQueue
 
     public function toDatabase($notifiable)
     {
-
-
+        $unidade = $this->servico->unidade ? $this->servico->unidade->nomeFantasia : 'N/A';
 
         return [
-            //
-            'mensagem' => 'Voce foi mencionado nesse servico',
-            'servico' => $this->servico->id,
+            'mensagem' => $unidade,
+            'servico' => $this->servico->os,
             'action' => route($this->route, $this->servico->id),
-
         ];
     }
 }

@@ -409,18 +409,24 @@ class ClienteController extends Controller
             ], $request->observacoes);
 
             $emailErrors = [];
-            foreach ($users[0] as $index => $u) {
+            $webhookService = new \App\Services\WebhookService();
+
+            foreach ($users[0] as $u) {
                 $u = ltrim($u, "@");
 
                 $user = User::where('name', 'like', '%' . $u . '%')->first();
                 if ($user) {
+                    // 1. Notificação Padrão (Sininho)
                     try {
                         $route = $user->privileges == 'admin' ? 'servicos.show' : 'cliente.servico.show';
-                        // Delayed notifications to prevent SMTP blocking
-                        $notification = (new UserMentioned($servico, $route, $resumo))->delay(now()->addSeconds($index * 10));
-                        $user->notify($notification);
+                        $user->notify(new UserMentioned($servico, $route, $resumo));
                     } catch (\Exception $e) {
-                        \Log::error('ClienteController: Erro ao enviar e-mail para ' . $user->email . ': ' . $e->getMessage());
+                        \Log::error('ClienteController: Erro na notificação interna: ' . $e->getMessage());
+                    }
+
+                    // 2. Email via Webhook
+                    $success = $webhookService->sendMentionEmail($user, $servico, $resumo, $request->observacoes);
+                    if (!$success) {
                         $emailErrors[] = $user->name;
                     }
                 }
