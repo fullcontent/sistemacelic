@@ -687,7 +687,7 @@ class ApiController extends Controller
 
     public function getAllServiceIds()
     {
-        $ids = Servico::pluck('id');
+        $ids = Servico::pluck('id')->whereNotIn('responsavel_id', [1])->take(20);
         return response()->json($ids);
     }
 }
