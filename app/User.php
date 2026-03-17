@@ -88,9 +88,12 @@ class User extends Authenticatable
         return $this->belongsToMany('App\UserAccess','user_accesses','user_id','unidade_id');
     }
     
-
-    
-    
-    
+    public function servicos()
+    {
+        return $this->hasMany('App\Models\Servico', 'responsavel_id')
+            ->orWhere('coresponsavel_id', $this->id)
+            ->orWhere('analista1_id', $this->id)
+            ->orWhere('analista2_id', $this->id);
+    }
     
 }

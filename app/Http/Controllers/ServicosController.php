@@ -243,6 +243,17 @@ class ServicosController extends Controller
             ->with('servicos', $servicos);
     }
 
+    public function meusServicos()
+    {
+        $servicos = Servico::porUsuario(Auth::id())
+            ->where('situacao', '<>', 'arquivado')
+            ->with('unidade', 'empresa', 'responsavel')
+            ->get();
+
+        return view('admin.lista-servicos')
+            ->with('servicos', $servicos);
+    }
+
     public function listaInativo()
     {
 

@@ -152,6 +152,14 @@ class Servico extends Model
         return $this->hasMany('App\Models\OrdemCompra','servico_id');
     }
 
-    
+    public function scopePorUsuario($query, $userId)
+    {
+        return $query->where(function($q) use ($userId) {
+            $q->where('responsavel_id', $userId)
+              ->orWhere('coresponsavel_id', $userId)
+              ->orWhere('analista1_id', $userId)
+              ->orWhere('analista2_id', $userId);
+        });
+    }
 
 }
