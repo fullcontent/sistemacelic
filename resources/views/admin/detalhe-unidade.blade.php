@@ -12,45 +12,62 @@
 </div>
 @endif
 <div class="row">
-    <div class="col-md-12">
-        
+    <div class="col-md-8">
         @include('admin.components.widget-detalhes')
-        
+    </div>
+    <div class="col-md-4">
+        @php
+            $apiKey = config('services.google_maps.api_key');
+            $locationQuery = urlencode("{$dados->endereco}, {$dados->numero} - {$dados->bairro}, {$dados->cidade} - {$dados->uf}, Brasil");
+            $staticImageUrl = "https://maps.googleapis.com/maps/api/streetview?size=600x400&location={$locationQuery}&key={$apiKey}";
+        @endphp
+
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title"><i class="fa fa-image"></i> Fachada da Unidade</h3>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
+            <div class="box-body no-padding text-center" style="background: #f4f4f4; min-height: 255px;">
+                <a href="https://www.google.com/maps/search/?api=1&query={{ $locationQuery }}" target="_blank">
+                    <img src="{{ $staticImageUrl }}" class="img-responsive center-block" alt="Street View" style="cursor: pointer; width: 100%; height: 255px; object-fit: cover;">
+                </a>
+            </div>
+        </div>
     </div>
 </div>
+
+<style>
+    .embed-responsive-item, .embed-responsive iframe {
+        width: 100% !important;
+        height: 100% !important;
+        border: 0;
+    }
+</style>
 
 <div class="row">
     <div class="col-md-3">
         <div class="box box-gray collapsed-box">
-          <div class="box-header with-border">
-            <a href="#" data-widget="collapse"><h3 class="box-title">Cadastrar novo</h3></a>
-            <div class="box-tools pull-right">
-                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                </button>
-                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+            <div class="box-header with-border">
+                <a href="#" data-widget="collapse"><h3 class="box-title">Cadastrar novo</h3></a>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
+                </div>
             </div>
-          </div>
-          
-          <!-- /.box-header -->
-          <div class="box-body">
-            <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'nRenovaveis'])}}" class="btn btn-block btn-default btn-flat">Licenças Não Renováveis</a>
-            <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'projetosLaudos'])}}" class="btn btn-block btn-default btn-flat">Projetos e Laudos</a>
-            <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'controleCertidoes'])}}" class="btn btn-block btn-default btn-flat">Controle de Certidões</a>
-            <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'controleTaxas'])}}" class="btn btn-block btn-default btn-flat">Controle de Taxas</a>
-            <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'facilitiesRealEstate'])}}" class="btn btn-block btn-default btn-flat">Facilities/Real Estate</a>
-            <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'licencaOperacao'])}}" class="btn btn-block btn-default btn-flat">Licença de Operação</a>
-
-          </div>
-          <!-- /.box-body -->
+            <div class="box-body">
+                <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'nRenovaveis'])}}" class="btn btn-block btn-default btn-flat">Licenças Não Renováveis</a>
+                <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'projetosLaudos'])}}" class="btn btn-block btn-default btn-flat">Projetos e Laudos</a>
+                <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'controleCertidoes'])}}" class="btn btn-block btn-default btn-flat">Controle de Certidões</a>
+                <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'controleTaxas'])}}" class="btn btn-block btn-default btn-flat">Controle de Taxas</a>
+                <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'facilitiesRealEstate'])}}" class="btn btn-block btn-default btn-flat">Facilities/Real Estate</a>
+                <a href="{{route('servicos.create', ['id'=>$dados->id,'t'=>substr($route, 0,7),'tipoServico'=>'licencaOperacao'])}}" class="btn btn-block btn-default btn-flat">Licença de Operação</a>
+            </div>
         </div>
-        <!-- /.box -->
-      </div>
-      <div class="col-md-9">
-        
-            @include('admin.components.widget-arquivos')
-        
-        
-       
+    </div>
+    <div class="col-md-9">
+        @include('admin.components.widget-arquivos')
     </div>
 </div>
 <div class="row">
