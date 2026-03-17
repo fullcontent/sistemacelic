@@ -483,7 +483,7 @@
                         contentHtml += '</div>';
 
                         Swal.fire({
-                            title: `<i class="fa fa-bullhorn text-yellow"></i> Changelog do Sistema <br><small style="font-size: 12px; color: #777;">Atualizado em: ${displayDate}</small>`,
+                            title: `<i class="fa fa-bullhorn text-yellow"></i> Atualizações do Sistema<small>Escrita por uma IA irônica</small>`,
                             html: contentHtml,
                             width: '650px',
                             confirmButtonColor: '#3c8dbc',
