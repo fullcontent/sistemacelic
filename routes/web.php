@@ -147,6 +147,7 @@ Route::prefix('admin')->group(function () {
 	Route::get('/proposta/pdf/{id}', 'PropostasController@printPDF')->name('propostaPDF');
 
 	Route::get('/proposta/revisar/{id}', 'PropostasController@revisar')->name('proposta.revisar');
+	Route::post('/proposta/vendedor/update', 'PropostasController@updateVendedor')->name('proposta.vendedor.update');
 	Route::get('/propostas-list-data', 'PropostasController@listData')->name('proposta.listData');
 
 

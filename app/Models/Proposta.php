@@ -32,14 +32,67 @@ class Proposta extends Model
     }
 
 
-    
-    public function valorTotal()
-        {
-            return $this->servicos->sum('valor');
+    public function vendedor()
+    {
+        return $this->belongsTo('App\User', 'created_by');
+    }
+
+    public function solicitanteObject()
+    {
+        return $this->belongsTo('App\Models\Solicitante', 'solicitante');
+    }
+
+    public function getDiasEmAnaliseAttribute()
+    {
+        $startDate = $this->sent_to_analysis_at ?: $this->created_at;
+        
+        // Se ainda está em análise, calcula até hoje
+        if ($this->status == 'Em análise') {
+            return \Carbon\Carbon::parse($startDate)->diffInDays(\Carbon\Carbon::now());
         }
 
-        public function dadosCastro()
+        // Para outros status, precisamos da data de finalização
+        $endDate = null;
+        if ($this->status == 'Aprovada') {
+            $endDate = $this->approved_at;
+        } elseif ($this->status == 'Recusada') {
+            $endDate = $this->refused_at;
+        }
+        
+        // Fallback para updated_at se não tiver data específica de aprovação/recusa/faturamento/fim
+        if (!$endDate) {
+            $endDate = $this->updated_at;
+        }
+
+        return \Carbon\Carbon::parse($startDate)->diffInDays(\Carbon\Carbon::parse($endDate));
+    }
+
+    public function getIsDataAproximadaAttribute()
     {
-        return $this->belongsTo('App\Models\DadosCastro','dadosCastro_id');
+        // É aproximada se não tiver o marco inicial (sent_to_analysis_at) 
+        // ou se não for 'Em análise' e não tiver o marco final (approved_at/refused_at)
+        if ($this->status == 'Em análise') {
+            return !$this->sent_to_analysis_at;
+        }
+
+        if ($this->status == 'Aprovada') {
+            return !$this->approved_at;
+        }
+
+        if ($this->status == 'Recusada') {
+            return !$this->refused_at;
+        }
+
+        return true; // Para outros status como Revisando/Arquivada sem datas específicas
+    }
+
+    public function valorTotal()
+    {
+        return $this->servicos->sum('valor');
+    }
+
+    public function dadosCastro()
+    {
+        return $this->belongsTo('App\Models\DadosCastro', 'dadosCastro_id');
     }
 }

@@ -13,6 +13,7 @@ use App\Models\Historico;
 use App\Models\ServicoFinanceiro;
 use App\Models\Pendencia;
 use App\Models\Solicitante;
+use App\User;
 use Carbon\Carbon;
 use Auth;
 use Dompdf\Dompdf;
@@ -30,57 +31,83 @@ class PropostasController extends Controller
         $hoje = Carbon::now();
         $periodo = $request->get('periodo', 'todos');
         $statusFiltro = $request->get('status');
+        $vendedorFiltro = $request->get('vendedor');
+        $solicitanteFiltro = $request->get('solicitante');
 
-        $query = Proposta::select(['id', 'proposta', 'empresa_id', 'unidade_id', 'status', 'created_at'])
-            ->addSelect([
-                'valor_total' => \App\Models\PropostaServico::selectRaw('sum(valor)')
-                    ->whereColumn('proposta_id', 'propostas.id')
-            ])
-            ->with([
-                'empresa' => function ($q) {
-                    $q->select('id', 'nomeFantasia');
-                },
-                'unidade' => function ($q) {
-                    $q->select('id', 'nomeFantasia', 'codigo');
-                }
-            ])
-            ->withCount(['servicosFaturados', 'servicosCriados'])
-            ->whereNotIn('empresa_id', [16]);
-
-        // Period Filtering
-        if ($periodo == 'mes_vigente') {
-            $query->whereYear('created_at', $hoje->year)->whereMonth('created_at', $hoje->month);
-        } elseif ($periodo == 'mes_anterior') {
-            $mesAnterior = $hoje->copy()->subMonth();
-            $query->whereYear('created_at', $mesAnterior->year)->whereMonth('created_at', $mesAnterior->month);
-        } elseif ($periodo == 'ano_atual') {
-            $query->whereYear('created_at', $hoje->year);
-        }
-
-        if ($statusFiltro) {
-            $query->where('status', $statusFiltro);
-        }
-
-        // For server-side, we don't need to fetch propostas here anymore.
-        // DataTables will call listData() via AJAX.
         $propostas = collect([]);
 
         // Base query for stats with standard exclusions
         $baseStatsQuery = Proposta::whereNotIn('empresa_id', [16])->where('status', '!=', 'Arquivada');
 
+        $periodoLabel = "Todos os Registros";
+
         // Apply period filtering to stats queries
         if ($periodo == 'mes_vigente') {
             $baseStatsQuery->whereYear('created_at', $hoje->year)->whereMonth('created_at', $hoje->month);
+            $periodoLabel = $hoje->translatedFormat('F Y');
         } elseif ($periodo == 'mes_anterior') {
             $mesAnterior = $hoje->copy()->subMonth();
             $baseStatsQuery->whereYear('created_at', $mesAnterior->year)->whereMonth('created_at', $mesAnterior->month);
+            $periodoLabel = $mesAnterior->translatedFormat('F Y');
+        } elseif (strpos($periodo, 'mes_') === 0) {
+            // Handle historical months (e.g., mes_2024_02)
+            $parts = explode('_', $periodo);
+            if (count($parts) == 3) {
+                $year = $parts[1];
+                $month = $parts[2];
+                $baseStatsQuery->whereYear('created_at', $year)->whereMonth('created_at', $month);
+                $periodoLabel = Carbon::createFromDate($year, $month, 1)->translatedFormat('F Y');
+            }
         } elseif ($periodo == 'ano_atual') {
             $baseStatsQuery->whereYear('created_at', $hoje->year);
+            $periodoLabel = "Ano " . $hoje->year;
         }
 
         $stats = [];
         $stats['elaboracao_count'] = (clone $baseStatsQuery)->where('status', 'Revisando')->count();
-        $stats['analise_count'] = (clone $baseStatsQuery)->where('status', 'Em análise')->count();
+        
+        // Em Análise Stats
+        $analiseQuery = (clone $baseStatsQuery)->where('status', 'Em análise');
+        $stats['analise_count'] = (clone $analiseQuery)->count();
+        
+        $stats['analise_0_7'] = (clone $analiseQuery)
+            ->where(function($q) {
+                $q->where(function($sq) {
+                    $sq->whereNotNull('sent_to_analysis_at')
+                       ->where('sent_to_analysis_at', '>=', now()->subDays(7));
+                })->orWhere(function($sq) {
+                    $sq->whereNull('sent_to_analysis_at')
+                       ->where('created_at', '>=', now()->subDays(7));
+                });
+            })
+            ->count();
+            
+        $stats['analise_8_15'] = (clone $analiseQuery)
+            ->where(function($q) {
+                $q->where(function($sq) {
+                    $sq->whereNotNull('sent_to_analysis_at')
+                       ->where('sent_to_analysis_at', '<', now()->subDays(7))
+                       ->where('sent_to_analysis_at', '>=', now()->subDays(15));
+                })->orWhere(function($sq) {
+                    $sq->whereNull('sent_to_analysis_at')
+                       ->where('created_at', '<', now()->subDays(7))
+                       ->where('created_at', '>=', now()->subDays(15));
+                });
+            })
+            ->count();
+            
+        $stats['analise_15_plus'] = (clone $analiseQuery)
+            ->where(function($q) {
+                $q->where(function($sq) {
+                    $sq->whereNotNull('sent_to_analysis_at')
+                       ->where('sent_to_analysis_at', '<', now()->subDays(15));
+                })->orWhere(function($sq) {
+                    $sq->whereNull('sent_to_analysis_at')
+                       ->where('created_at', '<', now()->subDays(15));
+                });
+            })
+            ->count();
+
         $stats['aprovadas_mes_count'] = (clone $baseStatsQuery)->where('status', 'Aprovada')->count();
         $stats['recusadas_count'] = (clone $baseStatsQuery)->where('status', 'Recusada')->count();
 
@@ -88,12 +115,73 @@ class PropostasController extends Controller
         $totalAprovadasNoPeriodo = $stats['aprovadas_mes_count'];
         $stats['conversao'] = $totalNoPeriodo > 0 ? ($totalAprovadasNoPeriodo / $totalNoPeriodo) * 100 : 0;
 
+        // Conversion Rate Comparison (Last Month)
+        $mesAnterior = $hoje->copy()->subMonth();
+        $baseStatsMesAnterior = Proposta::whereNotIn('empresa_id', [16])
+            ->where('status', '!=', 'Arquivada')
+            ->whereYear('created_at', $mesAnterior->year)
+            ->whereMonth('created_at', $mesAnterior->month);
+            
+        $totalMesAnterior = (clone $baseStatsMesAnterior)->count();
+        $aprovadasMesAnterior = (clone $baseStatsMesAnterior)->where('status', 'Aprovada')->count();
+        $conversaoMesAnterior = $totalMesAnterior > 0 ? ($aprovadasMesAnterior / $totalMesAnterior) * 100 : 0;
+        
+        $stats['conversao_anterior'] = $conversaoMesAnterior;
+        $stats['conversao_diff'] = $stats['conversao'] - $conversaoMesAnterior;
+
+        // Goals Calculation (Constant 120k for now)
+        $stats['meta_valor'] = 120000;
+        
+        // Revenue from approved proposals. 
+        // Rule: If period is 'todos' or 'ano_atual', we show Meta for the current month only.
+        $metaQuery = clone $baseStatsQuery;
+        if ($periodo == 'todos' || $periodo == 'ano_atual') {
+            $metaQuery = Proposta::whereNotIn('empresa_id', [16])
+                ->where('status', '!=', 'Arquivada')
+                ->whereYear('created_at', $hoje->year)
+                ->whereMonth('created_at', $hoje->month);
+            $stats['periodo_label'] = $hoje->translatedFormat('F Y');
+        }
+
+        $idsAprovadas = $metaQuery->where('status', 'Aprovada')->pluck('id');
+        $valorAprovadoPeriodo = \App\Models\PropostaServico::whereIn('proposta_id', $idsAprovadas)->sum('valor');
+            
+        $stats['valor_aprovado'] = $valorAprovadoPeriodo;
+        $stats['meta_percentual'] = $stats['meta_valor'] > 0 ? ($valorAprovadoPeriodo / $stats['meta_valor']) * 100 : 0;
+
         $stats['status_atual'] = $statusFiltro;
         $stats['periodo_atual'] = $periodo;
+        $stats['periodo_label'] = $periodoLabel;
+        $stats['vendedor_atual'] = $vendedorFiltro;
+        $stats['solicitante_atual'] = $solicitanteFiltro;
+
+        // Historical Months (Last 6 months)
+        $mesesFiltro = [];
+        for ($i = 0; $i < 7; $i++) {
+            $date = $hoje->copy()->subMonths($i);
+            $val = "mes_" . $date->year . "_" . $date->month;
+            if ($i == 0) $val = 'mes_vigente';
+            if ($i == 1) $val = 'mes_anterior';
+            
+            $mesesFiltro[$val] = $date->translatedFormat('F Y');
+        }
+
+        // Data for filters
+        $vendedores = User::orderBy('name')->pluck('name', 'id');
+        $users = $vendedores; // For the assign modal
+        $solicitantes = Solicitante::orderBy('nome')->pluck('nome', 'id');
+        $status_list = ['Em análise', 'Aprovada', 'Recusada', 'Arquivada', 'Revisando'];
 
         return view('admin.proposta.lista-propostas')
-            ->with('propostas', $propostas)
-            ->with('stats', $stats);
+            ->with([
+                'propostas' => $propostas,
+                'stats' => $stats,
+                'vendedores' => $vendedores,
+                'users' => $users,
+                'solicitantes' => $solicitantes,
+                'status_list' => $status_list,
+                'meses_filtro' => $mesesFiltro
+            ]);
     }
 
     /**
@@ -135,9 +223,9 @@ class PropostasController extends Controller
         return view('admin.proposta.step2')->with(['proposta' => $proposta, 'propostaServicos' => $propostaServicos]);
     }
 
-    public function step3(Type $var = null)
+    public function step3(Request $request)
     {
-        # code...
+        // Placeholder for step 3 logic if needed
     }
 
 
@@ -151,7 +239,6 @@ class PropostasController extends Controller
         if ($request->proposta_id) {
             $proposta = Proposta::find($request->proposta_id);
 
-
         } else {
 
             $proposta = new Proposta;
@@ -160,6 +247,7 @@ class PropostasController extends Controller
 
             $proposta->unidade_id = $request->unidade_id;
             $proposta->status = "Revisando";
+            $proposta->created_by = Auth::id();
 
 
 
@@ -451,6 +539,7 @@ class PropostasController extends Controller
     {
         $proposta = Proposta::find($id);
         $proposta->status = "Em análise";
+        $proposta->sent_to_analysis_at = now();
         $proposta->save();
 
         return response()->json(['success' => true, 'status' => 200, 'id' => $id]);
@@ -464,6 +553,7 @@ class PropostasController extends Controller
     {
         $proposta = Proposta::find($id);
         $proposta->status = "Recusada";
+        $proposta->refused_at = now();
         $proposta->save();
 
         return response()->json(['success' => true, 'status' => 200, 'id' => $id]);
@@ -484,6 +574,7 @@ class PropostasController extends Controller
 
         $proposta = Proposta::find($id);
         $proposta->status = "Aprovada";
+        $proposta->approved_at = now();
         $proposta->save();
 
         $servicos = array();
@@ -593,7 +684,7 @@ class PropostasController extends Controller
         $parts = explode(' ', $fullName);
 
         // Generate OS name by concatenating first letter of each part.
-        $os = substr($parts[0], 0, 1) . substr($parts[1], 0, 1);
+        $os = mb_substr($parts[0], 0, 1) . mb_substr($parts[1], 0, 1);
 
         // Get latest OS in which string starts with generated $os.
         $lastOS = Servico::where('os', 'like', '%' . $os . '%')->orderBy('os', 'DESC')->value('os');
@@ -604,7 +695,7 @@ class PropostasController extends Controller
         }
 
         // Otherwise, increase the archival number by 1.
-        $number = (int) substr($lastOS, 2) + 1;
+        $number = (int) mb_substr($lastOS, 2) + 1;
         return $os . str_pad($number, 4, "0", STR_PAD_LEFT);
     }
 
@@ -644,40 +735,67 @@ class PropostasController extends Controller
 
     }
 
+    public function updateVendedor(Request $request)
+    {
+        $proposta = Proposta::find($request->proposta_id);
+        if ($proposta) {
+            $proposta->timestamps = false; // Do not update updated_at
+            $proposta->created_by = $request->vendedor_id;
+            $proposta->save();
+            return response()->json(['success' => true, 'message' => 'Vendedor atualizado com sucesso.']);
+        }
+        return response()->json(['success' => false, 'message' => 'Proposta não encontrada.'], 404);
+    }
+
     public function listData(Request $request)
     {
         $hoje = Carbon::now();
         $peri = $request->get('periodo', 'todos');
+        $vendedorFiltro = $request->get('vendedor');
+        $solicitanteFiltro = $request->get('solicitante');
         $statusFiltro = $request->get('status');
 
-        $query = Proposta::select(['propostas.id', 'propostas.proposta', 'propostas.empresa_id', 'propostas.unidade_id', 'propostas.status', 'propostas.created_at'])
+        $query = Proposta::select(['propostas.*'])
             ->addSelect([
                 'valor_total' => \App\Models\PropostaServico::selectRaw('sum(valor)')
                     ->whereColumn('proposta_id', 'propostas.id')
             ])
             ->with([
-                'empresa' => function ($q) {
-                    $q->select('id', 'nomeFantasia');
-                },
-                'unidade' => function ($q) {
-                    $q->select('id', 'nomeFantasia', 'codigo');
-                }
+                'empresa:id,nomeFantasia',
+                'unidade:id,nomeFantasia,codigo',
+                'vendedor:id,name',
             ])
             ->withCount(['servicosFaturados', 'servicosCriados'])
             ->whereNotIn('empresa_id', [16]);
 
-        // Period Filtering (Match index logic)
+        // Period Filtering
         if ($peri == 'mes_vigente') {
             $query->whereYear('propostas.created_at', $hoje->year)->whereMonth('propostas.created_at', $hoje->month);
         } elseif ($peri == 'mes_anterior') {
             $mesAnterior = $hoje->copy()->subMonth();
             $query->whereYear('propostas.created_at', $mesAnterior->year)->whereMonth('propostas.created_at', $mesAnterior->month);
+        } elseif (strpos($peri, 'mes_') === 0) {
+            $parts = explode('_', $peri);
+            if (count($parts) == 3) {
+                $query->whereYear('propostas.created_at', $parts[1])->whereMonth('propostas.created_at', $parts[2]);
+            }
         } elseif ($peri == 'ano_atual') {
             $query->whereYear('propostas.created_at', $hoje->year);
         }
 
-        if ($statusFiltro) {
+        // Status Filter
+        if ($statusFiltro && $statusFiltro != 'Todos') {
             $query->where('propostas.status', $statusFiltro);
+        }
+
+        // User (Seller) Filter
+        if ($vendedorFiltro) {
+            $query->where('propostas.created_by', $vendedorFiltro);
+        }
+
+        // Requester Filter
+        if ($solicitanteFiltro) {
+            $query->where('propostas.solicitante', $solicitanteFiltro);
         }
 
         // Global Search
@@ -691,18 +809,39 @@ class PropostasController extends Controller
                     ->orWhereHas('unidade', function ($sub) use ($search) {
                         $sub->where('nomeFantasia', 'like', "%{$search}%")
                             ->orWhere('codigo', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('vendedor', function ($sub) use ($search) {
+                        $sub->where('name', 'like', "%{$search}%");
                     });
             });
         }
 
         $recordsFiltered = (clone $query)->count();
 
-        // Ordering (Columns index mapping from blade)
-        // 0: ID, 1: Empresa/Unidade, 2: Total, 3: Status, 4: Invoicing, 5: Actions
-        $columns = ['propostas.id', 'propostas.empresa_id', 'valor_total', 'propostas.status', 'propostas.created_at'];
+        // Ordering
+        // Mapping from Blade table structure: 
+        // 0: ID, 1: Vendedor, 2: Cliente/Unidade, 3: Solicitante, 4: Total, 5: Status, 6: Dias em Análise, 7: Faturamento, 8: Actions
+        $columns = [
+            0 => 'propostas.id',
+            1 => 'users.name',
+            2 => 'empresas.nomeFantasia',
+            3 => 'propostas.solicitante', // If it's IDs, we'd need another join
+            4 => 'valor_total',
+            5 => 'propostas.status',
+            6 => 'propostas.updated_at',
+            7 => 'propostas.created_at'
+        ];
+        
         $orderColumnIndex = $request->input('order.0.column', 0);
         $orderDir = $request->input('order.0.dir', 'desc');
         $orderField = $columns[$orderColumnIndex] ?? 'propostas.created_at';
+
+        // Add joins only for ordering if needed
+        if ($orderColumnIndex == 1) {
+            $query->leftJoin('users', 'propostas.created_by', '=', 'users.id');
+        } elseif ($orderColumnIndex == 2) {
+            $query->leftJoin('empresas', 'propostas.empresa_id', '=', 'empresas.id');
+        }
 
         $query->orderBy($orderField, $orderDir);
 
@@ -714,20 +853,44 @@ class PropostasController extends Controller
 
         // Format data for response
         $data = $propostas->map(function ($p) {
-            // Replicate the badge logic from blade to return as formatted strings or needed values
-            // Alternatively, return raw values and handle formatting in DataTables 'render' property
+            $dias = $p->dias_em_analise;
+            $cor = 'green';
+            if ($dias > 15) $cor = 'red';
+            elseif ($dias >= 8) $cor = 'orange';
+
+            // Resolve solicitante name if it's an ID
+            $solicitanteName = 'N/A';
+            if ($p->solicitante) {
+                if (is_numeric($p->solicitante)) {
+                    $sol = \App\Models\Solicitante::find($p->solicitante);
+                    $solicitanteName = $sol->nome ?? 'N/A';
+                } else {
+                    $solicitanteName = $p->solicitante;
+                }
+            }
+
+            $vendedor_nome = $p->vendedor->name ?? '';
+            if ($vendedor_nome == 'Sistema') $vendedor_nome = '';
+
             return [
                 'id' => $p->id,
                 'proposta' => $p->proposta,
+                'vendedor_nome' => $vendedor_nome,
                 'empresa_nome' => $p->empresa->nomeFantasia ?? 'N/A',
                 'unidade_nome' => $p->unidade->nomeFantasia ?? '',
                 'unidade_codigo' => $p->unidade->codigo ?? '',
-                'valor_total' => number_format($p->valor_total, 2, ',', '.'),
+                'solicitante_nome' => $solicitanteName,
+                'valor_total' => number_format($p->valorTotal(), 2, ',', '.'),
                 'status' => $p->status,
-                'servicosFaturados_count' => $p->servicosFaturados_count,
-                'servicosCriados_count' => $p->servicosCriados_count,
+                'dias_analise' => $dias,
+                'dias_analise_cor' => $cor,
+                'is_data_aproximada' => $p->is_data_aproximada,
+                'approved_at' => ($p->status == 'Aprovada') ? \Carbon\Carbon::parse($p->approved_at ?: $p->updated_at)->format('d/m/Y') : null,
+                'refused_at' => ($p->status == 'Recusada') ? \Carbon\Carbon::parse($p->refused_at ?: $p->updated_at)->format('d/m/Y') : null,
+                'finalized_at' => in_array($p->status, ['Arquivada', 'Revisando']) ? \Carbon\Carbon::parse($p->updated_at)->format('d/m/Y') : null,
+                'servicos_faturados_count' => $p->servicos_faturados_count,
+                'servicos_criados_count' => $p->servicos_criados_count,
                 'created_at' => $p->created_at->format('d/m/Y'),
-                // Action URLs
                 'edit_url' => route('proposta.edit', $p->id),
                 'pdf_url' => route('propostaPDF', $p->id),
                 'remove_url' => route('removerProposta', $p->id),
