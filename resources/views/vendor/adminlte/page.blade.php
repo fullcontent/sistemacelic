@@ -503,7 +503,8 @@
             });
         });
     </script>
-    
+        @include('adminlte::partials.chat-widget')
+
     @stack('js')
     @yield('js')
 @stop
