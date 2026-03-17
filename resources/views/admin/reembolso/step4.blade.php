@@ -47,7 +47,7 @@
                 <td>{{$s->unidade->codigo}}</td>
                 <td>{{$s->unidade->nomeFantasia}}</td>
                 <td>{{$s->servico->nome}}</td>
-                <td>{{$s->nome}}</td>
+                <td><a href="{{route('taxas.show', $s->id)}}" target="_blank">{{$s->nome}}</a></td>
                 <td>@if(!is_numeric($s->servico->solicitante))
                   {{$s->servico->solicitante}}
                 @else
