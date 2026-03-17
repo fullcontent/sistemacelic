@@ -123,7 +123,12 @@
 
         <ul class="nav navbar-nav">
 
-
+          <!-- CHANGELOG DO SISTEMA -->
+          <li class="notifications-menu">
+            <a href="#" id="changelogBtn" title="Novidades do Sistema">
+              <i class="fa fa-history"></i>
+            </a>
+          </li>
 
                      <!-- MENÇOES DO USUARIO -->
         <li class="dropdown notifications-menu">
@@ -347,6 +352,155 @@
             $.get('/markAsRead', {'notif_id': notif_id}, function (data) {
                 window.location.href = targetHref;
             }, 'json');
+        });
+
+        // Funcionalidade do Changelog
+        $(document).ready(function() {
+            $('#changelogBtn').on('click', function(e) {
+                e.preventDefault();
+                
+                const funMessages = [
+                    "Sacrificando noites de sono e litros de café para trazer novidades...",
+                    "Buscando atualizações feitas sob a luz da lua e muita cafeína...",
+                    "Carregando código escrito enquanto os pássaros já começavam a cantar...",
+                    "Transformando cafeína em melhorias para você. Aguarde...",
+                    "Compilando novidades preparadas nas madrugadas mais produtivas...",
+                    "Interceptando pacotes de código enviados do futuro (ou de uma madrugada longa)...",
+                    "Ajustando os últimos pixels enquanto o sol ameaça aparecer no horizonte...",
+                    "Lutando contra o sono e bugs noturnos para entregar essa atualização..."
+                ];
+                const randomMessage = funMessages[Math.floor(Math.random() * funMessages.length)];
+
+                Swal.fire({
+                    title: randomMessage,
+                    allowOutsideClick: false,
+                    onBeforeOpen: () => { Swal.showLoading(); }
+                });
+
+                const webhookUrl = 'https://n8n.srv1477025.hstgr.cloud/webhook/d003ad03-43ca-43ff-af8d-d7baaa195eb6';
+                
+                fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        request_time: new Date().toISOString(),
+                        action: 'get_changelog'
+                    })
+                })
+                    .then(res => {
+                        if (!res.ok) throw new Error('Erro na resposta do servidor: ' + res.status);
+                        return res.text(); // Pega como texto primeiro para evitar erro de JSON vazio
+                    })
+                    .then(text => {
+                        console.log('Raw response:', text);
+                        
+                        if (!text || text.trim() === "" || text === "Workflow started") {
+                            // Se for n8n em modo teste, às vezes ele retorna apenas um texto de confirmação
+                            // ou vazio se não houver resposta imediata configurada
+                            throw new Error('O webhook respondeu com sucesso, mas não enviou dados. Certifique-se de que o workflow do n8n termina com um nó de "Respond to Webhook".');
+                        }
+
+                        let data;
+                        try {
+                            data = JSON.parse(text);
+                        } catch (e) {
+                            throw new Error('A resposta do servidor não é um JSON válido: ' + text.substring(0, 100));
+                        }
+                        
+                        console.log('Parsed data:', data);
+                        
+                        let contentHtml = '<div style="text-align: left; font-family: \'Source Sans Pro\', sans-serif; max-height: 400px; overflow-y: auto;">';
+                        
+                        // Robustez para diferentes formatos de JSON (incluindo o novo formato com 'output')
+                        let updates = [];
+                        let sourceData = data;
+                        
+                        // Lidar com array envolvente [ { output: ... } ]
+                        if (Array.isArray(data) && data.length > 0) {
+                            sourceData = data[0];
+                        }
+                        
+                        // Lidar com campo 'output' aninhado
+                        if (sourceData.output) {
+                            sourceData = sourceData.output;
+                        }
+
+                        if (Array.isArray(sourceData)) {
+                            updates = sourceData;
+                        } else if (sourceData.changelog && Array.isArray(sourceData.changelog)) {
+                            updates = sourceData.changelog;
+                        } else if (sourceData.updates && Array.isArray(sourceData.updates)) {
+                            updates = sourceData.updates;
+                        } else if (typeof sourceData === 'object' && sourceData !== null) {
+                            // Se for apenas um objeto com mensagem de erro do n8n
+                            if (sourceData.message && sourceData.message.includes('not registered')) {
+                                throw new Error('O webhook de teste não está ativo no n8n.');
+                            }
+                            updates = [sourceData];
+                        }
+                        
+                        if (updates.length > 0 && updates[0] !== null) {
+                            updates.forEach((item, index) => {
+                                let title, description, date;
+                                
+                                if (typeof item === 'string') {
+                                    title = `Item ${index + 1}`;
+                                    description = item;
+                                    date = '';
+                                } else {
+                                    title = item.titulo || item.title || item.header || 'Nova Atualização';
+                                    description = item.descricao || item.description || item.texto || item.output || JSON.stringify(item);
+                                    date = item.updated_at || item.data || item.date || item.timestamp || '';
+                                }
+
+                                contentHtml += `
+                                    <div style="margin-bottom: 15px; border-left: 5px solid #f39c12; padding-left: 15px; padding-bottom: 10px; background: #fff; padding-top: 10px; border-radius: 0 4px 4px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-top: 1px solid #eee; border-right: 1px solid #eee;">
+                                        <div style="font-weight: bold; color: #333; font-size: 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f4f4f4; padding-bottom: 5px; margin-bottom: 8px;">
+                                            <span><i class="fa fa-caret-right text-orange"></i> ${title}</span>
+                                            ${date ? `<small class="label label-default" style="font-size: 10px;">${date}</small>` : ''}
+                                        </div>
+                                        <div style="color: #555; font-size: 13px; line-height: 1.6;">
+                                            ${description}
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                        } else {
+                            contentHtml += `
+                                <div style="text-align: center; padding: 20px; color: #777;">
+                                    <i class="fa fa-info-circle" style="font-size: 30px; margin-bottom: 10px; color: #ddd;"></i>
+                                    <p>Nenhuma atualização encontrada na última semana.</p>
+                                </div>
+                            `;
+                        }
+                        
+                        // Extrai a data global do JSON se existir, ou do primeiro item
+                        const globalDate = sourceData.date || sourceData.data || sourceData.last_update || (updates.length > 0 ? (updates[0].date || updates[0].data) : null);
+                        const displayDate = globalDate || new Date().toLocaleDateString('pt-BR');
+                        
+                        contentHtml += '</div>';
+
+                        Swal.fire({
+                            title: `<i class="fa fa-bullhorn text-yellow"></i> Changelog do Sistema <br><small style="font-size: 12px; color: #777;">Atualizado em: ${displayDate}</small>`,
+                            html: contentHtml,
+                            width: '650px',
+                            confirmButtonColor: '#3c8dbc',
+                            confirmButtonText: 'FECHAR',
+                            type: 'info'
+                        });
+                    })
+                    .catch(err => {
+                        console.error('Erro ao buscar changelog:', err);
+                        Swal.fire({
+                            title: 'Ops!',
+                            text: err.message || 'Não foi possível carregar as atualizações. Verifique se o webhook do n8n está ativo.',
+                            type: 'warning',
+                            confirmButtonColor: '#f39c12'
+                        });
+                    });
+            });
         });
     </script>
     
