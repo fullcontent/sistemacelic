@@ -65,45 +65,45 @@ class PropostasController extends Controller
 
         $stats = [];
         $stats['elaboracao_count'] = (clone $baseStatsQuery)->where('status', 'Revisando')->count();
-        
+
         // Em Análise Stats
         $analiseQuery = (clone $baseStatsQuery)->where('status', 'Em análise');
         $stats['analise_count'] = (clone $analiseQuery)->count();
-        
+
         $stats['analise_0_7'] = (clone $analiseQuery)
-            ->where(function($q) {
-                $q->where(function($sq) {
+            ->where(function ($q) {
+                $q->where(function ($sq) {
                     $sq->whereNotNull('sent_to_analysis_at')
-                       ->where('sent_to_analysis_at', '>=', now()->subDays(7));
-                })->orWhere(function($sq) {
+                        ->where('sent_to_analysis_at', '>=', now()->subDays(7));
+                })->orWhere(function ($sq) {
                     $sq->whereNull('sent_to_analysis_at')
-                       ->where('created_at', '>=', now()->subDays(7));
+                        ->where('created_at', '>=', now()->subDays(7));
                 });
             })
             ->count();
-            
+
         $stats['analise_8_15'] = (clone $analiseQuery)
-            ->where(function($q) {
-                $q->where(function($sq) {
+            ->where(function ($q) {
+                $q->where(function ($sq) {
                     $sq->whereNotNull('sent_to_analysis_at')
-                       ->where('sent_to_analysis_at', '<', now()->subDays(7))
-                       ->where('sent_to_analysis_at', '>=', now()->subDays(15));
-                })->orWhere(function($sq) {
+                        ->where('sent_to_analysis_at', '<', now()->subDays(7))
+                        ->where('sent_to_analysis_at', '>=', now()->subDays(15));
+                })->orWhere(function ($sq) {
                     $sq->whereNull('sent_to_analysis_at')
-                       ->where('created_at', '<', now()->subDays(7))
-                       ->where('created_at', '>=', now()->subDays(15));
+                        ->where('created_at', '<', now()->subDays(7))
+                        ->where('created_at', '>=', now()->subDays(15));
                 });
             })
             ->count();
-            
+
         $stats['analise_15_plus'] = (clone $analiseQuery)
-            ->where(function($q) {
-                $q->where(function($sq) {
+            ->where(function ($q) {
+                $q->where(function ($sq) {
                     $sq->whereNotNull('sent_to_analysis_at')
-                       ->where('sent_to_analysis_at', '<', now()->subDays(15));
-                })->orWhere(function($sq) {
+                        ->where('sent_to_analysis_at', '<', now()->subDays(15));
+                })->orWhere(function ($sq) {
                     $sq->whereNull('sent_to_analysis_at')
-                       ->where('created_at', '<', now()->subDays(15));
+                        ->where('created_at', '<', now()->subDays(15));
                 });
             })
             ->count();
@@ -121,17 +121,17 @@ class PropostasController extends Controller
             ->where('status', '!=', 'Arquivada')
             ->whereYear('created_at', $mesAnterior->year)
             ->whereMonth('created_at', $mesAnterior->month);
-            
+
         $totalMesAnterior = (clone $baseStatsMesAnterior)->count();
         $aprovadasMesAnterior = (clone $baseStatsMesAnterior)->where('status', 'Aprovada')->count();
         $conversaoMesAnterior = $totalMesAnterior > 0 ? ($aprovadasMesAnterior / $totalMesAnterior) * 100 : 0;
-        
+
         $stats['conversao_anterior'] = $conversaoMesAnterior;
         $stats['conversao_diff'] = $stats['conversao'] - $conversaoMesAnterior;
 
         // Goals Calculation (Constant 120k for now)
-        $stats['meta_valor'] = 120000;
-        
+        $stats['meta_valor'] = 175000;
+
         // Revenue from approved proposals. 
         // Rule: If period is 'todos' or 'ano_atual', we show Meta for the current month only.
         $metaQuery = clone $baseStatsQuery;
@@ -145,7 +145,7 @@ class PropostasController extends Controller
 
         $idsAprovadas = $metaQuery->where('status', 'Aprovada')->pluck('id');
         $valorAprovadoPeriodo = \App\Models\PropostaServico::whereIn('proposta_id', $idsAprovadas)->sum('valor');
-            
+
         $stats['valor_aprovado'] = $valorAprovadoPeriodo;
         $stats['meta_percentual'] = $stats['meta_valor'] > 0 ? ($valorAprovadoPeriodo / $stats['meta_valor']) * 100 : 0;
 
@@ -160,9 +160,11 @@ class PropostasController extends Controller
         for ($i = 0; $i < 7; $i++) {
             $date = $hoje->copy()->subMonths($i);
             $val = "mes_" . $date->year . "_" . $date->month;
-            if ($i == 0) $val = 'mes_vigente';
-            if ($i == 1) $val = 'mes_anterior';
-            
+            if ($i == 0)
+                $val = 'mes_vigente';
+            if ($i == 1)
+                $val = 'mes_anterior';
+
             $mesesFiltro[$val] = $date->translatedFormat('F Y');
         }
 
@@ -831,7 +833,7 @@ class PropostasController extends Controller
             6 => 'propostas.updated_at',
             7 => 'propostas.created_at'
         ];
-        
+
         $orderColumnIndex = $request->input('order.0.column', 0);
         $orderDir = $request->input('order.0.dir', 'desc');
         $orderField = $columns[$orderColumnIndex] ?? 'propostas.created_at';
@@ -855,8 +857,10 @@ class PropostasController extends Controller
         $data = $propostas->map(function ($p) {
             $dias = $p->dias_em_analise;
             $cor = 'green';
-            if ($dias > 15) $cor = 'red';
-            elseif ($dias >= 8) $cor = 'orange';
+            if ($dias > 15)
+                $cor = 'red';
+            elseif ($dias >= 8)
+                $cor = 'orange';
 
             // Resolve solicitante name if it's an ID
             $solicitanteName = 'N/A';
@@ -870,7 +874,8 @@ class PropostasController extends Controller
             }
 
             $vendedor_nome = $p->vendedor->name ?? '';
-            if ($vendedor_nome == 'Sistema') $vendedor_nome = '';
+            if ($vendedor_nome == 'Sistema')
+                $vendedor_nome = '';
 
             return [
                 'id' => $p->id,
