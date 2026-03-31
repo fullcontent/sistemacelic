@@ -732,7 +732,7 @@ class ServicosController extends Controller
                     'pendencias' => $servico->pendencias,
                     'arquivo' => 'servico',
                     'usuarios' => User::pluck('name', 'id')->toArray(),
-                    'ordensCompra' => $servico->ordensCompra,
+                    'ordensServico' => $servico->ordensServico,
 
                 ]);
 
@@ -765,7 +765,7 @@ class ServicosController extends Controller
             'pendencias',
             'arquivos',
             'faturamento',
-            'ordensCompra',
+            'ordensServico',
             'financeiro',
             'responsavel',
             'coresponsavel',
@@ -1443,5 +1443,88 @@ class ServicosController extends Controller
         return redirect()->route('servicos.show', $servico->id);
     }
 
+    public function timelineView($id)
+    {
+        $servico = Servico::find($id);
+        if (!$servico) abort(404);
+        return view('admin.timeline-view')->with('servico', $servico);
+    }
 
+    private function categorizarEvento($item) 
+    {
+        // Check if it's a Pendencia or Taxa (Taxa doesn't have pendencia field directly, usually has 'nome')
+        $texto = strtolower(($item->pendencia ?? ($item->nome ?? '')) . ' ' . ($item->observacoes ?? ''));
+
+        // REGRA 1: Órgão Público (Baseado em keywords e entidades)
+        if (preg_match('/(órgão|prefeitura|semmas|danc|viabilidade|protocolo|análise interna)/i', $texto)) {
+            return [
+                'frente' => 'Orgao',
+                'responsavel' => 'Órgão Competente',
+                'cor' => 'orange'
+            ];
+        }
+
+        // REGRA 2: Cliente (Baseado no tipo de responsabilidade no banco)
+        if (isset($item->responsavel_tipo) && $item->responsavel_tipo === 'cliente') {
+            return [
+                'frente' => 'Cliente',
+                'responsavel' => 'Cliente / Solicitante',
+                'cor' => 'green'
+            ];
+        }
+
+        // REGRA 3: Castro (Default para o que sobra ou é marcado como usuario/op)
+        $responsavelNome = $item->responsavel->name ?? 'Equipe Castro';
+
+        return [
+            'frente' => 'Castro',
+            'responsavel' => $responsavelNome,
+            'cor' => 'blue'
+        ];
+    }
+
+    public function timelineData($id)
+    {
+        $servico = Servico::with(['pendencias.responsavel', 'taxas'])->find($id);
+        if (!$servico) return response()->json(['error' => 'Not found'], 404);
+
+        $todosEventos = collect();
+
+        // Adiciona as pendências como marcos principais
+        foreach ($servico->pendencias as $p) {
+            $meta = $this->categorizarEvento($p);
+            $createdAt = \Carbon\Carbon::parse($p->created_at);
+            $updatedAt = $p->status === 'concluido' ? \Carbon\Carbon::parse($p->updated_at) : now();
+
+            $todosEventos->push([
+                'data' => $p->created_at,
+                'etapa' => $p->pendencia,
+                'stakeholder' => $meta['responsavel'],
+                'frente' => $meta['frente'],
+                'dias' => $createdAt->diffInDays($updatedAt),
+                'cor' => $meta['cor'],
+                'status' => $p->status === "concluido" ? "Concluído" : "Em andamento",
+                'observacoes' => strip_tags($p->observacoes ?? ""),
+                'data_conclusao' => $p->status === "concluido" ? $updatedAt->format('d/m/Y') : null
+            ]);
+        }
+
+        // Adiciona as taxas como eventos de custo na timeline
+        foreach ($servico->taxas as $t) {
+            $dataEvento = $t->pagamento ?? $t->created_at;
+            $todosEventos->push([
+                'data' => $dataEvento,
+                'etapa' => "Pagamento: " . $t->nome,
+                'stakeholder' => 'Financeiro',
+                'frente' => 'Castro',
+                'dias' => 0,
+                'cor' => 'blue',
+                'status' => 'pago',
+                'observacoes' => "Valor: R$ " . number_format($t->valor, 2, ',', '.'),
+                'data_conclusao' => \Carbon\Carbon::parse($dataEvento)->format('d/m/Y')
+            ]);
+        }
+
+        return $todosEventos->sortBy('data')->values();
+    }
 }

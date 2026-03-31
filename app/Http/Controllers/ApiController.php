@@ -604,7 +604,7 @@ class ApiController extends Controller
             'pendencias',
             'arquivos',
             'faturamento',
-            'ordensCompra',
+            'ordensServico',
             'financeiro',
             'responsavel',
             'coresponsavel',

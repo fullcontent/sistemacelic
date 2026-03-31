@@ -89,9 +89,9 @@ Route::prefix('admin')->group(function () {
 
 
 
-	Route::resource('/ordemCompra', 'OrdemCompraController');
-
-	Route::get('/ordemCompra/{servico_id}/create', 'OrdemCompraController@create')->name('ordemCompra.criar');
+	Route::resource('/ordemServico', 'OrdemServicoController');
+	Route::get('/ordemServico-list-data', 'OrdemServicoController@listData')->name('ordemServico.listData');
+	Route::get('/ordemServico/{servico_id}/create', 'OrdemServicoController@create')->name('ordemServico.criar');
 
 	Route::resource('/solicitantes', 'SolicitantesController');
 
@@ -251,6 +251,8 @@ Route::prefix('admin')->group(function () {
 	Route::get('/servico/{id}/interacoes', 'ServicosController@interacoes')->name('interacoes.lista');
 
 	Route::get('/servico/{id}/timeline', 'ServicosController@timeline')->name('timeline');
+	Route::get('/servico/{id}/timeline-new', 'ServicosController@timelineView')->name('timeline.new');
+	Route::get('/api/servico/{id}/timeline', 'ServicosController@timelineData')->name('api.servico.timeline');
 
 
 	Route::get('/users/list', 'UsersController@usersList')->name('users.list');

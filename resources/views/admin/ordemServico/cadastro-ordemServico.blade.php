@@ -9,17 +9,17 @@
 	<div class="box box-primary">
 	
 	<div class="box-header with-border">
-		<h3 class="box-title">Nova ordem de compra</h3>
+		<h3 class="box-title">Nova ordem de serviço</h3>
 	</div>
 
 	
 
-	{!! Form::open(['route'=>'ordemCompra.store','enctype'=>'multipart/form-data']) !!}
+	{!! Form::open(['route'=>'ordemServico.store','enctype'=>'multipart/form-data']) !!}
 
-	@include('admin.ordemCompra.form-ordemCompra')
+	@include('admin.ordemServico.form-ordemServico')
 	
       			<div class="box-footer">
-      			<a href="{{route('ordemCompra.index')}}" class="btn btn-default">Voltar</a>
+      			<a href="{{route('ordemServico.index')}}" class="btn btn-default">Voltar</a>
                 
                 <button type="submit" class="btn btn-info"><i class="fa fa-save"></i> Salvar</button>
               	</div>

@@ -147,9 +147,9 @@ class Servico extends Model
         return $this->hasOne('App\Models\Solicitante','id','solicitante');
     }
 
-    public function ordensCompra()
+    public function ordensServico()
     {
-        return $this->hasMany('App\Models\OrdemCompra','servico_id');
+        return $this->hasMany('App\Models\OrdemServico','servico_id');
     }
 
     public function scopePorUsuario($query, $userId)

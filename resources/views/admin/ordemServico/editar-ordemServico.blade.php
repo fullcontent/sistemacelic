@@ -7,14 +7,14 @@
 	<div class="box box-primary">
 	
 	<div class="box-header with-border">
-		<h3 class="box-title">Editar Ordem de Compra</h3>
+		<h3 class="box-title">Editar Ordem de Serviço</h3>
 	</div>
 
 	
 	
-	{!! Form::model($ordemCompra,['route'=>['ordemCompra.update', $ordemCompra->id],'method'=>'PUT', 'enctype'=>'multipart/form-data']) !!}
+	{!! Form::model($ordemServico,['route'=>['ordemServico.update', $ordemServico->id],'method'=>'PUT', 'enctype'=>'multipart/form-data']) !!}
 
-	@include('admin.ordemCompra.form-ordemCompra')
+	@include('admin.ordemServico.form-ordemServico')
 
 				<div class="box-footer">
                 <button type="submit" class="btn btn-default">Voltar</button>

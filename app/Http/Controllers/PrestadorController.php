@@ -18,7 +18,7 @@ class PrestadorController extends Controller
     {
         $prestadores = Prestador::all();
 
-        return view('admin.prestadores.lista-prestadores')->with('prestadores',$prestadores);
+        return view('admin.prestadores.lista-prestadores')->with('prestadores', $prestadores);
     }
 
     /**
@@ -39,22 +39,22 @@ class PrestadorController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {   
+    {
 
 
-       
-        
+
+
         $prestador = new Prestador();
         $prestador->nome = $request->nome;
         $prestador->cnpj = $request->cnpj;
         $prestador->qualificacao = $request->qualificacao;
         $prestador->telefone = $request->telefone;
         $prestador->email = $request->email;
-        
-       $prestador->ufAtuacao = $request->ufAtuacao;
-       $prestador->cidadeAtuacao = json_encode($request->cidadeAtuacao);
-       
-        
+
+        $prestador->ufAtuacao = $request->ufAtuacao;
+        $prestador->cidadeAtuacao = json_encode($request->cidadeAtuacao);
+
+
         $prestador->chavePix = $request->input('chavePix');
         $prestador->tipoChave = $request->input('tipoChave');
         $prestador->banco = $request->input('banco');
@@ -66,14 +66,14 @@ class PrestadorController extends Controller
         $prestador->cnpjVinculado = $request->input('cnpjVinculado');
         $prestador->razaoSocial = $request->input('razaoSocial');
         $prestador->obs = $request->input('obs');
-    
-        
+
+
         $prestador->save();
         // return $prestador;
-        
+
         return redirect()->route('prestador.index')->with('success', 'Item created successfully.');
 
-        
+
 
     }
 
@@ -97,10 +97,10 @@ class PrestadorController extends Controller
      */
     public function edit($id)
     {
-        
+
         $prestador = Prestador::find($id);
 
-        return view('admin.prestadores.editar-prestador')->with('prestador',$prestador);
+        return view('admin.prestadores.editar-prestador')->with('prestador', $prestador);
 
     }
 
@@ -113,7 +113,7 @@ class PrestadorController extends Controller
      */
     public function update(Request $request, $id)
     {
-    
+
         $prestador = Prestador::find($id);
 
         $prestador->nome = $request->nome;
@@ -121,11 +121,11 @@ class PrestadorController extends Controller
         $prestador->qualificacao = $request->qualificacao;
         $prestador->telefone = $request->telefone;
         $prestador->email = $request->email;
-        
+
         $prestador->cidadeAtuacao = json_encode($request->cidadeAtuacao);
         $prestador->ufAtuacao = $request->ufAtuacao;
-       
-        
+
+
         $prestador->chavePix = $request->input('chavePix');
         $prestador->tipoChave = $request->input('tipoChave');
         $prestador->banco = $request->input('banco');
@@ -140,7 +140,7 @@ class PrestadorController extends Controller
 
         $prestador->save();
 
-        
+
 
 
 
@@ -165,25 +165,25 @@ class PrestadorController extends Controller
 
     public function rate(Request $request)
     {
-       
-       
-       $prestador = Prestador::find($request->prestador_id);
 
-       $prestadorComentario = new PrestadorComentario();
-       $prestadorComentario->prestador_id = $request->prestador_id;
-       $prestadorComentario->ordemCompra_id = $request->ordemCompra_id;
-       $prestadorComentario->rating = $request->rating;
-       $prestadorComentario->comentario = $request->comentario;
-       $prestadorComentario->user_id = Auth::id();
-       $prestadorComentario->save();
 
-       return redirect()->route('ordemCompra.index')->with('success', 'Avaliacao feita!');
+        $prestador = Prestador::find($request->prestador_id);
+
+        $prestadorComentario = new PrestadorComentario();
+        $prestadorComentario->prestador_id = $request->prestador_id;
+        $prestadorComentario->ordemServico_id = $request->ordemServico_id;
+        $prestadorComentario->rating = $request->rating;
+        $prestadorComentario->comentario = $request->comentario;
+        $prestadorComentario->user_id = Auth::id();
+        $prestadorComentario->save();
+
+        return redirect()->route('ordemServico.index')->with('success', 'Avaliacao feita!');
     }
 
 
     public function ratings(Request $request)
     {
-        $data = PrestadorComentario::where('prestador_id',$request->prestador_id)->where('ordemCompra_id',$request->ordemCompra_id)->with('prestador','user','ordemCompra','ordemCompra.servicoPrincipal')->get();
+        $data = PrestadorComentario::where('prestador_id', $request->prestador_id)->where('ordemServico_id', $request->ordemServico_id)->with('prestador', 'user', 'ordemServico', 'ordemServico.servicoPrincipal')->get();
         return response()->json($data);
     }
 }

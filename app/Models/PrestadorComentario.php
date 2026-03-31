@@ -11,19 +11,19 @@ class PrestadorComentario extends Model
         return $this->belongsTo('App\Models\Prestador');
     }
 
-    public function ordemCompra()
+    public function ordemServico()
     {
-        return $this->belongsTo('App\Models\OrdemCompra','ordemCompra_id');
+        return $this->belongsTo('App\Models\OrdemServico','ordemServico_id');
     }
 
     public function servico()
     {
         return $this->hasOneThrough(
             'App\Models\Servico',
-            'App\Models\OrdemCompra',
+            'App\Models\OrdemServico',
             'servico_id', // Foreign key on the cars table...
             'id', // Foreign key on the owners table...
-            'ordemCompra_id', // Local key on the mechanics table...
+            'ordemServico_id', // Local key on the mechanics table...
             'id' // Local key on the cars table...
         );
 

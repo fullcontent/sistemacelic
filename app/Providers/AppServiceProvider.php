@@ -192,8 +192,8 @@ class AppServiceProvider extends ServiceProvider
                             'icon' => 'fa fa-newspaper',
                             ],
                             [
-                                'text' => 'Ordens de Compra',
-                                'url' => ''.Auth::user()->privileges.'/ordemCompra',
+                                'text' => 'Ordens de Serviço',
+                                'url' => ''.Auth::user()->privileges.'/ordemServico',
                                 'icon' => 'fa fa-credit-card',
                                 ],
                                 [

@@ -10,8 +10,8 @@
 
             
 
-            @if(Route::is('ordemCompra.edit'))
-            {!! Form::select('prestador_id', $prestadores, optional($ordemCompra->prestador)->id, ['class'=>'form-control']) !!}
+            @if(Route::is('ordemServico.edit'))
+            {!! Form::select('prestador_id', $prestadores, optional($ordemServico->prestador)->id, ['class'=>'form-control']) !!}
 
             @else
             {!! Form::select('prestador_id', $prestadores, null, ['class'=>'form-control']) !!}
@@ -39,8 +39,8 @@
         <div class="form-group">
             {!! Form::label('telefone', 'Telefone') !!}
 
-            @if(Route::is('ordemCompra.edit'))
-            {!! Form::text('telefone', optional($ordemCompra->prestador)->telefone, ['class'=>'form-control']) !!}
+            @if(Route::is('ordemServico.edit'))
+            {!! Form::text('telefone', optional($ordemServico->prestador)->telefone, ['class'=>'form-control']) !!}
             @else
             {!! Form::text('telefone', null, ['class'=>'form-control']) !!}
             @endif
@@ -50,8 +50,8 @@
 
 
     
-    @if(Route::is('ordemCompra.edit') && $ordemCompra->pagamentos->count() > 0)
-        @foreach($ordemCompra->pagamentos as $index => $pagamento)
+    @if(Route::is('ordemServico.edit') && $ordemServico->pagamentos->count() > 0)
+        @foreach($ordemServico->pagamentos as $index => $pagamento)
         <div class="col-md-12 parcela-edit" id="parcela_{{$index}}" data-id="{{$index + 1}}">
             <div class="form-group">
                 <div class="col-md-2">
@@ -177,14 +177,14 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         {!! Form::label('servicoPrincipal_valor', 'Valor') !!}
-                        {!! Form::text('servicoPrincipal_valor', Route::is('ordemCompra.edit') ? $vinculoPrincipal->valor : null, ['class'=>'form-control']) !!}
+                        {!! Form::text('servicoPrincipal_valor', Route::is('ordemServico.edit') ? optional($vinculoPrincipal)->valor : null, ['class'=>'form-control']) !!}
                     </div>
                 </div>
 
                 <div class="col-md-1">
                     <div class="form-group">
                         {!! Form::label('servicoPrincipal_reembolso', 'reembolso') !!}
-                        {!! Form::select('servicoPrincipal_reembolso', ['nao'=>'Não','sim'=>'Sim'] , Route::is('ordemCompra.edit') ? $vinculoPrincipal->reembolso : null, ['class'=>'form-control','id'=>'servicoPrincipal_reembolso']) !!}
+                        {!! Form::select('servicoPrincipal_reembolso', ['nao'=>'Não','sim'=>'Sim'] , Route::is('ordemServico.edit') ? optional($vinculoPrincipal)->reembolso : null, ['class'=>'form-control','id'=>'servicoPrincipal_reembolso']) !!}
                     </div>
                 </div>
 
@@ -229,7 +229,7 @@
 
 
         <div id="clonedDivsContainer">
-            @if(Route::is('ordemCompra.edit'))
+            @if(Route::is('ordemServico.edit'))
                 @foreach($vinculoOutros as $vinculo)
                 <div class="col-md-12 servicoVinculado-edit" id="servicoVinculado_{{$vinculo->id}}">
                     <div class="form-group">
@@ -454,6 +454,7 @@ $(document).ready(function () {
 
   
   
+  
 
 
   $('#prestador_id').select2();
@@ -502,12 +503,12 @@ $(document).ready(function () {
     });
   });
 
-  if(route == 'ordemCompra.criar')
+  if(route == 'ordemServico.criar')
   {
     $("#prestador_id").val(null).change();
     $("#dadosPagamento").hide();
     
-  } else if (route == 'ordemCompra.edit') {
+  } else if (route == 'ordemServico.edit') {
     $('.select2-servico-ajax').each(function() {
         initSelect2Servico($(this));
     });

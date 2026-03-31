@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class OrdemCompraVinculo extends Model
+class OrdemServicoVinculo extends Model
 {
     public function servico()
     {

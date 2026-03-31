@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class OrdemCompra extends Model
+class OrdemServico extends Model
 {
     public function servicoPrincipal()
     {
@@ -13,12 +13,12 @@ class OrdemCompra extends Model
     
     public function pagamentos()
     {    
-        return $this->hasMany('App\Models\OrdemCompraPagamento','ordemCompra_id');
+        return $this->hasMany('App\Models\OrdemServicoPagamento','ordemServico_id');
     }
 
     public function situacaoPagamento()
     {
-       $s = $this->hasMany('App\Models\OrdemCompraPagamento','ordemCompra_id')->where('situacao','aberto');
+       $s = $this->hasMany('App\Models\OrdemServicoPagamento','ordemServico_id')->where('situacao','aberto');
        return $s;
     }
 
@@ -29,11 +29,11 @@ class OrdemCompra extends Model
     
     public function rating()
     {
-        return $this->hasMany('App\Models\PrestadorComentario','ordemCompra_id');
+        return $this->hasMany('App\Models\PrestadorComentario','ordemServico_id');
     }
     public function vinculos()
     {
-        return $this->hasMany('App\Models\OrdemCompraVinculo', 'ordemCompra_id');
+        return $this->hasMany('App\Models\OrdemServicoVinculo', 'ordemServico_id');
     }
 
 }

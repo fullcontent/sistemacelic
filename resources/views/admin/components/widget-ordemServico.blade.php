@@ -1,6 +1,6 @@
 <div class="box box-info ">
   <div class="box-header with-border">
-    <h3 class="box-title"><i class="fa fa-credit-card"></i> Ordens de Compra</h3>
+    <h3 class="box-title"><i class="fa fa-credit-card"></i> Ordens de Serviço</h3>
 
     <div class="box-tools pull-right">
       <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -23,7 +23,7 @@
         </thead>
         <tbody>
 
-          @foreach($ordensCompra as $oc)
+          @foreach($ordensServico as $oc)
 
             <tr>
               <td style="vertical-align: middle;">
@@ -55,13 +55,13 @@
                 @endif
               </td>
               <td class="text-right" style="vertical-align: middle; white-space: nowrap;">
-                <a href="{{route('ordemCompra.edit', $oc->id)}}" class="btn btn-sm btn-info" title="Editar">
+                <a href="{{route('ordemServico.edit', $oc->id)}}" class="btn btn-sm btn-info" title="Editar">
                   <i class="glyphicon glyphicon-pencil"></i> Editar
                 </a>
 
-                {!! Form::open(['route' => ['ordemCompra.destroy', $oc->id], 'method' => 'delete', 'style' => 'display:inline']) !!}
+                {!! Form::open(['route' => ['ordemServico.destroy', $oc->id], 'method' => 'delete', 'style' => 'display:inline']) !!}
                 <button type="submit" class="btn btn-sm btn-danger"
-                  onclick="return confirm('Tem certeza que deseja excluir esta ordem de compra?')" title="Excluir">
+                  onclick="return confirm('Tem certeza que deseja excluir esta ordem de serviço?')" title="Excluir">
                   <i class="glyphicon glyphicon-trash"></i> Excluir
                 </button>
                 {!! Form::close() !!}
@@ -77,8 +77,8 @@
   <!-- /.box-body -->
   <div class="box-footer clearfix">
     @if(Request::is('admin/servicos/*'))
-      <a href="{{route('ordemCompra.criar', $servico->id)}}" class="btn btn-sm btn-info btn-flat pull-left">
-        <i class="glyphicon glyphicon-plus-sign"></i> Nova ordem de Compra
+      <a href="{{route('ordemServico.criar', $servico->id)}}" class="btn btn-sm btn-info btn-flat pull-left">
+        <i class="glyphicon glyphicon-plus-sign"></i> Nova ordem de Serviço
       </a>
     @endif
   </div>

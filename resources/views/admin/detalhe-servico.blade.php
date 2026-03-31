@@ -250,6 +250,9 @@
             <button id="webhookServiceBtn" class="btn btn-info">
                 <i class="fa fa-gear"></i> Auditoria do Serviço
             </button>
+            <a href="{{route('timeline.new', $servico->id)}}" class="btn btn-primary" target="_blank">
+                <i class="fa fa-clock-o"></i> TIMELINE
+            </a>
         </div>
 
     </div>
@@ -580,7 +583,7 @@
 </div>
 
 <div class="col-md-12">
-  @include('admin.components.widget-ordemCompra')
+  @include('admin.components.widget-ordemServico')
 </div>
 
 
