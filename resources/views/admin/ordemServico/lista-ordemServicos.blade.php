@@ -87,6 +87,9 @@
         <h1 style="margin: 0; font-weight: 700; color: #333;">Ordens de Serviço</h1>
     </div>
     <div class="col-sm-6 text-right">
+        <a class="btn btn-primary" href="{{route('ordemServico.criar')}}" style="border-radius: 50px; padding: 8px 20px; font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-right: 10px;">
+            <i class="fa fa-plus"></i> Nova OS
+        </a>
         <a class="btn btn-default" href="{{route('servico.lista')}}" style="border-radius: 50px; padding: 8px 20px; font-weight: 600; border: 1px solid #ddd; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
             <i class="fa fa-wrench"></i> Ir para Serviços
         </a>
@@ -164,6 +167,7 @@
                     <th width="100">Pagamento</th>
                     <th width="120">Situação</th>
                     <th width="150" class="text-center">Avaliação</th>
+                    <th width="80" class="text-center">Ações</th>
                 </tr>
             </thead>
             <tbody>
@@ -238,8 +242,8 @@
                     { 
                         "data": "servico_os",
                         "render": function(data, type, row) {
-                            return '<div style="font-weight: 600; color: #354256;">' + data + '</div>' +
-                                   '<small class="text-muted">' + row.servico_nome + '</small>';
+                            var link = row.servico_show_url ? '<a href="' + row.servico_show_url + '" style="font-weight: 700; color: #354256;">' + data + '</a>' : '<div style="font-weight: 600; color: #354256;">' + data + '</div>';
+                            return link + '<br><small class="text-muted">' + row.servico_nome + '</small>';
                         }
                     },
                     { "data": "escopo", "className": "text-muted", "style": "font-size: 0.9em;" },
@@ -252,6 +256,12 @@
                         "render": function(data, type, row) {
                             return data + row.view_ratings_btn;
                         }
+                    },
+                    { 
+                        "data": "acoes", 
+                        "className": "text-center",
+                        "orderable": false,
+                        "searchable": false
                     }
                 ],
                 "order": [[0, 'desc']],
@@ -305,6 +315,29 @@
                         $('#modal-avaliacoes').modal('show');
                     }
                 });
+            });
+
+            // Delete Button
+            $(document).on("click", ".delete-btn", function () {
+                var id = $(this).data('id');
+                var url = $(this).data('url');
+                
+                if (confirm('Tem certeza que deseja excluir esta Ordem de Serviço #'+id+'? Esta ação não pode ser desfeita.')) {
+                    $.ajax({
+                        url: url,
+                        type: 'DELETE',
+                        data: {
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(result) {
+                            table.ajax.reload();
+                            // Toastr or Alert notification could be added here
+                        },
+                        error: function(xhr) {
+                            alert('Erro ao excluir a Ordem de Serviço. Tente novamente.');
+                        }
+                    });
+                }
             });
         });
     </script>

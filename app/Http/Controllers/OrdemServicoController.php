@@ -47,20 +47,27 @@ class OrdemServicoController extends Controller
      *
      * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
-    public function create($id)
+    public function create($id = null)
     {   
-
-        $servico = Servico::with(['unidade', 'empresa'])->find($id);
-
-        if (!$servico) {
-            return redirect()->back()->with('error', 'Serviço não encontrado.');
+        if ($id) {
+            $servico = Servico::with(['unidade', 'empresa'])->find($id);
+            if (!$servico) {
+                return redirect()->back()->with('error', 'Serviço não encontrado.');
+            }
+            $servicos = [];
+        } else {
+            $servico = null;
+            $servicos = Servico::with(['unidade', 'empresa'])->get()->mapWithKeys(function ($item) {
+                return [$item->id => $item->unidade->nome . " - " . $item->nome . " (" . ($item->empresa ? $item->empresa->nomeFantasia : '---') . ")"];
+            })->toArray();
         }
 
-        $prestadores = Prestador::pluck('nome','id')->toArray();
+        $prestadores = Prestador::orderBy('nome')->pluck('nome', 'id')->toArray();
 
         return view('admin.ordemServico.cadastro-ordemServico')->with([
-            'prestadores'=>$prestadores,
-            'servico'=>$servico,
+            'prestadores' => $prestadores,
+            'servico' => $servico,
+            'servicos' => $servicos,
         ]);
     }
 
@@ -145,12 +152,14 @@ class OrdemServicoController extends Controller
         $ordemServico->save();
 
 
-        $ordemServicoServicoPrincipal = new OrdemServicoVinculo;
-        $ordemServicoServicoPrincipal->ordemServico_id = $ordemServico->id;
-        $ordemServicoServicoPrincipal->servico_id = $request->servicoPrincipal_id;
-        $ordemServicoServicoPrincipal->valor = $request->servicoPrincipal_valor;
-        $ordemServicoServicoPrincipal->reembolso = $request->servicoPrincipal_reembolso;
-        $ordemServicoServicoPrincipal->save();
+        if ($request->servicoPrincipal_id) {
+            $ordemServicoServicoPrincipal = new OrdemServicoVinculo;
+            $ordemServicoServicoPrincipal->ordemServico_id = $ordemServico->id;
+            $ordemServicoServicoPrincipal->servico_id = $request->servicoPrincipal_id;
+            $ordemServicoServicoPrincipal->valor = (float) str_replace(',', '.', $request->servicoPrincipal_valor);
+            $ordemServicoServicoPrincipal->reembolso = $request->servicoPrincipal_reembolso;
+            $ordemServicoServicoPrincipal->save();
+        }
 
 
         
@@ -243,7 +252,11 @@ class OrdemServicoController extends Controller
 
 
 
-        return redirect()->route('servicos.show',$request->servico_id)->with('message','Ordem de serviço criada com sucesso!');
+        if ($request->servico_id) {
+            return redirect()->route('servicos.show', $request->servico_id)->with('message', 'Ordem de serviço criada com sucesso!');
+        }
+
+        return redirect()->route('ordemServico.index')->with('message', 'Ordem de serviço criada com sucesso!');
 
 
 
@@ -277,7 +290,11 @@ class OrdemServicoController extends Controller
         }
 
         $servico = Servico::with(['unidade', 'empresa'])->find($ordemServico->servico_id);
-        $prestadores = Prestador::pluck('nome','id')->toArray();
+        $prestadores = Prestador::orderBy('nome')->pluck('nome','id')->toArray();
+
+        $servicos = Servico::with(['unidade', 'empresa'])->get()->mapWithKeys(function ($item) {
+            return [$item->id => $item->unidade->nome . " - " . $item->nome . " (" . ($item->empresa ? $item->empresa->nomeFantasia : '---') . ")"];
+        })->toArray();
 
         // Encontrar o vínculo que corresponde ao serviço principal
         $vinculoPrincipal = $ordemServico->vinculos->where('servico_id', $ordemServico->servico_id)->first();
@@ -286,6 +303,7 @@ class OrdemServicoController extends Controller
         return view('admin.ordemServico.editar-ordemServico')->with([
             'ordemServico'=>$ordemServico,
             'servico'=>$servico,
+            'servicos' => $servicos,
             'prestadores'=>$prestadores,
             'vinculoPrincipal'=>$vinculoPrincipal,
             'vinculoOutros'=>$vinculoOutros
@@ -303,6 +321,21 @@ class OrdemServicoController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // Validação da soma dos valores vinculados
+        $valorTotal = (float) str_replace(',', '.', $request->valorServico);
+        $valorPrincipal = (float) str_replace(',', '.', $request->servicoPrincipal_valor);
+        $somaVinculos = 0;
+        
+        if ($request->servicoVinculado_valor) {
+            foreach ($request->servicoVinculado_valor as $v) {
+                $somaVinculos += (float) str_replace(',', '.', $v);
+            }
+        }
+
+        if (($valorPrincipal + $somaVinculos) > ($valorTotal + 0.01)) {
+            return redirect()->back()->withInput()->with('error', 'A soma dos valores vinculados (R$ '.number_format($valorPrincipal + $somaVinculos, 2, ',', '.').') excede o valor total da OS (R$ '.number_format($valorTotal, 2, ',', '.').').');
+        }
+
         $ordemServico = OrdemServico::find($id);
         
         if (!$ordemServico) {
@@ -321,12 +354,14 @@ class OrdemServicoController extends Controller
         OrdemServicoVinculo::where('ordemServico_id', $id)->delete();
 
         // Principal
-        $ordemServicoServicoPrincipal = new OrdemServicoVinculo;
-        $ordemServicoServicoPrincipal->ordemServico_id = $id;
-        $ordemServicoServicoPrincipal->servico_id = $request->servicoPrincipal_id;
-        $ordemServicoServicoPrincipal->valor = $request->servicoPrincipal_valor;
-        $ordemServicoServicoPrincipal->reembolso = $request->servicoPrincipal_reembolso;
-        $ordemServicoServicoPrincipal->save();
+        if ($request->servicoPrincipal_id) {
+            $ordemServicoServicoPrincipal = new OrdemServicoVinculo;
+            $ordemServicoServicoPrincipal->ordemServico_id = $id;
+            $ordemServicoServicoPrincipal->servico_id = $request->servicoPrincipal_id;
+            $ordemServicoServicoPrincipal->valor = (float) str_replace(',', '.', $request->servicoPrincipal_valor);
+            $ordemServicoServicoPrincipal->reembolso = $request->servicoPrincipal_reembolso;
+            $ordemServicoServicoPrincipal->save();
+        }
 
         // Outros
         if($request->has('servicoVinculado_id') && is_array($request->servicoVinculado_id))
@@ -388,7 +423,11 @@ class OrdemServicoController extends Controller
             }
         }
 
-        return redirect()->route('servicos.show', $ordemServico->servico_id)->with('message', 'Ordem de serviço atualizada com sucesso!');
+        if ($ordemServico->servico_id) {
+            return redirect()->route('servicos.show', $ordemServico->servico_id)->with('message', 'Ordem de serviço atualizada com sucesso!');
+        }
+
+        return redirect()->route('ordemServico.index')->with('message', 'Ordem de serviço atualizada com sucesso!');
     }
 
     /**
@@ -511,6 +550,7 @@ class OrdemServicoController extends Controller
                 'prestador_nome' => optional($oc->prestador)->nome ?? 'N/A',
                 'servico_os' => optional($oc->servicoPrincipal)->os ?? 'N/A',
                 'servico_nome' => optional($oc->servicoPrincipal)->nome ?? 'Serviço não vinculado',
+                'servico_show_url' => $oc->servico_id ? route('servicos.show', $oc->servico_id) : null,
                 'escopo' => $clean_escopo,
                 'valor' => 'R$ ' . number_format($oc->valorServico, 2, ',', '.'),
                 'formaPagamento' => ($oc->formaPagamento == 1) ? 'à vista' : $oc->formaPagamento . 'x',
@@ -525,9 +565,14 @@ class OrdemServicoController extends Controller
                         : ''),
                 'prestador_info' => '',
                 'edit_url' => route('ordemServico.edit', $oc->id),
+                'delete_url' => route('ordemServico.destroy', $oc->id),
                 'view_ratings_btn' => $oc->rating->count() > 0 
                     ? '<div style="margin-top: 4px;"><a href="#" class="btn btn-xs btn-default rates-show-btn" data-id="'.$oc->id.'" data-prestador="'.$oc->prestador_id.'" style="border-radius: 50px;">ver avaliações ('.$oc->rating->count().')</a></div>'
-                    : ''
+                    : '',
+                'acoes' => '<div class="btn-group" style="display: flex; gap: 5px; justify-content: center;">
+                                <a href="'.route('ordemServico.edit', $oc->id).'" class="btn btn-xs btn-default" title="Editar"><i class="fa fa-edit text-blue"></i></a>
+                                <button type="button" class="btn btn-xs btn-default delete-btn" data-id="'.$oc->id.'" data-url="'.route('ordemServico.destroy', $oc->id).'" title="Excluir"><i class="fa fa-trash text-red"></i></button>
+                            </div>'
             ];
         });
 

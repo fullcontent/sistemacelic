@@ -91,7 +91,7 @@ Route::prefix('admin')->group(function () {
 
 	Route::resource('/ordemServico', 'OrdemServicoController');
 	Route::get('/ordemServico-list-data', 'OrdemServicoController@listData')->name('ordemServico.listData');
-	Route::get('/ordemServico/{servico_id}/create', 'OrdemServicoController@create')->name('ordemServico.criar');
+	Route::get('/ordemServico/create/{servico_id?}', 'OrdemServicoController@create')->name('ordemServico.criar');
 
 	Route::resource('/solicitantes', 'SolicitantesController');
 

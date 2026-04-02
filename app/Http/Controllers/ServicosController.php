@@ -10,6 +10,7 @@ use App\UserAccess;
 use App\Models\Arquivo;
 use App\Models\Empresa;
 use App\Models\Servico;
+use App\Models\OrdemServico;
 use App\Models\Unidade;
 use App\Models\Historico;
 use App\Models\ServicoLpu;
@@ -732,7 +733,10 @@ class ServicosController extends Controller
                     'pendencias' => $servico->pendencias,
                     'arquivo' => 'servico',
                     'usuarios' => User::pluck('name', 'id')->toArray(),
-                    'ordensServico' => $servico->ordensServico,
+                    'ordensServico' => OrdemServico::where('servico_id', $id)
+                        ->orWhereHas('vinculos', function($q) use ($id) {
+                            $q->where('servico_id', $id);
+                        })->with(['prestador', 'pagamentos', 'vinculos'])->get(),
 
                 ]);
 

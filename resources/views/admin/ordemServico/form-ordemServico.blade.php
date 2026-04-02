@@ -2,7 +2,7 @@
 
   
     {!! Form::hidden('user_id', Auth::id(), ['class'=>'form-control']) !!}
-    {!! Form::hidden('servico_id', $servico->id, ['class'=>'form-control']) !!}
+    {!! Form::hidden('servico_id', optional($servico)->id, ['class'=>'form-control', 'id' => 'hidden_servico_id']) !!}
 
     <div class="col-md-4">
         <div class="form-group">
@@ -164,14 +164,18 @@
 </div>
     <div class="servicos">
 
-        <div class="col-md-12" id="servicoPrincipal">
+        <div class="col-md-12" id="servicoPrincipal" @if(!$servico) style="display: none;" @endif>
             <div class="form-group">
                 <div class="col-md-7">
                     <div class="form-group">
-                        {!! Form::label('servicoPrincipal_nome', 'Serviço') !!}
-                        {!! Form::text('servicoPrincipal_nome', ($servico->os ?? '---').' | '.(optional($servico->empresa)->nomeFantasia ?? '---').' | '.(optional($servico->unidade)->codigo ?? '---').' | '.(optional($servico->unidade)->nomeFantasia ?? '---'), ['class'=>'form-control']) !!}
+                        {!! Form::label('servicoPrincipal_id', 'Serviço Principal') !!}
                         
-                        {!! Form::hidden('servicoPrincipal_id', $servico->id, ['class'=>'form-control']) !!}
+                        @if($servico)
+                            {!! Form::text('servicoPrincipal_nome', ($servico->os ?? '---').' | '.(optional($servico->empresa)->nomeFantasia ?? '---').' | '.(optional($servico->unidade)->codigo ?? '---').' | '.(optional($servico->unidade)->nomeFantasia ?? '---'), ['class'=>'form-control', 'readonly']) !!}
+                            {!! Form::hidden('servicoPrincipal_id', $servico->id, ['class'=>'form-control', 'id' => 'servicoPrincipal_id']) !!}
+                        @else
+                            {!! Form::select('servicoPrincipal_id', [], null, ['class'=>'form-control select2-servico-ajax', 'id' => 'servicoPrincipal_id']) !!}
+                        @endif
                     </div>
                 </div>
                 <div class="col-md-3">
@@ -279,6 +283,21 @@ $(document).ready(function () {
 
 
     const route = "{{Route::current()->getName()}}";
+
+    $('.select2').select2({
+        placeholder: 'Selecione uma opção...',
+        allowClear: true
+    });
+
+    // Inicializa busca AJAX no serviço principal se ele for um select
+    if ($('#servicoPrincipal_id').is('select')) {
+        initSelect2Servico($('#servicoPrincipal_id'));
+    }
+
+    // Se mudar o serviço principal no caso de OS Avulsa, sincroniza o servico_id principal
+    $('#servicoPrincipal_id').on('change', function() {
+        $('#hidden_servico_id').val($(this).val());
+    });
    
     function initSelect2Servico($el) {
         $el.select2({
@@ -371,9 +390,18 @@ $(document).ready(function () {
 
     
 
-
     $('#cloneButton').click(function(event) {
         event.preventDefault();
+
+        // Se o principal estiver escondido (OS Avulsa inicial), apenas mostra ele
+        if ($('#servicoPrincipal').is(':hidden')) {
+            $('#servicoPrincipal').show();
+            if ($('#servicoPrincipal_id').is('select')) {
+                initSelect2Servico($('#servicoPrincipal_id'));
+            }
+            recalcularRateioAutomatico();
+            return;
+        }
 
         var clonedDiv = $('#servicoVinculado').clone();
         
@@ -390,7 +418,32 @@ $(document).ready(function () {
 
         // Init select2 on the new element
         initSelect2Servico(clonedDiv.find('.select2-servico-ajax'));
+
+        recalcularRateioAutomatico();
   });
+
+  function recalcularRateioAutomatico() {
+      var valorTotalStr = $('#valorServico').val() || "0";
+      var valorTotalNum = parseFloat(valorTotalStr.replace(',', '.')) || 0;
+      
+      // Contagem: principal (se visível) + vinculados extras
+      var principalCount = $('#servicoPrincipal').is(':visible') ? 1 : 0;
+      var vinculadosCount = $('#clonedDivsContainer .servicoVinculado-edit, #clonedDivsContainer div[id^="servicoVinculado_"]').length;
+      var count = principalCount + vinculadosCount;
+
+      if (count === 0) return;
+      
+      var valorRateado = (valorTotalNum / count).toFixed(2);
+      var valorRateadoStr = valorRateado.replace('.', ',');
+
+      // Atualiza Principal
+      $('#servicoPrincipal_valor').val(valorRateadoStr);
+      
+      // Atualiza Vinculados
+      $('#clonedDivsContainer input[name="servicoVinculado_valor[]"]').val(valorRateadoStr);
+      
+      calcularTotaisVinculados();
+  }
 
   function calcularTotaisVinculados() {
       var valorTotalStr = $('#valorServico').val() || "0";
@@ -431,7 +484,7 @@ $(document).ready(function () {
 
   $(document).on('click', '.removerServicoVinculado', function() {
       $(this).closest('div[id^="servicoVinculado"]').remove();
-      calcularTotaisVinculados();
+      recalcularRateioAutomatico();
   });
 
   $('#valorServico').keyup(function(){
@@ -440,7 +493,7 @@ $(document).ready(function () {
     var numParcelas = parseInt($('#formaPagamento').val()) || 1;
     
     // Atualiza automaticamente o valor do serviço principal vinculado
-    $('input[id="servicoPrincipal_valor"]').val(valorServicoStr);
+    recalcularRateioAutomatico();
 
     if (numParcelas == 1) {
         $('input[id="valorParcela[]"]').val(valorServicoStr);
