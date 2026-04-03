@@ -34,4 +34,12 @@ return [
         'api_key' => env('GOOGLE_MAPS_API_KEY'),
     ],
 
+    'plugnotas' => [
+        'base_url' => env('PLUGNOTAS_BASE_URL', 'https://api.plugnotas.com.br'),
+        'api_key' => env('PLUGNOTAS_API_KEY'),
+        'timeout' => env('PLUGNOTAS_TIMEOUT', 30),
+        'mock_mode' => env('PLUGNOTAS_MOCK_MODE', true),
+        'webhook_secret' => env('PLUGNOTAS_WEBHOOK_SECRET'),
+    ],
+
 ];

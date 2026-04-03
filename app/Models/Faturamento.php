@@ -31,6 +31,11 @@ class Faturamento extends Model
         return $this->belongsTo('App\Models\DadosCastro','dadosCastro_id');
     }
 
+    public function nfseEmissions()
+    {
+        return $this->hasMany('App\Models\NfseEmission', 'faturamento_id');
+    }
+
    
 
    
