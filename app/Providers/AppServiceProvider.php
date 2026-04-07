@@ -178,11 +178,16 @@ class AppServiceProvider extends ServiceProvider
                             'url' => route('pendencias.outras'),
                             'icon' => 'fa fa-child',
                             ],
-                            [
-                            'text' => 'Pendências Vinculadas',
-                            'url' => route('pendencias.vinculadas'),
-                            'icon' => 'fa fa-link',
-                            ],
+                                [
+                                    'text' => 'Pendências Vinculadas',
+                                    'url' => route('pendencias.vinculadas'),
+                                    'icon' => 'fa fa-link',
+                                ],
+                                [
+                                    'text' => 'Relatório de Ativas',
+                                    'url' => route('relatorio.pendencias_ativas'),
+                                    'icon' => 'fa fa-file-alt',
+                                ],
 
                             ]
                             ],
@@ -200,9 +205,7 @@ class AppServiceProvider extends ServiceProvider
                                     'text' => 'Prestadores',
                                     'url' => ''.Auth::user()->privileges.'/prestador',
                                     'icon' => 'fa fa-user',
-                                    ],
-                            
-
+                                ]
 
                             );
 

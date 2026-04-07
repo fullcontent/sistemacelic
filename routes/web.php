@@ -278,6 +278,8 @@ Route::prefix('admin')->group(function () {
 	Route::patch('/github/issues/{number}', 'GitHubDashboardController@patchIssue')->name('admin.github.issues.patch');
 	Route::post('/github/projects/link', 'GitHubDashboardController@linkToProject')->name('admin.github.projects.link');
 
+	Route::get('/relatorio/pendencias-ativas', 'RelatoriosController@pendenciasAtivas')->name('relatorio.pendencias_ativas');
+
 });
 
 Route::prefix('cliente')->group(function () {
