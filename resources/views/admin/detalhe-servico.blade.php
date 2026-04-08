@@ -337,6 +337,7 @@
 	              				@if(($servico->licenca_validade >= date('Y-m-d')) && ($servico->tipo == 'licencaOperacao'))
 
 									<button type="button" class="btn btn-xs btn-success">Finalizado</button>
+                  <small>{{$servico->servicoFinalizado ? \Carbon\Carbon::parse($servico->servicoFinalizado->finalizado)->format('d/m/Y') : ''}}</small>
 	              					@elseif(($servico->licenca_validade < date('Y-m-d'))&& ($servico->tipo == 'licencaOperacao'))
 	              					<button type="button" class="btn btn-xs btn-danger">Finalizado</button>
 
