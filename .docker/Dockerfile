@@ -36,3 +36,5 @@ RUN composer --version
 
 # Set property permissions to files
 RUN chown -R www-data:www-data /var/www/html
+
+RUN composer install --no-interaction --no-ansi --no-scripts --no-audit
