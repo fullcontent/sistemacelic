@@ -66,7 +66,7 @@ class NfseEmissionService
 
             if ($isAgrupada) {
                 // Opção 3 ou 4: Agrupado
-                $tomadorData = $this->resolveTomadorData($faturamento, null, $opcao, $tomadorOverride);
+                $tomadorData = $this->resolveTomadorData($faturamento, null, $opcao, $tomadorOverride, $config);
                 $groupedItem = $this->buildGroupedItem($faturamentoServicos, $tomadorData['cpfCnpj']);
                 
                 $payload = NfsePayloadFactory2::buildBasePayload($config->toArray(), $groupedItem, $camposAdicionais);
@@ -93,7 +93,7 @@ class NfseEmissionService
                     $servico = $faturamentoServico->detalhes;
                     if (!$servico) continue;
 
-                    $tomadorData = $this->resolveTomadorData($faturamento, $servico, $opcao, $tomadorOverride);
+                    $tomadorData = $this->resolveTomadorData($faturamento, $servico, $opcao, $tomadorOverride, $config);
                     $itemData = $this->buildItemData($servico, $faturamentoServico, $tomadorData['cpfCnpj']);
 
                     $payload = NfsePayloadFactory2::buildBasePayload($config->toArray(), $itemData, $camposAdicionais);
@@ -153,7 +153,7 @@ class NfseEmissionService
         }
     }
 
-    protected function resolveTomadorData(Faturamento $faturamento, $servico, $opcao, $override)
+    protected function resolveTomadorData(Faturamento $faturamento, $servico, $opcao, $override, $config = null)
     {
         $clean = function($val) { return preg_replace('/\D/', '', (string)$val); };
 
@@ -220,6 +220,7 @@ class NfseEmissionService
         // Opção 3: Agrupada com dados da Empresa do Faturamento
         if ($opcao == '3' && $faturamento->empresa) {
             $uf = strtoupper((string) ($faturamento->empresa->uf ?? ''));
+            $resolvedUf = $uf;
             $codigoCidade = $this->resolveCodigoCidade(
                 $faturamento->empresa->cidade ?? null,
                 $uf,
@@ -229,8 +230,50 @@ class NfseEmissionService
                 $faturamento->empresa->inscricaoMun ?? null
             );
 
+            // Fallback 1: configuração ativa de NFS-e (quando empresa não possui dados completos)
+            if (empty($codigoCidade) && !empty($config)) {
+                $configUf = strtoupper((string) ($config->uf ?? ''));
+                $codigoCidade = $this->resolveCodigoCidade(
+                    $config->municipio_nome ?? null,
+                    $configUf,
+                    $config->codigo_cidade ?? null,
+                    $config->municipio_ibge ?? null
+                );
+
+                if (!empty($codigoCidade) && empty($resolvedUf)) {
+                    $resolvedUf = $configUf;
+                }
+            }
+
+            // Fallback 2: usar dados de unidade dos serviços do faturamento
+            if (empty($codigoCidade) && !empty($faturamento->servicosFaturados)) {
+                foreach ($faturamento->servicosFaturados as $fs) {
+                    $unidade = $fs->detalhes->unidade ?? null;
+                    if (!$unidade) {
+                        continue;
+                    }
+
+                    $unidadeUf = strtoupper((string) ($unidade->uf ?? ''));
+                    $codigoCidade = $this->resolveCodigoCidade(
+                        $unidade->cidade ?? null,
+                        $unidadeUf,
+                        $unidade->codigo_cidade ?? null,
+                        $unidade->codigoCidade ?? null,
+                        $unidade->municipio_ibge ?? null,
+                        $unidade->inscricaoMun ?? null
+                    );
+
+                    if (!empty($codigoCidade)) {
+                        if (empty($resolvedUf)) {
+                            $resolvedUf = $unidadeUf;
+                        }
+                        break;
+                    }
+                }
+            }
+
             if (empty($codigoCidade)) {
-                throw new \InvalidArgumentException('Empresa do faturamento sem código IBGE válido para o tomador.');
+                throw new \InvalidArgumentException('Empresa do faturamento sem código IBGE válido para o tomador. Cadastre cidade/UF da empresa ou configure o código da cidade na configuração NFS-e.');
             }
 
             return [
@@ -243,7 +286,7 @@ class NfseEmissionService
                     'bairro' => $faturamento->empresa->bairro,
                     'codigoCidade' => $codigoCidade,
                     'cep' => $clean($faturamento->empresa->cep),
-                    'uf' => $uf
+                    'uf' => !empty($resolvedUf) ? $resolvedUf : $uf
                 ]
             ];
         }

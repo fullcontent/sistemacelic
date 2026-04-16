@@ -282,6 +282,31 @@
 @section('js')
 <script>
 $(document).ready(function() {
+    const nfseDebug = {
+        enabled: true,
+        log: function(message, data) {
+            if (!this.enabled) return;
+            console.log('[NFSE DEBUG] ' + message, data || '');
+        },
+        warn: function(message, data) {
+            if (!this.enabled) return;
+            console.warn('[NFSE DEBUG] ' + message, data || '');
+        },
+        error: function(message, data) {
+            if (!this.enabled) return;
+            console.error('[NFSE DEBUG] ' + message, data || '');
+        }
+    };
+
+    nfseDebug.log('Tela de emissão carregada', {
+        faturamentoId: '{{ $faturamento->id }}',
+        totalServicosVisiveis: $('.checkItem').length
+    });
+
+    @if(session('error'))
+    nfseDebug.error('Último erro de emissão (session)', {!! json_encode(session('error'), JSON_UNESCAPED_UNICODE) !!});
+    @endif
+
     // Seleção de card
     $('.option-card').on('click', function() {
         $('.option-card').removeClass('option-selected');
@@ -289,6 +314,7 @@ $(document).ready(function() {
         
         const option = $(this).data('option');
         $(`#opt${option}`).prop('checked', true);
+        nfseDebug.log('Modo de emissão selecionado', { opcao: option });
         
         $('#sectionTomador').fadeIn();
         $('#btnFinalizar').prop('disabled', false);
@@ -304,6 +330,18 @@ $(document).ready(function() {
     // CheckAll logic
     $('#checkAll').on('change', function() {
         $('.checkItem').prop('checked', $(this).is(':checked'));
+        nfseDebug.log('Seleção de serviços alterada via checkAll', {
+            marcado: $(this).is(':checked'),
+            totalSelecionados: $('.checkItem:checked').length
+        });
+    });
+
+    $('.checkItem').on('change', function() {
+        nfseDebug.log('Serviço selecionado/desmarcado', {
+            servicoId: $(this).val(),
+            marcado: $(this).is(':checked'),
+            totalSelecionados: $('.checkItem:checked').length
+        });
     });
 
     // Nova Empresa Logic
@@ -324,6 +362,7 @@ $(document).ready(function() {
         $('#tomadorDefault').fadeOut(function() {
             $('#tomadorManual').fadeIn();
             $('#input_nova_empresa').val('1');
+            nfseDebug.log('Tomador manual ativado');
         });
     }
 
@@ -331,6 +370,7 @@ $(document).ready(function() {
         $('#tomadorManual').fadeOut(function() {
             $('#tomadorDefault').fadeIn();
             $('#input_nova_empresa').val('0');
+            nfseDebug.log('Tomador manual desativado (tomador padrão)');
         });
     }
 
@@ -339,11 +379,14 @@ $(document).ready(function() {
         const cnpj = $('#override_cnpj').val();
         if(!cnpj) return;
 
+        nfseDebug.log('Consulta CNPJ iniciada', { cnpjInformado: cnpj });
+
         $(this).html('<i class="fa fa-spinner fa-spin"></i>');
         
         $.ajax({
             url: "{{ url('admin/nfse/buscar-cnpj') }}/" + cnpj,
             success: function(response) {
+                nfseDebug.log('Consulta CNPJ retornou sucesso', response);
                 $('#override_razaoSocial').val(response.razaoSocial);
                 $('#override_email').val(response.email);
                 $('#override_logradouro').val(response.logradouro);
@@ -355,12 +398,20 @@ $(document).ready(function() {
                 $('#override_codigoCidade').val(response.ibge || '');
                 
                 if (!response.ibge) {
+                    nfseDebug.warn('Consulta CNPJ sem IBGE automático', {
+                        municipio: response.municipio,
+                        uf: response.uf
+                    });
                     Swal.fire('Atenção', 'CNPJ consultado, mas sem código IBGE automático. Preencha cidade/UF e confirme o código IBGE (7 dígitos).', 'warning');
                 } else {
                     Swal.fire('Sucesso', 'Dados recuperados da Receita Federal!', 'success');
                 }
             },
-            error: function() {
+            error: function(xhr) {
+                nfseDebug.error('Falha na consulta de CNPJ', {
+                    status: xhr.status,
+                    response: xhr.responseText
+                });
                 Swal.fire('Erro', 'Não foi possível localizar este CNPJ.', 'error');
             },
             complete: function() {
@@ -371,13 +422,31 @@ $(document).ready(function() {
 
     // Validar form antes de enviar
     $('#formEmissao').on('submit', function(e) {
+        const currentOpt = $('input[name="opcao_automatica"]:checked').val();
+        const selecionados = $('.checkItem:checked').map(function() { return $(this).val(); }).get();
+        const payloadPreview = {
+            opcao_automatica: currentOpt,
+            servico_ids: selecionados,
+            nova_empresa: $('#input_nova_empresa').val(),
+            override_cnpj: $('#override_cnpj').val(),
+            override_razaoSocial: $('#override_razaoSocial').val(),
+            override_logradouro: $('#override_logradouro').val(),
+            override_numero: $('#override_numero').val(),
+            override_bairro: $('#override_bairro').val(),
+            override_cep: $('#override_cep').val(),
+            override_municipio: $('#override_municipio').val(),
+            override_codigoCidade: $('#override_codigoCidade').val(),
+            override_uf: $('#override_uf').val()
+        };
+        nfseDebug.log('Submit iniciado (preview payload)', payloadPreview);
+
         if($('.checkItem:checked').length == 0) {
             e.preventDefault();
+            nfseDebug.warn('Submit bloqueado: nenhum serviço selecionado');
             Swal.fire('Erro', 'Selecione pelo menos um serviço para emitir a nota.', 'error');
             return;
         }
 
-        const currentOpt = $('input[name="opcao_automatica"]:checked').val();
         const isManual = currentOpt == 2 || currentOpt == 4;
         const isTomadorManualAtivo = $('#input_nova_empresa').val() === '1';
 
@@ -385,10 +454,16 @@ $(document).ready(function() {
             const codigoCidade = ($('#override_codigoCidade').val() || '').replace(/\D/g, '');
             if (codigoCidade.length !== 7) {
                 e.preventDefault();
+                nfseDebug.warn('Submit bloqueado: codigoCidade inválido para tomador manual', {
+                    codigoCidadeInformado: $('#override_codigoCidade').val(),
+                    codigoCidadeNormalizado: codigoCidade
+                });
                 Swal.fire('Erro', 'Informe um código IBGE da cidade válido (7 dígitos) para o tomador.', 'error');
                 return;
             }
         }
+
+        nfseDebug.log('Submit validado no front, enviando formulário');
     });
 });
 </script>
