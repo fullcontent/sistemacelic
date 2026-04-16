@@ -28,7 +28,7 @@ class NfseEmissionService
         $config = $this->resolveConfig($data);
 
         $servicoIds = isset($data['servico_ids']) ? $data['servico_ids'] : [];
-        $opcao = $data['opcao_automatica']; // 1, 2, 3, 4
+        $opcao = $this->normalizeOpcaoAutomatica(isset($data['opcao_automatica']) ? $data['opcao_automatica'] : null); // 1, 2, 3, 4
         $tomadorOverride = isset($data['tomador_override']) ? $data['tomador_override'] : null;
         $camposAdicionais = isset($data['campos_adicionais']) ? $data['campos_adicionais'] : [];
 
@@ -69,7 +69,7 @@ class NfseEmissionService
                 $tomadorData = $this->resolveTomadorData($faturamento, null, $opcao, $tomadorOverride);
                 $groupedItem = $this->buildGroupedItem($faturamentoServicos, $tomadorData['cpfCnpj']);
                 
-                $payload = NfsePayloadFactory::buildBasePayload($config->toArray(), $groupedItem, $camposAdicionais);
+                $payload = NfsePayloadFactory2::buildBasePayload($config->toArray(), $groupedItem, $camposAdicionais);
                 $payload['tomador'] = $tomadorData;
                 
                 // Call API without inner catch
@@ -96,7 +96,7 @@ class NfseEmissionService
                     $tomadorData = $this->resolveTomadorData($faturamento, $servico, $opcao, $tomadorOverride);
                     $itemData = $this->buildItemData($servico, $faturamentoServico, $tomadorData['cpfCnpj']);
 
-                    $payload = NfsePayloadFactory::buildBasePayload($config->toArray(), $itemData, $camposAdicionais);
+                    $payload = NfsePayloadFactory2::buildBasePayload($config->toArray(), $itemData, $camposAdicionais);
                     $payload['tomador'] = $tomadorData;
                     
                         // Call API without inner catch
@@ -159,6 +159,17 @@ class NfseEmissionService
 
         // Se houver override (Opção 2 ou 4), usar os dados manuais
         if (($opcao == '2' || $opcao == '4') && !empty($override)) {
+            $uf = strtoupper((string) ($override['uf'] ?? ($override['estado'] ?? '')));
+            $codigoCidade = $this->resolveCodigoCidade(
+                $override['municipio'] ?? null,
+                $uf,
+                $override['codigoCidade'] ?? null
+            );
+
+            if (empty($codigoCidade)) {
+                throw new \InvalidArgumentException('Tomador manual sem código IBGE válido. Preencha a cidade/UF ou informe o código da cidade (7 dígitos).');
+            }
+
             return [
                 'cpfCnpj' => $clean($override['cnpj']),
                 'razaoSocial' => $override['razaoSocial'],
@@ -167,15 +178,28 @@ class NfseEmissionService
                     'logradouro' => $override['logradouro'] ?? '',
                     'numero' => $override['numero'] ?? '',
                     'bairro' => $override['bairro'] ?? '',
-                    'codigoCidade' => $override['codigoCidade'] ?? '',
+                    'codigoCidade' => $codigoCidade,
                     'cep' => $clean($override['cep'] ?? ''),
-                    'uf' => $override['uf'] ?? ''
+                    'uf' => $uf
                 ]
             ];
         }
 
         // Opção 1: Individual com dados da Unidade
         if ($opcao == '1' && $servico && !empty($servico->unidade)) {
+            $uf = strtoupper((string) ($servico->unidade->uf ?? ''));
+            $codigoCidade = $this->resolveCodigoCidade(
+                $servico->unidade->cidade ?? null,
+                $uf,
+                $servico->unidade->codigo_cidade ?? null,
+                $servico->unidade->codigoCidade ?? null,
+                $servico->unidade->municipio_ibge ?? null
+            );
+
+            if (empty($codigoCidade)) {
+                throw new \InvalidArgumentException('Unidade do serviço sem código IBGE válido para o tomador.');
+            }
+
             return [
                 'cpfCnpj' => $clean($servico->unidade->cnpj),
                 'razaoSocial' => $servico->unidade->razaoSocial ?? $servico->unidade->nomeFantasia,
@@ -184,15 +208,28 @@ class NfseEmissionService
                     'logradouro' => $servico->unidade->endereco,
                     'numero' => $servico->unidade->numero,
                     'bairro' => $servico->unidade->bairro,
-                    'codigoCidade' => IbgeHelper::getIbgeCode($servico->unidade->cidade, $servico->unidade->uf) ?? $servico->unidade->codigo_cidade ?? $servico->unidade->inscricaoMun, 
+                    'codigoCidade' => $codigoCidade,
                     'cep' => $clean($servico->unidade->cep),
-                    'uf' => $servico->unidade->uf
+                    'uf' => $uf
                 ]
             ];
         }
 
         // Opção 3: Agrupada com dados da Empresa do Faturamento
         if ($opcao == '3' && $faturamento->empresa) {
+            $uf = strtoupper((string) ($faturamento->empresa->uf ?? ''));
+            $codigoCidade = $this->resolveCodigoCidade(
+                $faturamento->empresa->cidade ?? null,
+                $uf,
+                $faturamento->empresa->codigo_cidade ?? null,
+                $faturamento->empresa->codigoCidade ?? null,
+                $faturamento->empresa->municipio_ibge ?? null
+            );
+
+            if (empty($codigoCidade)) {
+                throw new \InvalidArgumentException('Empresa do faturamento sem código IBGE válido para o tomador.');
+            }
+
             return [
                 'cpfCnpj' => $clean($faturamento->empresa->cnpj),
                 'razaoSocial' => $faturamento->empresa->razaoSocial ?? $faturamento->empresa->nomeFantasia,
@@ -201,14 +238,54 @@ class NfseEmissionService
                     'logradouro' => $faturamento->empresa->endereco,
                     'numero' => $faturamento->empresa->numero,
                     'bairro' => $faturamento->empresa->bairro,
-                    'codigoCidade' => IbgeHelper::getIbgeCode($faturamento->empresa->cidade, $faturamento->empresa->uf) ?? $faturamento->empresa->codigo_cidade ?? $faturamento->empresa->inscricaoMun,
+                    'codigoCidade' => $codigoCidade,
                     'cep' => $clean($faturamento->empresa->cep),
-                    'uf' => $faturamento->empresa->uf
+                    'uf' => $uf
                 ]
             ];
         }
 
         throw new \InvalidArgumentException('Não foi possível determinar os dados do tomador para a opção ' . $opcao);
+    }
+
+    private function resolveCodigoCidade($cidade, $uf)
+    {
+        $candidates = array_slice(func_get_args(), 2);
+
+        foreach ($candidates as $candidate) {
+            $digits = preg_replace('/\D/', '', (string) $candidate);
+            if (strlen($digits) === 7) {
+                return $digits;
+            }
+        }
+
+        $ibge = IbgeHelper::getIbgeCode($cidade, $uf);
+        if (!empty($ibge) && strlen((string) $ibge) === 7) {
+            return (string) $ibge;
+        }
+
+        return null;
+    }
+
+    private function normalizeOpcaoAutomatica($opcao)
+    {
+        $map = [
+            '1' => '1',
+            '2' => '2',
+            '3' => '3',
+            '4' => '4',
+            'individual_cnpj_padrao' => '1',
+            'individual_cnpj_manual' => '2',
+            'agrupado' => '3',
+            'agrupado_manual' => '4',
+        ];
+
+        $key = strtolower(trim((string) $opcao));
+        if (!isset($map[$key])) {
+            throw new \InvalidArgumentException('Opção automática inválida para emissão de NFS-e.');
+        }
+
+        return $map[$key];
     }
 
     public function cancelar($emissionId, $motivo)
@@ -469,7 +546,7 @@ class NfseEmissionService
 
         return [
             'cnpj_tomador' => $cnpj,
-            'descricao_servico' => NfsePayloadFactory::buildGroupedDescription($lines),
+            'descricao_servico' => NfsePayloadFactory2::buildGroupedDescription($lines),
             'valor_servico' => round($valorTotal, 2),
         ];
     }

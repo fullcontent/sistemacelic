@@ -352,9 +352,13 @@ $(document).ready(function() {
                 $('#override_cep').val(response.cep);
                 $('#override_municipio').val(response.municipio);
                 $('#override_uf').val(response.uf);
-                $('#override_codigoCidade').val(response.ibge); // Se disponível
+                $('#override_codigoCidade').val(response.ibge || '');
                 
-                Swal.fire('Sucesso', 'Dados recuperados da Receita Federal!', 'success');
+                if (!response.ibge) {
+                    Swal.fire('Atenção', 'CNPJ consultado, mas sem código IBGE automático. Preencha cidade/UF e confirme o código IBGE (7 dígitos).', 'warning');
+                } else {
+                    Swal.fire('Sucesso', 'Dados recuperados da Receita Federal!', 'success');
+                }
             },
             error: function() {
                 Swal.fire('Erro', 'Não foi possível localizar este CNPJ.', 'error');
@@ -370,6 +374,20 @@ $(document).ready(function() {
         if($('.checkItem:checked').length == 0) {
             e.preventDefault();
             Swal.fire('Erro', 'Selecione pelo menos um serviço para emitir a nota.', 'error');
+            return;
+        }
+
+        const currentOpt = $('input[name="opcao_automatica"]:checked').val();
+        const isManual = currentOpt == 2 || currentOpt == 4;
+        const isTomadorManualAtivo = $('#input_nova_empresa').val() === '1';
+
+        if (isManual || isTomadorManualAtivo) {
+            const codigoCidade = ($('#override_codigoCidade').val() || '').replace(/\D/g, '');
+            if (codigoCidade.length !== 7) {
+                e.preventDefault();
+                Swal.fire('Erro', 'Informe um código IBGE da cidade válido (7 dígitos) para o tomador.', 'error');
+                return;
+            }
         }
     });
 });

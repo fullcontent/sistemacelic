@@ -123,17 +123,7 @@ class NfseController extends Controller
         
         // Se houver dados de tomador override
         if ($request->has('nova_empresa') && $request->nova_empresa == '1') {
-            $data['tomador_override'] = [
-                'cnpj' => $request->override_cnpj,
-                'razaoSocial' => $request->override_razaoSocial,
-                'email' => $request->override_email,
-                'logradouro' => $request->override_logradouro,
-                'numero' => $request->override_numero,
-                'bairro' => $request->override_bairro,
-                'cep' => $request->override_cep,
-                'uf' => $request->override_uf,
-                'codigoCidade' => $request->override_codigoCidade,
-            ];
+            $data['tomador_override'] = $this->buildTomadorOverrideFromRequest($request);
         }
 
         try {
@@ -169,7 +159,7 @@ class NfseController extends Controller
                 'uf' => $data['uf'],
                 'email' => $data['email'] ?? '',
                 'municipio' => $data['municipio'],
-                // Mapeamento básico de código cidade (v1 não traz IBGE, v2 sim, mas vamos simplificar ou usar o nome)
+                'ibge' => $data['codigo_municipio_ibge'] ?? \App\Helpers\IbgeHelper::getIbgeCode($data['municipio'] ?? null, $data['uf'] ?? null),
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'CNPJ não encontrado ou erro na consulta.'], 404);
@@ -295,7 +285,7 @@ class NfseController extends Controller
             'faturamento_id' => 'required|integer|exists:faturamentos,id',
             'dados_castro_id' => 'nullable|integer',
             'nfse_configuration_id' => 'nullable|integer|exists:nfse_configurations,id',
-            'opcao_automatica' => 'required|string|in:individual_cnpj_padrao,individual_cnpj_manual,agrupado',
+            'opcao_automatica' => 'required|string|in:1,2,3,4,individual_cnpj_padrao,individual_cnpj_manual,agrupado,agrupado_manual',
             'servico_ids' => 'required|array|min:1',
             'servico_ids.*' => 'integer',
             'cnpj_manual_agrupado' => 'nullable|string',
@@ -308,7 +298,15 @@ class NfseController extends Controller
         }
 
         try {
-            $emission = $this->service->emitirAutomatico($validator->validated());
+            $data = $validator->validated();
+
+            if (!isset($data['tomador_override']) && !empty($data['cnpj_manual_agrupado'])) {
+                $override = $this->buildTomadorOverrideFromRequest($request);
+                $override['cnpj'] = $data['cnpj_manual_agrupado'];
+                $data['tomador_override'] = $override;
+            }
+
+            $emission = $this->service->emitirAutomatico($data);
             return response()->json($emission, 201);
         } catch (\InvalidArgumentException $e) {
             return response()->json(['error' => $e->getMessage()], 422);
@@ -429,5 +427,21 @@ class NfseController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Erro ao baixar XML: ' . $e->getMessage());
         }
+    }
+
+    private function buildTomadorOverrideFromRequest(Request $request)
+    {
+        return [
+            'cnpj' => $request->get('override_cnpj', $request->get('cnpj_manual', $request->get('tomador_cnpj'))),
+            'razaoSocial' => $request->get('override_razaoSocial', $request->get('razao_social_manual', $request->get('tomador_razaoSocial'))),
+            'email' => $request->get('override_email', $request->get('email_manual', $request->get('tomador_email'))),
+            'logradouro' => $request->get('override_logradouro', $request->get('logradouro_manual', $request->get('tomador_logradouro'))),
+            'numero' => $request->get('override_numero', $request->get('numero_manual', $request->get('tomador_numero'))),
+            'bairro' => $request->get('override_bairro', $request->get('bairro_manual', $request->get('tomador_bairro'))),
+            'cep' => $request->get('override_cep', $request->get('cep_manual', $request->get('tomador_cep'))),
+            'municipio' => $request->get('override_municipio', $request->get('municipio_manual', $request->get('tomador_municipio'))),
+            'uf' => $request->get('override_uf', $request->get('uf_manual', $request->get('tomador_uf', $request->get('tomador_estado')))),
+            'codigoCidade' => $request->get('override_codigoCidade', $request->get('codigo_cidade_manual', $request->get('tomador_codigoCidade'))),
+        ];
     }
 }

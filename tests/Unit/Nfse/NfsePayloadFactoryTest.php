@@ -2,14 +2,14 @@
 
 namespace Tests\Unit\Nfse;
 
-use App\Services\Nfse\NfsePayloadFactory;
+use App\Services\Nfse\NfsePayloadFactory2;
 use PHPUnit\Framework\TestCase;
 
 class NfsePayloadFactoryTest extends TestCase
 {
     public function test_build_grouped_description()
     {
-        $description = NfsePayloadFactory::buildGroupedDescription([
+        $description = NfsePayloadFactory2::buildGroupedDescription([
             [
                 'codigo_unidade' => '101',
                 'nome_unidade' => 'Espaçolaser Blumenau',
@@ -30,12 +30,12 @@ class NfsePayloadFactoryTest extends TestCase
 
     public function test_sanitize_document()
     {
-        $this->assertEquals('12345678000199', NfsePayloadFactory::sanitizeDocument('12.345.678/0001-99'));
+        $this->assertEquals('12345678000199', NfsePayloadFactory2::sanitizeDocument('12.345.678/0001-99'));
     }
 
     public function test_build_payload_sets_default_automatic_fields()
     {
-        $payload = NfsePayloadFactory::buildBasePayload([
+        $payload = NfsePayloadFactory2::buildBasePayload([
             'emit_as' => 'Prestador',
             'simples_regime' => 'Regime de apuração dos tributos federais e municipal pelo Simples Nacional',
             'tomador_tipo' => 'Brasil',
@@ -51,15 +51,16 @@ class NfsePayloadFactoryTest extends TestCase
             'pis_cofins_situacao' => '00',
             'aliquota_simples' => 9.90,
             'valor_aproximado_tributos' => 9.90,
+            'codigo_tributacao_nacional' => '17.02.02',
         ], [
             'cnpj_tomador' => '12.345.678/0001-99',
             'descricao_servico' => 'Serviço teste',
             'valor_servico' => 100.00,
         ]);
 
-        $this->assertEquals('', $payload['tomador']['indicadorMunicipal']);
-        $this->assertEquals('', $payload['tomador']['telefone']);
-        $this->assertEquals('', $payload['tomador']['email']);
-        $this->assertEquals(100.00, $payload['servico']['valor']);
+        $this->assertIsArray($payload['tomador']);
+        $this->assertEquals('17.02.02', $payload['servico'][0]['codigo']);
+        $this->assertEquals('Serviço teste', $payload['servico'][0]['discriminacao']);
+        $this->assertEquals(100.00, $payload['servico'][0]['valor']['servico']);
     }
 }

@@ -3,7 +3,7 @@
 namespace Tests\Unit\Nfse;
 
 use App\Helpers\IbgeHelper;
-use App\Services\Nfse\NfsePayloadFactory;
+use App\Services\Nfse\NfsePayloadFactory2;
 use PHPUnit\Framework\TestCase;
 
 class NfsePayloadValidationTest extends TestCase
@@ -45,7 +45,7 @@ class NfsePayloadValidationTest extends TestCase
             'valor_servico' => 1500.50,
         ];
 
-        $payload = NfsePayloadFactory::buildBasePayload($config, $item);
+        $payload = NfsePayloadFactory2::buildBasePayload($config, $item);
 
         // Required top-level fields
         $this->assertArrayHasKey('dataCompetencia', $payload);
