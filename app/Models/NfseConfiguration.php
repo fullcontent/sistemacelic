@@ -26,6 +26,20 @@ class NfseConfiguration extends Model
         'aliquota_simples',
         'valor_aproximado_tributos',
         'ativo',
+        'inscricao_municipal',
+        'email_emitente',
+        'telefone_emitente',
+        'logradouro',
+        'numero',
+        'bairro',
+        'codigo_cidade',
+        'cep',
+        'uf',
+        'regime_tributario',
+        'login_prefeitura',
+        'senha_prefeitura',
+        'certificado',
+        'producao',
     ];
 
     protected $casts = [
@@ -34,10 +48,16 @@ class NfseConfiguration extends Model
         'issqn_retido' => 'boolean',
         'beneficio_municipal' => 'boolean',
         'ativo' => 'boolean',
+        'producao' => 'boolean',
     ];
 
     public function scopeAtiva($query)
     {
         return $query->where('ativo', true);
+    }
+
+    public function dadosCastro()
+    {
+        return $this->belongsTo('App\Models\DadosCastro', 'dados_castro_id');
     }
 }

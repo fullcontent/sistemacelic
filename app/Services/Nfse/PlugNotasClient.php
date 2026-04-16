@@ -9,17 +9,21 @@ class PlugNotasClient
 
     /** @var array */
     private $settings;
-
     public function __construct($http = null, array $settings = [])
     {
         $default = [
             'base_url' => function_exists('config') ? config('services.plugnotas.base_url', 'https://api.plugnotas.com.br') : 'https://api.plugnotas.com.br',
             'api_key' => function_exists('config') ? config('services.plugnotas.api_key') : null,
             'timeout' => function_exists('config') ? (int) config('services.plugnotas.timeout', 30) : 30,
-            'mock_mode' => function_exists('config') ? (bool) config('services.plugnotas.mock_mode', true) : true,
+            'mock_mode' => function_exists('config') ? (bool) config('services.plugnotas.mock_mode', false) : false,
         ];
 
         $this->settings = array_merge($default, $settings);
+
+        // Auto-disable mock if we have a key and it wasn't explicitly forced
+        if (!empty($this->settings['api_key']) && env('PLUGNOTAS_MOCK_MODE') === null) {
+            $this->settings['mock_mode'] = false;
+        }
 
         if ($this->settings['mock_mode']) {
             $this->http = null;
@@ -63,12 +67,92 @@ class PlugNotasClient
                     'x-api-key' => $this->settings['api_key'],
                     'Accept' => 'application/json',
                 ],
-                'json' => $payload,
+                'json' => [$payload],
             ]);
 
             return json_decode((string) $response->getBody(), true);
         } catch (\Exception $e) {
             throw new \RuntimeException('Falha na chamada PlugNotas: ' . $e->getMessage(), 0, $e);
+        }
+    }
+
+    public function consultarNfse($id)
+    {
+        if ($this->settings['mock_mode']) {
+            return [
+                'id' => $id, 
+                'status' => 'concluido', 
+                'numero' => '999',
+                'pdf' => 'https://plugnotas.com.br/pdf/exemplo',
+                'xml' => 'https://plugnotas.com.br/xml/exemplo',
+                'mock' => true
+            ];
+        }
+
+        try {
+            $response = $this->http->get("/nfse/{$id}", [
+                'headers' => [
+                    'x-api-key' => $this->settings['api_key'],
+                    'Accept' => 'application/json',
+                ]
+            ]);
+
+            return json_decode((string) $response->getBody(), true);
+        } catch (\Exception $e) {
+            throw new \RuntimeException('Falha ao consultar nota na PlugNotas: ' . $e->getMessage(), 0, $e);
+        }
+    }
+
+    public function getBaseUrl()
+    {
+        return $this->settings['base_url'];
+    }
+
+    public function cancelarNfse($id, $motivo = 'Cancelamento solicitado pelo usuário.')
+    {
+        if ($this->settings['mock_mode']) {
+            return ['id' => $id, 'status' => 'cancelado', 'mensagem' => 'Nota cancelada (MOCK)', 'mock' => true];
+        }
+
+        try {
+            $response = $this->http->post("/nfse/cancelar", [
+                'headers' => [
+                    'x-api-key' => $this->settings['api_key'],
+                    'Accept' => 'application/json',
+                ],
+                'json' => [
+                    'id' => $id,
+                    'justificativa' => $motivo
+                ]
+            ]);
+
+            return json_decode((string) $response->getBody(), true);
+        } catch (\Exception $e) {
+            throw new \RuntimeException('Falha ao cancelar nota na PlugNotas: ' . $e->getMessage(), 0, $e);
+        }
+    }
+
+    public function downloadFile($id, $type = 'pdf')
+    {
+        if ($this->settings['mock_mode']) {
+            if ($type === 'xml') {
+                return '<?xml version="1.0" encoding="UTF-8"?><mock>Conteúdo XML de teste</mock>';
+            }
+            // Minimal valid PDF 1.4
+            return "%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj 2 0 obj<</Type/Pages/Count 1/Kids[3 0 R]>>endobj 3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R/Resources<<>>>>endobj\nxref\n0 4\n0000000000 65535 f\n0000000009 00000 n\n0000000052 00000 n\n0000000101 00000 n\ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n178\n%%EOF";
+        }
+
+        try {
+            $endpoint = $type === 'pdf' ? "/nfse/pdf/{$id}" : "/nfse/xml/{$id}";
+            $response = $this->http->get($endpoint, [
+                'headers' => [
+                    'x-api-key' => $this->settings['api_key'],
+                ]
+            ]);
+
+            return (string) $response->getBody();
+        } catch (\Exception $e) {
+            throw new \RuntimeException("Falha ao baixar arquivo {$type} na PlugNotas: " . $e->getMessage(), 0, $e);
         }
     }
 }

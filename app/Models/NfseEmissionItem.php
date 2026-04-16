@@ -18,6 +18,8 @@ class NfseEmissionItem extends Model
         'status',
         'pdf_path',
         'xml_path',
+        'pdf_url',
+        'xml_url',
         'mensagem_erro',
         'additional_data',
     ];

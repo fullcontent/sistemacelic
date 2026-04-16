@@ -29,8 +29,13 @@ class NfsePayloadFactory
     {
         $descricao = isset($item['descricao_servico']) ? $item['descricao_servico'] : '';
         $valor = isset($item['valor_servico']) ? (float) $item['valor_servico'] : 0;
-        $cnpj = isset($item['cnpj_tomador']) ? self::sanitizeDocument($item['cnpj_tomador']) : '';
-
+        
+        \Log::info('NfsePayloadFactory: Building payload', [
+            'has_certificado' => !empty($config['certificado']),
+            'certificado_val' => $config['certificado'] ?? 'MISSING'
+        ]);
+        
+        // Base payload structure following PlugNotas requirements
         $payload = [
             'dataCompetencia' => date('Y-m-d'),
             'emitirComo' => $config['emit_as'],
@@ -40,7 +45,7 @@ class NfsePayloadFactory
             'localPrestacao' => $config['local_prestacao'],
             'municipio' => $config['municipio_nome'],
             'codigoTributacaoNacional' => $config['codigo_tributacao_nacional'],
-            'suspensaoExigibilidadeIssqn' => (bool) $config['suspensao_exigibilidade_issqn'],
+            'suspensaoExigibilidadeIssqn' => (bool) ($config['suspensao_exigibilidade_issqn'] ?? false),
             'itemNbs' => $config['item_nbs'],
             'issqnExigibilidadeSuspensa' => (bool) $config['issqn_exigibilidade_suspensa'],
             'issqnRetido' => (bool) $config['issqn_retido'],
@@ -48,18 +53,23 @@ class NfsePayloadFactory
             'pisCofinsSituacao' => $config['pis_cofins_situacao'],
             'aliquotaSimples' => (float) $config['aliquota_simples'],
             'valorAproximadoTributos' => isset($config['valor_aproximado_tributos']) ? (float) $config['valor_aproximado_tributos'] : null,
-            'tomador' => [
-                'cnpj' => $cnpj,
-                'indicadorMunicipal' => '',
-                'telefone' => '',
-                'email' => '',
+            'prestador' => [
+                'cpfCnpj' => self::sanitizeDocument($config['cnpj'] ?? ($config['dados_castro']['cnpj'] ?? null)),
+                'inscricaoMunicipal' => isset($config['inscricao_municipal']) ? self::sanitizeDocument($config['inscricao_municipal']) : null,
+                'certificado' => $config['certificado'] ?? null,
             ],
+            'tomador' => [], // To be populated by resolveTomadorData
             'servico' => [
-                'descricao' => $descricao,
-                'valor' => round($valor, 2),
+                [
+                    'discriminacao' => $descricao,
+                    'valor' => [
+                        'servico' => round($valor, 2),
+                    ],
+                ]
             ],
         ];
 
+        // Merge extra top-level fields
         $optionalFields = [
             'numeroDocumentoResponsabilidadeTecnica',
             'documentoReferencia',

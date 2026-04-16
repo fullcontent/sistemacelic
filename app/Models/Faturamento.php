@@ -35,8 +35,10 @@ class Faturamento extends Model
     {
         return $this->hasMany('App\Models\NfseEmission', 'faturamento_id');
     }
-
-   
+    public function ultimaEmisao()
+    {
+        return $this->hasOne('App\Models\NfseEmission', 'faturamento_id')->orderBy('id', 'desc');
+    }
 
    
 }

@@ -3,7 +3,7 @@
 @section('title', 'Configurações NFS-e')
 
 @section('content_header')
-    <h1>Configurações de Emissão NFS-e</h1>
+    <h1><i class="fa fa-cogs"></i> Configurações de Emissão NFS-e</h1>
 @stop
 
 @section('content')
@@ -13,6 +13,7 @@
             <i class="fa fa-plus"></i> Nova Empresa Emitente
         </button>
     </div>
+
     <div class="col-md-12">
         <div class="nav-tabs-custom">
             <ul class="nav nav-tabs">
@@ -22,213 +23,261 @@
                     </li>
                 @endforeach
             </ul>
-            <div class="tab-content" style="background-color: #f4f6f9;">
+            <div class="tab-content" style="background-color: #f4f6f9; padding: 20px;">
                 @foreach($dadosCastros as $index => $dc)
                 <div class="tab-pane {{ $index == 0 ? 'active' : '' }}" id="tab_{{ $dc->id }}">
                     <form class="nfse-config-form" data-id="{{ $dc->id }}">
                         @csrf
                         <input type="hidden" name="dados_castro_id" value="{{ $dc->id }}">
                         
-                        <div class="box box-solid" style="border-top: 3px solid #7aa2c9; margin-top: 15px;">
-                            <div class="box-header with-border" style="background-color: #f4f6f9;">
-                                <h3 class="box-title" style="color: #354256;">Dados Cadastrais da Empresa</h3>
+                        <!-- SEÇÃO 1: DADOS CADASTRAIS -->
+                        <div class="box box-solid section-box">
+                            <div class="box-header with-border">
+                                <h3 class="box-title text-primary"><i class="fa fa-building"></i> 1. Dados Cadastrais e Bancários</h3>
                             </div>
                             <div class="box-body">
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label>Razão Social</label>
                                             <input type="text" name="dados_castro[razaoSocial]" class="form-control" value="{{ $dc->razaoSocial }}" required>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <div class="form-group">
                                             <label>CNPJ</label>
                                             <div class="input-group">
                                                 <input type="text" name="dados_castro[cnpj]" class="form-control input-cnpj" value="{{ $dc->cnpj }}" required>
                                                 <span class="input-group-btn">
-                                                    <button type="button" class="btn btn-warning btn-flat btn-pesquisar-cnpj"><i class="fa fa-search"></i> Buscar</button>
+                                                    <button type="button" class="btn btn-warning btn-flat btn-pesquisar-cnpj"><i class="fa fa-search"></i></button>
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-4">
                                         <div class="form-group">
-                                            <label>Banco</label>
-                                            <input type="text" name="dados_castro[banco]" class="form-control" value="{{ $dc->banco }}">
+                                            <label>Inscrição Municipal</label>
+                                            <input type="text" name="inscricao_municipal" class="form-control" value="{{ $dc->nfseConfiguration->inscricao_municipal ?? '' }}">
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label>Agência</label>
-                                            <input type="text" name="dados_castro[agencia]" class="form-control" value="{{ $dc->agencia }}">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label>Conta</label>
-                                            <input type="text" name="dados_castro[conta]" class="form-control" value="{{ $dc->conta }}">
-                                        </div>
-                                    </div>
+                                </div>
+                                <div class="row">
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label>Chave PIX</label>
                                             <input type="text" name="dados_castro[chavePix]" class="form-control" value="{{ $dc->chavePix }}">
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="box box-solid" style="border-top: 3px solid #354256;">
-                            <div class="box-header with-border" style="background-color: #eaeaec;">
-                                <h3 class="box-title" style="color: #354256;">Parâmetros de Emissão (PlugNotas)</h3>
-                            </div>
-                            <div class="box-body">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label>Emitir nota como:</label>
-                                            <select name="emitir_como" class="form-control">
-                                                <option value="Prestador" {{ ($dc->nfseConfiguration->emitir_como ?? '') == 'Prestador' ? 'selected' : '' }}>Prestador (Padrão)</option>
-                                                <option value="Tomador" {{ ($dc->nfseConfiguration->emitir_como ?? '') == 'Tomador' ? 'selected' : '' }}>Tomador</option>
-                                                <option value="Intermediário" {{ ($dc->nfseConfiguration->emitir_como ?? '') == 'Intermediário' ? 'selected' : '' }}>Intermediário</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label>Regime de Apuração:</label>
-                                            <select name="regime_apuracao" class="form-control">
-                                                <option value="Simples Nacional" {{ ($dc->nfseConfiguration->regime_apuracao ?? '') == 'Simples Nacional' ? 'selected' : '' }}>Simples Nacional</option>
-                                                <option value="Microempreendedor Individual (MEI)" {{ ($dc->nfseConfiguration->regime_apuracao ?? '') == 'Microempreendedor Individual (MEI)' ? 'selected' : '' }}>Microempreendedor Individual (MEI)</option>
-                                                <option value="Lucro Presumido" {{ ($dc->nfseConfiguration->regime_apuracao ?? '') == 'Lucro Presumido' ? 'selected' : '' }}>Lucro Presumido</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label>Tomador do Serviço:</label>
-                                            <select name="tomador_servico" class="form-control">
-                                                <option value="Brasil" {{ ($dc->nfseConfiguration->tomador_servico ?? '') == 'Brasil' ? 'selected' : '' }}>Brasil</option>
-                                                <option value="Exterior" {{ ($dc->nfseConfiguration->tomador_servico ?? '') == 'Exterior' ? 'selected' : '' }}>Exterior</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Código de Tributação Nacional:</label>
-                                            <input type="text" name="codigo_tributacao_nacional" class="form-control" value="{{ $dc->nfseConfiguration->codigo_tributacao_nacional ?? '17.02.02' }}" placeholder="Ex: 17.02.02">
-                                            <small class="text-muted">Serviço de Licenciamento (Padrão)</small>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Item NBS:</label>
-                                            <input type="text" name="item_nbs" class="form-control" value="{{ $dc->nfseConfiguration->item_nbs ?? '118064000' }}">
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
                                     <div class="col-md-3">
                                         <div class="form-group">
-                                            <label>Alíquota Simples Nacional (%):</label>
-                                            <input type="number" step="0.01" name="aliquota_simples_nacional" class="form-control" value="{{ $dc->nfseConfiguration->aliquota_simples_nacional ?? '9.90' }}">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label>ISSQN Retido?</label>
-                                            <select name="issqn_retido" class="form-control">
-                                                <option value="0" {{ !($dc->nfseConfiguration->issqn_retido ?? false) ? 'selected' : '' }}>Não</option>
-                                                <option value="1" {{ ($dc->nfseConfiguration->issqn_retido ?? false) ? 'selected' : '' }}>Sim</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label>Benefício Municipal?</label>
-                                            <select name="beneficio_municipal" class="form-control">
-                                                <option value="0" {{ !($dc->nfseConfiguration->beneficio_municipal ?? false) ? 'selected' : '' }}>Não</option>
-                                                <option value="1" {{ ($dc->nfseConfiguration->beneficio_municipal ?? false) ? 'selected' : '' }}>Sim</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label>Situação PIS/COFINS:</label>
-                                            <input type="text" name="pis_cofins_situacao" class="form-control" value="{{ $dc->nfseConfiguration->pis_cofins_situacao ?? '00' }}">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label>Inscrição Municipal:</label>
-                                            <input type="text" name="inscricao_municipal" class="form-control" value="{{ $dc->nfseConfiguration->inscricao_municipal ?? '' }}">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label>Email Emitente:</label>
+                                            <label>Email Emitente</label>
                                             <input type="email" name="email_emitente" class="form-control" value="{{ $dc->nfseConfiguration->email_emitente ?? '' }}">
                                         </div>
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
-                                            <label>Telefone:</label>
+                                            <label>Telefone</label>
                                             <input type="text" name="telefone_emitente" class="form-control" value="{{ $dc->nfseConfiguration->telefone_emitente ?? '' }}">
                                         </div>
                                     </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Status</label>
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox" name="ativo" {{ ($dc->nfseConfiguration->ativo ?? true) ? 'checked' : '' }}> Emitente Ativo
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
+                            </div>
+                        </div>
 
-                                <h4 style="border-bottom: 2px solid #7aa2c9; padding-bottom: 5px; margin-top: 20px;">Endereço do Emitente (Obrigatório para registro)</h4>
+                        <!-- SEÇÃO 2: ENDEREÇO FISCAL -->
+                        <div class="box box-solid section-box">
+                            <div class="box-header with-border">
+                                <h3 class="box-title text-primary"><i class="fa fa-map-marker"></i> 2. Endereço Fiscal (IBGE/Município)</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="form-group">
+                                            <label>Logradouro / Rua</label>
+                                            <input type="text" name="logradouro" class="form-control" value="{{ $dc->nfseConfiguration->logradouro ?? '' }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Número</label>
+                                            <input type="text" name="numero" class="form-control" value="{{ $dc->nfseConfiguration->numero ?? '' }}">
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label>Logradouro:</label>
-                                            <input type="text" name="logradouro" class="form-control" value="{{ $dc->nfseConfiguration->logradouro ?? '' }}">
+                                            <label>Bairro</label>
+                                            <input type="text" name="bairro" class="form-control" value="{{ $dc->nfseConfiguration->bairro ?? '' }}">
                                         </div>
                                     </div>
                                     <div class="col-md-2">
                                         <div class="form-group">
-                                            <label>Número:</label>
-                                            <input type="text" name="numero" class="form-control" value="{{ $dc->nfseConfiguration->numero ?? '' }}">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label>Bairro:</label>
-                                            <input type="text" name="bairro" class="form-control" value="{{ $dc->nfseConfiguration->bairro ?? '' }}">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label>CEP:</label>
+                                            <label>CEP</label>
                                             <input type="text" name="cep" class="form-control" value="{{ $dc->nfseConfiguration->cep ?? '' }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Município (Nome)</label>
+                                            <input type="text" name="municipio_nome" class="form-control" value="{{ $dc->nfseConfiguration->municipio_nome ?? 'Balneário Camboriú' }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label>UF</label>
+                                            <input type="text" name="uf" class="form-control text-uppercase" value="{{ $dc->nfseConfiguration->uf ?? 'SC' }}" maxlength="2">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Cód. Município IBGE <i class="fa fa-info-circle text-info" title="Consulte o código IBGE do seu município para garantir a emissão correta."></i></label>
+                                            <input type="text" name="codigo_cidade" class="form-control" value="{{ $dc->nfseConfiguration->codigo_cidade ?? '4202008' }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SEÇÃO 3: PARÂMETROS TRIBUTÁRIOS -->
+                        <div class="box box-solid section-box">
+                            <div class="box-header with-border">
+                                <h3 class="box-title text-primary"><i class="fa fa-percent"></i> 3. Parâmetros Tributários e Fiscais</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Regime de Apuração</label>
+                                            <select name="simples_regime" class="form-control select2">
+                                                <option value="Simples Nacional" {{ ($dc->nfseConfiguration->simples_regime ?? '') == 'Simples Nacional' ? 'selected' : '' }}>Simples Nacional</option>
+                                                <option value="Microempreendedor Individual (MEI)" {{ ($dc->nfseConfiguration->simples_regime ?? '') == 'Microempreendedor Individual (MEI)' ? 'selected' : '' }}>Microempreendedor Individual (MEI)</option>
+                                                <option value="Lucro Presumido" {{ ($dc->nfseConfiguration->simples_regime ?? '') == 'Lucro Presumido' ? 'selected' : '' }}>Lucro Presumido</option>
+                                                <option value="Lucro Real" {{ ($dc->nfseConfiguration->simples_regime ?? '') == 'Lucro Real' ? 'selected' : '' }}>Lucro Real</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Alíquota Simples Nacional (%)</label>
+                                            <input type="number" step="0.01" name="aliquota_simples" class="form-control" value="{{ $dc->nfseConfiguration->aliquota_simples ?? '9.90' }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>Situação PIS/COFINS (CST)</label>
+                                            <input type="text" name="pis_cofins_situacao" class="form-control" value="{{ $dc->nfseConfiguration->pis_cofins_situacao ?? '00' }}">
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label>Código Cidade (IBGE):</label>
-                                            <input type="text" name="codigo_cidade" class="form-control" value="{{ $dc->nfseConfiguration->codigo_cidade ?? '4202008' }}">
+                                            <label>Cód. Tributação Nacional (LC 116)</label>
+                                            <input type="text" name="codigo_tributacao_nacional" class="form-control" value="{{ $dc->nfseConfiguration->codigo_tributacao_nacional ?? '17.02.02' }}">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label>UF:</label>
-                                            <input type="text" name="uf" class="form-control" value="{{ $dc->nfseConfiguration->uf ?? 'SC' }}" maxlength="2">
+                                            <label>Item NBS</label>
+                                            <input type="text" name="item_nbs" class="form-control" value="{{ $dc->nfseConfiguration->item_nbs ?? '118064000' }}">
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" name="issqn_retido" {{ ($dc->nfseConfiguration->issqn_retido ?? false) ? 'checked' : '' }}> ISSQN Retido
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" name="beneficio_municipal" {{ ($dc->nfseConfiguration->beneficio_municipal ?? false) ? 'checked' : '' }}> Benefício Municipal
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" name="suspensao_exigibilidade_issqn" {{ ($dc->nfseConfiguration->suspensao_exigibilidade_issqn ?? false) ? 'checked' : '' }}> Suspensão Exigibilidade
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" name="issqn_exigibilidade_suspensa" {{ ($dc->nfseConfiguration->issqn_exigibilidade_suspensa ?? false) ? 'checked' : '' }}> Exigibilidade Suspensa
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SEÇÃO 4: CONFIGURAÇÕES TÉCNICAS -->
+                        <div class="box box-solid section-box" style="border-bottom: 2px solid #3c8dbc;">
+                            <div class="box-header with-border">
+                                <h3 class="box-title text-primary"><i class="fa fa-key"></i> 4. Integração e Certificado (PlugNotas)</h3>
+                            </div>
+                            <div class="box-body">
+                                <div class="row">
+                                    <div class="col-md-6">
                                         <div class="form-group">
-                                            <label>Regime Tributário (PlugNotas):</label>
+                                            <label>ID Certificado (PlugNotas)</label>
+                                            <input type="text" name="certificado" class="form-control" value="{{ $dc->nfseConfiguration->certificado ?? '' }}" placeholder="Cole o ID do certificado da PlugNotas">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Login Prefeitura</label>
+                                            <input type="text" name="login_prefeitura" class="form-control" value="{{ $dc->nfseConfiguration->login_prefeitura ?? '' }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Senha Prefeitura</label>
+                                            <input type="password" name="senha_prefeitura" class="form-control" value="{{ $dc->nfseConfiguration->senha_prefeitura ?? '' }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Ambiente</label>
+                                            <select name="producao" class="form-control">
+                                                <option value="0" {{ !($dc->nfseConfiguration->producao ?? false) ? 'selected' : '' }}>Sandbox (Testes)</option>
+                                                <option value="1" {{ ($dc->nfseConfiguration->producao ?? false) ? 'selected' : '' }}>Produção (Real)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Tipo Tomador</label>
+                                            <select name="tomador_tipo" class="form-control">
+                                                <option value="Brasil" {{ ($dc->nfseConfiguration->tomador_tipo ?? '') == 'Brasil' ? 'selected' : '' }}>Brasil</option>
+                                                <option value="Exterior" {{ ($dc->nfseConfiguration->tomador_tipo ?? '') == 'Exterior' ? 'selected' : '' }}>Exterior</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Regime Tributário (PlugNotas)</label>
                                             <select name="regime_tributario" class="form-control">
                                                 <option value="1" {{ ($dc->nfseConfiguration->regime_tributario ?? '') == '1' ? 'selected' : '' }}>Simples Nacional</option>
                                                 <option value="2" {{ ($dc->nfseConfiguration->regime_tributario ?? '') == '2' ? 'selected' : '' }}>Simples Nacional - MEI</option>
@@ -237,48 +286,26 @@
                                             </select>
                                         </div>
                                     </div>
-                                </div>
-
-                                <h4 style="border-bottom: 2px solid #7aa2c9; padding-bottom: 5px; margin-top: 20px;">Credenciais e Certificado (Opcional)</h4>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label>ID Certificado (PlugNotas):</label>
-                                            <input type="text" name="certificado" class="form-control" value="{{ $dc->nfseConfiguration->certificado ?? '' }}" placeholder="Ex: 5af59d271f6... ">
-                                        </div>
-                                    </div>
                                     <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label>Login Prefeitura:</label>
-                                            <input type="text" name="login_prefeitura" class="form-control" value="{{ $dc->nfseConfiguration->login_prefeitura ?? '' }}">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label>Senha Prefeitura:</label>
-                                            <input type="password" name="senha_prefeitura" class="form-control" value="{{ $dc->nfseConfiguration->senha_prefeitura ?? '' }}">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <label>Ambiente:</label>
-                                            <select name="producao" class="form-control">
-                                                <option value="0" {{ !($dc->nfseConfiguration->producao ?? false) ? 'selected' : '' }}>Sandbox</option>
-                                                <option value="1" {{ ($dc->nfseConfiguration->producao ?? false) ? 'selected' : '' }}>Produção</option>
+                                         <div class="form-group">
+                                            <label>Mapear como:</label>
+                                            <select name="emit_as" class="form-control">
+                                                <option value="Prestador" {{ ($dc->nfseConfiguration->emit_as ?? '') == 'Prestador' ? 'selected' : '' }}>Prestador</option>
+                                                <option value="Tomador" {{ ($dc->nfseConfiguration->emit_as ?? '') == 'Tomador' ? 'selected' : '' }}>Tomador</option>
                                             </select>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="box-footer" style="background-color: #eaeaec;">
-                                <button type="button" class="btn btn-flat btn-danger btn-delete-emitente" data-id="{{ $dc->id }}" style="margin-right: 15px;">
-                                    <i class="fa fa-trash"></i> Desativar Empresa
+                            <div class="box-footer" style="padding: 20px;">
+                                <button type="button" class="btn btn-default btn-flat btn-delete-emitente" data-id="{{ $dc->id }}">
+                                    <i class="fa fa-trash"></i> Desativar
                                 </button>
-                                <button type="button" class="btn btn-flat btn-info btn-sync-plugnotas" data-id="{{ $dc->id }}">
-                                    <i class="fa fa-refresh"></i> Sincronizar com PlugNotas
+                                <button type="button" class="btn btn-info btn-flat btn-sync-plugnotas" data-id="{{ $dc->id }}">
+                                    <i class="fa fa-refresh"></i> Sincronizar PlugNotas
                                 </button>
-                                <button type="submit" class="btn btn-flat pull-right" style="background-color: #354256; color: white;">
-                                    <i class="fa fa-save"></i> Salvar Configurações
+                                <button type="submit" class="btn btn-primary btn-flat pull-right btn-lg">
+                                    <i class="fa fa-save"></i> SALVAR CONFIGURAÇÕES
                                 </button>
                             </div>
                         </div>
@@ -291,25 +318,22 @@
 </div>
 
 <!-- Modal Nova Empresa -->
-<div class="modal fade" id="modalNovoEmitente" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="modalNovoEmitente" tabindex="-1">
+    <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header" style="background-color: #354256; color: white;">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: white; opacity: 1;">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title"><i class="fa fa-building"></i> Nova Empresa Emitente</h4>
+            <div class="modal-header bg-primary">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Nova Empresa Emitente</h4>
             </div>
             <form action="{{ route('nfse.emitente.store') }}" method="POST">
                 @csrf
                 <div class="modal-body">
-                    <p>Insira o CNPJ e clique em buscar. Traremos todos os dados disponíveis.</p>
                     <div class="form-group">
                         <label>CNPJ</label>
                         <div class="input-group">
-                            <input type="text" name="cnpj" class="form-control input-cnpj" placeholder="00.000.000/0000-00" required>
+                            <input type="text" name="cnpj" class="form-control input-cnpj" required>
                             <span class="input-group-btn">
-                                <button type="button" class="btn btn-warning btn-flat btn-pesquisar-cnpj"><i class="fa fa-search"></i> Buscar</button>
+                                <button type="button" class="btn btn-warning btn-flat btn-pesquisar-cnpj"><i class="fa fa-search"></i></button>
                             </span>
                         </div>
                     </div>
@@ -317,228 +341,87 @@
                         <label>Razão Social</label>
                         <input type="text" name="razaoSocial" class="form-control" required>
                     </div>
-
-                    <!-- Campos Ocultos para Autopreenchimento da ReceitaWS -->
-                    <input type="hidden" name="logradouro" value="">
-                    <input type="hidden" name="numero" value="">
-                    <input type="hidden" name="bairro" value="">
-                    <input type="hidden" name="cep" value="">
-                    <input type="hidden" name="uf" value="">
-                    <input type="hidden" name="telefone_emitente" value="">
-                    <input type="hidden" name="email_emitente" value="">
-
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary" style="background-color: #354256;">Cadastrar e Configurar</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-primary">Cadastrar</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
 @stop
 
 @section('css')
 <style>
-    .nav-tabs-custom > .nav-tabs > li.active {
-        border-top-color: #354256;
-    }
-    .form-control:focus {
-        border-color: #7aa2c9;
-        box-shadow: none;
-    }
+    .section-box { border-top: 3px solid #d2d6de; margin-bottom: 25px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .section-box .box-header { background: #fff; }
+    .nav-tabs-custom > .nav-tabs > li.active { border-top-color: #3c8dbc; }
 </style>
 @stop
 
 @section('js')
 <script>
 $(function() {
+    $('.input-cnpj').mask('00.000.000/0000-00');
+
     $('.nfse-config-form').on('submit', function(e) {
         e.preventDefault();
         var form = $(this);
-        var data = form.serialize();
+        var btn = form.find('button[type="submit"]');
+        btn.html('<i class="fa fa-spinner fa-spin"></i> SALVANDO...').prop('disabled', true);
         
-        $.ajax({
-            url: "{{ route('nfse.config.save') }}",
-            type: "POST",
-            data: data,
-            success: function(response) {
-                if(response.success) {
-                    Swal.fire('Sucesso!', response.message, 'success');
-                }
-            },
-            error: function() {
-                Swal.fire('Erro', 'Erro ao salvar configurações.', 'error');
-            }
-        });
-    });
-
-    // Clique no botão de Sincronizar
-    $('.btn-sync-plugnotas').on('click', function() {
-        var btn = $(this);
-        var id = btn.data('id');
-        var form = btn.closest('form');
-        
-        // Primeiro salva as configurações locais para garantir que estão atualizadas
         $.ajax({
             url: "{{ route('nfse.config.save') }}",
             type: "POST",
             data: form.serialize(),
-            success: function(saveRes) {
-                if(saveRes.success) {
-                    // Após salvar, dispara a sincronização
-                    btn.html('<i class="fa fa-spinner fa-spin"></i> Sincronizando...').prop('disabled', true);
-                    
-                    $.ajax({
-                        url: "{{ route('nfse.sync') }}",
-                        type: "POST",
-                        data: {
-                            _token: "{{ csrf_token() }}",
-                            dados_castro_id: id
-                        },
-                        success: function(syncRes) {
-                            if(syncRes.success) {
-                                Swal.fire('Sucesso!', 'Empresa sincronizada com PlugNotas.', 'success');
-                            } else {
-                                Swal.fire('Erro na API', syncRes.message || 'Erro ao sincronizar.', 'error');
-                            }
-                        },
-                        error: function() {
-                            Swal.fire('Erro', 'Erro na comunicação com o servidor Celic.', 'error');
-                        },
-                        complete: function() {
-                            btn.html('<i class="fa fa-refresh"></i> Sincronizar com PlugNotas').prop('disabled', false);
-                        }
-                    });
+            success: function(response) {
+                if(response.success) {
+                    Swal.fire('Sucesso!', 'Configurações salvas com sucesso!', 'success');
                 }
+            },
+            error: function(err) {
+                Swal.fire('Erro', 'Falha ao salvar. Verifique os dados.', 'error');
+            },
+            complete: function() {
+                btn.html('<i class="fa fa-save"></i> SALVAR CONFIGURAÇÕES').prop('disabled', false);
             }
         });
     });
 
-    // Desativar Empresa
-    $('.btn-delete-emitente').on('click', function() {
+    $('.btn-pesquisar-cnpj').on('click', function() {
         var btn = $(this);
-        var id = btn.data('id');
-
-        Swal.fire({
-            title: 'Você tem certeza?',
-            text: "Esta empresa será ocultada do painel de configurações e do formulário de emissão. Nenhum faturamento passado será afetado.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Sim, desativar!',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                btn.prop('disabled', true);
-                $.ajax({
-                    url: "/admin/nfse/configuracoes/emitente/" + id,
-                    type: "POST",
-                    data: {
-                        _method: 'DELETE',
-                        _token: "{{ csrf_token() }}"
-                    },
-                    success: function(response) {
-                        if(response.success) {
-                            Swal.fire('Desativada!', response.message, 'success').then(() => {
-                                window.location.reload();
-                            });
-                        }
-                    },
-                    error: function() {
-                        btn.prop('disabled', false);
-                        Swal.fire('Erro', 'Ocorreu um problema ao desativar.', 'error');
-                    }
-                });
-            }
-        });
-    });
-
-    // Função de formato
-    function formatText(text) {
-        if(!text) return '';
-        var loweredText = text.toLowerCase();
-        var words = loweredText.split(" ");
-        for (var a = 0; a < words.length; a++) {
-            var w = words[a];
-            if(w.length > 0) {
-                var firstLetter = w[0];
-                w = firstLetter.toUpperCase() + w.slice(1);
-                words[a] = w;
-            }
-        }
-        return words.join(" ");
-    }
-
-    // Pesquisar CNPJ na ReceitaWS
-    $('.btn-pesquisar-cnpj').on('click', function(e) {
-        e.preventDefault();
-        var btn = $(this);
+        var container = btn.closest('.form-group').parent();
+        var cnpj = container.find('.input-cnpj').val().replace(/\D/g, '');
         
-        // Pega o container do escopo atual (seja do modal ou da form tab).
-        var container = btn.closest('.modal-body');
-        if (container.length === 0) {
-            container = btn.closest('.box-body');
-        }
+        if (cnpj.length !== 14) return;
 
-        var inputCnpj = container.find('.input-cnpj');
-        var cnpj = inputCnpj.val().replace(/[^0-9]/g, '');
-
-        if (cnpj.length == 14) {
-            btn.html('<i class="fa fa-spinner fa-spin"></i>').prop('disabled', true);
-
-            $.ajax({
-                url: 'https://www.receitaws.com.br/v1/cnpj/' + cnpj,
-                method: 'GET',
-                dataType: 'jsonp',
-                success: function (response) {
-                    if (response && response.status == 'OK') {
-                        // Preenche Razão Social genérica
-                        var razaoSocial = container.find('input[name="razaoSocial"], input[name="dados_castro[razaoSocial]"]');
-                        if(razaoSocial.length > 0) razaoSocial.val(formatText(response.nome));
-
-                        // Preenche os outros dados fiscais se existirem no form do escopo
-                        var endereco = container.find('input[name="logradouro"]');
-                        if (endereco.length > 0) {
-                            endereco.val(formatText(response.logradouro));
-                            container.find('input[name="numero"]').val(response.numero);
-                            container.find('input[name="cep"]').val(response.cep);
-                            container.find('input[name="bairro"]').val(formatText(response.bairro));
-                            // Não setamos o codigo_cidade do IBGE pois a API da Receita traz só o nome e UF.
-                            container.find('input[name="uf"]').val(response.uf);
-                            
-                            var telefone = container.find('input[name="telefone_emitente"]');
-                            if(telefone.length > 0) telefone.val(response.telefone);
-                            var email = container.find('input[name="email_emitente"]');
-                            if(email.length > 0) email.val(response.email);
-                        } else {
-                            // Estamos no modal, setar os hiddens
-                            container.find('input[name="logradouro"]').val(formatText(response.logradouro));
-                            container.find('input[name="numero"]').val(response.numero);
-                            container.find('input[name="cep"]').val(response.cep);
-                            container.find('input[name="bairro"]').val(formatText(response.bairro));
-                            container.find('input[name="uf"]').val(response.uf);
-                            container.find('input[name="telefone_emitente"]').val(response.telefone);
-                            container.find('input[name="email_emitente"]').val(response.email);
-                        }
-
-                        Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Dados obtidos com sucesso. Verifique o preenchimento.', showConfirmButton: false, timer: 3000 });
+        btn.html('<i class="fa fa-spinner fa-spin"></i>').prop('disabled', true);
+        $.ajax({
+            url: 'https://www.receitaws.com.br/v1/cnpj/' + cnpj,
+            method: 'GET',
+            dataType: 'jsonp',
+            success: function (response) {
+                if (response.status == 'OK') {
+                    if (container.closest('.modal-body').length) {
+                         container.closest('.modal-body').find('input[name="razaoSocial"]').val(response.nome);
                     } else {
-                        Swal.fire('Erro', response ? response.message : 'Não foi possível buscar os dados (verifique o CNPJ)', 'warning');
+                         container.closest('.box-body').find('input[name="dados_castro[razaoSocial]"]').val(response.nome);
+                         // Preencher endereço se estiver na aba
+                         container.closest('.nfse-config-form').find('input[name="logradouro"]').val(response.logradouro);
+                         container.closest('.nfse-config-form').find('input[name="numero"]').val(response.numero);
+                         container.closest('.nfse-config-form').find('input[name="bairro"]').val(response.bairro);
+                         container.closest('.nfse-config-form').find('input[name="cep"]').val(response.cep);
+                         container.closest('.nfse-config-form').find('input[name="uf"]').val(response.uf);
+                         container.closest('.nfse-config-form').find('input[name="municipio_nome"]').val(response.municipio);
                     }
-                    
-                    btn.html('<i class="fa fa-search"></i> Buscar').prop('disabled', false);
-                },
-                error: function() {
-                    Swal.fire('Erro', 'Falha na comunicação com a Receita Federal.', 'error');
-                    btn.html('<i class="fa fa-search"></i> Buscar').prop('disabled', false);
+                    Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Dados recuperados!' });
                 }
-            });
-        } else {
-            Swal.fire('Atenção', 'CNPJ deve conter 14 dígitos válidos.', 'error');
-        }
+            },
+            complete: function() {
+                btn.html('<i class="fa fa-search"></i>').prop('disabled', false);
+            }
+        });
     });
 });
 </script>

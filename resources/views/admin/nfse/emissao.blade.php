@@ -1,240 +1,377 @@
 @extends('adminlte::page')
 
-@section('title', 'Área de Emissão de Notas Fiscais')
+@section('title', 'Emissão de NFS-e')
 
 @section('content_header')
-    <h1><i class="fa fa-file-invoice"></i> Área de Emissão de Notas Fiscais</h1>
+    <h1><i class="fa fa-file-invoice"></i> Emissão de Notas Fiscais (NFS-e)</h1>
 @stop
 
 @section('content')
 <div class="row">
-    <div class="col-md-10 col-md-offset-1">
-        
+    <div class="col-md-12">
         @if(session('success'))
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    Swal.fire({ title: 'Sucesso!', text: "{{ session('success') }}", icon: 'success' });
-                });
-            </script>
+            <div class="alert alert-success alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <h5><i class="icon fas fa-check"></i> Sucesso!</h5>
+                {{ session('success') }}
+            </div>
         @endif
 
         @if(session('error'))
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    Swal.fire({ title: 'Erro na Emissão', text: "{{ session('error') }}", icon: 'error' });
-                });
-            </script>
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <h5><i class="icon fas fa-ban"></i> Erro na Emissão!</h5>
+                <div style="word-wrap: break-word; white-space: pre-wrap;">
+                    @if(strpos(session('error'), 'Resposta:') !== false)
+                        <?php 
+                            $parts = explode(' | Resposta: ', session('error'));
+                            $mainMsg = $parts[0];
+                            $jsonMsg = $parts[1] ?? '';
+                            // Tenta formatar se for JSON
+                            $decoded = json_decode($jsonMsg, true);
+                            if ($decoded) {
+                                $formattedJson = json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                            } else {
+                                $formattedJson = $jsonMsg;
+                            }
+                        ?>
+                        <p>{{ $mainMsg }}</p>
+                        <hr style="border-top: 1px solid rgba(255,255,255,0.2)">
+                        <strong>Detalhes da API:</strong>
+                        <pre style="background: rgba(0,0,0,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); margin-top: 10px; max-height: 300px; overflow-y: auto;">{{ $formattedJson }}</pre>
+                    @else
+                        {{ session('error') }}
+                    @endif
+                </div>
+            </div>
         @endif
 
-        <div class="box box-solid" style="border-top: 3px solid #354256;">
-            <div class="box-header with-border" style="background-color: #eaeaec;">
-                <h3 class="box-title" style="color: #354256;">Faturamento #{{ $faturamento->id }} - {{ $faturamento->empresa->nomeFantasia }}</h3>
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">Faturamento #{{ $faturamento->id }} - {{ $faturamento->empresa->nomeFantasia }}</h3>
             </div>
             
-            <form action="{{ route('nfse.processar', $faturamento->id) }}" method="POST" enctype="multipart/form-data">
+            <form id="formEmissao" action="{{ route('nfse.processar', $faturamento->id) }}" method="POST">
                 @csrf
                 <div class="box-body">
-                    <div class="row" style="margin-bottom: 20px;">
+                    <!-- PASSO 1: SELEÇÃO DA OPÇÃO -->
+                    <div class="row">
                         <div class="col-md-12">
-                            <label>Empresa Emitente (Prestador):</label>
-                            <select name="dados_castro_id" class="form-control" style="border-color: #7aa2c9;">
-                                @foreach($empresasDisponiveis as $emp)
-                                    <option value="{{ $emp->id }}" {{ $dadosCastro && $dadosCastro->id == $emp->id ? 'selected' : '' }}>
-                                        {{ $emp->cnpj }} - {{ $emp->razaoSocial }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            <h4 style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">
+                                <span class="label label-primary">1</span> Escolha o Modo de Emissão
+                            </h4>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="info-box bg-aqua option-card" data-option="1" style="cursor: pointer; opacity: 0.7;">
+                                <span class="info-box-icon"><i class="fa fa-copy"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text"><b>OPÇÃO 1: INDIVIDUAL (PADRÃO)</b></span>
+                                    <span class="info-box-number">Uma nota por serviço</span>
+                                    <div class="progress"><div class="progress-bar" style="width: 100%"></div></div>
+                                    <span class="progress-description">Tomador = CNPJ da Unidade do Serviço</span>
+                                </div>
+                                <input type="radio" name="opcao_automatica" value="1" style="display:none;" id="opt1">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="info-box bg-green option-card" data-option="2" style="cursor: pointer; opacity: 0.7;">
+                                <span class="info-box-icon"><i class="fa fa-user-edit"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text"><b>OPÇÃO 2: INDIVIDUAL (MANUAL)</b></span>
+                                    <span class="info-box-number">Uma nota por serviço</span>
+                                    <div class="progress"><div class="progress-bar" style="width: 100%"></div></div>
+                                    <span class="progress-description">Tomador = CNPJ digitado manualmente</span>
+                                </div>
+                                <input type="radio" name="opcao_automatica" value="2" style="display:none;" id="opt2">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="info-box bg-purple option-card" data-option="3" style="cursor: pointer; opacity: 0.7;">
+                                <span class="info-box-icon"><i class="fa fa-layer-group"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text"><b>OPÇÃO 3: AGRUPADA (PADRÃO)</b></span>
+                                    <span class="info-box-number">Uma nota única</span>
+                                    <div class="progress"><div class="progress-bar" style="width: 100%"></div></div>
+                                    <span class="progress-description">Tomador = Empresa do faturamento</span>
+                                </div>
+                                <input type="radio" name="opcao_automatica" value="3" style="display:none;" id="opt3">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="info-box bg-orange option-card" data-option="4" style="cursor: pointer; opacity: 0.7;">
+                                <span class="info-box-icon"><i class="fa fa-search"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text"><b>OPÇÃO 4: AGRUPADA (MANUAL)</b></span>
+                                    <span class="info-box-number">Uma nota única</span>
+                                    <div class="progress"><div class="progress-bar" style="width: 100%"></div></div>
+                                    <span class="progress-description">Tomador = CNPJ digitado manualmente</span>
+                                </div>
+                                <input type="radio" name="opcao_automatica" value="4" style="display:none;" id="opt4">
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="nav-tabs-custom">
-                        <ul class="nav nav-tabs nav-justified">
-                            <li class="active"><a href="#modo1" data-toggle="tab" aria-expanded="true"><i class="fa fa-magic"></i> MODO 1: Automático</a></li>
-                            <li class=""><a href="#modo2" data-toggle="tab" aria-expanded="false"><i class="fa fa-upload"></i> MODO 2: Manual (Anexar)</a></li>
-                            <li class=""><a href="#modo3" data-toggle="tab" aria-expanded="false"><i class="fa fa-times"></i> MODO 3: Não emitir</a></li>
-                        </ul>
-                        
-                        <div class="tab-content" style="padding-top: 20px;">
-                            <!-- MODO 1: AUTOMÁTICO -->
-                            <div class="tab-pane active" id="modo1">
-                                <input type="hidden" name="tipo_emissao" value="automatica" id="input_tipo_emissao">
-                                
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="well" style="background-color: #f4f6f9; border-left: 5px solid #7aa2c9;">
-                                            <h4>Escolha a forma de preenchimento dos itens:</h4>
-                                            
-                                            <div class="radio">
-                                                <label>
-                                                    <input type="radio" name="sub_opcao_modo1" value="1" checked onclick="toggleAutoDesc(1)">
-                                                    <b>OPÇÃO 1:</b> Apenas o valor total com discriminação padrão do sistema.
-                                                </label>
-                                            </div>
-                                            <div class="radio">
-                                                <label>
-                                                    <input type="radio" name="sub_opcao_modo1" value="2" onclick="toggleAutoDesc(2)">
-                                                    <b>OPÇÃO 2:</b> Preencher descrição da nota manualmente (Campo único).
-                                                </label>
-                                            </div>
-                                            <div class="radio">
-                                                <label>
-                                                    <input type="radio" name="sub_opcao_modo1" value="3" onclick="toggleAutoDesc(3)">
-                                                    <b>OPÇÃO 3:</b> Agrupamento Automático (O sistema concatenará os serviços faturados).
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
 
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label>Discriminação dos Serviços na Nota:</label>
-                                            <textarea name="descricao_agregada" id="descricao_agregada" class="form-control" rows="6" required></textarea>
-                                        </div>
-                                    </div>
-                                </div>
+                    <!-- PASSO 2: SELEÇÃO DE SERVIÇOS -->
+                    <div class="row" style="margin-top: 30px;">
+                        <div class="col-md-12">
+                            <h4 style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">
+                                <span class="label label-primary">2</span> Serviços Vinculados
+                            </h4>
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                    <tr style="background-color: #f9f9f9;">
+                                        <th width="30"><input type="checkbox" id="checkAll"></th>
+                                        <th>OS</th>
+                                        <th>Unidade</th>
+                                        <th>Serviço</th>
+                                        <th>Valor Faturado</th>
+                                        <th>CNPJ Destino (Padrão)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($faturamento->servicosFaturados as $item)
+                                        @if($item->detalhes)
+                                        <tr>
+                                            <td><input type="checkbox" name="servico_ids[]" value="{{ $item->servico_id }}" checked class="checkItem"></td>
+                                            <td>{{ $item->detalhes->os }}</td>
+                                            <td>{{ $item->detalhes->unidade->nomeFantasia ?? '-' }}</td>
+                                            <td>{{ $item->detalhes->nome }}</td>
+                                            <td>R$ {{ number_format($item->valorFaturado, 2, ',', '.') }}</td>
+                                            <td>{{ $item->detalhes->unidade->cnpj ?? 'N/A' }}</td>
+                                        </tr>
+                                        @endif
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
 
+                    <!-- PASSO 3: DADOS DO TOMADOR -->
+                    <div id="sectionTomador" class="row" style="margin-top: 30px; display: none;">
+                        <div class="col-md-12">
+                            <h4 style="border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">
+                                <span class="label label-primary">3</span> Dados do Tomador (Destinatário)
+                            </h4>
+                            
+                            <div id="tomadorDefault" class="well" style="background-color: #fff; border: 1px solid #ddd;">
                                 <div class="row">
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label>Valor Total da Nota (R$):</label>
-                                            <input type="text" name="valor_total" id="valor_total" class="form-control" value="{{ number_format($faturamento->valorTotal, 2, ',', '.') }}" readonly>
-                                        </div>
+                                    <div class="col-md-8">
+                                        <p><b>Empresa Principal:</b> {{ $faturamento->empresa->razaoSocial }}</p>
+                                        <p><b>CNPJ:</b> {{ $faturamento->empresa->cnpj }}</p>
+                                        <p><b>Endereço:</b> {{ $faturamento->empresa->endereco }}, {{ $faturamento->empresa->numero }} - {{ $faturamento->empresa->cidade }}/{{ $faturamento->empresa->uf }}</p>
                                     </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label>Número Pedido / OS (B2B):</label>
-                                            <input type="text" name="numero_pedido_os" class="form-control">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label>Responsabilidade Técnica:</label>
-                                            <input type="text" name="responsabilidade_tecnica" class="form-control" placeholder="Número do documento">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label>Documento de Referência:</label>
-                                            <input type="text" name="documento_referencia" class="form-control">
-                                        </div>
+                                    <div class="col-md-4 text-right">
+                                        <button type="button" class="btn btn-warning" id="btnNovaEmpresa"><i class="fa fa-plus"></i> Usar Outra Empresa</button>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- MODO 2: MANUAL -->
-                            <div class="tab-pane" id="modo2">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Número da Nota Fiscal:</label>
-                                            <input type="text" name="numero_nf" class="form-control">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Anexar PDF da Nota:</label>
-                                            <input type="file" name="pdf_nota" class="form-control">
-                                        </div>
+                            <div id="tomadorManual" class="box box-warning box-solid" style="display:none;">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Informar Novo Tomador</h3>
+                                    <div class="box-tools pull-right">
+                                        <button type="button" class="btn btn-box-tool" id="btnRecusarNovaEmpresa"><i class="fa fa-times"></i> Voltar ao padrão</button>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label>Observações:</label>
-                                            <textarea name="obs" class="form-control" rows="3"></textarea>
+                                <div class="box-body">
+                                    <input type="hidden" name="nova_empresa" id="input_nova_empresa" value="0">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>CNPJ do Tomador:</label>
+                                                <div class="input-group">
+                                                    <input type="text" name="override_cnpj" id="override_cnpj" class="form-control" placeholder="00.000.000/0000-00">
+                                                    <span class="input-group-btn">
+                                                        <button type="button" class="btn btn-info btn-flat" id="btnConsutarCnpj"><i class="fa fa-search"></i> Consultar</button>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="form-group">
+                                                <label>Razão Social:</label>
+                                                <input type="text" name="override_razaoSocial" id="override_razaoSocial" class="form-control">
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-
-                            <!-- MODO 3: NÃO EMITIR -->
-                            <div class="tab-pane" id="modo3">
-                                <div class="alert alert-warning" style="background-color: #fcf8e3 !important; color: #8a6d3b !important; border-color: #faebcc !important;">
-                                    <i class="icon fa fa-warning"></i> 
-                                    Atenção! Ao escolher esta opção, o sistema marcará este faturamento como "Concluído" sem a necessidade de emissão ou anexo de nota fiscal.
-                                </div>
-                                <div class="form-group">
-                                    <label>Motivo da não emissão:</label>
-                                    <textarea name="motivo_nao_emitir" class="form-control" rows="3"></textarea>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>E-mail:</label>
+                                                <input type="text" name="override_email" id="override_email" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="form-group">
+                                                <label>Logradouro:</label>
+                                                <input type="text" name="override_logradouro" id="override_logradouro" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Número:</label>
+                                                <input type="text" name="override_numero" id="override_numero" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Bairro:</label>
+                                                <input type="text" name="override_bairro" id="override_bairro" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>CEP:</label>
+                                                <input type="text" name="override_cep" id="override_cep" class="form-control">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>Cidade:</label>
+                                                <input type="text" name="override_municipio" id="override_municipio" class="form-control">
+                                                <input type="hidden" name="override_codigoCidade" id="override_codigoCidade">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label>UF:</label>
+                                                <input type="text" name="override_uf" id="override_uf" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <div class="box-footer" style="background-color: #eaeaec;">
-                    <button type="submit" class="btn btn-lg btn-flat pull-right" style="background-color: #354256; color: white;">
-                        <i class="fa fa-check"></i> Finalizar Emissão
+                <div class="box-footer">
+                    <a href="{{ route('faturamento.show', $faturamento->id) }}" class="btn btn-default btn-lg">Cancelar</a>
+                    <button type="submit" class="btn btn-primary btn-lg pull-right" id="btnFinalizar" disabled>
+                        <i class="fa fa-check"></i> Processar Emissão
                     </button>
-                    <a href="{{ route('faturamentos.index') }}" class="btn btn-lg btn-flat btn-default">Cancelar</a>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
-<!-- Dados brutos para o JS -->
-<div id="dados_servicos" style="display:none;">
-    @foreach($servicos as $s)
-        <div class="servico-item" data-id="{{ $s->id }}" data-nome="{{ $s->nome }}" data-unidade="{{ $s->unidade_nome }}" data-valor="{{ $s->valorFaturar }}" data-os="{{ $s->os }}"></div>
-    @endforeach
-</div>
 @stop
 
 @section('css')
 <style>
-    .nav-tabs-custom > .nav-tabs > li.active {
-        border-top-color: #354256;
+    .option-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transition: all 0.3s;
     }
-    .nav-tabs-custom > .nav-tabs > li.active > a {
-        background-color: #354256;
-        color: white;
+    .option-selected {
+        opacity: 1 !important;
+        border: 4px solid #3c8dbc !important;
+        transform: translateY(-2px);
     }
-    .box-header {
-        border-bottom: 3px solid #7aa2c9;
-    }
+    .label-primary { font-size: 110%; padding: 0.3em 0.8em; }
 </style>
 @stop
 
 @section('js')
 <script>
-$(function() {
-    // Escuta troca de tabs para atualizar o tipo_emissao
-    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-        var target = $(e.target).attr("href");
-        if(target == '#modo1') $('#input_tipo_emissao').val('automatica');
-        if(target == '#modo2') $('#input_tipo_emissao').val('manual');
-        if(target == '#modo3') $('#input_tipo_emissao').val('nao_emitir');
+$(document).ready(function() {
+    // Seleção de card
+    $('.option-card').on('click', function() {
+        $('.option-card').removeClass('option-selected');
+        $(this).addClass('option-selected');
+        
+        const option = $(this).data('option');
+        $(`#opt${option}`).prop('checked', true);
+        
+        $('#sectionTomador').fadeIn();
+        $('#btnFinalizar').prop('disabled', false);
+        
+        // Se for opção 2 ou 4 (Manual), forçar o toggle de Nova Empresa se ainda não estiver ativo
+        if(option == 2 || option == 4) {
+            ativarManual();
+        } else {
+            desativarManual();
+        }
     });
 
-    // Descrição padrão inicial
-    toggleAutoDesc(1);
-});
+    // CheckAll logic
+    $('#checkAll').on('change', function() {
+        $('.checkItem').prop('checked', $(this).is(':checked'));
+    });
 
-function toggleAutoDesc(opcao) {
-    var descArea = $('#descricao_agregada');
-    
-    if(opcao == 1) {
-        descArea.val("Serviços de consultoria técnica e licenciamento ambiental conforme faturamento #{{ $faturamento->id }}");
-        descArea.prop('readonly', true);
-    }
-    else if(opcao == 2) {
-        descArea.val("");
-        descArea.prop('readonly', false);
-        descArea.focus();
-    }
-    else if(opcao == 3) {
-        var items = [];
-        $('.servico-item').each(function() {
-            var item = $(this);
-            var valor = parseFloat(item.data('valor')).toLocaleString('pt-br', { style: 'currency', currency: 'BRL' });
-            items.push(item.data('os') + " - " + item.data('unidade') + " - " + item.data('nome') + " - " + valor);
+    // Nova Empresa Logic
+    $('#btnNovaEmpresa').on('click', function() {
+        ativarManual();
+    });
+
+    $('#btnRecusarNovaEmpresa').on('click', function() {
+        const currentOpt = $('input[name="opcao_automatica"]:checked').val();
+        if(currentOpt == 2 || currentOpt == 4) {
+            Swal.fire('Atenção', 'Esta opção exige que os dados do tomador sejam preenchidos manualmente.', 'warning');
+            return;
+        }
+        desativarManual();
+    });
+
+    function ativarManual() {
+        $('#tomadorDefault').fadeOut(function() {
+            $('#tomadorManual').fadeIn();
+            $('#input_nova_empresa').val('1');
         });
-        descArea.val(items.join('\n'));
-        descArea.prop('readonly', true);
     }
-}
+
+    function desativarManual() {
+        $('#tomadorManual').fadeOut(function() {
+            $('#tomadorDefault').fadeIn();
+            $('#input_nova_empresa').val('0');
+        });
+    }
+
+    // Consulta CNPJ
+    $('#btnConsutarCnpj').on('click', function() {
+        const cnpj = $('#override_cnpj').val();
+        if(!cnpj) return;
+
+        $(this).html('<i class="fa fa-spinner fa-spin"></i>');
+        
+        $.ajax({
+            url: "{{ url('admin/nfse/buscar-cnpj') }}/" + cnpj,
+            success: function(response) {
+                $('#override_razaoSocial').val(response.razaoSocial);
+                $('#override_email').val(response.email);
+                $('#override_logradouro').val(response.logradouro);
+                $('#override_numero').val(response.numero);
+                $('#override_bairro').val(response.bairro);
+                $('#override_cep').val(response.cep);
+                $('#override_municipio').val(response.municipio);
+                $('#override_uf').val(response.uf);
+                $('#override_codigoCidade').val(response.ibge); // Se disponível
+                
+                Swal.fire('Sucesso', 'Dados recuperados da Receita Federal!', 'success');
+            },
+            error: function() {
+                Swal.fire('Erro', 'Não foi possível localizar este CNPJ.', 'error');
+            },
+            complete: function() {
+                $('#btnConsutarCnpj').html('<i class="fa fa-search"></i> Consultar');
+            }
+        });
+    });
+
+    // Validar form antes de enviar
+    $('#formEmissao').on('submit', function(e) {
+        if($('.checkItem:checked').length == 0) {
+            e.preventDefault();
+            Swal.fire('Erro', 'Selecione pelo menos um serviço para emitir a nota.', 'error');
+        }
+    });
+});
 </script>
 @stop

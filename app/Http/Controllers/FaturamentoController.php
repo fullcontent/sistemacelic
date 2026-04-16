@@ -147,7 +147,8 @@ class FaturamentoController extends Controller
                 },
                 'servicos' => function ($query) {
                     $query->select('servicos.id', 'proposta_id', 'nf', 'tipo')->with('financeiro');
-                }
+                },
+                'ultimaEmisao'
             ])
             ->orderBy('created_at', 'desc')
             ->get();
@@ -416,16 +417,7 @@ class FaturamentoController extends Controller
         $this->atualizarFaturamento($faturamento->id, $total, $request->obs, $request->descricao);
 
 
-        return view('admin.faturamento.step4')->with([
-
-            'faturamentoItens' => $servicosFaturar,
-            'totalFaturamento' => $total,
-            'descricao' => $request->descricao,
-            'obs' => $request->obs,
-            'link' => $request->link,
-            'dadosCastro' => $faturamento->dadosCastro,
-
-        ]);
+        return redirect()->route('nfse.emissao', $faturamento->id);
 
     }
 
@@ -620,11 +612,11 @@ class FaturamentoController extends Controller
     {
 
 
-        $faturamento = Faturamento::with('servicosFaturados.detalhes.unidade')->find($id);
+        $faturamento = Faturamento::with(['servicosFaturados.detalhes.unidade', 'ultimaEmisao'])->find($id);
 
 
         return view('admin.faturamento.detalhe-faturamento')->with([
-
+            'faturamento' => $faturamento,
             'faturamentoItens' => $faturamento->servicosFaturados,
             'totalFaturamento' => $faturamento->valorTotal,
             'descricao' => $faturamento->nome,

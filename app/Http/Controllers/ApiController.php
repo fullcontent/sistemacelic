@@ -638,7 +638,10 @@ class ApiController extends Controller
             $query->where(function ($q) use ($term) {
                 $q->where('nome', 'like', "%$term%")
                     ->orWhere('os', 'like', "%$term%")
-                    ->orWhere('observacoes', 'like', "%$term%");
+                    ->orWhere('observacoes', 'like', "%$term%")
+                    ->orWhereHas('unidade', function ($qu) use ($term) {
+                        $qu->where('codigo', 'like', "%$term%");
+                    });
             });
         }
 
@@ -652,7 +655,8 @@ class ApiController extends Controller
         if ($unit) {
             $query->whereHas('unidade', function ($q) use ($unit) {
                 $q->where('nomeFantasia', 'like', "%$unit%")
-                    ->orWhere('razaoSocial', 'like', "%$unit%");
+                    ->orWhere('razaoSocial', 'like', "%$unit%")
+                    ->orWhere('codigo', 'like', "%$unit%");
             });
         }
 
@@ -687,7 +691,7 @@ class ApiController extends Controller
 
     public function getAllServiceIds()
     {
-        $ids = Servico::pluck('id')->whereNotIn('responsavel_id', [1])->take(20);
+        $ids = Servico::orderBy('id', 'desc')->pluck('id')->whereNotIn('responsavel_id', [1]);
         return response()->json($ids);
     }
 }

@@ -248,6 +248,14 @@
 
 
             </div>
+            <div class="col-md-12">
+                <hr style="border-top: 1px solid #354256;">
+                <div class="form-group">
+                    {!! Form::label('dados_castro_id', 'Entidade Castro (Emitente NFS-e)', array('class'=>'control-label')) !!}
+                    {!! Form::select('dados_castro_id', $dadosCastro, null, ['class'=>'form-control', 'placeholder' => 'Selecione a entidade para emissão de nota']) !!}
+                    <small class="text-muted"><i class="fa fa-info-circle"></i> Esta empresa herdará as configurações fiscais desta entidade para emissão via PlugNotas.</small>
+                </div>
+            </div>
 </div>
 
 @section('js')

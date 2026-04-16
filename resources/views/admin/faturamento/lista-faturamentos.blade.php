@@ -241,13 +241,31 @@
 						</td>
 						<td>R$ {{number_format($f->valorTotal, 2, ',', '.')}}</td>
 						<td>
-							@if($f->nf || $f->servicos->whereNotNull('nf')->count() > 0)
-								<span class="label label-success">Emitida</span>
+							@if($f->ultimaEmisao)
+								@php $emissao = $f->ultimaEmisao; @endphp
+								@if($emissao->status == 'CONCLUIDA')
+									<span class="label label-success" title="NFS-e Automática"><i class="fa fa-check-circle"></i> Emitida</span>
+								@elseif($emissao->status == 'PROCESSANDO')
+									<span class="label label-primary" title="NFS-e em processamento na PlugNotas"><i class="fa fa-spinner fa-spin"></i> Processando</span>
+								@elseif($emissao->status == 'ERRO')
+									<span class="label label-danger" title="Erro na emissão automática"><i class="fa fa-exclamation-triangle"></i> Erro na Emissão</span>
+								@else
+									<span class="label label-default">{{ $emissao->status }}</span>
+								@endif
+							@elseif($f->nf || $f->servicos->whereNotNull('nf')->count() > 0)
+								<span class="label label-success">Emitida (Manual)</span>
 							@else
-								<a href="#" class="label label-warning cadastroNF" data-id="{{ $f->id }}"
-									data-cliente="{{ $f->empresa->nomeFantasia }}" data-nome="{{ $f->nome }}">
-									Não Emitida
-								</a>
+								<div class="row">
+									<div class="col-xs-12">
+										<a href="{{ route('nfse.emissao', $f->id) }}" class="btn btn-xs btn-primary btn-block" style="margin-bottom: 5px;">
+											<i class="fa fa-magic"></i> Gerar NFS-e (Novo)
+										</a>
+										<a href="#" class="label label-warning btn-block cadastroNF" data-id="{{ $f->id }}"
+											data-cliente="{{ $f->empresa->nomeFantasia }}" data-nome="{{ $f->nome }}">
+											Registrar Manual
+										</a>
+									</div>
+								</div>
 							@endif
 						</td>
 						<td>
@@ -302,6 +320,22 @@
 											<i class="fa fa-building"></i> Alterar CNPJ
 										</a>
 									</li>
+									@if($f->ultimaEmisao && ($f->ultimaEmisao->status == 'CONCLUIDA' || $f->ultimaEmisao->status == 'concluido' || $f->ultimaEmisao->status == 'emitida'))
+										@if($f->ultimaEmisao->pdf_url)
+											<li>
+												<a href="{{ route('nfse.download.pdf', $f->ultimaEmisao->id) }}" target="_blank">
+													<i class="fa fa-file-pdf-o"></i> Baixar PDF NFS-e
+												</a>
+											</li>
+										@endif
+										@if($f->ultimaEmisao->xml_url)
+											<li>
+												<a href="{{ route('nfse.download.xml', $f->ultimaEmisao->id) }}" target="_blank">
+													<i class="fa fa-file-code-o"></i> Baixar XML NFS-e
+												</a>
+											</li>
+										@endif
+									@endif
 									<li class="divider"></li>
 									<li>
 										<a href="{{route('faturamento.destroy', $f->id)}}" class="confirmation">

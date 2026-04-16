@@ -35,10 +35,12 @@ return [
     ],
 
     'plugnotas' => [
-        'base_url' => env('PLUGNOTAS_BASE_URL', 'https://api.plugnotas.com.br'),
-        'api_key' => env('PLUGNOTAS_API_KEY'),
-        'timeout' => env('PLUGNOTAS_TIMEOUT', 30),
-        'mock_mode' => env('PLUGNOTAS_MOCK_MODE', true),
+        'base_url' => env('PLUGNOTAS_ENV') === 'production' 
+            ? 'https://api.plugnotas.com.br' 
+            : 'https://api.sandbox.plugnotas.com.br',
+        'api_key' => env('PLUGNOTAS_TOKEN'),
+        'timeout' => (int) env('PLUGNOTAS_TIMEOUT', 30),
+        'mock_mode' => (bool) env('PLUGNOTAS_MOCK_MODE', false),
         'webhook_secret' => env('PLUGNOTAS_WEBHOOK_SECRET'),
     ],
 

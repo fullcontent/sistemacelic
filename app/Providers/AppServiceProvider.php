@@ -245,9 +245,19 @@ class AppServiceProvider extends ServiceProvider
                                             'icon'  =>  'glyphicon glyphicon glyphicon-barcode',
                                         ],
                                         [
+                                            'text' => 'Painel de Notas (NFS-e)',
+                                            'url'  =>  route('nfse.index'),
+                                            'icon' => 'fa fa-file-invoice-dollar text-green',
+                                        ],
+                                        [
                                             'text' => 'Reembolsos',
                                             'url'  =>  ''.Auth::user()->privileges.'/reembolsos',
                                             'icon'  =>  'glyphicon glyphicon glyphicon-usd',
+                                        ],
+                                        [
+                                            'text' => 'Configurações NFS-e',
+                                            'url'  =>  route('nfse.config'),
+                                            'icon' => 'fa fa-cog text-aqua',
                                         ]
                                     );
                                 }

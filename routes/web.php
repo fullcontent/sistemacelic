@@ -278,6 +278,26 @@ Route::prefix('admin')->group(function () {
 	Route::patch('/github/issues/{number}', 'GitHubDashboardController@patchIssue')->name('admin.github.issues.patch');
 	Route::post('/github/projects/link', 'GitHubDashboardController@linkToProject')->name('admin.github.projects.link');
 
+    // NFS-e Routes
+    Route::group(['prefix' => 'nfse'], function () {
+        Route::get('/', 'NfseController@index')->name('nfse.index');
+        Route::get('/configuracoes', 'NfseController@indexConfig')->name('nfse.config');
+        Route::post('/configuracoes', 'NfseController@upsertConfig')->name('nfse.config.save');
+        Route::post('/configuracoes/sync', 'NfseController@syncEmpresa')->name('nfse.sync');
+        Route::post('/configuracoes/emitente', 'NfseController@storeEmitente')->name('nfse.emitente.store');
+        Route::delete('/configuracoes/emitente/{id}', 'NfseController@destroyEmitente')->name('nfse.emitente.destroy');
+        
+        Route::get('/emissao/{faturamentoId}', 'NfseController@showEmissao')->name('nfse.emissao');
+        Route::post('/emissao/{faturamentoId}', 'NfseController@processarEmissao')->name('nfse.processar');
+        Route::get('/status/{id}', 'NfseController@status')->name('nfse.status');
+        
+        Route::get('/buscar-cnpj/{cnpj}', 'NfseController@buscarCnpjExterno')->name('nfse.buscar_cnpj');
+        Route::post('/cancelar/{id}', 'NfseController@cancelar')->name('nfse.cancelar');
+        Route::post('/sync/{id}', 'NfseController@syncStatus')->name('nfse.sync');
+        Route::get('/pdf/{id}', 'NfseController@downloadPdf')->name('nfse.download.pdf');
+        Route::get('/xml/{id}', 'NfseController@downloadXml')->name('nfse.download.xml');
+    });
+
 });
 
 Route::prefix('cliente')->group(function () {

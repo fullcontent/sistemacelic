@@ -16,6 +16,10 @@ class NfseEmission extends Model
         'retorno',
         'zip_path',
         'observacoes',
+        'pdf_url',
+        'xml_url',
+        'mensagem_erro',
+        'valor_total',
     ];
 
     public function faturamento()
