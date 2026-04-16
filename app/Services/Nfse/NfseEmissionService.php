@@ -157,8 +157,8 @@ class NfseEmissionService
     {
         $clean = function($val) { return preg_replace('/\D/', '', (string)$val); };
 
-        // Se houver override (Opção 2 ou 4), usar os dados manuais
-        if (($opcao == '2' || $opcao == '4') && !empty($override)) {
+        // Se houver override, usar os dados informados (inclusive para opção agrupada)
+        if (!empty($override) && !empty($override['cnpj'])) {
             $uf = strtoupper((string) ($override['uf'] ?? ($override['estado'] ?? '')));
             $codigoCidade = $this->resolveCodigoCidade(
                 $override['municipio'] ?? null,
@@ -184,6 +184,10 @@ class NfseEmissionService
                     'uf' => $uf
                 ]
             ];
+        }
+
+        if (($opcao == '2' || $opcao == '4') && empty($override)) {
+            throw new \InvalidArgumentException('Para emissão manual, informe os dados do tomador.');
         }
 
         // Opção 1: Individual com dados da Unidade

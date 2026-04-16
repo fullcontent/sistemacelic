@@ -168,6 +168,60 @@
                                         <button type="button" class="btn btn-warning" id="btnNovaEmpresa"><i class="fa fa-plus"></i> Usar Outra Empresa</button>
                                     </div>
                                 </div>
+
+                                @php
+                                    $tomadores = [];
+                                    foreach ($faturamento->servicosFaturados as $fs) {
+                                        if (empty($fs->detalhes) || empty($fs->detalhes->unidade) || empty($fs->detalhes->unidade->cnpj)) {
+                                            continue;
+                                        }
+                                        $u = $fs->detalhes->unidade;
+                                        $key = preg_replace('/\D/', '', (string) $u->cnpj);
+                                        if (!isset($tomadores[$key])) {
+                                            $tomadores[$key] = [
+                                                'cnpj' => $u->cnpj,
+                                                'razaoSocial' => $u->razaoSocial ?? $u->nomeFantasia,
+                                                'email' => $u->email ?? '',
+                                                'logradouro' => $u->endereco ?? '',
+                                                'numero' => $u->numero ?? '',
+                                                'bairro' => $u->bairro ?? '',
+                                                'cep' => $u->cep ?? '',
+                                                'municipio' => $u->cidade ?? '',
+                                                'uf' => $u->uf ?? '',
+                                                'codigoCidade' => $u->codigo_cidade ?? $u->municipio_ibge ?? $u->inscricaoMun ?? '',
+                                                'label' => ($u->nomeFantasia ?? $u->razaoSocial ?? 'Unidade') . ' - ' . $u->cnpj,
+                                            ];
+                                        }
+                                    }
+                                @endphp
+
+                                <div class="row" style="margin-top: 10px;">
+                                    <div class="col-md-12">
+                                        <div class="form-group" style="margin-bottom: 5px;">
+                                            <label>Tomador para emissão agrupada</label>
+                                            <select id="tomador_predefinido" class="form-control">
+                                                <option value="empresa" selected>Empresa do faturamento (padrão)</option>
+                                                @foreach($tomadores as $t)
+                                                    <option
+                                                        value="unidade"
+                                                        data-cnpj="{{ $t['cnpj'] }}"
+                                                        data-razaosocial="{{ $t['razaoSocial'] }}"
+                                                        data-email="{{ $t['email'] }}"
+                                                        data-logradouro="{{ $t['logradouro'] }}"
+                                                        data-numero="{{ $t['numero'] }}"
+                                                        data-bairro="{{ $t['bairro'] }}"
+                                                        data-cep="{{ $t['cep'] }}"
+                                                        data-municipio="{{ $t['municipio'] }}"
+                                                        data-uf="{{ $t['uf'] }}"
+                                                        data-codigocidade="{{ $t['codigoCidade'] }}"
+                                                    >{{ $t['label'] }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <small class="text-muted">Use esta seleção quando o faturamento tiver serviços com tomadores diferentes.</small>
+                                        <div id="tomadorSelecionadoInfo" class="alert alert-info" style="margin-top: 10px; margin-bottom: 0; display:none;"></div>
+                                    </div>
+                                </div>
                             </div>
 
                             <div id="tomadorManual" class="box box-warning box-solid" style="display:none;">
@@ -325,6 +379,8 @@ $(document).ready(function() {
         } else {
             desativarManual();
         }
+
+        aplicarTomadorSelecionadoNoOverride();
     });
 
     // CheckAll logic
@@ -373,6 +429,57 @@ $(document).ready(function() {
             nfseDebug.log('Tomador manual desativado (tomador padrão)');
         });
     }
+
+    function aplicarTomadorSelecionadoNoOverride() {
+        const currentOpt = $('input[name="opcao_automatica"]:checked').val();
+        const selected = $('#tomador_predefinido option:selected');
+        const selectedType = selected.val();
+
+        if (selectedType !== 'unidade') {
+            if (currentOpt == 3) {
+                $('#input_nova_empresa').val('0');
+                $('#tomadorSelecionadoInfo').hide();
+            }
+            return;
+        }
+
+        const dados = {
+            cnpj: selected.data('cnpj') || '',
+            razaoSocial: selected.data('razaosocial') || '',
+            email: selected.data('email') || '',
+            logradouro: selected.data('logradouro') || '',
+            numero: selected.data('numero') || '',
+            bairro: selected.data('bairro') || '',
+            cep: selected.data('cep') || '',
+            municipio: selected.data('municipio') || '',
+            uf: selected.data('uf') || '',
+            codigoCidade: selected.data('codigocidade') || ''
+        };
+
+        $('#override_cnpj').val(dados.cnpj);
+        $('#override_razaoSocial').val(dados.razaoSocial);
+        $('#override_email').val(dados.email);
+        $('#override_logradouro').val(dados.logradouro);
+        $('#override_numero').val(dados.numero);
+        $('#override_bairro').val(dados.bairro);
+        $('#override_cep').val(dados.cep);
+        $('#override_municipio').val(dados.municipio);
+        $('#override_uf').val(dados.uf);
+        $('#override_codigoCidade').val(dados.codigoCidade);
+
+        if (currentOpt == 3) {
+            $('#input_nova_empresa').val('1');
+            $('#tomadorSelecionadoInfo')
+                .html('<b>Tomador selecionado:</b> ' + dados.razaoSocial + ' (' + dados.cnpj + ')')
+                .show();
+        }
+
+        nfseDebug.log('Tomador pré-definido aplicado no override', dados);
+    }
+
+    $('#tomador_predefinido').on('change', function() {
+        aplicarTomadorSelecionadoNoOverride();
+    });
 
     // Consulta CNPJ
     $('#btnConsutarCnpj').on('click', function() {
@@ -423,6 +530,7 @@ $(document).ready(function() {
     // Validar form antes de enviar
     $('#formEmissao').on('submit', function(e) {
         const currentOpt = $('input[name="opcao_automatica"]:checked').val();
+        aplicarTomadorSelecionadoNoOverride();
         const selecionados = $('.checkItem:checked').map(function() { return $(this).val(); }).get();
         const payloadPreview = {
             opcao_automatica: currentOpt,
@@ -452,13 +560,17 @@ $(document).ready(function() {
 
         if (isManual || isTomadorManualAtivo) {
             const codigoCidade = ($('#override_codigoCidade').val() || '').replace(/\D/g, '');
-            if (codigoCidade.length !== 7) {
+            const municipio = ($('#override_municipio').val() || '').trim();
+            const uf = ($('#override_uf').val() || '').trim();
+            if (codigoCidade.length !== 7 && !(municipio && uf.length === 2)) {
                 e.preventDefault();
                 nfseDebug.warn('Submit bloqueado: codigoCidade inválido para tomador manual', {
                     codigoCidadeInformado: $('#override_codigoCidade').val(),
-                    codigoCidadeNormalizado: codigoCidade
+                    codigoCidadeNormalizado: codigoCidade,
+                    municipio: municipio,
+                    uf: uf
                 });
-                Swal.fire('Erro', 'Informe um código IBGE da cidade válido (7 dígitos) para o tomador.', 'error');
+                Swal.fire('Erro', 'Informe o código IBGE (7 dígitos) ou cidade/UF válidos para o tomador.', 'error');
                 return;
             }
         }
