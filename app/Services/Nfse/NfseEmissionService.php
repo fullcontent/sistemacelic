@@ -163,7 +163,8 @@ class NfseEmissionService
             $codigoCidade = $this->resolveCodigoCidade(
                 $override['municipio'] ?? null,
                 $uf,
-                $override['codigoCidade'] ?? null
+                $override['codigoCidade'] ?? null,
+                $override['codigo_cidade'] ?? null
             );
 
             if (empty($codigoCidade)) {
@@ -193,7 +194,8 @@ class NfseEmissionService
                 $uf,
                 $servico->unidade->codigo_cidade ?? null,
                 $servico->unidade->codigoCidade ?? null,
-                $servico->unidade->municipio_ibge ?? null
+                $servico->unidade->municipio_ibge ?? null,
+                $servico->unidade->inscricaoMun ?? null
             );
 
             if (empty($codigoCidade)) {
@@ -223,7 +225,8 @@ class NfseEmissionService
                 $uf,
                 $faturamento->empresa->codigo_cidade ?? null,
                 $faturamento->empresa->codigoCidade ?? null,
-                $faturamento->empresa->municipio_ibge ?? null
+                $faturamento->empresa->municipio_ibge ?? null,
+                $faturamento->empresa->inscricaoMun ?? null
             );
 
             if (empty($codigoCidade)) {
@@ -250,6 +253,15 @@ class NfseEmissionService
 
     private function resolveCodigoCidade($cidade, $uf)
     {
+        $uf = strtoupper(trim((string) $uf));
+        $cidade = trim((string) $cidade);
+
+        if (empty($uf) && preg_match('/\/?([A-Za-z]{2})$/', $cidade, $matches)) {
+            $uf = strtoupper($matches[1]);
+        }
+
+        $cidade = preg_replace('/\s*[\/-]\s*[A-Za-z]{2}$/', '', $cidade);
+
         $candidates = array_slice(func_get_args(), 2);
 
         foreach ($candidates as $candidate) {

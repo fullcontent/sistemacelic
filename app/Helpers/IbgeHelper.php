@@ -21,8 +21,8 @@ class IbgeHelper
             'BOMBINHAS' => '4202453',
             'NAVEGANTES' => '4211306',
             'PENHA' => '4212502',
-            'PIÇARRAS' => '4202305',
-            'BALNEARIO PIÇARRAS' => '4202305',
+            'PICARRAS' => '4202305',
+            'BALNEARIO PICARRAS' => '4202305',
         ],
         'RS' => [
             'GRAMADO' => '4309100',
@@ -38,6 +38,16 @@ class IbgeHelper
             'RECIFE' => '2611606',
             'JABOATAO DOS GUARARAPES' => '2607901',
             'OLINDA' => '2609600',
+        ],
+        'GO' => [
+            'GOIANIA' => '5208707',
+            'APARECIDA DE GOIANIA' => '5201405',
+            'ANAPOLIS' => '5201108',
+        ],
+        'RN' => [
+            'CAICO' => '2402006',
+            'NATAL' => '2408102',
+            'MOSSORO' => '2408003',
         ],
         'SP' => [
             'SAO PAULO' => '3550308',
@@ -92,6 +102,7 @@ class IbgeHelper
             'Ç' => 'C'
         ];
         $string = strtr($string, $map);
+        $string = preg_replace('/\s+/', ' ', $string);
         $string = trim($string);
         return $string;
     }
