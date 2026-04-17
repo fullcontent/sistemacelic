@@ -27,7 +27,7 @@ class NfsePayloadFactory2
 
 	public static function buildBasePayload(array $config, array $item, array $extraFields = [])
 	{
-		$descricao = isset($item['descricao_servico']) ? $item['descricao_servico'] : '';
+		$descricao = self::sanitizeDiscriminacao(isset($item['descricao_servico']) ? $item['descricao_servico'] : '');
 		$valor = isset($item['valor_servico']) ? (float) $item['valor_servico'] : 0;
 
 		$payload = [
@@ -78,6 +78,22 @@ class NfsePayloadFactory2
 		}
 
 		return $payload;
+	}
+
+	private static function sanitizeDiscriminacao($descricao)
+	{
+		$descricao = (string) $descricao;
+
+		// PlugNotas pode rejeitar quebras de linha/controles em servico.discriminacao.
+		$descricao = preg_replace('/[\r\n]+/', ' | ', $descricao);
+		$descricao = preg_replace('/[\x00-\x1F\x7F]+/', ' ', $descricao);
+		$descricao = preg_replace('/\s{2,}/', ' ', trim($descricao));
+
+		if (function_exists('mb_substr')) {
+			return mb_substr($descricao, 0, 2000);
+		}
+
+		return substr($descricao, 0, 2000);
 	}
 
 	private static function resolveServicoCodigo(array $config, array $item)

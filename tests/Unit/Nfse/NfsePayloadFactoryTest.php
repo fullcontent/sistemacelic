@@ -63,4 +63,23 @@ class NfsePayloadFactoryTest extends TestCase
         $this->assertEquals('Serviço teste', $payload['servico'][0]['discriminacao']);
         $this->assertEquals(100.00, $payload['servico'][0]['valor']['servico']);
     }
+
+    public function test_build_payload_sanitizes_discriminacao()
+    {
+        $payload = NfsePayloadFactory2::buildBasePayload([
+            'emit_as' => 'Prestador',
+            'simples_regime' => 'Regime de apuração dos tributos federais e municipal pelo Simples Nacional',
+            'tomador_tipo' => 'Brasil',
+            'intermediario_tipo' => 'Intermediario nao informado',
+            'local_prestacao' => 'Brasil',
+            'municipio_nome' => 'Balneário Camboriú/SC',
+            'codigo_tributacao_nacional' => '17.02.02',
+            'item_nbs' => '118064000',
+        ], [
+            'descricao_servico' => "Linha 1\n\nLinha 2\r\n\tLinha 3",
+            'valor_servico' => 50.00,
+        ]);
+
+        $this->assertEquals('Linha 1 | Linha 2 | Linha 3', $payload['servico'][0]['discriminacao']);
+    }
 }

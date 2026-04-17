@@ -16,6 +16,8 @@ class PlugNotasClient
             'api_key' => function_exists('config') ? config('services.plugnotas.api_key') : null,
             'timeout' => function_exists('config') ? (int) config('services.plugnotas.timeout', 30) : 30,
             'mock_mode' => function_exists('config') ? (bool) config('services.plugnotas.mock_mode', false) : false,
+            'retry_attempts' => function_exists('config') ? (int) config('services.plugnotas.retry_attempts', 3) : 3,
+            'retry_delay_ms' => function_exists('config') ? (int) config('services.plugnotas.retry_delay_ms', 600) : 600,
         ];
 
         $this->settings = array_merge($default, $settings);
@@ -61,19 +63,80 @@ class PlugNotasClient
             throw new \RuntimeException('PLUGNOTAS_API_KEY não configurada e mock desabilitado.');
         }
 
-        try {
-            $response = $this->http->post('/nfse', [
-                'headers' => [
-                    'x-api-key' => $this->settings['api_key'],
-                    'Accept' => 'application/json',
-                ],
-                'json' => [$payload],
-            ]);
+        $attempts = max(1, (int) ($this->settings['retry_attempts'] ?? 3));
+        $baseDelayMs = max(100, (int) ($this->settings['retry_delay_ms'] ?? 600));
+        $lastException = null;
 
-            return json_decode((string) $response->getBody(), true);
-        } catch (\Exception $e) {
-            throw new \RuntimeException('Falha na chamada PlugNotas: ' . $e->getMessage(), 0, $e);
+        for ($attempt = 1; $attempt <= $attempts; $attempt++) {
+            try {
+                $response = $this->http->post('/nfse', [
+                    'headers' => [
+                        'x-api-key' => $this->settings['api_key'],
+                        'Accept' => 'application/json',
+                    ],
+                    'json' => [$payload],
+                ]);
+
+                return json_decode((string) $response->getBody(), true);
+            } catch (\Exception $e) {
+                $lastException = $e;
+                $statusCode = $this->extractStatusCode($e);
+                $retryable = $this->isRetryableEmissionError($statusCode);
+                $isLastAttempt = $attempt >= $attempts;
+
+                if ($retryable && !$isLastAttempt) {
+                    $this->logRetryAttempt($attempt, $attempts, $statusCode, $e);
+                    $delayMs = $baseDelayMs * $attempt;
+                    usleep($delayMs * 1000);
+                    continue;
+                }
+
+                $suffix = $isLastAttempt && $retryable
+                    ? " após {$attempts} tentativas"
+                    : '';
+
+                throw new \RuntimeException('Falha na chamada PlugNotas' . $suffix . ': ' . $e->getMessage(), 0, $e);
+            }
         }
+
+        throw new \RuntimeException('Falha na chamada PlugNotas: erro desconhecido.', 0, $lastException);
+    }
+
+    private function extractStatusCode($exception)
+    {
+        if (!is_object($exception) || !method_exists($exception, 'getResponse')) {
+            return null;
+        }
+
+        $response = $exception->getResponse();
+        if (!$response || !method_exists($response, 'getStatusCode')) {
+            return null;
+        }
+
+        return (int) $response->getStatusCode();
+    }
+
+    private function isRetryableEmissionError($statusCode)
+    {
+        if ($statusCode === null) {
+            return true;
+        }
+
+        return $statusCode >= 500;
+    }
+
+    private function logRetryAttempt($attempt, $attempts, $statusCode, \Exception $e)
+    {
+        if (!function_exists('logger')) {
+            return;
+        }
+
+        logger()->warning('PlugNotas: tentativa de reenvio da emissao NFSe', [
+            'attempt' => $attempt,
+            'attempts' => $attempts,
+            'status_code' => $statusCode,
+            'error' => $e->getMessage(),
+        ]);
     }
 
     public function consultarNfse($id)
