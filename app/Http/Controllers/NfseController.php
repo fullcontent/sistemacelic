@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Faturamento;
 use App\Models\NfseConfiguration;
 use App\Models\NfseEmission;
+use App\Services\NfseService;
 use App\Services\Nfse\NfseEmissionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -103,8 +104,344 @@ class NfseController extends Controller
 
     public function syncEmpresa(Request $request)
     {
-        // Dummy implementation to complete the front-end success block
-        return response()->json(['success' => true]);
+        $validator = Validator::make($request->all(), [
+            'dados_castro_id' => 'required|integer|exists:dados_castros,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Empresa emitente inválida para sincronização.',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $dadosCastroId = (int) $request->get('dados_castro_id');
+        $dadosCastro = \App\Models\DadosCastro::with('nfseConfiguration')->find($dadosCastroId);
+
+        if (!$dadosCastro) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Empresa emitente não encontrada.',
+            ], 404);
+        }
+
+        $config = $dadosCastro->nfseConfiguration;
+        if (!$config) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Configuração NFS-e não encontrada. Salve a configuração antes de sincronizar.',
+            ], 422);
+        }
+
+        $service = app(NfseService::class);
+        $payload = $this->buildEmpresaPayloadForPlugNotas($dadosCastro, $config);
+        $cnpj = isset($payload['cpfCnpj']) ? $payload['cpfCnpj'] : null;
+
+        if (empty($cnpj)) {
+            \Log::warning('NFSe syncEmpresa: CNPJ ausente no payload.', [
+                'dados_castro_id' => $dadosCastroId,
+                'dados_castro_cnpj' => $dadosCastro->cnpj,
+                'payload' => $payload,
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'CNPJ do emitente não informado.',
+            ], 422);
+        }
+
+        $consultaEmpresa = $service->consultarEmpresaPorCnpj($cnpj);
+        if (!empty($consultaEmpresa['success']) && !empty($consultaEmpresa['exists'])) {
+            $config->plugnotas_empresa_sincronizada = true;
+            $config->plugnotas_empresa_sync_at = now();
+            $config->plugnotas_empresa_sync_error = null;
+            $config->save();
+
+            return response()->json([
+                'success' => true,
+                'synced' => true,
+                'message' => 'Empresa já cadastrada na PlugNotas e marcada como sincronizada.',
+                'sync_at' => optional($config->plugnotas_empresa_sync_at)->format('d/m/Y H:i:s'),
+            ]);
+        }
+
+        if (empty($consultaEmpresa['success'])) {
+            \Log::warning('NFSe syncEmpresa: falha ao consultar empresa na PlugNotas.', [
+                'dados_castro_id' => $dadosCastroId,
+                'cnpj' => $cnpj,
+                'consulta_empresa' => $consultaEmpresa,
+                'payload' => $payload,
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => $consultaEmpresa['message'] ?? 'Não foi possível consultar empresa na PlugNotas.',
+            ], 422);
+        }
+
+        $requiredErrors = [];
+        if (empty($payload['razaoSocial'])) {
+            $requiredErrors[] = 'Razão social do emitente não informada.';
+        }
+
+        // Quando a empresa ainda nao existe na PlugNotas, estes campos sao exigidos no cadastro.
+        $requiredForCadastro = $this->validateRequiredFieldsForPlugNotasCadastro($payload);
+        if (!empty($requiredForCadastro)) {
+            $requiredErrors = array_merge($requiredErrors, $requiredForCadastro);
+        }
+
+        if (!empty($requiredErrors)) {
+            \Log::warning('NFSe syncEmpresa: validacao bloqueou cadastro de empresa na PlugNotas.', [
+                'dados_castro_id' => $dadosCastroId,
+                'cnpj' => $cnpj,
+                'required_errors' => $requiredErrors,
+                'consulta_empresa' => $consultaEmpresa,
+                'payload' => $payload,
+                'nfse_config_id' => $config->id,
+                'certificado' => $config->certificado,
+                'inscricao_municipal' => $config->inscricao_municipal,
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => implode(' ', $requiredErrors),
+            ], 422);
+        }
+
+        try {
+            $result = $service->cadastrarEmpresa($payload);
+
+            if (!empty($result['success'])) {
+                $cnpjRetornado = preg_replace('/\D/', '', (string) ($result['data']['data']['cnpj'] ?? $result['data']['cnpj'] ?? ''));
+                $confirmadoPorRetorno = !empty($cnpjRetornado) && $cnpjRetornado === $cnpj;
+
+                $confirmadoPorConsulta = false;
+                if (!$confirmadoPorRetorno) {
+                    $confirmacao = $service->consultarEmpresaPorCnpj($cnpj);
+                    $confirmadoPorConsulta = !empty($confirmacao['success']) && !empty($confirmacao['exists']);
+                }
+
+                if ($confirmadoPorRetorno || $confirmadoPorConsulta) {
+                    $config->plugnotas_empresa_sincronizada = true;
+                    $config->plugnotas_empresa_sync_at = now();
+                    $config->plugnotas_empresa_sync_error = null;
+                    $config->save();
+
+                    return response()->json([
+                        'success' => true,
+                        'synced' => true,
+                        'message' => $result['message'] ?? 'Empresa sincronizada com sucesso na PlugNotas.',
+                        'sync_at' => optional($config->plugnotas_empresa_sync_at)->format('d/m/Y H:i:s'),
+                    ]);
+                }
+
+                \Log::warning('NFSe syncEmpresa: API retornou sucesso, mas sem confirmacao de existencia da empresa na PlugNotas.', [
+                    'dados_castro_id' => $dadosCastroId,
+                    'cnpj' => $cnpj,
+                    'cnpj_retorno_cadastro' => $cnpjRetornado,
+                    'result' => $result,
+                ]);
+
+                $config->plugnotas_empresa_sincronizada = false;
+                $config->plugnotas_empresa_sync_error = 'PlugNotas retornou sucesso, mas não confirmou a empresa no cadastro.';
+                $config->save();
+
+                return response()->json([
+                    'success' => false,
+                    'synced' => false,
+                    'message' => 'A PlugNotas respondeu sucesso, mas a empresa não foi confirmada no cadastro. Verifique no portal e tente novamente.',
+                ], 422);
+            }
+
+            $errorMessage = !empty($result['message']) ? $result['message'] : 'Falha ao sincronizar empresa com a PlugNotas.';
+            \Log::warning('NFSe syncEmpresa: cadastro/atualizacao na PlugNotas retornou falha.', [
+                'dados_castro_id' => $dadosCastroId,
+                'cnpj' => $cnpj,
+                'result' => $result,
+                'payload' => $payload,
+            ]);
+
+            $config->plugnotas_empresa_sync_error = $errorMessage;
+            $config->save();
+
+            return response()->json([
+                'success' => false,
+                'synced' => (bool) $config->plugnotas_empresa_sincronizada,
+                'message' => $errorMessage,
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('NFSe syncEmpresa: excecao durante sincronizacao.', [
+                'dados_castro_id' => $dadosCastroId,
+                'cnpj' => $cnpj,
+                'payload' => $payload,
+                'exception_message' => $e->getMessage(),
+                'exception_class' => get_class($e),
+            ]);
+
+            $config->plugnotas_empresa_sync_error = $e->getMessage();
+            $config->save();
+
+            return response()->json([
+                'success' => false,
+                'synced' => (bool) $config->plugnotas_empresa_sincronizada,
+                'message' => 'Erro ao sincronizar com a PlugNotas: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    private function buildEmpresaPayloadForPlugNotas($dadosCastro, NfseConfiguration $config)
+    {
+        $cnpj = preg_replace('/\D/', '', (string) $dadosCastro->cnpj);
+        $cep = preg_replace('/\D/', '', (string) $config->cep);
+        $telefoneSomenteDigitos = preg_replace('/\D/', '', (string) $config->telefone_emitente);
+
+        $ddd = null;
+        $numeroTelefone = null;
+        if (!empty($telefoneSomenteDigitos)) {
+            if (strlen($telefoneSomenteDigitos) >= 10) {
+                $ddd = substr($telefoneSomenteDigitos, 0, 2);
+                $numeroTelefone = substr($telefoneSomenteDigitos, 2);
+            } else {
+                $numeroTelefone = $telefoneSomenteDigitos;
+            }
+        }
+
+        $simplesNacional = in_array((int) $config->regime_tributario, [1, 2], true);
+        $emailEmitente = !empty($config->email_emitente)
+            ? $config->email_emitente
+            : env('MAIL_FROM_ADDRESS');
+
+        $payload = [
+            'cpfCnpj' => $cnpj,
+            'razaoSocial' => $dadosCastro->razaoSocial,
+            'nomeFantasia' => $dadosCastro->razaoSocial,
+            'email' => $emailEmitente,
+            'inscricaoMunicipal' => $config->inscricao_municipal,
+            'regimeTributario' => (int) ($config->regime_tributario ?: 1),
+            'simplesNacional' => $simplesNacional,
+            'certificado' => $config->certificado,
+            'endereco' => [
+                'bairro' => $config->bairro,
+                'cep' => $cep,
+                'codigoCidade' => (string) $config->codigo_cidade,
+                'estado' => strtoupper((string) $config->uf),
+                'tipoLogradouro' => 'Rua',
+                'logradouro' => $config->logradouro,
+                'numero' => (string) $config->numero,
+                'descricaoCidade' => $config->municipio_nome,
+                'codigoPais' => '1058',
+                'descricaoPais' => 'Brasil',
+            ],
+            'nfse' => [
+                'ativo' => (bool) $config->ativo,
+                'tipoContrato' => 0,
+                'config' => [
+                    'producao' => (bool) $config->producao,
+                    'prefeitura' => [
+                        'login' => $config->login_prefeitura,
+                        'senha' => $config->senha_prefeitura,
+                    ],
+                ],
+            ],
+        ];
+
+        if (!empty($ddd) || !empty($numeroTelefone)) {
+            $payload['telefone'] = [
+                'ddd' => $ddd,
+                'numero' => $numeroTelefone,
+            ];
+        }
+
+        return $this->removeNullAndEmpty($payload);
+    }
+
+    private function removeNullAndEmpty(array $data)
+    {
+        $clean = [];
+
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $value = $this->removeNullAndEmpty($value);
+                if (empty($value)) {
+                    continue;
+                }
+
+                $clean[$key] = $value;
+                continue;
+            }
+
+            if ($value === null) {
+                continue;
+            }
+
+            if (is_string($value) && trim($value) === '') {
+                continue;
+            }
+
+            $clean[$key] = $value;
+        }
+
+        return $clean;
+    }
+
+    private function validateRequiredFieldsForPlugNotasCadastro(array $payload)
+    {
+        $missing = [];
+
+        if (empty($payload['cpfCnpj'])) {
+            $missing[] = 'CNPJ do emitente (cpfCnpj)';
+        }
+
+        if (empty($payload['razaoSocial'])) {
+            $missing[] = 'Razão social do emitente (razaoSocial)';
+        }
+
+        if (empty($payload['inscricaoMunicipal'])) {
+            $missing[] = 'Inscrição municipal (inscricaoMunicipal)';
+        }
+
+        if (empty($payload['email'])) {
+            $missing[] = 'Email do emitente (email)';
+        }
+
+        if (empty($payload['certificado'])) {
+            $missing[] = 'ID do certificado PlugNotas (certificado)';
+        }
+
+        if (empty($payload['endereco']) || !is_array($payload['endereco'])) {
+            $missing[] = 'Endereço do emitente (endereco)';
+        } else {
+            if (empty($payload['endereco']['codigoCidade'])) {
+                $missing[] = 'Código IBGE da cidade (endereco.codigoCidade)';
+            }
+
+            if (empty($payload['endereco']['estado'])) {
+                $missing[] = 'UF do emitente (endereco.estado)';
+            }
+
+            if (empty($payload['endereco']['logradouro'])) {
+                $missing[] = 'Logradouro do emitente (endereco.logradouro)';
+            }
+
+            if (empty($payload['endereco']['tipoLogradouro'])) {
+                $missing[] = 'Tipo de logradouro (endereco.tipoLogradouro)';
+            }
+
+            if (empty($payload['endereco']['numero'])) {
+                $missing[] = 'Número do endereço (endereco.numero)';
+            }
+
+            if (empty($payload['endereco']['bairro'])) {
+                $missing[] = 'Bairro do emitente (endereco.bairro)';
+            }
+        }
+
+        if (empty($missing)) {
+            return [];
+        }
+
+        return ['Preencha os campos obrigatórios para cadastro na PlugNotas: ' . implode(', ', $missing) . '.'];
     }
 
     public function showEmissao($faturamentoId)

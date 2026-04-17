@@ -57,7 +57,7 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label>Inscrição Municipal</label>
-                                            <input type="text" name="inscricao_municipal" class="form-control" value="{{ $dc->nfseConfiguration->inscricao_municipal ?? '' }}">
+                                            <input type="text" name="inscricao_municipal" class="form-control" value="{{ $dc->nfseConfiguration->inscricao_municipal ?? '' }}" required>
                                         </div>
                                     </div>
                                 </div>
@@ -71,7 +71,7 @@
                                     <div class="col-md-3">
                                         <div class="form-group">
                                             <label>Email Emitente</label>
-                                            <input type="email" name="email_emitente" class="form-control" value="{{ $dc->nfseConfiguration->email_emitente ?? '' }}">
+                                            <input type="email" name="email_emitente" class="form-control" value="{{ $dc->nfseConfiguration->email_emitente ?? '' }}" required>
                                         </div>
                                     </div>
                                     <div class="col-md-3">
@@ -104,13 +104,13 @@
                                     <div class="col-md-8">
                                         <div class="form-group">
                                             <label>Logradouro / Rua</label>
-                                            <input type="text" name="logradouro" class="form-control" value="{{ $dc->nfseConfiguration->logradouro ?? '' }}">
+                                            <input type="text" name="logradouro" class="form-control" value="{{ $dc->nfseConfiguration->logradouro ?? '' }}" required>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label>Número</label>
-                                            <input type="text" name="numero" class="form-control" value="{{ $dc->nfseConfiguration->numero ?? '' }}">
+                                            <input type="text" name="numero" class="form-control" value="{{ $dc->nfseConfiguration->numero ?? '' }}" required>
                                         </div>
                                     </div>
                                 </div>
@@ -118,7 +118,7 @@
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label>Bairro</label>
-                                            <input type="text" name="bairro" class="form-control" value="{{ $dc->nfseConfiguration->bairro ?? '' }}">
+                                            <input type="text" name="bairro" class="form-control" value="{{ $dc->nfseConfiguration->bairro ?? '' }}" required>
                                         </div>
                                     </div>
                                     <div class="col-md-2">
@@ -136,7 +136,7 @@
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <label>UF</label>
-                                            <input type="text" name="uf" class="form-control text-uppercase" value="{{ $dc->nfseConfiguration->uf ?? 'SC' }}" maxlength="2">
+                                            <input type="text" name="uf" class="form-control text-uppercase" value="{{ $dc->nfseConfiguration->uf ?? 'SC' }}" maxlength="2" required>
                                         </div>
                                     </div>
                                 </div>
@@ -144,7 +144,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label>Cód. Município IBGE <i class="fa fa-info-circle text-info" title="Consulte o código IBGE do seu município para garantir a emissão correta."></i></label>
-                                            <input type="text" name="codigo_cidade" class="form-control" value="{{ $dc->nfseConfiguration->codigo_cidade ?? '4202008' }}">
+                                            <input type="text" name="codigo_cidade" class="form-control" value="{{ $dc->nfseConfiguration->codigo_cidade ?? '4202008' }}" required>
                                         </div>
                                     </div>
                                 </div>
@@ -240,7 +240,7 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label>ID Certificado (PlugNotas)</label>
-                                            <input type="text" name="certificado" class="form-control" value="{{ $dc->nfseConfiguration->certificado ?? '' }}" placeholder="Cole o ID do certificado da PlugNotas">
+                                            <input type="text" name="certificado" class="form-control" value="{{ $dc->nfseConfiguration->certificado ?? '' }}" placeholder="Cole o ID do certificado da PlugNotas" required>
                                         </div>
                                     </div>
                                     <div class="col-md-3">
@@ -304,6 +304,9 @@
                                 <button type="button" class="btn btn-info btn-flat btn-sync-plugnotas" data-id="{{ $dc->id }}">
                                     <i class="fa fa-refresh"></i> Sincronizar PlugNotas
                                 </button>
+                                <span class="label label-success js-sync-indicator" data-id="{{ $dc->id }}" style="margin-left: 10px; {{ ($dc->nfseConfiguration->plugnotas_empresa_sincronizada ?? false) ? '' : 'display:none;' }}">
+                                    <i class="fa fa-check-circle"></i> Sincronizado
+                                </span>
                                 <button type="submit" class="btn btn-primary btn-flat pull-right btn-lg">
                                     <i class="fa fa-save"></i> SALVAR CONFIGURAÇÕES
                                 </button>
@@ -420,6 +423,70 @@ $(function() {
             },
             complete: function() {
                 btn.html('<i class="fa fa-search"></i>').prop('disabled', false);
+            }
+        });
+    });
+
+    $('.btn-sync-plugnotas').on('click', function() {
+        var btn = $(this);
+        var dadosCastroId = btn.data('id');
+        var icon = $('.js-sync-indicator[data-id="' + dadosCastroId + '"]');
+        var form = $('.nfse-config-form[data-id="' + dadosCastroId + '"]');
+
+        var requiredSelectors = [
+            { name: 'inscricao_municipal', label: 'Inscrição Municipal' },
+            { name: 'certificado', label: 'ID Certificado (PlugNotas)' },
+            { name: 'email_emitente', label: 'Email Emitente' },
+            { name: 'logradouro', label: 'Logradouro' },
+            { name: 'numero', label: 'Número' },
+            { name: 'bairro', label: 'Bairro' },
+            { name: 'codigo_cidade', label: 'Cód. Município IBGE' },
+            { name: 'uf', label: 'UF' }
+        ];
+
+        var missing = [];
+        $.each(requiredSelectors, function(_, field) {
+            var input = form.find('[name="' + field.name + '"]');
+            var value = $.trim(input.val() || '');
+            if (!value) {
+                missing.push(field.label);
+            }
+        });
+
+        if (missing.length > 0) {
+            Swal.fire('Campos obrigatórios', 'Para sincronizar com a PlugNotas, preencha: ' + missing.join(', ') + '.', 'warning');
+            return;
+        }
+
+        btn.html('<i class="fa fa-spinner fa-spin"></i> Sincronizando...').prop('disabled', true);
+
+        $.ajax({
+            url: "{{ route('nfse.config.sync') }}",
+            type: 'POST',
+            data: {
+                _token: "{{ csrf_token() }}",
+                dados_castro_id: dadosCastroId
+            },
+            success: function(response) {
+                if (response.success) {
+                    icon.show();
+                    Swal.fire('Sucesso!', response.message || 'Empresa sincronizada com sucesso.', 'success');
+                    return;
+                }
+
+                Swal.fire('Atenção', response.message || 'Não foi possível sincronizar a empresa.', 'warning');
+            },
+            error: function(xhr) {
+                var message = 'Falha ao sincronizar empresa com a PlugNotas.';
+
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message;
+                }
+
+                Swal.fire('Erro', message, 'error');
+            },
+            complete: function() {
+                btn.html('<i class="fa fa-refresh"></i> Sincronizar PlugNotas').prop('disabled', false);
             }
         });
     });

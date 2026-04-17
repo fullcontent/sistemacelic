@@ -283,7 +283,7 @@ Route::prefix('admin')->group(function () {
         Route::get('/', 'NfseController@index')->name('nfse.index');
         Route::get('/configuracoes', 'NfseController@indexConfig')->name('nfse.config');
         Route::post('/configuracoes', 'NfseController@upsertConfig')->name('nfse.config.save');
-        Route::post('/configuracoes/sync', 'NfseController@syncEmpresa')->name('nfse.sync');
+		Route::post('/configuracoes/sync', 'NfseController@syncEmpresa')->name('nfse.config.sync');
         Route::post('/configuracoes/emitente', 'NfseController@storeEmitente')->name('nfse.emitente.store');
         Route::delete('/configuracoes/emitente/{id}', 'NfseController@destroyEmitente')->name('nfse.emitente.destroy');
         
@@ -293,7 +293,7 @@ Route::prefix('admin')->group(function () {
         
         Route::get('/buscar-cnpj/{cnpj}', 'NfseController@buscarCnpjExterno')->name('nfse.buscar_cnpj');
         Route::post('/cancelar/{id}', 'NfseController@cancelar')->name('nfse.cancelar');
-        Route::post('/sync/{id}', 'NfseController@syncStatus')->name('nfse.sync');
+		Route::post('/sync/{id}', 'NfseController@syncStatus')->name('nfse.sync.status');
         Route::get('/pdf/{id}', 'NfseController@downloadPdf')->name('nfse.download.pdf');
         Route::get('/xml/{id}', 'NfseController@downloadXml')->name('nfse.download.xml');
     });

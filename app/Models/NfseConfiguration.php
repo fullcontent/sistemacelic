@@ -40,6 +40,9 @@ class NfseConfiguration extends Model
         'senha_prefeitura',
         'certificado',
         'producao',
+        'plugnotas_empresa_sincronizada',
+        'plugnotas_empresa_sync_at',
+        'plugnotas_empresa_sync_error',
     ];
 
     protected $casts = [
@@ -49,6 +52,8 @@ class NfseConfiguration extends Model
         'beneficio_municipal' => 'boolean',
         'ativo' => 'boolean',
         'producao' => 'boolean',
+        'plugnotas_empresa_sincronizada' => 'boolean',
+        'plugnotas_empresa_sync_at' => 'datetime',
     ];
 
     public function scopeAtiva($query)

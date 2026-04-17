@@ -28,9 +28,18 @@ $idCounter = 10000; // Começa de um ID seguro ou usar auto_increment
 while (($row = fgetcsv($handle, 0, ",")) !== false) {
     if (count($row) < 25) continue;
     
-    // Mapeamento dos campos do CSV
-    $csv_id = trim($row[0]);
+    // Mapping based on user clarification:
+    // Column 0: SERVICO_ID (servico_id)
+    // Column 1: Nº O.S (id of ordem_servicos)
+    $csv_servico_id = trim($row[0]);
     $csv_num_os = trim($row[1]);
+    
+    // Clean OS ID to be numeric
+    $id_os = (int) preg_replace('/[^0-9]/', '', $csv_num_os);
+    if ($id_os <= 0) {
+        $id_os = $idCounter++;
+    }
+
     $csv_status = trim($row[2]);
     $csv_nome_servico = trim($row[3]);
     $csv_os_str = trim($row[7]); // EP1727
@@ -49,6 +58,11 @@ while (($row = fgetcsv($handle, 0, ",")) !== false) {
     $csv_forma_pagamento = trim($row[23]);
     $csv_conta_bancaria = trim($row[24]);
 
+    // Track processed IDs to avoid duplicate payments
+    static $processedOsIds = [];
+    $isDuplicate = in_array($id_os, $processedOsIds);
+    $processedOsIds[] = $id_os;
+
     // Limpar valores
     $valor_servico = preg_replace('/[^0-9,]/', '', $csv_valor_servico_raw);
     $valor_servico = str_replace(',', '.', $valor_servico);
@@ -58,12 +72,14 @@ while (($row = fgetcsv($handle, 0, ",")) !== false) {
     $valor_pago = str_replace(',', '.', $valor_pago);
     $valor_pago = (float)$valor_pago ?: 0;
 
-    // Buscar Servico
-    $servico = Servico::where('os', $csv_os_str)->first();
-    $servico_id = $servico ? $servico->id : 'NULL';
-    
-    if (!$servico) {
-        $missingServicos[] = $csv_os_str;
+    // Servico ID - Prioritize Column 0, fallback to OS string search
+    $servico_id = is_numeric($csv_servico_id) ? (int)$csv_servico_id : 'NULL';
+    if ($servico_id == 'NULL' && !empty($csv_os_str)) {
+        $servico = Servico::where('os', $csv_os_str)->first();
+        $servico_id = $servico ? $servico->id : 'NULL';
+        if (!$servico) {
+            $missingServicos[] = $csv_os_str;
+        }
     }
 
     // Prestador
@@ -88,40 +104,83 @@ while (($row = fgetcsv($handle, 0, ",")) !== false) {
     $formaPagamentoNum = 1; // Forçado para 1 conforme solicitado (retroativo)
     $escopo = addslashes($csv_escopo);
     $now = date('Y-m-d H:i:s');
-    $escopo = addslashes($csv_escopo);
 
-    // Converter data do CSV para Y-m-d
-    // Formato comum no CSV: "18-jun.-21" ou "09/12/2021"
-    $data_pagamento_sql = 'NULL';
-    if (!empty($csv_data_pagamento) && $csv_data_pagamento != '-') {
-        // Tenta extrair dd/mm/yyyy
-        if (preg_match('/(\d{2})\/(\d{2})\/(\d{4})/', $csv_data_pagamento, $matches)) {
-            $data_pagamento_sql = "'" . $matches[3] . "-" . $matches[2] . "-" . $matches[1] . "'";
-        } 
-        // Tenta extrair dd-mmm.-yy
-        elseif (preg_match('/(\d+)-([a-z]+)\.-(\d+)/i', $csv_data_pagamento, $matches)) {
+    /**
+     * Helper to sanitize and best-guess invalid dates from CSV
+     */
+    $sanitizeDateHeuristic = function($dateStr) {
+        if (empty($dateStr) || $dateStr === '-' || strpos($dateStr, '#') !== false) {
+            return 'NULL';
+        }
+
+        // Sanitize multiple slashes
+        $dateStr = preg_replace('/\/+/', '/', $dateStr);
+        
+        // Take first part if multiple dates exist
+        $parts = preg_split('/[\s,;]+/', $dateStr);
+        $dateStr = $parts[0];
+
+        // Pattern 1: D-MMM-YY (e.g., 18-jun.-21)
+        if (preg_match('/(\d+)-([a-z]+)\.-(\d+)/i', $dateStr, $matches)) {
             $meses = ['jan'=>1,'fev'=>2,'mar'=>3,'abr'=>4,'mai'=>5,'jun'=>6,'jul'=>7,'ago'=>8,'set'=>9,'out'=>10,'nov'=>11,'dez'=>12];
             $m = strtolower($matches[2]);
-            if (isset($meses[$m])) {
-                $y = '20' . $matches[3]; // Assume anos 2000+
-                $data_pagamento_sql = sprintf("'%04d-%02d-%02d'", $y, $meses[$m], $matches[1]);
-            }
+            $month = $meses[$m] ?? 1;
+            $day = (int)$matches[1];
+            $year = (int)('20' . $matches[3]);
+            return sprintf("'%04d-%02d-%02d'", $year, $month, min($day, 28)); // Safe clamp for day
         }
-    }
 
-    // Calcular data de criação baseada no pagamento (ou usar data atual se não houver)
+        // Pattern 2: D/M/Y or M/D/Y (e.g., 29/07/2022 or 3/24/2026)
+        if (preg_match('/(\d{1,2})\/(\d{1,2})\/(\d{2,4})/', $dateStr, $matches)) {
+            $p1 = (int)$matches[1];
+            $p2 = (int)$matches[2];
+            $y  = (int)$matches[3];
+
+            // Fix year typo (e.g., 025 -> 2025)
+            if ($y < 100) $y += 2000;
+            elseif ($y < 1000) $y = 2000 + ($y % 100);
+
+            $day = 1; $month = 1;
+
+            if ($p1 > 12) { // Must be D/M/Y
+                $day = $p1; $month = $p2;
+            } elseif ($p2 > 12) { // Must be M/D/Y
+                $month = $p1; $day = $p2;
+            } else { // Ambiguous - assume D/M/Y (Brazil)
+                $day = $p1; $month = $p2;
+            }
+
+            // Final clamp to ensure validity
+            $month = max(1, min(12, $month));
+            $lastDay = (int)date('t', strtotime("$y-$month-01"));
+            $day = max(1, min($lastDay, $day));
+            
+            return sprintf("'%04d-%02d-%02d'", $y, $month, $day);
+        }
+
+        return 'NULL';
+    };
+
+    // Converter data do CSV para Y-m-d
+    $data_pagamento_sql = $sanitizeDateHeuristic($csv_data_pagamento);
+
     $created_at = $now;
     if ($data_pagamento_sql != 'NULL') {
         $created_at = trim($data_pagamento_sql, "'") . ' 00:00:00';
     }
 
-    $id_os = (int) $csv_id;
-    if ($id_os <= 0) $id_os = $idCounter++;
-
+    // OS INSERT (UPSERT)
     $sql .= "INSERT INTO `ordem_servicos` (`id`, `servico_id`, `prestador_id`, `valorServico`, `formaPagamento`, `escopo`, `user_id`, `situacao`, `created_at`, `updated_at`) VALUES ";
     $sql .= "($id_os, $servico_id, $prestador_id, $valor_servico, $formaPagamentoNum, '$escopo', $user_id, '$situacao', '$created_at', '$created_at') ";
-    $sql .= "ON DUPLICATE KEY UPDATE `valorServico` = VALUES(`valorServico`), `situacao` = VALUES(`situacao`), `created_at` = VALUES(`created_at`), `updated_at` = VALUES(`updated_at`);\n";
+    $sql .= "ON DUPLICATE KEY UPDATE `valorServico` = VALUES(`valorServico`), `situacao` = VALUES(`situacao`), `updated_at` = VALUES(`updated_at`);\n";
     
+    // If THIS OS ID has already been seen in this generation, we skip adding more payments/vinculos
+    // to avoid artificial duplication from messy CSV data.
+    if ($isDuplicate) {
+        $sql .= "-- Skipping duplicate payment/vinculo for OS $id_os\n";
+        continue;
+    }
+
     // Reembolso
     $valor_reembolso_raw = preg_replace('/[^0-9,]/', '', $csv_valor_reembolso_raw);
     $valor_reembolso_raw = str_replace(',', '.', $valor_reembolso_raw);
@@ -134,17 +193,12 @@ while (($row = fgetcsv($handle, 0, ",")) !== false) {
         $sql .= "($id_os, $servico_id, $valor_servico, '$reembolso_status', '$created_at', '$created_at');\n";
     }
     
-    // Calcula o valor por parcela (sempre 1 agora)
     $valor_por_parcela = $valor_servico;
-    
-    // Verifica se esta parcela está paga
     $situacao_pagamento = !empty($csv_data_pagamento) && $csv_data_pagamento != '-' ? 'pago' : 'aberto';
-    $data_pagamento_linha = $data_pagamento_sql;
-
     $forma_pagamento_slug = strtolower(trim($csv_forma_pagamento)) ?: 'pix';
     
     $sql .= "INSERT INTO `ordem_servico_pagamentos` (`ordemServico_id`, `parcela`, `valor`, `formaPagamento`, `situacao`, `dataPagamento`, `created_at`, `updated_at`) VALUES ";
-    $sql .= "($id_os, 1, $valor_por_parcela, '$forma_pagamento_slug', '$situacao_pagamento', $data_pagamento_linha, '$created_at', '$created_at');\n";
+    $sql .= "($id_os, 1, $valor_por_parcela, '$forma_pagamento_slug', '$situacao_pagamento', $data_pagamento_sql, '$created_at', '$created_at');\n";
 
 }
 fclose($handle);
