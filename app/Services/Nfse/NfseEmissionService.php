@@ -52,8 +52,11 @@ class NfseEmissionService
             'observacoes' => json_encode(['tomador_override' => $tomadorOverride]),
         ]);
 
+        $payloads = [];
+        $retornos = [];
+
         try {
-            return DB::transaction(function () use ($data, $faturamento, $config, $servicoIds, $opcao, $tomadorOverride, $camposAdicionais, $faturamentoServicos, $emission) {
+            return DB::transaction(function () use ($data, $faturamento, $config, $servicoIds, $opcao, $tomadorOverride, $camposAdicionais, $faturamentoServicos, $emission, &$payloads, &$retornos) {
             // Determinar o modo PlugNotas com base na opção
             // Opções 1 e 2 são INDIVIDUAIS
             // Opções 3 e 4 são AGRUPADAS
@@ -61,8 +64,6 @@ class NfseEmissionService
             $useOverride = ($opcao == '2' || $opcao == '4' || !empty($tomadorOverride));
 
             $items = [];
-            $payloads = [];
-            $retornos = [];
 
             if ($isAgrupada) {
                 // Opção 3 ou 4: Agrupado
@@ -71,6 +72,9 @@ class NfseEmissionService
                 
                 $payload = NfsePayloadFactory2::buildBasePayload($config->toArray(), $groupedItem, $camposAdicionais);
                 $payload['tomador'] = $tomadorData;
+
+                // Keep attempted payload for troubleshooting even if provider call fails.
+                $payloads[] = $payload;
                 
                 // Call API without inner catch
                 $retorno = $this->plugNotasClient->emitirNfse($payload);
@@ -84,8 +88,6 @@ class NfseEmissionService
 
                 $this->updateItemFromPlugNotasStatus($item, $retorno);
                 $items[] = $item;
-
-                $payloads[] = $payload;
                 $retornos[] = $retorno;
             } else {
                 // Opção 1 ou 2: Individual
@@ -98,6 +100,9 @@ class NfseEmissionService
 
                     $payload = NfsePayloadFactory2::buildBasePayload($config->toArray(), $itemData, $camposAdicionais);
                     $payload['tomador'] = $tomadorData;
+
+                    // Keep attempted payload for troubleshooting even if provider call fails.
+                    $payloads[] = $payload;
                     
                         // Call API without inner catch
                         $retorno = $this->plugNotasClient->emitirNfse($payload);
@@ -113,8 +118,6 @@ class NfseEmissionService
                     
                     $this->updateItemFromPlugNotasStatus($item, $retorno);
                     $items[] = $item;
-
-                    $payloads[] = $payload;
                     $retornos[] = $retorno;
                 }
             }
@@ -144,10 +147,15 @@ class NfseEmissionService
             }
             $emission->status = 'erro';
             $emission->mensagem_erro = $msg;
-            // Persist as much as we have
-            if (isset($payloads)) {
+
+            // Persist as much as we have to support troubleshooting in provider errors.
+            if (!empty($payloads)) {
                 $emission->payload = json_encode($payloads);
             }
+            if (!empty($retornos)) {
+                $emission->retorno = json_encode($retornos);
+            }
+
             $emission->save();
             throw new \Exception($msg, $e->getCode(), $e);
         }

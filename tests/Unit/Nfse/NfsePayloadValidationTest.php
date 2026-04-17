@@ -61,6 +61,8 @@ class NfsePayloadValidationTest extends TestCase
         $this->assertIsArray($payload['servico']);
         $this->assertEquals('Teste Unitário', $payload['servico'][0]['discriminacao']);
         $this->assertEquals(1500.50, $payload['servico'][0]['valor']['servico']);
+        $this->assertArrayHasKey('iss', $payload['servico'][0]);
+        $this->assertEquals(9.9, $payload['servico'][0]['iss']['aliquota']);
 
         // Tomador should be an empty array base, ready for resolveTomadorData
         $this->assertIsArray($payload['tomador']);

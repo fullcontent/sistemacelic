@@ -62,6 +62,9 @@ class NfsePayloadFactoryTest extends TestCase
         $this->assertEquals('17.02.02', $payload['servico'][0]['codigo']);
         $this->assertEquals('Serviço teste', $payload['servico'][0]['discriminacao']);
         $this->assertEquals(100.00, $payload['servico'][0]['valor']['servico']);
+        $this->assertArrayHasKey('iss', $payload['servico'][0]);
+        $this->assertFalse($payload['servico'][0]['iss']['retido']);
+        $this->assertEquals(9.9, $payload['servico'][0]['iss']['aliquota']);
     }
 
     public function test_build_payload_sanitizes_discriminacao()

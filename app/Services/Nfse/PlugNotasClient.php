@@ -69,12 +69,14 @@ class PlugNotasClient
 
         for ($attempt = 1; $attempt <= $attempts; $attempt++) {
             try {
+                $normalizedPayload = $this->stripNullValues($payload);
+
                 $response = $this->http->post('/nfse', [
                     'headers' => [
                         'x-api-key' => $this->settings['api_key'],
                         'Accept' => 'application/json',
                     ],
-                    'json' => [$payload],
+                    'json' => [$normalizedPayload],
                 ]);
 
                 return json_decode((string) $response->getBody(), true);
@@ -95,7 +97,7 @@ class PlugNotasClient
                     ? " após {$attempts} tentativas"
                     : '';
 
-                throw new \RuntimeException('Falha na chamada PlugNotas' . $suffix . ': ' . $e->getMessage(), 0, $e);
+                throw new \RuntimeException('Falha na chamada PlugNotas' . $suffix . ': ' . $this->formatExceptionMessage($e), 0, $e);
             }
         }
 
@@ -137,6 +139,51 @@ class PlugNotasClient
             'status_code' => $statusCode,
             'error' => $e->getMessage(),
         ]);
+    }
+
+    private function formatExceptionMessage(\Exception $e)
+    {
+        $message = $e->getMessage();
+
+        if (!method_exists($e, 'getResponse')) {
+            return $message;
+        }
+
+        $response = $e->getResponse();
+        if (!$response || !method_exists($response, 'getBody')) {
+            return $message;
+        }
+
+        try {
+            $body = (string) $response->getBody();
+            if (!empty($body)) {
+                return $message . ' | Resposta: ' . $body;
+            }
+        } catch (\Exception $ignored) {
+            // Mantem a mensagem original quando nao for possivel ler o corpo.
+        }
+
+        return $message;
+    }
+
+    private function stripNullValues(array $data)
+    {
+        $clean = [];
+
+        foreach ($data as $key => $value) {
+            if ($value === null) {
+                continue;
+            }
+
+            if (is_array($value)) {
+                $clean[$key] = $this->stripNullValues($value);
+                continue;
+            }
+
+            $clean[$key] = $value;
+        }
+
+        return $clean;
     }
 
     public function consultarNfse($id)
