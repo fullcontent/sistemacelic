@@ -46,7 +46,7 @@
                 @endif
               </td>
               <td style="vertical-align: middle;">
-                <strong>{{$oc->prestador->nome}}</strong>
+                <strong>{{ optional($oc->prestador)->nome ?? '---' }}</strong>
               </td>
               <td style="vertical-align: middle;">
                 <small class="text-muted">{{ $clean_escopo ?: '---' }}</small>
