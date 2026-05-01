@@ -17,3 +17,9 @@ composer.phar
 /public/uploads
 
 config/app.php
+
+# Reversa
+# .reversa/config.user.toml
+# _reversa_sdd/
+.agents
+.reversa

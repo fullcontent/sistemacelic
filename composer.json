@@ -22,8 +22,11 @@
         "jurosh/pdf-merge": "^2.0"
     },
     "require-dev": {
+        "carbonphp/carbon-doctrine-types": "1.0",
+        "doctrine/dbal": "2.13",
         "facade/ignition": "^1.4",
         "fzaninotto/faker": "^1.4",
+        "kitloong/laravel-migrations-generator": "4.0",
         "mockery/mockery": "^1.0",
         "nunomaduro/collision": "^3.0",
         "phpunit/phpunit": "^8.0"
