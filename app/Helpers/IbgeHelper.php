@@ -36,17 +36,6 @@ class IbgeHelper
         });
 
         if (!is_array($cidades)) {
-            // Fallback para a API da PlugNotas caso BrasilAPI esteja indisponível
-            try {
-                $plugNotasClient = app(\App\Services\Nfse\PlugNotasClient::class);
-                $ibge = $plugNotasClient->getCidadeByNome($cityName, $uf);
-                if ($ibge) {
-                    \Illuminate\Support\Facades\Log::info("IbgeHelper: Código IBGE obtido via contingência PlugNotas (BrasilAPI offline) para '{$cityName}' ({$uf}): {$ibge}");
-                    return $ibge;
-                }
-            } catch (\Exception $ex) {
-                \Illuminate\Support\Facades\Log::warning("IbgeHelper: Falha no fallback de contingência PlugNotas para '{$cityName}' ({$uf}): " . $ex->getMessage());
-            }
             return null;
         }
 
@@ -69,7 +58,7 @@ class IbgeHelper
             if (isset($c['nome'], $c['codigo_ibge'])) {
                 $cidadeNormalizada = self::normalizeString($c['nome']);
                 similar_text($nomeNormalizado, $cidadeNormalizada, $percent);
-                
+
                 if ($percent > $highestSimilarity) {
                     $highestSimilarity = $percent;
                     $bestMatchId = (string) $c['codigo_ibge'];
@@ -83,18 +72,6 @@ class IbgeHelper
             return $bestMatchId;
         }
 
-        // Fallback final para a API da PlugNotas caso não tenha encontrado via BrasilAPI
-        try {
-            $plugNotasClient = app(\App\Services\Nfse\PlugNotasClient::class);
-            $ibge = $plugNotasClient->getCidadeByNome($cityName, $uf);
-            if ($ibge) {
-                \Illuminate\Support\Facades\Log::info("IbgeHelper: Código IBGE obtido via contingência PlugNotas (final) para '{$cityName}' ({$uf}): {$ibge}");
-                return $ibge;
-            }
-        } catch (\Exception $ex) {
-            \Illuminate\Support\Facades\Log::warning("IbgeHelper: Falha no fallback final de contingência PlugNotas para '{$cityName}' ({$uf}): " . $ex->getMessage());
-        }
-
         return null;
     }
 
@@ -102,11 +79,28 @@ class IbgeHelper
     {
         $string = mb_strtoupper((string) $string, 'UTF-8');
         $map = [
-            'Á' => 'A', 'À' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'A',
-            'É' => 'E', 'È' => 'E', 'Ê' => 'E', 'Ë' => 'E',
-            'Í' => 'I', 'Ì' => 'I', 'Î' => 'I', 'Ï' => 'I',
-            'Ó' => 'O', 'Ò' => 'O', 'Ô' => 'O', 'Õ' => 'O', 'Ö' => 'O',
-            'Ú' => 'U', 'Ù' => 'U', 'Û' => 'U', 'Ü' => 'U',
+            'Á' => 'A',
+            'À' => 'A',
+            'Â' => 'A',
+            'Ã' => 'A',
+            'Ä' => 'A',
+            'É' => 'E',
+            'È' => 'E',
+            'Ê' => 'E',
+            'Ë' => 'E',
+            'Í' => 'I',
+            'Ì' => 'I',
+            'Î' => 'I',
+            'Ï' => 'I',
+            'Ó' => 'O',
+            'Ò' => 'O',
+            'Ô' => 'O',
+            'Õ' => 'O',
+            'Ö' => 'O',
+            'Ú' => 'U',
+            'Ù' => 'U',
+            'Û' => 'U',
+            'Ü' => 'U',
             'Ç' => 'C'
         ];
         $string = strtr($string, $map);
