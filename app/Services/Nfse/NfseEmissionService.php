@@ -210,7 +210,8 @@ class NfseEmissionService
     protected function resolveTomadorData(Faturamento $faturamento, $servico, $opcao, $override)
     {
         $clean = function ($val) {
-            return preg_replace('/\D/', '', (string) $val); };
+            return preg_replace('/\D/', '', (string) $val);
+        };
 
         $tomadorInfo = [];
 
@@ -287,10 +288,10 @@ class NfseEmissionService
         if (!empty($payload['endereco']['cep'])) {
             $cep = preg_replace('/\D/', '', $payload['endereco']['cep']);
             $cepData = $this->plugNotasClient->getCepInfo($cep);
-            
+
             if ($cepData) {
                 $cityIbge = $cepData['city_ibge'] ?? $cepData['ibge'] ?? null;
-                
+
                 // Se não veio o IBGE no CEP, tenta buscar pelo nome da cidade retornado pelo CEP
                 if (!$cityIbge && !empty($cepData['city'])) {
                     $fallbackUf = $payload['endereco']['estado'] ?? $payload['endereco']['uf'] ?? '';
@@ -479,6 +480,24 @@ class NfseEmissionService
         $item->status = strtolower($status);
 
         // Numero da nota
+        if (isset($data['numero']) && !empty($data['numero'])) {
+            $item->numero_nf = $data['numero'];
+
+            // Atualiza o campo nf no serviço relacionado
+            if ($item->servico_id) {
+                \App\Models\Servico::where('id', $item->servico_id)->update(['nf' => $item->numero_nf]);
+            } else {
+                $emission = $item->emissao;
+                if ($emission && $emission->faturamento_id) {
+                    $servicoIds = \App\Models\FaturamentoServico::where('faturamento_id', $emission->faturamento_id)->pluck('servico_id');
+                    if ($servicoIds->isNotEmpty()) {
+                        \App\Models\Servico::whereIn('id', $servicoIds)->update(['nf' => $item->numero_nf]);
+                    }
+                }
+            }
+        } else {
+            $item->numero_nf = $item->numero_nf;
+        }
         if (isset($data['numero']) && !empty($data['numero'])) {
             $item->numero_nf = $data['numero'];
 
@@ -717,7 +736,7 @@ class NfseEmissionService
         if (in_array('erro', $statuses, true)) {
             return 'erro';
         }
-        
+
         if (in_array('rejeitada', $statuses, true) || in_array('rejeitado', $statuses, true)) {
             return 'rejeitada';
         }
