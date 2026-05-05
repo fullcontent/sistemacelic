@@ -155,4 +155,107 @@ class PlugNotasClient
             throw new \RuntimeException("Falha ao baixar arquivo {$type} na PlugNotas: " . $e->getMessage(), 0, $e);
         }
     }
+
+    public function getCidadeByNome($nome, $uf)
+    {
+        if ($this->settings['mock_mode'] || empty($this->settings['api_key'])) {
+            return null;
+        }
+
+        $uf = trim(strtoupper($uf));
+        $cacheKey = 'plugnotas_todas_cidades';
+
+        $cidades = \Illuminate\Support\Facades\Cache::remember($cacheKey, 86400 * 30, function () {
+            try {
+                $response = $this->http->get('/nfse/cidades', [
+                    'headers' => [
+                        'x-api-key' => $this->settings['api_key'],
+                        'Accept' => 'application/json',
+                    ]
+                ]);
+                return json_decode((string) $response->getBody(), true);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::warning("Erro ao consultar /nfse/cidades PlugNotas: " . $e->getMessage());
+                return null;
+            }
+        });
+
+        if (!is_array($cidades)) {
+            return null;
+        }
+
+        $nomeNormalizado = self::normalizeString($nome);
+
+        // Busca exata primeiro
+        foreach ($cidades as $c) {
+            if (isset($c['uf'], $c['nome'], $c['id']) && strtoupper($c['uf']) === $uf) {
+                if (self::normalizeString($c['nome']) === $nomeNormalizado) {
+                    return (string) $c['id'];
+                }
+            }
+        }
+
+        // Busca aproximada (fuzzy match) para lidar com erros de digitação
+        $bestMatchId = null;
+        $highestSimilarity = 0;
+
+        foreach ($cidades as $c) {
+            if (isset($c['uf'], $c['nome'], $c['id']) && strtoupper($c['uf']) === $uf) {
+                $cidadeNormalizada = self::normalizeString($c['nome']);
+                similar_text($nomeNormalizado, $cidadeNormalizada, $percent);
+                
+                if ($percent > $highestSimilarity) {
+                    $highestSimilarity = $percent;
+                    $bestMatchId = (string) $c['id'];
+                }
+            }
+        }
+
+        // Se a similaridade for de 80% ou mais, aceitamos como erro de digitação
+        if ($bestMatchId !== null && $highestSimilarity >= 80) {
+            \Illuminate\Support\Facades\Log::info("PlugNotasClient: Correção automática de cidade. Digitado: '{$nome}', IBGE encontrado: {$bestMatchId} (Similaridade: {$highestSimilarity}%)");
+            return $bestMatchId;
+        }
+
+        return null;
+    }
+
+    public function getCidadeById($codigoIbge)
+    {
+        if ($this->settings['mock_mode'] || empty($this->settings['api_key'])) {
+            return null;
+        }
+
+        $cacheKey = 'plugnotas_cidade_id_' . $codigoIbge;
+
+        return \Illuminate\Support\Facades\Cache::remember($cacheKey, 86400 * 30, function () use ($codigoIbge) {
+            try {
+                $response = $this->http->get('/nfse/cidades/' . $codigoIbge, [
+                    'headers' => [
+                        'x-api-key' => $this->settings['api_key'],
+                        'Accept' => 'application/json',
+                    ]
+                ]);
+                return json_decode((string) $response->getBody(), true);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::warning("Erro ao consultar /nfse/cidades/{$codigoIbge} PlugNotas: " . $e->getMessage());
+                return null;
+            }
+        });
+    }
+
+    private static function normalizeString($string)
+    {
+        $string = mb_strtoupper((string) $string, 'UTF-8');
+        $map = [
+            'Á' => 'A', 'À' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'A',
+            'É' => 'E', 'È' => 'E', 'Ê' => 'E', 'Ë' => 'E',
+            'Í' => 'I', 'Ì' => 'I', 'Î' => 'I', 'Ï' => 'I',
+            'Ó' => 'O', 'Ò' => 'O', 'Ô' => 'O', 'Õ' => 'O', 'Ö' => 'O',
+            'Ú' => 'U', 'Ù' => 'U', 'Û' => 'U', 'Ü' => 'U',
+            'Ç' => 'C'
+        ];
+        $string = strtr($string, $map);
+        return trim($string);
+    }
 }

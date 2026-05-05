@@ -288,6 +288,7 @@ Route::prefix('admin')->group(function () {
         Route::delete('/configuracoes/emitente/{id}', 'NfseController@destroyEmitente')->name('nfse.emitente.destroy');
         
         Route::get('/emissao/{faturamentoId}', 'NfseController@showEmissao')->name('nfse.emissao');
+        Route::post('/emissao/{faturamentoId}/preview', 'NfseController@previewEmissao')->name('nfse.preview');
         Route::post('/emissao/{faturamentoId}', 'NfseController@processarEmissao')->name('nfse.processar');
         Route::get('/status/{id}', 'NfseController@status')->name('nfse.status');
         

@@ -116,6 +116,42 @@ class NfseController extends Controller
         return view('admin.nfse.emissao', compact('faturamento', 'dadosCastros', 'activeConfig'));
     }
 
+    public function previewEmissao(Request $request, $faturamentoId)
+    {
+        $data = $request->all();
+        $data['faturamento_id'] = $faturamentoId;
+        
+        // Se houver dados de tomador override
+        if ($request->has('nova_empresa') && $request->nova_empresa == '1') {
+            $data['tomador_override'] = [
+                'cnpj' => $request->override_cnpj,
+                'razaoSocial' => $request->override_razaoSocial,
+                'email' => $request->override_email,
+                'logradouro' => $request->override_logradouro,
+                'numero' => $request->override_numero,
+                'bairro' => $request->override_bairro,
+                'cep' => $request->override_cep,
+                'uf' => $request->override_uf,
+                'codigoCidade' => $request->override_codigoCidade,
+            ];
+        }
+
+        try {
+            $payloads = $this->service->buildPayloadsPreview($data);
+            return response()->json([
+                'success' => true,
+                'payloads' => $payloads,
+                'count' => count($payloads)
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('NfseController: Erro ao gerar preview: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 400);
+        }
+    }
+
     public function processarEmissao(Request $request, $faturamentoId)
     {
         $data = $request->all();

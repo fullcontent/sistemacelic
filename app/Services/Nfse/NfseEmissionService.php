@@ -142,6 +142,13 @@ class NfseEmissionService
             if (method_exists($e, 'getResponse') && $e->getResponse()) {
                 $msg .= ' | Resposta: ' . (string) $e->getResponse()->getBody();
             }
+            
+            \Log::error('NfseEmissionService: Erro ao emitir NFSe para faturamento ' . $data['faturamento_id'], [
+                'error' => $msg,
+                'exception' => $e,
+                'payloads' => isset($payloads) ? $payloads : null
+            ]);
+            
             $emission->status = 'erro';
             $emission->mensagem_erro = $msg;
             // Persist as much as we have
@@ -153,62 +160,130 @@ class NfseEmissionService
         }
     }
 
+    public function buildPayloadsPreview(array $data)
+    {
+        $faturamento = Faturamento::with('servicosFaturados.detalhes.unidade', 'empresa')->findOrFail($data['faturamento_id']);
+        $config = $this->resolveConfig($data);
+
+        $servicoIds = isset($data['servico_ids']) ? $data['servico_ids'] : [];
+        $opcao = $data['opcao_automatica']; // 1, 2, 3, 4
+        $tomadorOverride = isset($data['tomador_override']) ? $data['tomador_override'] : null;
+        $camposAdicionais = isset($data['campos_adicionais']) ? $data['campos_adicionais'] : [];
+
+        $faturamentoServicos = FaturamentoServico::with('detalhes.unidade', 'detalhes.financeiro')
+            ->where('faturamento_id', $faturamento->id)
+            ->whereIn('servico_id', $servicoIds)
+            ->get();
+
+        if ($faturamentoServicos->isEmpty()) {
+            throw new \InvalidArgumentException('Nenhum serviço válido encontrado para o faturamento informado.');
+        }
+
+        $payloads = [];
+        $isAgrupada = ($opcao == '3' || $opcao == '4');
+
+        if ($isAgrupada) {
+            // Opção 3 ou 4: Agrupado
+            $tomadorData = $this->resolveTomadorData($faturamento, null, $opcao, $tomadorOverride);
+            $groupedItem = $this->buildGroupedItem($faturamentoServicos, $tomadorData['cpfCnpj']);
+            
+            $payload = NfsePayloadFactory::buildBasePayload($config->toArray(), $groupedItem, $camposAdicionais);
+            $payload['tomador'] = $tomadorData;
+            
+            $payloads[] = $payload;
+        } else {
+            // Opção 1 ou 2: Individual
+            foreach ($faturamentoServicos as $faturamentoServico) {
+                $servico = $faturamentoServico->detalhes;
+                if (!$servico) continue;
+
+                $tomadorData = $this->resolveTomadorData($faturamento, $servico, $opcao, $tomadorOverride);
+                $itemData = $this->buildItemData($servico, $faturamentoServico, $tomadorData['cpfCnpj']);
+
+                $payload = NfsePayloadFactory::buildBasePayload($config->toArray(), $itemData, $camposAdicionais);
+                $payload['tomador'] = $tomadorData;
+                
+                $payloads[] = $payload;
+            }
+        }
+
+        return $payloads;
+    }
+
     protected function resolveTomadorData(Faturamento $faturamento, $servico, $opcao, $override)
     {
         $clean = function($val) { return preg_replace('/\D/', '', (string)$val); };
 
+        $tomadorInfo = [];
+
         // Se houver override (Opção 2 ou 4), usar os dados manuais
         if (($opcao == '2' || $opcao == '4') && !empty($override)) {
-            return [
+            $tomadorInfo = [
                 'cpfCnpj' => $clean($override['cnpj']),
                 'razaoSocial' => $override['razaoSocial'],
                 'email' => $override['email'] ?? null,
+                'inscricaoMunicipal' => !empty($override['inscricao_municipal']) ? $override['inscricao_municipal'] : null,
                 'endereco' => [
+                    'tipoLogradouro' => 'Rua',
                     'logradouro' => $override['logradouro'] ?? '',
                     'numero' => $override['numero'] ?? '',
+                    'complemento' => null,
+                    'tipoBairro' => 'Centro',
                     'bairro' => $override['bairro'] ?? '',
                     'codigoCidade' => $override['codigoCidade'] ?? '',
+                    'descricaoCidade' => $override['municipio'] ?? '',
                     'cep' => $clean($override['cep'] ?? ''),
                     'uf' => $override['uf'] ?? ''
                 ]
             ];
         }
-
         // Opção 1: Individual com dados da Unidade
-        if ($opcao == '1' && $servico && !empty($servico->unidade)) {
-            return [
+        elseif ($opcao == '1' && $servico && !empty($servico->unidade)) {
+            $tomadorInfo = [
                 'cpfCnpj' => $clean($servico->unidade->cnpj),
                 'razaoSocial' => $servico->unidade->razaoSocial ?? $servico->unidade->nomeFantasia,
-                'email' => $servico->unidade->email,
+                'email' => $servico->unidade->email ?? null,
+                'inscricaoMunicipal' => !empty($servico->unidade->inscricaoMun) ? $servico->unidade->inscricaoMun : null,
                 'endereco' => [
-                    'logradouro' => $servico->unidade->endereco,
-                    'numero' => $servico->unidade->numero,
-                    'bairro' => $servico->unidade->bairro,
-                    'codigoCidade' => IbgeHelper::getIbgeCode($servico->unidade->cidade, $servico->unidade->uf) ?? $servico->unidade->codigo_cidade ?? $servico->unidade->inscricaoMun, 
-                    'cep' => $clean($servico->unidade->cep),
-                    'uf' => $servico->unidade->uf
+                    'tipoLogradouro' => 'Rua',
+                    'logradouro' => $servico->unidade->endereco ?? '',
+                    'numero' => $servico->unidade->numero ?? '',
+                    'complemento' => null,
+                    'tipoBairro' => 'Centro',
+                    'bairro' => $servico->unidade->bairro ?? '',
+                    'codigoCidade' => IbgeHelper::getIbgeCode($servico->unidade->cidade, $servico->unidade->uf) ?? $servico->unidade->codigo_cidade ?? '', 
+                    'descricaoCidade' => $servico->unidade->cidade ?? '',
+                    'cep' => $clean($servico->unidade->cep ?? ''),
+                    'uf' => $servico->unidade->uf ?? ''
                 ]
             ];
         }
-
         // Opção 3: Agrupada com dados da Empresa do Faturamento
-        if ($opcao == '3' && $faturamento->empresa) {
-            return [
+        elseif ($opcao == '3' && $faturamento->empresa) {
+            $tomadorInfo = [
                 'cpfCnpj' => $clean($faturamento->empresa->cnpj),
                 'razaoSocial' => $faturamento->empresa->razaoSocial ?? $faturamento->empresa->nomeFantasia,
-                'email' => $faturamento->empresa->email,
+                'email' => $faturamento->empresa->email ?? null,
+                'inscricaoMunicipal' => !empty($faturamento->empresa->inscricaoMun) ? $faturamento->empresa->inscricaoMun : null,
                 'endereco' => [
-                    'logradouro' => $faturamento->empresa->endereco,
-                    'numero' => $faturamento->empresa->numero,
-                    'bairro' => $faturamento->empresa->bairro,
-                    'codigoCidade' => IbgeHelper::getIbgeCode($faturamento->empresa->cidade, $faturamento->empresa->uf) ?? $faturamento->empresa->codigo_cidade ?? $faturamento->empresa->inscricaoMun,
-                    'cep' => $clean($faturamento->empresa->cep),
-                    'uf' => $faturamento->empresa->uf
+                    'tipoLogradouro' => 'Rua',
+                    'logradouro' => $faturamento->empresa->endereco ?? '',
+                    'numero' => $faturamento->empresa->numero ?? '',
+                    'complemento' => null,
+                    'tipoBairro' => 'Centro',
+                    'bairro' => $faturamento->empresa->bairro ?? '',
+                    'codigoCidade' => IbgeHelper::getIbgeCode($faturamento->empresa->cidade, $faturamento->empresa->uf) ?? $faturamento->empresa->codigo_cidade ?? '',
+                    'descricaoCidade' => $faturamento->empresa->cidade ?? '',
+                    'cep' => $clean($faturamento->empresa->cep ?? ''),
+                    'uf' => $faturamento->empresa->uf ?? ''
                 ]
             ];
+        } else {
+            throw new \InvalidArgumentException('Não foi possível determinar os dados do tomador para a opção ' . $opcao);
         }
 
-        throw new \InvalidArgumentException('Não foi possível determinar os dados do tomador para a opção ' . $opcao);
+        // Usar o factory para estruturar corretamente
+        return NfsePayloadFactory::buildTomadorData($tomadorInfo);
     }
 
     public function cancelar($emissionId, $motivo)
@@ -333,7 +408,41 @@ class NfseEmissionService
 
     private function updateItemFromPlugNotasStatus(NfseEmissionItem $item, array $data)
     {
-        $item->status = isset($data['status']) ? $data['status'] : $item->status;
+        // Determinar o status com base na resposta da API
+        $status = null;
+        
+        // Prioridade 1: Status direto da resposta
+        if (isset($data['status'])) {
+            $status = $data['status'];
+        }
+        // Prioridade 2: Status dentro dos documents
+        elseif (isset($data['documents']) && is_array($data['documents']) && isset($data['documents'][0]['status'])) {
+            $status = $data['documents'][0]['status'];
+        }
+        // Prioridade 3: Mapear de acordo com a mensagem
+        elseif (!empty($data['message'])) {
+            $message = strtolower($data['message']);
+            if (strpos($message, 'processamento') !== false) {
+                $status = 'processando';
+            } elseif (strpos($message, 'sucesso') !== false || strpos($message, 'emitida') !== false) {
+                $status = 'emitida';
+            } elseif (strpos($message, 'erro') !== false) {
+                $status = 'erro';
+            }
+        }
+        // Prioridade 4: Se tem ID e retornou com sucesso, provavelmente está processando
+        elseif (isset($data['id'])) {
+            $status = 'processando';
+        }
+        
+        // Fallback: manter status anterior se existir, senão "processando"
+        if (empty($status)) {
+            $status = !empty($item->status) ? $item->status : 'processando';
+        }
+        
+        $item->status = $status;
+        
+        // Numero da nota
         $item->numero_nf = isset($data['numero']) ? $data['numero'] : $item->numero_nf;
 
         $baseUrl = $this->plugNotasClient->getBaseUrl();
@@ -344,6 +453,13 @@ class NfseEmissionService
             $item->xml_url = "{$baseUrl}/nfse/xml/{$externalId}";
         }
 
+        // Guardar mensagem de erro se houver
+        if (!empty($data['message'])) {
+            // Apenas guardar se for realmente uma mensagem de erro
+            if (strpos(strtolower($data['message']), 'erro') !== false) {
+                $item->mensagem_erro = $data['message'];
+            }
+        }
         if (!empty($data['mensagem'])) {
             $item->mensagem_erro = $data['mensagem'];
         }
@@ -351,9 +467,6 @@ class NfseEmissionService
         // Se for um retorno de submissão (array de documentos)
         if (isset($data['documents']) && is_array($data['documents']) && isset($data['documents'][0]['id'])) {
             $item->external_id = $data['documents'][0]['id'];
-            if (isset($data['documents'][0]['status'])) {
-                $item->status = $data['documents'][0]['status'];
-            }
         } elseif (isset($data['id'])) {
             // Se for um retorno de consulta individual
             $item->external_id = $data['id'];

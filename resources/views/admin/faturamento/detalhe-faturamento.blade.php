@@ -202,10 +202,12 @@ $(function() {
     <!-- /.row -->
     <div class="col-xs-8" style="margin-top: 100px;">
       <p>__________________________________________________________________</p>
-      <p><b>{{$dadosCastro->razaoSocial}}
-        </b></p>
-      <p>CNPJ: {{$dadosCastro->cnpj}}
-      </p>
+      @if($dadosCastro)
+        <p><b>{{$dadosCastro->razaoSocial}}</b></p>
+        <p>CNPJ: {{$dadosCastro->cnpj}}</p>
+      @else
+        <p><b>Empresa/Tomador não vinculado</b></p>
+      @endif
 
     </div>
     <!-- this row will not appear when printing -->
