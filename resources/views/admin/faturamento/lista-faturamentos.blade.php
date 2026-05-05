@@ -243,14 +243,14 @@
 						<td>
 							@if($f->ultimaEmisao)
 								@php $emissao = $f->ultimaEmisao; @endphp
-								@if($emissao->status == 'CONCLUIDA')
+								@if($emissao->status == 'CONCLUIDA' || strtolower($emissao->status) == 'emitida')
 									<span class="label label-success" title="NFS-e Automática"><i class="fa fa-check-circle"></i> Emitida</span>
 								@elseif($emissao->status == 'PROCESSANDO')
 									<span class="label label-primary" title="NFS-e em processamento na PlugNotas"><i class="fa fa-spinner fa-spin"></i> Processando</span>
-								@elseif($emissao->status == 'ERRO')
-									<span class="label label-danger" title="Erro na emissão automática"><i class="fa fa-exclamation-triangle"></i> Erro na Emissão</span>
+								@elseif(in_array(strtoupper($emissao->status), ['ERRO', 'REJEITADA', 'REJEITADO']))
+									<span class="label label-danger" title="{{ $emissao->mensagem_erro ?? 'Erro na emissão automática' }}"><i class="fa fa-exclamation-triangle"></i> {{ strtoupper($emissao->status) == 'ERRO' ? 'Erro na Emissão' : 'Rejeitada' }}</span>
 								@else
-									<span class="label label-default">{{ $emissao->status }}</span>
+									<span class="label label-default">{{ strtoupper($emissao->status) }}</span>
 								@endif
 							@elseif($f->nf || $f->servicos->whereNotNull('nf')->count() > 0)
 								<span class="label label-success">Emitida (Manual)</span>
@@ -335,6 +335,12 @@
 												</a>
 											</li>
 										@endif
+									@elseif($f->ultimaEmisao && in_array(strtoupper($f->ultimaEmisao->status), ['ERRO', 'CANCELADA', 'REJEITADO', 'REJEITADA', 'PENDENTE']))
+										<li>
+											<a href="{{ route('nfse.emissao', $f->id) }}">
+												<i class="fa fa-refresh"></i> Re-emitir NFS-e
+											</a>
+										</li>
 									@endif
 									<li class="divider"></li>
 									<li>

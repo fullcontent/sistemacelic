@@ -430,6 +430,10 @@ class NfseEmissionService
         if (isset($data['status'])) {
             $status = $data['status'];
         }
+        // Prioridade 1.5: situacao (usado em algumas respostas de prefeituras)
+        elseif (isset($data['situacao'])) {
+            $status = $data['situacao'];
+        }
         // Prioridade 2: Status dentro dos documents
         elseif (isset($data['documents']) && is_array($data['documents']) && isset($data['documents'][0]['status'])) {
             $status = $data['documents'][0]['status'];
@@ -494,6 +498,9 @@ class NfseEmissionService
         }
         if (!empty($data['mensagem'])) {
             $item->mensagem_erro = $data['mensagem'];
+        }
+        if (!empty($data['mensagemRetorno'])) {
+            $item->mensagem_erro = $data['mensagemRetorno'];
         }
 
         // Se for um retorno de submissão (array de documentos)
@@ -692,6 +699,10 @@ class NfseEmissionService
 
         if (in_array('erro', $statuses, true)) {
             return 'erro';
+        }
+        
+        if (in_array('rejeitada', $statuses, true) || in_array('rejeitado', $statuses, true)) {
+            return 'rejeitada';
         }
 
         if (in_array('processando', $statuses, true) || in_array('pendente', $statuses, true)) {

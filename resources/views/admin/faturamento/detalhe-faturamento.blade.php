@@ -94,13 +94,13 @@ $(function() {
                     <span class="label label-success">CONCLUÍDA</span>
                   @elseif($status == 'PROCESSANDO')
                     <span class="label label-primary"><i class="fa fa-spinner fa-spin"></i> PROCESSANDO</span>
-                  @elseif($status == 'ERRO')
-                    <span class="label label-danger">ERRO NA EMISSÃO</span>
+                  @elseif(in_array($status, ['ERRO', 'REJEITADA', 'REJEITADO']))
+                    <span class="label label-danger">{{ $status }}</span>
                   @else
                     <span class="label label-default">{{ $status }}</span>
                   @endif
                 </p>
-                @if($status == 'ERRO' && $emissao->mensagem_erro)
+                @if(in_array($status, ['ERRO', 'REJEITADA', 'REJEITADO']) && $emissao->mensagem_erro)
                    <p class="text-danger"><small><b>Motivo:</b> {{ $emissao->mensagem_erro }}</small></p>
                 @endif
               </div>
