@@ -843,6 +843,10 @@ class NfseEmissionService
         if (in_array('erro', $statuses, true)) {
             return 'erro';
         }
+        
+        if (in_array('rejeitada', $statuses, true) || in_array('rejeitado', $statuses, true)) {
+            return 'rejeitada';
+        }
 
         if (in_array('rejeitada', $statuses, true) || in_array('rejeitado', $statuses, true)) {
             return 'rejeitada';
