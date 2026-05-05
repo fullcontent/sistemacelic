@@ -152,14 +152,7 @@ class NfseEmissionService
                 'payloads' => isset($payloads) ? $payloads : null
             ]);
 
-            $emission->status = 'erro';
-            $emission->mensagem_erro = $msg;
-            // Persist as much as we have
-            if (isset($payloads)) {
-                $emission->payload = json_encode($payloads);
-            }
-            $emission->save();
-            throw new \Exception($msg, $e->getCode(), $e);
+            throw new \Exception($msg, $e->getCode() ?: 0, $e);
         }
     }
 
