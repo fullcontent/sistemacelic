@@ -18,3 +18,4 @@ composer.phar
 
 config/app.php
 .agent/
+scripts/*

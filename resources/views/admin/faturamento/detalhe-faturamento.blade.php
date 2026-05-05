@@ -60,7 +60,9 @@ $(function() {
           <span class="no-print">
             <button type="button" class="btn btn-xs btn-info" data-toggle="modal" data-target="#edit-faturamento"><i class="fa fa-edit"></i> Editar</button>
             @if(!$faturamento->ultimaEmisao)
-              <a href="{{ route('nfse.emissao', $faturamento->id) }}" class="btn btn-xs btn-primary"><i class="fa fa-magic"></i> Gerar NFS-e (Novo)</a>
+              <a href="{{ route('nfse.emissao', $faturamento->id) }}" class="btn btn-xs btn-primary"><i class="fa fa-magic"></i> Gerar NFS-e</a>
+            @elseif(in_array(strtoupper($faturamento->ultimaEmisao->status), ['ERRO', 'CANCELADA', 'REJEITADO', 'REJEITADA']))
+              <a href="{{ route('nfse.emissao', $faturamento->id) }}" class="btn btn-xs btn-warning"><i class="fa fa-refresh"></i> Re-emitir NFS-e</a>
             @endif
           </span>
         </p>

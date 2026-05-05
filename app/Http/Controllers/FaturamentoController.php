@@ -614,7 +614,6 @@ class FaturamentoController extends Controller
 
         $faturamento = Faturamento::with(['servicosFaturados.detalhes.unidade', 'ultimaEmisao'])->find($id);
 
-
         return view('admin.faturamento.detalhe-faturamento')->with([
             'faturamento' => $faturamento,
             'faturamentoItens' => $faturamento->servicosFaturados,

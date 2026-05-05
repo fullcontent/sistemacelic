@@ -283,7 +283,23 @@ class NfseEmissionService
         }
 
         // Usar o factory para estruturar corretamente
-        return NfsePayloadFactory::buildTomadorData($tomadorInfo);
+        $payload = NfsePayloadFactory::buildTomadorData($tomadorInfo);
+
+        // Validação Preventiva de CEP vs Município (Erro E0240)
+        if (!empty($payload['endereco']['cep'])) {
+            $cepData = $this->plugNotasClient->getCepInfo($payload['endereco']['cep']);
+            if ($cepData && !empty($cepData['city_ibge'])) {
+                // Se o código IBGE for diferente do que temos, priorizar o do CEP
+                if ($payload['endereco']['codigoCidade'] != $cepData['city_ibge']) {
+                    \Log::info("NfseEmissionService: Corrigindo codigoCidade de {$payload['endereco']['codigoCidade']} para {$cepData['city_ibge']} baseado no CEP {$payload['endereco']['cep']}");
+                    $payload['endereco']['codigoCidade'] = $cepData['city_ibge'];
+                    $payload['endereco']['descricaoCidade'] = $cepData['city'];
+                    $payload['endereco']['uf'] = $cepData['state'];
+                }
+            }
+        }
+
+        return $payload;
     }
 
     public function cancelar($emissionId, $motivo)
@@ -598,6 +614,46 @@ class NfseEmissionService
         }
 
         return 'processando';
+    }
+
+    public function sincronizarGeral(array $filtros = [])
+    {
+        // Se não houver filtros de data, pegamos os últimos 30 dias por padrão
+        if (empty($filtros['dataInicio'])) {
+            $filtros['dataInicio'] = date('Y-m-d', strtotime('-30 days'));
+        }
+
+        $notasPlug = $this->plugNotasClient->listarNfse($filtros);
+        $count = 0;
+
+        foreach ($notasPlug as $nota) {
+            $externalId = isset($nota['id']) ? $nota['id'] : null;
+            if (!$externalId) continue;
+
+            $item = NfseEmissionItem::where('external_id', $externalId)->first();
+            if ($item) {
+                $this->updateItemFromPlugNotasStatus($item, $nota);
+                
+                // Atualizar o status da emissão pai
+                $emission = $item->emissao;
+                if ($emission) {
+                    $items = $emission->itens()->get();
+                    $emission->status = $this->resolveEmissionStatus($items->all());
+                    
+                    // Atualizar dados principais se for a nota principal
+                    if ($items->first()->id === $item->id) {
+                        $emission->pdf_url = $item->pdf_url;
+                        $emission->xml_url = $item->xml_url;
+                        $emission->numero_nf = $item->numero_nf;
+                    }
+                    
+                    $emission->save();
+                }
+                $count++;
+            }
+        }
+
+        return $count;
     }
 
     private function resolveEmissionStatus(array $items)

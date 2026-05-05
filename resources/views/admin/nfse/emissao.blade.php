@@ -129,7 +129,6 @@
                                         <th>Unidade</th>
                                         <th>Serviço</th>
                                         <th>Valor Faturado</th>
-                                        <th>CNPJ Destino (Padrão)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -141,7 +140,6 @@
                                             <td>{{ $item->detalhes->unidade->nomeFantasia ?? '-' }}</td>
                                             <td>{{ $item->detalhes->nome }}</td>
                                             <td>R$ {{ number_format($item->valorFaturado, 2, ',', '.') }}</td>
-                                            <td>{{ $item->detalhes->unidade->cnpj ?? 'N/A' }}</td>
                                         </tr>
                                         @endif
                                     @endforeach
@@ -370,7 +368,26 @@ $(document).ready(function() {
         if($('.checkItem:checked').length == 0) {
             e.preventDefault();
             Swal.fire('Erro', 'Selecione pelo menos um serviço para emitir a nota.', 'error');
+            return;
         }
+
+        // Mostrar Barra de Progresso / Overlay de Carregamento
+        Swal.fire({
+            title: 'Processando Emissão...',
+            html: `
+                <p>Por favor, aguarde enquanto comunicamos com a prefeitura.</p>
+                <div class="progress progress-striped active" style="margin-bottom:0;">
+                    <div class="progress-bar progress-bar-primary" style="width: 100%"></div>
+                </div>
+                <p style="margin-top:10px;"><small>Este processo pode levar até 3 minutos.</small></p>
+            `,
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
     });
 });
 </script>

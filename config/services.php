@@ -39,7 +39,7 @@ return [
             ? 'https://api.plugnotas.com.br' 
             : 'https://api.sandbox.plugnotas.com.br',
         'api_key' => env('PLUGNOTAS_TOKEN'),
-        'timeout' => (int) env('PLUGNOTAS_TIMEOUT', 30),
+        'timeout' => (int) env('PLUGNOTAS_TIMEOUT', 180),
         'mock_mode' => (bool) env('PLUGNOTAS_MOCK_MODE', false),
         'webhook_secret' => env('PLUGNOTAS_WEBHOOK_SECRET'),
     ],

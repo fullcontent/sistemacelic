@@ -32,6 +32,7 @@
                     </div>
                     <div class="col-md-3" style="padding-top: 25px;">
                         <button type="submit" class="btn btn-primary"><i class="fa fa-filter"></i> Filtrar</button>
+                        <button type="button" class="btn btn-info" id="btn-sync-batch"><i class="fa fa-refresh"></i> Sincronizar Tudo</button>
                         <a href="{{ route('nfse.index') }}" class="btn btn-default">Limpar</a>
                     </div>
                 </form>
@@ -195,6 +196,39 @@ $(document).ready(function() {
             },
             complete: function() {
                 btn.html('<i class="fa fa-refresh"></i> Sincronizar').prop('disabled', false);
+            }
+        });
+    });
+
+    $('#btn-sync-batch').on('click', function() {
+        const btn = $(this);
+        const data_inicio = $('input[name="data_inicio"]').val();
+        const data_fim = $('input[name="data_fim"]').val();
+
+        btn.html('<i class="fa fa-refresh fa-spin"></i> Sincronizando...').prop('disabled', true);
+
+        $.ajax({
+            url: "{{ route('nfse.sync_batch') }}",
+            method: 'POST',
+            data: {
+                _token: "{{ csrf_token() }}",
+                data_inicio: data_inicio,
+                data_fim: data_fim
+            },
+            success: function(response) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sucesso',
+                    text: response.message
+                }).then(() => {
+                    location.reload();
+                });
+            },
+            error: function(error) {
+                Swal.fire('Erro', 'Falha ao sincronizar em lote: ' + (error.responseJSON.error || 'Erro interno'), 'error');
+            },
+            complete: function() {
+                btn.html('<i class="fa fa-refresh"></i> Sincronizar Tudo').prop('disabled', false);
             }
         });
     });

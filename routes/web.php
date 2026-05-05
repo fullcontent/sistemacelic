@@ -294,6 +294,7 @@ Route::prefix('admin')->group(function () {
         
         Route::get('/buscar-cnpj/{cnpj}', 'NfseController@buscarCnpjExterno')->name('nfse.buscar_cnpj');
         Route::post('/cancelar/{id}', 'NfseController@cancelar')->name('nfse.cancelar');
+        Route::post('/sync-batch', 'NfseController@syncBatch')->name('nfse.sync_batch');
         Route::post('/sync/{id}', 'NfseController@syncStatus')->name('nfse.sync');
         Route::get('/pdf/{id}', 'NfseController@downloadPdf')->name('nfse.download.pdf');
         Route::get('/xml/{id}', 'NfseController@downloadXml')->name('nfse.download.xml');

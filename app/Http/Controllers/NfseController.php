@@ -191,8 +191,8 @@ class NfseController extends Controller
 
         $client = new Client();
         try {
-            // Usando BrasilAPI (v2 é mais detalhada)
-            $response = $client->get("https://brasilapi.com.br/api/cnpj/v1/{$cnpj}");
+            // Usando BrasilAPI v2 (traz código IBGE)
+            $response = $client->get("https://brasilapi.com.br/api/cnpj/v2/{$cnpj}");
             $data = json_decode((string) $response->getBody(), true);
             
             return response()->json([
@@ -205,7 +205,7 @@ class NfseController extends Controller
                 'uf' => $data['uf'],
                 'email' => $data['email'] ?? '',
                 'municipio' => $data['municipio'],
-                // Mapeamento básico de código cidade (v1 não traz IBGE, v2 sim, mas vamos simplificar ou usar o nome)
+                'ibge' => $data['municipio_ibge'] ?? null,
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'CNPJ não encontrado ou erro na consulta.'], 404);
@@ -233,6 +233,29 @@ class NfseController extends Controller
                 'status' => $emission->status, 
                 'pdf_url' => $emission->pdf_url,
                 'xml_url' => $emission->xml_url
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    public function syncBatch(Request $request)
+    {
+        try {
+            $filtros = [];
+            if ($request->has('data_inicio') && !empty($request->data_inicio)) {
+                $filtros['dataInicio'] = Carbon::createFromFormat('d/m/Y', $request->data_inicio)->toDateString();
+            }
+            if ($request->has('data_fim') && !empty($request->data_fim)) {
+                $filtros['dataFim'] = Carbon::createFromFormat('d/m/Y', $request->data_fim)->toDateString();
+            }
+
+            $count = $this->service->sincronizarGeral($filtros);
+            
+            return response()->json([
+                'success' => true,
+                'message' => "Sincronização concluída! {$count} notas foram processadas.",
+                'count' => $count
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);

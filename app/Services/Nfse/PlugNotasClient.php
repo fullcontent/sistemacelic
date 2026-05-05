@@ -14,7 +14,7 @@ class PlugNotasClient
         $default = [
             'base_url' => function_exists('config') ? config('services.plugnotas.base_url', 'https://api.plugnotas.com.br') : 'https://api.plugnotas.com.br',
             'api_key' => function_exists('config') ? config('services.plugnotas.api_key') : null,
-            'timeout' => function_exists('config') ? (int) config('services.plugnotas.timeout', 30) : 30,
+            'timeout' => function_exists('config') ? (int) config('services.plugnotas.timeout', 180) : 180,
             'mock_mode' => function_exists('config') ? (bool) config('services.plugnotas.mock_mode', false) : false,
         ];
 
@@ -100,6 +100,44 @@ class PlugNotasClient
             return json_decode((string) $response->getBody(), true);
         } catch (\Exception $e) {
             throw new \RuntimeException('Falha ao consultar nota na PlugNotas: ' . $e->getMessage(), 0, $e);
+        }
+    }
+
+    public function listarNfse(array $filtros = [])
+    {
+        if ($this->settings['mock_mode']) {
+            return [];
+        }
+
+        try {
+            $response = $this->http->get("/nfse", [
+                'headers' => [
+                    'x-api-key' => $this->settings['api_key'],
+                    'Accept' => 'application/json',
+                ],
+                'query' => $filtros
+            ]);
+
+            return json_decode((string) $response->getBody(), true);
+        } catch (\Exception $e) {
+            throw new \RuntimeException('Falha ao listar notas na PlugNotas: ' . $e->getMessage(), 0, $e);
+        }
+    }
+
+    public function getCepInfo($cep)
+    {
+        $cep = preg_replace('/\D/', '', $cep);
+        try {
+            $response = $this->http->get("https://brasilapi.com.br/api/cep/v2/{$cep}");
+            return json_decode((string) $response->getBody(), true);
+        } catch (\Exception $e) {
+            // Fallback para v1 se v2 falhar
+            try {
+                $response = $this->http->get("https://brasilapi.com.br/api/cep/v1/{$cep}");
+                return json_decode((string) $response->getBody(), true);
+            } catch (\Exception $e2) {
+                return null;
+            }
         }
     }
 
