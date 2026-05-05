@@ -24,6 +24,8 @@ class NfseConfiguration extends Model
         'beneficio_municipal',
         'pis_cofins_situacao',
         'aliquota_simples',
+        'tipo_tributacao_iss',
+        'exigibilidade_iss',
         'valor_aproximado_tributos',
         'ativo',
         'inscricao_municipal',

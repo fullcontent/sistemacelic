@@ -183,16 +183,44 @@
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <div class="form-group">
                                             <label>Cód. Tributação Nacional (LC 116)</label>
                                             <input type="text" name="codigo_tributacao_nacional" class="form-control" value="{{ $dc->nfseConfiguration->codigo_tributacao_nacional ?? '17.02.02' }}">
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-3">
                                         <div class="form-group">
                                             <label>Item NBS</label>
                                             <input type="text" name="item_nbs" class="form-control" value="{{ $dc->nfseConfiguration->item_nbs ?? '118064000' }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Tipo Tributação ISS</label>
+                                            <select name="tipo_tributacao_iss" class="form-control">
+                                                <option value="" {{ empty($dc->nfseConfiguration->tipo_tributacao_iss) ? 'selected' : '' }}>Padrão (Automático)</option>
+                                                <option value="1" {{ ($dc->nfseConfiguration->tipo_tributacao_iss ?? '') == '1' ? 'selected' : '' }}>1 - Tributável no Município</option>
+                                                <option value="2" {{ ($dc->nfseConfiguration->tipo_tributacao_iss ?? '') == '2' ? 'selected' : '' }}>2 - Tributável fora do Município</option>
+                                                <option value="3" {{ ($dc->nfseConfiguration->tipo_tributacao_iss ?? '') == '3' ? 'selected' : '' }}>3 - Isenção / Substituição</option>
+                                                <option value="4" {{ ($dc->nfseConfiguration->tipo_tributacao_iss ?? '') == '4' ? 'selected' : '' }}>4 - Imunidade / Não Incidência</option>
+                                                <option value="5" {{ ($dc->nfseConfiguration->tipo_tributacao_iss ?? '') == '5' ? 'selected' : '' }}>5 - Suspensa (Decisão Jud.)</option>
+                                                <option value="6" {{ ($dc->nfseConfiguration->tipo_tributacao_iss ?? '') == '6' ? 'selected' : '' }}>6 - Suspensa (Proc. Adm.)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>Exigibilidade ISS</label>
+                                            <select name="exigibilidade_iss" class="form-control">
+                                                <option value="" {{ empty($dc->nfseConfiguration->exigibilidade_iss) ? 'selected' : '' }}>Padrão (Automático)</option>
+                                                <option value="1" {{ ($dc->nfseConfiguration->exigibilidade_iss ?? '') == '1' ? 'selected' : '' }}>1 - Exigível</option>
+                                                <option value="2" {{ ($dc->nfseConfiguration->exigibilidade_iss ?? '') == '2' ? 'selected' : '' }}>2 - Imunidade / Não Incidência</option>
+                                                <option value="3" {{ ($dc->nfseConfiguration->exigibilidade_iss ?? '') == '3' ? 'selected' : '' }}>3 - Isenção</option>
+                                                <option value="4" {{ ($dc->nfseConfiguration->exigibilidade_iss ?? '') == '4' ? 'selected' : '' }}>4 - Não Incidência / Exportação</option>
+                                                <option value="5" {{ ($dc->nfseConfiguration->exigibilidade_iss ?? '') == '5' ? 'selected' : '' }}>5 - Suspensa (Decisão Jud.)</option>
+                                                <option value="6" {{ ($dc->nfseConfiguration->exigibilidade_iss ?? '') == '6' ? 'selected' : '' }}>6 - Suspensa (Proc. Adm.)</option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>

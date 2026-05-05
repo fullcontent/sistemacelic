@@ -71,7 +71,7 @@ Adicione no ambiente da aplicação:
 
 - `PLUGNOTAS_BASE_URL=https://api.plugnotas.com.br`
 - `PLUGNOTAS_API_KEY=...`
-- `PLUGNOTAS_TIMEOUT=30`
+- `PLUGNOTAS_TIMEOUT=180`
 - `PLUGNOTAS_MOCK_MODE=true`
 - `PLUGNOTAS_WEBHOOK_SECRET=...`
 

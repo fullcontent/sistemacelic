@@ -72,7 +72,11 @@ class PlugNotasClient
 
             return json_decode((string) $response->getBody(), true);
         } catch (\Exception $e) {
-            throw new \RuntimeException('Falha na chamada PlugNotas: ' . $e->getMessage(), 0, $e);
+            $message = $e->getMessage();
+            if (strpos($message, 'cURL error 28') !== false || strpos($message, 'timed out') !== false) {
+                $message .= ' (Dica: Aumente o PLUGNOTAS_TIMEOUT no .env para lidar com lentidão na API)';
+            }
+            throw new \RuntimeException('Falha na chamada PlugNotas: ' . $message, 0, $e);
         }
     }
 
@@ -99,7 +103,11 @@ class PlugNotasClient
 
             return json_decode((string) $response->getBody(), true);
         } catch (\Exception $e) {
-            throw new \RuntimeException('Falha ao consultar nota na PlugNotas: ' . $e->getMessage(), 0, $e);
+            $message = $e->getMessage();
+            if (strpos($message, 'cURL error 28') !== false || strpos($message, 'timed out') !== false) {
+                $message .= ' (Dica: Aumente o PLUGNOTAS_TIMEOUT no .env)';
+            }
+            throw new \RuntimeException('Falha ao consultar nota na PlugNotas: ' . $message, 0, $e);
         }
     }
 
@@ -120,7 +128,11 @@ class PlugNotasClient
 
             return json_decode((string) $response->getBody(), true);
         } catch (\Exception $e) {
-            throw new \RuntimeException('Falha ao listar notas na PlugNotas: ' . $e->getMessage(), 0, $e);
+            $message = $e->getMessage();
+            if (strpos($message, 'cURL error 28') !== false || strpos($message, 'timed out') !== false) {
+                $message .= ' (Dica: Aumente o PLUGNOTAS_TIMEOUT no .env)';
+            }
+            throw new \RuntimeException('Falha ao listar notas na PlugNotas: ' . $message, 0, $e);
         }
     }
 
@@ -153,14 +165,14 @@ class PlugNotasClient
         }
 
         try {
-            $response = $this->http->post("/nfse/cancelar", [
+            $response = $this->http->post("/nfse/cancelar/{$id}", [
                 'headers' => [
                     'x-api-key' => $this->settings['api_key'],
                     'Accept' => 'application/json',
                 ],
                 'json' => [
-                    'id' => $id,
-                    'justificativa' => $motivo
+                    'codigo' => '9',
+                    'motivo' => $motivo
                 ]
             ]);
 

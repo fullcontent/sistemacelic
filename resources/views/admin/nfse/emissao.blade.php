@@ -127,6 +127,7 @@
                                         <th width="30"><input type="checkbox" id="checkAll"></th>
                                         <th>OS</th>
                                         <th>Unidade</th>
+                                        <th>CNPJ Tomador</th>
                                         <th>Serviço</th>
                                         <th>Valor Faturado</th>
                                     </tr>
@@ -138,6 +139,11 @@
                                             <td><input type="checkbox" name="servico_ids[]" value="{{ $item->servico_id }}" checked class="checkItem"></td>
                                             <td>{{ $item->detalhes->os }}</td>
                                             <td>{{ $item->detalhes->unidade->nomeFantasia ?? '-' }}</td>
+                                            <td>
+                                                <span class="cnpj-display" data-unit-cnpj="{{ $item->detalhes->unidade->cnpj ?? '-' }}">
+                                                    {{ $item->detalhes->unidade->cnpj ?? '-' }}
+                                                </span>
+                                            </td>
                                             <td>{{ $item->detalhes->nome }}</td>
                                             <td>R$ {{ number_format($item->valorFaturado, 2, ',', '.') }}</td>
                                         </tr>
@@ -155,28 +161,12 @@
                                 <span class="label label-primary">3</span> Dados do Tomador (Destinatário)
                             </h4>
                             
-                            <div id="tomadorDefault" class="well" style="background-color: #fff; border: 1px solid #ddd;">
-                                <div class="row">
-                                    <div class="col-md-8">
-                                        <p><b>Empresa Principal:</b> {{ $faturamento->empresa->razaoSocial }}</p>
-                                        <p><b>CNPJ:</b> {{ $faturamento->empresa->cnpj }}</p>
-                                        <p><b>Endereço:</b> {{ $faturamento->empresa->endereco }}, {{ $faturamento->empresa->numero }} - {{ $faturamento->empresa->cidade }}/{{ $faturamento->empresa->uf }}</p>
-                                    </div>
-                                    <div class="col-md-4 text-right">
-                                        <button type="button" class="btn btn-warning" id="btnNovaEmpresa"><i class="fa fa-plus"></i> Usar Outra Empresa</button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div id="tomadorManual" class="box box-warning box-solid" style="display:none;">
+                            <div id="tomadorManual" class="box box-warning box-solid">
                                 <div class="box-header with-border">
-                                    <h3 class="box-title">Informar Novo Tomador</h3>
-                                    <div class="box-tools pull-right">
-                                        <button type="button" class="btn btn-box-tool" id="btnRecusarNovaEmpresa"><i class="fa fa-times"></i> Voltar ao padrão</button>
-                                    </div>
+                                    <h3 class="box-title">Informar Dados do Tomador</h3>
                                 </div>
                                 <div class="box-body">
-                                    <input type="hidden" name="nova_empresa" id="input_nova_empresa" value="0">
+                                    <input type="hidden" name="nova_empresa" id="input_nova_empresa" value="1">
                                     <div class="row">
                                         <div class="col-md-4">
                                             <div class="form-group">
@@ -280,6 +270,25 @@
 @section('js')
 <script>
 $(document).ready(function() {
+    const empresaCnpj = "{{ $faturamento->empresa->cnpj }}";
+
+    function updateCnpjDisplays() {
+        const option = $('input[name="opcao_automatica"]:checked').val();
+        const manualCnpj = $('#override_cnpj').val();
+
+        $('.cnpj-display').each(function() {
+            const unitCnpj = $(this).data('unit-cnpj');
+            
+            if (option == '1') {
+                $(this).text(unitCnpj).removeClass('text-orange text-bold');
+            } else if (option == '2' || option == '4') {
+                $(this).text(manualCnpj || 'AGUARDANDO CNPJ...').addClass('text-orange text-bold');
+            } else if (option == '3') {
+                $(this).text(empresaCnpj).removeClass('text-orange text-bold');
+            }
+        });
+    }
+
     // Seleção de card
     $('.option-card').on('click', function() {
         $('.option-card').removeClass('option-selected');
@@ -288,15 +297,18 @@ $(document).ready(function() {
         const option = $(this).data('option');
         $(`#opt${option}`).prop('checked', true);
         
-        $('#sectionTomador').fadeIn();
         $('#btnFinalizar').prop('disabled', false);
         
-        // Se for opção 2 ou 4 (Manual), forçar o toggle de Nova Empresa se ainda não estiver ativo
+        // Se for opção 2 ou 4 (Manual), mostrar seção do tomador
         if(option == 2 || option == 4) {
-            ativarManual();
+            $('#sectionTomador').fadeIn();
+            $('#input_nova_empresa').val('1');
         } else {
-            desativarManual();
+            $('#sectionTomador').fadeOut();
+            $('#input_nova_empresa').val('0');
         }
+
+        updateCnpjDisplays();
     });
 
     // CheckAll logic
@@ -304,33 +316,12 @@ $(document).ready(function() {
         $('.checkItem').prop('checked', $(this).is(':checked'));
     });
 
-    // Nova Empresa Logic
-    $('#btnNovaEmpresa').on('click', function() {
-        ativarManual();
+
+
+    // Atualizar displays ao digitar CNPJ manual
+    $('#override_cnpj').on('input', function() {
+        updateCnpjDisplays();
     });
-
-    $('#btnRecusarNovaEmpresa').on('click', function() {
-        const currentOpt = $('input[name="opcao_automatica"]:checked').val();
-        if(currentOpt == 2 || currentOpt == 4) {
-            Swal.fire('Atenção', 'Esta opção exige que os dados do tomador sejam preenchidos manualmente.', 'warning');
-            return;
-        }
-        desativarManual();
-    });
-
-    function ativarManual() {
-        $('#tomadorDefault').fadeOut(function() {
-            $('#tomadorManual').fadeIn();
-            $('#input_nova_empresa').val('1');
-        });
-    }
-
-    function desativarManual() {
-        $('#tomadorManual').fadeOut(function() {
-            $('#tomadorDefault').fadeIn();
-            $('#input_nova_empresa').val('0');
-        });
-    }
 
     // Consulta CNPJ
     $('#btnConsutarCnpj').on('click', function() {
@@ -352,6 +343,7 @@ $(document).ready(function() {
                 $('#override_uf').val(response.uf);
                 $('#override_codigoCidade').val(response.ibge); // Se disponível
                 
+                updateCnpjDisplays();
                 Swal.fire('Sucesso', 'Dados recuperados da Receita Federal!', 'success');
             },
             error: function() {
