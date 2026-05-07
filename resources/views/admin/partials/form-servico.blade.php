@@ -227,6 +227,8 @@
 				'compras' => 'Compras',
 				'arquitetura' => 'Arquitetura',
 				'farmaceutico' => 'Farmacêutico',
+				'hubSaude' => 'Hub de Saúde',
+
 				'outros' => 'Outros'
 				), null, ['class'=>'form-control'])!!}
 		
