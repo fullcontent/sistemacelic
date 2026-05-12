@@ -184,31 +184,52 @@ class NfseController extends Controller
 
     public function buscarCnpjExterno($cnpj)
     {
+        $cnpjOriginal = $cnpj;
         $cnpj = preg_replace('/\D/', '', $cnpj);
+        
         if (strlen($cnpj) != 14) {
-            return response()->json(['error' => 'CNPJ inválido.'], 400);
+            return response()->json(['error' => 'CNPJ inválido (deve conter 14 dígitos).'], 400);
         }
 
-        $client = new Client();
+        $client = new Client(['timeout' => 10]);
+        
         try {
-            // Usando BrasilAPI v2 (traz código IBGE)
-            $response = $client->get("https://brasilapi.com.br/api/cnpj/v2/{$cnpj}");
-            $data = json_decode((string) $response->getBody(), true);
+            // Tenta primeiro v2 (mais completo, traz IBGE)
+            try {
+                $response = $client->get("https://brasilapi.com.br/api/cnpj/v2/{$cnpj}");
+                $data = json_decode((string) $response->getBody(), true);
+            } catch (\Exception $e2) {
+                \Log::warning("NfseController: BrasilAPI v2 falhou para {$cnpj}, tentando v1. Erro: " . $e2->getMessage());
+                // Fallback para v1
+                $response = $client->get("https://brasilapi.com.br/api/cnpj/v1/{$cnpj}");
+                $data = json_decode((string) $response->getBody(), true);
+            }
+
+            if (!isset($data['cnpj'])) {
+                throw new \Exception("Dados retornados da API são inválidos.");
+            }
             
             return response()->json([
                 'cnpj' => $data['cnpj'],
-                'razaoSocial' => $data['razao_social'],
-                'logradouro' => $data['logradouro'],
-                'numero' => $data['numero'],
+                'razaoSocial' => $data['razao_social'] ?? $data['nome'] ?? '',
+                'logradouro' => $data['logradouro'] ?? '',
+                'numero' => $data['numero'] ?? '',
                 'bairro' => $data['bairro'] ?? '',
-                'cep' => $data['cep'],
-                'uf' => $data['uf'],
+                'cep' => $data['cep'] ?? '',
+                'uf' => $data['uf'] ?? '',
                 'email' => $data['email'] ?? '',
-                'municipio' => $data['municipio'],
+                'municipio' => $data['municipio'] ?? '',
                 'ibge' => $data['municipio_ibge'] ?? null,
             ]);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'CNPJ não encontrado ou erro na consulta.'], 404);
+            \Log::error("NfseController: Erro ao buscar CNPJ {$cnpj}: " . $e->getMessage(), [
+                'cnpj' => $cnpj,
+                'exception' => $e
+            ]);
+            return response()->json([
+                'error' => 'CNPJ não encontrado ou erro na consulta externa.',
+                'details' => $e->getMessage()
+            ], 404);
         }
     }
 

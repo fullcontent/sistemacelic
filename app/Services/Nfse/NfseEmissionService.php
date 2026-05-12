@@ -285,15 +285,32 @@ class NfseEmissionService
 
         // Validação Preventiva de CEP vs Município (Erro E0240)
         if (!empty($payload['endereco']['cep'])) {
-            $cepData = $this->plugNotasClient->getCepInfo($payload['endereco']['cep']);
-            if ($cepData && !empty($cepData['city_ibge'])) {
-                // Se o código IBGE for diferente do que temos, priorizar o do CEP
-                if ($payload['endereco']['codigoCidade'] != $cepData['city_ibge']) {
-                    \Log::info("NfseEmissionService: Corrigindo codigoCidade de {$payload['endereco']['codigoCidade']} para {$cepData['city_ibge']} baseado no CEP {$payload['endereco']['cep']}");
-                    $payload['endereco']['codigoCidade'] = $cepData['city_ibge'];
-                    $payload['endereco']['descricaoCidade'] = $cepData['city'];
-                    $payload['endereco']['uf'] = $cepData['state'];
+            $cep = preg_replace('/\D/', '', $payload['endereco']['cep']);
+            $cepData = $this->plugNotasClient->getCepInfo($cep);
+            
+            if ($cepData) {
+                $cityIbge = $cepData['city_ibge'] ?? $cepData['ibge'] ?? null;
+                
+                // Se não veio o IBGE no CEP, tenta buscar pelo nome da cidade retornado pelo CEP
+                if (!$cityIbge && !empty($cepData['city'])) {
+                    $fallbackUf = $payload['endereco']['estado'] ?? $payload['endereco']['uf'] ?? '';
+                    $cityIbge = IbgeHelper::getIbgeCode($cepData['city'], $cepData['state'] ?? $fallbackUf);
                 }
+
+                if ($cityIbge) {
+                    // Se o código IBGE for diferente do que temos (ou se não temos nenhum), priorizar o do CEP para evitar E0240
+                    $currentIbge = $payload['endereco']['codigoCidade'] ?? '';
+                    if ($currentIbge != $cityIbge) {
+                        \Log::info("NfseEmissionService: Corrigindo codigoCidade de '{$currentIbge}' para '{$cityIbge}' baseado no CEP {$cep}");
+                        $payload['endereco']['codigoCidade'] = $cityIbge;
+                        $payload['endereco']['descricaoCidade'] = $cepData['city'] ?? ($payload['endereco']['descricaoCidade'] ?? '');
+                        $payload['endereco']['estado'] = $cepData['state'] ?? ($payload['endereco']['estado'] ?? $payload['endereco']['uf'] ?? '');
+                    }
+                } else {
+                    \Log::warning("NfseEmissionService: Não foi possível validar IBGE para o CEP {$cep}");
+                }
+            } else {
+                \Log::warning("NfseEmissionService: BrasilAPI não retornou dados para o CEP {$cep}");
             }
         }
 

@@ -268,9 +268,14 @@
 @stop
 
 @section('js')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.6/jquery.inputmask.min.js"></script>
 <script>
 $(document).ready(function() {
     const empresaCnpj = "{{ $faturamento->empresa->cnpj }}";
+
+    // Aplicar máscaras
+    $('#override_cnpj').inputmask("99.999.999/9999-99");
+    $('#override_cep').inputmask("99999-999");
 
     function updateCnpjDisplays() {
         const option = $('input[name="opcao_automatica"]:checked').val();
@@ -325,10 +330,13 @@ $(document).ready(function() {
 
     // Consulta CNPJ
     $('#btnConsutarCnpj').on('click', function() {
-        const cnpj = $('#override_cnpj').val();
+        let cnpj = $('#override_cnpj').val();
         if(!cnpj) return;
 
-        $(this).html('<i class="fa fa-spinner fa-spin"></i>');
+        // Limpar máscara para a URL
+        cnpj = cnpj.replace(/\D/g, '');
+
+        $(this).html('<i class="fa fa-spinner fa-spin"></i>').prop('disabled', true);
         
         $.ajax({
             url: "{{ url('admin/nfse/buscar-cnpj') }}/" + cnpj,
@@ -341,16 +349,28 @@ $(document).ready(function() {
                 $('#override_cep').val(response.cep);
                 $('#override_municipio').val(response.municipio);
                 $('#override_uf').val(response.uf);
-                $('#override_codigoCidade').val(response.ibge); // Se disponível
+                $('#override_codigoCidade').val(response.ibge); 
                 
                 updateCnpjDisplays();
-                Swal.fire('Sucesso', 'Dados recuperados da Receita Federal!', 'success');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Sucesso',
+                    text: 'Dados recuperados com sucesso!',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
             },
-            error: function() {
-                Swal.fire('Erro', 'Não foi possível localizar este CNPJ.', 'error');
+            error: function(xhr) {
+                let msg = 'Não foi possível localizar este CNPJ.';
+                if(xhr.responseJSON && xhr.responseJSON.details) {
+                    msg += ' Detalhes: ' + xhr.responseJSON.details;
+                }
+                Swal.fire('Aviso', msg, 'warning');
             },
             complete: function() {
-                $('#btnConsutarCnpj').html('<i class="fa fa-search"></i> Consultar');
+                $('#btnConsutarCnpj').html('<i class="fa fa-search"></i> Consultar').prop('disabled', false);
             }
         });
     });
