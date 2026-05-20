@@ -148,6 +148,8 @@ Route::prefix('admin')->group(function () {
 
 	Route::get('/proposta/revisar/{id}', 'PropostasController@revisar')->name('proposta.revisar');
 	Route::post('/proposta/vendedor/update', 'PropostasController@updateVendedor')->name('proposta.vendedor.update');
+	Route::post('/proposta/aprovar-lote', 'PropostasController@aprovarLote')->name('proposta.aprovarLote');
+	Route::post('/proposta/analisar-lote', 'PropostasController@analisarLote')->name('proposta.analisarLote');
 	Route::get('/propostas-list-data', 'PropostasController@listData')->name('proposta.listData');
 
 

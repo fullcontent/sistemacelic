@@ -160,6 +160,95 @@
 		border-radius: 10px;
 		transition: width 0.6s ease;
 	}
+
+	/* Floating Action Bar */
+	.floating-action-bar {
+		position: fixed;
+		bottom: -100px; /* Hidden initially */
+		left: 50%;
+		transform: translateX(-50%);
+		background: rgba(255, 255, 255, 0.95);
+		backdrop-filter: blur(15px);
+		-webkit-backdrop-filter: blur(15px);
+		border: 1px solid rgba(0, 0, 0, 0.08);
+		box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+		border-radius: 50px;
+		padding: 12px 30px;
+		z-index: 9999;
+		display: flex;
+		align-items: center;
+		gap: 20px;
+		transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+	}
+
+	.floating-action-bar.show {
+		bottom: 30px;
+	}
+
+	.floating-bar-info {
+		font-size: 0.95em;
+		font-weight: 700;
+		color: #2c3e50;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.floating-bar-info .badge-count {
+		background-color: #3c8dbc;
+		color: #fff;
+		border-radius: 50px;
+		padding: 4px 10px;
+		font-size: 0.85em;
+	}
+
+	.floating-bar-btn {
+		border-radius: 50px;
+		padding: 8px 22px;
+		font-weight: 600;
+		font-size: 0.9em;
+		border: none;
+		cursor: pointer;
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		transition: all 0.2s;
+	}
+
+	.floating-bar-btn:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	}
+
+	.floating-bar-btn:active {
+		transform: translateY(0);
+	}
+
+	.floating-bar-btn-close {
+		color: #95a5a6;
+		background: transparent;
+		font-size: 1.1em;
+		cursor: pointer;
+		border: none;
+		padding: 5px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: color 0.2s;
+	}
+
+	.floating-bar-btn-close:hover {
+		color: #c0392b;
+	}
+
+	/* Checkbox aesthetic */
+	.select-proposta-checkbox, #select-all-propostas {
+		width: 18px;
+		height: 18px;
+		cursor: pointer;
+		margin: 0;
+		vertical-align: middle;
+	}
 </style>
 @stop
 
@@ -363,6 +452,7 @@
 		<table id="lista-propostas" class="table table-hover" style="width:100%">
 			<thead>
 				<tr style="background: #fcfcfc;">
+					<th width="40" class="text-center" style="vertical-align: middle;"><input type="checkbox" id="select-all-propostas"></th>
 					<th width="60">ID</th>
 					<th>Vendedor</th>
 					<th>Cliente / Unidade</th>
@@ -378,6 +468,22 @@
 				{{-- DataTables Server-Side will populate this --}}
 			</tbody>
 		</table>
+	</div>
+
+	<!-- Floating Action Bar for Bulk operations -->
+	<div id="bulk-action-bar" class="floating-action-bar">
+		<div class="floating-bar-info">
+			<span id="selected-count-badge" class="badge-count">0</span> propostas selecionadas
+		</div>
+		<button id="btn-bulk-analise" class="floating-bar-btn btn-info">
+			<i class="fa fa-paper-plane"></i> Enviar para Análise
+		</button>
+		<button id="btn-bulk-aprovar" class="floating-bar-btn btn-success">
+			<i class="fa fa-check"></i> Aprovar em Lote
+		</button>
+		<button id="btn-bulk-cancel" class="floating-bar-btn btn-danger" style="background-color: #dd4b39; color: white;" title="Limpar Seleção">
+			<i class="fa fa-times"></i> Limpar Seleção
+		</button>
 	</div>
 
 @endsection
@@ -412,6 +518,14 @@
 				}
 			},
 			"columns": [
+				{
+					"data": "id",
+					"orderable": false,
+					"className": "text-center",
+					"render": function (data, type, row) {
+						return '<input type="checkbox" class="select-proposta-checkbox" value="' + data + '">';
+					}
+				},
 				{
 					"data": "id",
 					"render": function (data, type, row) {
@@ -540,8 +654,14 @@
 				"url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json",
 				"search": "Buscar:"
 			},
-			"order": [[0, 'desc']],
+			"order": [[1, 'desc']],
 			"drawCallback": function() {
+				// Uncheck select-all and hide bulk action bar when page changes
+				$('#select-all-propostas').prop('checked', false);
+				if (typeof updateBulkActionBar === 'function') {
+					updateBulkActionBar();
+				}
+
 				// Add "Go to page" input if not exists
 				if ($('.dataTables_goto').length === 0) {
 					var paginate = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
@@ -644,6 +764,122 @@
 					location.reload();
 				});
 			}
+		});
+
+		// Control of Bulk Action Bar checkboxes
+		$(document).on('change', '#select-all-propostas', function () {
+			var isChecked = $(this).prop('checked');
+			$('.select-proposta-checkbox').prop('checked', isChecked);
+			updateBulkActionBar();
+		});
+
+		$(document).on('change', '.select-proposta-checkbox', function () {
+			var allChecked = $('.select-proposta-checkbox').length === $('.select-proposta-checkbox:checked').length;
+			$('#select-all-propostas').prop('checked', allChecked);
+			updateBulkActionBar();
+		});
+
+		window.updateBulkActionBar = function() {
+			var selectedIds = [];
+			$('.select-proposta-checkbox:checked').each(function () {
+				selectedIds.push($(this).val());
+			});
+
+			var count = selectedIds.length;
+			$('#selected-count-badge').text(count);
+
+			if (count >= 2) {
+				$('#bulk-action-bar').addClass('show');
+			} else {
+				$('#bulk-action-bar').removeClass('show');
+			}
+		}
+
+		// Enviar para Análise em Lote
+		$('#btn-bulk-analise').on('click', function () {
+			var selectedIds = [];
+			$('.select-proposta-checkbox:checked').each(function () {
+				selectedIds.push($(this).val());
+			});
+
+			if (selectedIds.length < 2) return;
+
+			if (confirm('Deseja enviar as ' + selectedIds.length + ' propostas selecionadas para análise?')) {
+				var $btn = $(this);
+				$btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Enviando...');
+
+				$.ajax({
+					url: "{{ route('proposta.analisarLote') }}",
+					method: "POST",
+					data: {
+						_token: CSRF_TOKEN,
+						ids: selectedIds
+					},
+					success: function (response) {
+						if (response.success) {
+							$('#select-all-propostas').prop('checked', false);
+							table.ajax.reload(null, false);
+							alert(response.message || 'Propostas enviadas para análise com sucesso.');
+						} else {
+							alert(response.message || 'Erro ao enviar propostas para análise.');
+						}
+					},
+					error: function (xhr) {
+						alert('Erro na comunicação com o servidor. Verifique e tente novamente.');
+					},
+					complete: function () {
+						$btn.prop('disabled', false).html('<i class="fa fa-paper-plane"></i> Enviar para Análise');
+					}
+				});
+			}
+		});
+
+		// Aprovar em Lote
+		$('#btn-bulk-aprovar').on('click', function () {
+			var selectedIds = [];
+			$('.select-proposta-checkbox:checked').each(function () {
+				selectedIds.push($(this).val());
+			});
+
+			if (selectedIds.length < 2) return;
+
+			if (confirm('Deseja aprovar as ' + selectedIds.length + ' propostas selecionadas?')) {
+				var criarServicos = confirm('Gostaria de criar os serviços automaticamente para estas propostas?') ? 1 : 0;
+				var $btn = $(this);
+				$btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Aprovando...');
+
+				$.ajax({
+					url: "{{ route('proposta.aprovarLote') }}",
+					method: "POST",
+					data: {
+						_token: CSRF_TOKEN,
+						ids: selectedIds,
+						criar_servicos: criarServicos
+					},
+					success: function (response) {
+						if (response.success) {
+							$('#select-all-propostas').prop('checked', false);
+							table.ajax.reload(null, false);
+							alert(response.message || 'Propostas aprovadas com sucesso.');
+						} else {
+							alert(response.message || 'Erro ao aprovar propostas.');
+						}
+					},
+					error: function (xhr) {
+						alert('Erro na comunicação com o servidor. Verifique e tente novamente.');
+					},
+					complete: function () {
+						$btn.prop('disabled', false).html('<i class="fa fa-check"></i> Aprovar em Lote');
+					}
+				});
+			}
+		});
+
+		// Cancel Bulk selection
+		$('#btn-bulk-cancel').on('click', function () {
+			$('.select-proposta-checkbox').prop('checked', false);
+			$('#select-all-propostas').prop('checked', false);
+			updateBulkActionBar();
 		});
 	});
 </script>

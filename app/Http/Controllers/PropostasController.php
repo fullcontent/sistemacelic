@@ -822,26 +822,26 @@ class PropostasController extends Controller
 
         // Ordering
         // Mapping from Blade table structure: 
-        // 0: ID, 1: Vendedor, 2: Cliente/Unidade, 3: Solicitante, 4: Total, 5: Status, 6: Dias em Análise, 7: Faturamento, 8: Actions
+        // 0: Checkbox, 1: ID, 2: Vendedor, 3: Cliente/Unidade, 4: Solicitante, 5: Total, 6: Status, 7: Dias em Análise, 8: Faturamento, 9: Actions
         $columns = [
-            0 => 'propostas.id',
-            1 => 'users.name',
-            2 => 'empresas.nomeFantasia',
-            3 => 'propostas.solicitante', // If it's IDs, we'd need another join
-            4 => 'valor_total',
-            5 => 'propostas.status',
-            6 => 'propostas.updated_at',
-            7 => 'propostas.created_at'
+            1 => 'propostas.id',
+            2 => 'users.name',
+            3 => 'empresas.nomeFantasia',
+            4 => 'propostas.solicitante', // If it's IDs, we'd need another join
+            5 => 'valor_total',
+            6 => 'propostas.status',
+            7 => 'propostas.updated_at',
+            8 => 'propostas.created_at'
         ];
 
-        $orderColumnIndex = $request->input('order.0.column', 0);
+        $orderColumnIndex = $request->input('order.0.column', 1);
         $orderDir = $request->input('order.0.dir', 'desc');
         $orderField = $columns[$orderColumnIndex] ?? 'propostas.created_at';
 
         // Add joins only for ordering if needed
-        if ($orderColumnIndex == 1) {
+        if ($orderColumnIndex == 2) {
             $query->leftJoin('users', 'propostas.created_by', '=', 'users.id');
-        } elseif ($orderColumnIndex == 2) {
+        } elseif ($orderColumnIndex == 3) {
             $query->leftJoin('empresas', 'propostas.empresa_id', '=', 'empresas.id');
         }
 
@@ -913,6 +913,102 @@ class PropostasController extends Controller
             'recordsFiltered' => $recordsFiltered,
             'data' => $data
         ]);
+    }
+
+    public function analisarLote(Request $request)
+    {
+        $ids = $request->input('ids', []);
+
+        if (empty($ids)) {
+            return response()->json(['success' => false, 'message' => 'Nenhuma proposta selecionada.'], 400);
+        }
+
+        $count = Proposta::whereIn('id', $ids)->update([
+            'status' => 'Em análise',
+            'sent_to_analysis_at' => now(),
+            'updated_at' => now()
+        ]);
+
+        return response()->json(['success' => true, 'message' => "$count propostas enviadas para análise com sucesso."]);
+    }
+
+    public function aprovarLote(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        $criarServicos = $request->input('criar_servicos', 0);
+
+        if (empty($ids)) {
+            return response()->json(['success' => false, 'message' => 'Nenhuma proposta selecionada.'], 400);
+        }
+
+        $propostas = Proposta::whereIn('id', $ids)->get();
+        $count = 0;
+
+        foreach ($propostas as $proposta) {
+            $proposta->status = "Aprovada";
+            $proposta->approved_at = now();
+            $proposta->save();
+
+            if ($criarServicos == 1) {
+                foreach ($proposta->servicos as $s) {
+                    if (Servico::where('propostaServico_id', $s->id)->exists()) {
+                        continue;
+                    }
+
+                    $servico = new Servico;
+                    $servico->nome = $s->servico;
+                    $servico->tipo = $s->servicoLpu->tipoServico ?? 'N/A';
+                    $servico->situacao = "andamento";
+                    $servico->responsavel_id = $s->responsavel_id;
+                    $servico->empresa_id = $proposta->empresa_id;
+                    $servico->unidade_id = $proposta->unidade_id;
+                    $servico->solicitante = $proposta->solicitante;
+                    $servico->escopo = $s->escopo;
+                    $servico->propostaServico_id = $s->id;
+                    $servico->proposta_id = $proposta->id;
+                    $servico->proposta = $proposta->id;
+
+                    if ($s->servicoPrincipal) {
+                        $servicoPrincipal = Servico::where('propostaServico_id', $s->servicoPrincipal)->pluck('id')->first();
+                        $servico->servicoPrincipal = $servicoPrincipal;
+                    }
+
+                    $servico->os = $this->getLastOs($proposta->unidade_id);
+                    $servico->save();
+
+                    // Inserir financeiro
+                    $faturamento = new ServicoFinanceiro();
+                    $faturamento->servico_id = $servico->id;
+                    $faturamento->valorTotal = $s->valor;
+                    $faturamento->valorAberto = $s->valor;
+                    $faturamento->save();
+
+                    // Salvar historico
+                    $history = new Historico();
+                    $history->servico_id = $servico->id;
+                    $history->user_id = Auth::id();
+                    $history->observacoes = "Serviço " . $servico->id . " cadastrado via aprovação em lote.";
+                    $history->created_at = Carbon::now('america/sao_paulo');
+                    $history->save();
+
+                    // Criar Pendência principal
+                    $pendencia = new Pendencia;
+                    $pendencia->created_by = Auth::id();
+                    $pendencia->servico_id = $servico->id;
+                    $pendencia->pendencia = "Criar pendências!";
+                    $pendencia->vencimento = date('Y-m-d');
+                    $pendencia->prioridade = 1;
+                    $pendencia->responsavel_tipo = "usuario";
+                    $pendencia->responsavel_id = $s->responsavel_id;
+                    $pendencia->status = "pendente";
+                    $pendencia->observacoes = "Pendência criada automaticamente. Lembrar de criar pendências para esse serviço.";
+                    $pendencia->save();
+                }
+            }
+            $count++;
+        }
+
+        return response()->json(['success' => true, 'message' => "$count propostas aprovadas com sucesso."]);
     }
 
 }
