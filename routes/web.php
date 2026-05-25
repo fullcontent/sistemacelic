@@ -17,8 +17,6 @@
 
 Auth::routes();
 
-Auth::routes();
-
 Route::get('/', function () {
 	return view('auth.login');
 });
@@ -224,8 +222,6 @@ Route::prefix('admin')->group(function () {
 	Route::patch('/github/issues/{number}', 'GitHubDashboardController@patchIssue')->name('admin.github.issues.patch');
 	Route::post('/github/projects/link', 'GitHubDashboardController@linkToProject')->name('admin.github.projects.link');
 
-	Route::get('/relatorio/pendencias-ativas', 'RelatoriosController@pendenciasAtivas')->name('relatorio.pendencias_ativas');
-
 	// Outros Administrativos
 	Route::get('/relatorio/pendencias-ativas', 'RelatoriosController@pendenciasAtivas')->name('relatorio.pendencias_ativas');
 	Route::get('teste', function () {
@@ -281,7 +277,6 @@ Route::prefix('cliente')->group(function () {
 	Route::get('/arquivos', 'ClienteController@arquivosDigitais')->name('cliente.arquivos');
 	Route::get('/arquivos/download/servico/{tipo}/{servico_id}', 'ClienteController@downloadServicoFile')->name('cliente.servico.downloadFile');
 	Route::get('/arquivos/download/arquivo/{id}', 'ClienteController@downloadArquivo')->name('cliente.arquivo.download');
-
 });
 
 
