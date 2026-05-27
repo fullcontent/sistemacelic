@@ -218,8 +218,30 @@ class NfsePayloadFactory
 
         if (!empty($codigoCidade)) {
             $data['codigoCidade'] = $codigoCidade;
-        } elseif (!empty($data['descricaoCidade']) && !empty($data['estado'])) {
-            throw new \RuntimeException("Código IBGE não encontrado para a cidade '{$data['descricaoCidade']}' ({$data['estado']}). Verifique se há erros de digitação no nome da cidade.");
+        } else {
+            // Tenta obter o código IBGE de forma automatizada pelo nome da cidade e UF
+            if (!empty($data['descricaoCidade']) && !empty($data['estado'])) {
+                $ibge = \App\Helpers\IbgeHelper::getIbgeCode($data['descricaoCidade'], $data['estado']);
+                if ($ibge) {
+                    $data['codigoCidade'] = $ibge;
+                } else {
+                    // Tenta obter via PlugNotasClient se possível
+                    try {
+                        $plugNotasClient = app(\App\Services\Nfse\PlugNotasClient::class);
+                        $ibge = $plugNotasClient->getCidadeByNome($data['descricaoCidade'], $data['estado']);
+                        if ($ibge) {
+                            $data['codigoCidade'] = $ibge;
+                        }
+                    } catch (\Exception $ex) {
+                        // Ignora erro no client para não quebrar o fluxo se for teste
+                    }
+                }
+            }
+
+            // Se mesmo assim continuou vazio, e temos cidade/UF, lançamos o erro amigável
+            if (empty($data['codigoCidade']) && !empty($data['descricaoCidade']) && !empty($data['estado'])) {
+                throw new \RuntimeException("Código IBGE não encontrado para a cidade '{$data['descricaoCidade']}' ({$data['estado']}). Verifique se há erros de digitação no nome da cidade.");
+            }
         }
 
         return $data;

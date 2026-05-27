@@ -21,7 +21,7 @@ $(function() {
         btn.html('<i class="fa fa-refresh fa-spin"></i> Sincronizando...').prop('disabled', true);
         
         $.ajax({
-            url: "{{ url('admin/nfse/sync') }}/" + id,
+            url: "{{ url('nfse/sync') }}/" + id,
             method: 'POST',
             data: { _token: "{{ csrf_token() }}" },
             success: function(response) {
