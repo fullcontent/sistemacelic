@@ -194,24 +194,80 @@ class NfseController extends Controller
             return response()->json(['error' => 'CNPJ inválido (deve conter 14 dígitos).'], 400);
         }
 
-        $client = new Client(['timeout' => 10]);
-
+        // Tenta buscar com Guzzle com timeout e verify => false para evitar problemas de SSL em servidores compartilhados
+        $client = new Client(['timeout' => 10, 'verify' => false]);
         try {
-            // Tenta primeiro v2 (mais completo, traz IBGE)
+            // Tenta primeiro v2 da BrasilAPI (mais completo, traz IBGE)
             try {
                 $response = $client->get("https://brasilapi.com.br/api/cnpj/v2/{$cnpj}");
                 $data = json_decode((string) $response->getBody(), true);
             } catch (\Exception $e2) {
                 \Log::warning("NfseController: BrasilAPI v2 falhou para {$cnpj}, tentando v1. Erro: " . $e2->getMessage());
-                // Fallback para v1
-                $response = $client->get("https://brasilapi.com.br/api/cnpj/v1/{$cnpj}");
-                $data = json_decode((string) $response->getBody(), true);
+                
+                // Fallback para v1 da BrasilAPI
+                try {
+                    $response = $client->get("https://brasilapi.com.br/api/cnpj/v1/{$cnpj}");
+                    $data = json_decode((string) $response->getBody(), true);
+                } catch (\Exception $e1) {
+                    \Log::warning("NfseController: BrasilAPI v1 falhou para {$cnpj}, tentando ReceitaWS. Erro: " . $e1->getMessage());
+                    
+                    // Fallback para ReceitaWS via cURL do servidor
+                    $response = $client->get("https://www.receitaws.com.br/v1/cnpj/{$cnpj}");
+                    $data = json_decode((string) $response->getBody(), true);
+                    
+                    if (isset($data['status']) && $data['status'] === 'ERROR') {
+                        throw new \Exception($data['message'] ?? 'Erro retornado pela ReceitaWS.');
+                    }
+                    
+                    // Normaliza os dados da ReceitaWS para o padrão da BrasilAPI v2
+                    return response()->json([
+                        'cnpj' => preg_replace('/\D/', '', $data['cnpj'] ?? $cnpj),
+                        'razaoSocial' => $data['nome'] ?? '',
+                        'logradouro' => $data['logradouro'] ?? '',
+                        'numero' => $data['numero'] ?? '',
+                        'bairro' => $data['bairro'] ?? '',
+                        'cep' => preg_replace('/\D/', '', $data['cep'] ?? ''),
+                        'uf' => $data['uf'] ?? '',
+                        'email' => $data['email'] ?? '',
+                        'municipio' => $data['municipio'] ?? '',
+                        'ibge' => null, // ReceitaWS grátis não retorna IBGE diretamente
+                    ]);
+                }
             }
 
             if (!isset($data['cnpj'])) {
                 throw new \Exception("Dados retornados da API são inválidos.");
             }
 
+            // Se os dados de logradouro, número ou e-mail estiverem vazios (comum para MEIs na BrasilAPI devido a privacidade)
+            // tenta enriquecer as informações com a API da ReceitaWS
+            if (empty($data['logradouro']) || empty($data['numero']) || empty($data['email'])) {
+                try {
+                    \Log::info("NfseController: Dados incompletos na BrasilAPI para {$cnpj}. Tentando enriquecimento via ReceitaWS...");
+                    $resReceita = $client->get("https://www.receitaws.com.br/v1/cnpj/{$cnpj}");
+                    $dataReceita = json_decode((string) $resReceita->getBody(), true);
+
+                    if (isset($dataReceita['status']) && $dataReceita['status'] === 'OK') {
+                        if (empty($data['logradouro']) && !empty($dataReceita['logradouro'])) {
+                            $data['logradouro'] = $dataReceita['logradouro'];
+                        }
+                        if (empty($data['numero']) && !empty($dataReceita['numero'])) {
+                            $data['numero'] = $dataReceita['numero'];
+                        }
+                        if (empty($data['email']) && !empty($dataReceita['email'])) {
+                            $data['email'] = $dataReceita['email'];
+                        }
+                        if (empty($data['bairro']) && !empty($dataReceita['bairro'])) {
+                            $data['bairro'] = $dataReceita['bairro'];
+                        }
+                        if (empty($data['cep']) && !empty($dataReceita['cep'])) {
+                            $data['cep'] = $dataReceita['cep'];
+                        }
+                    }
+                } catch (\Exception $eReceita) {
+                    \Log::warning("NfseController: Falha no enriquecimento via ReceitaWS para {$cnpj}: " . $eReceita->getMessage());
+                }
+            }
             return response()->json([
                 'cnpj' => $data['cnpj'],
                 'razaoSocial' => $data['razao_social'] ?? $data['nome'] ?? '',
@@ -221,11 +277,11 @@ class NfseController extends Controller
                 'logradouro' => $data['logradouro'] ?? '',
                 'numero' => $data['numero'] ?? '',
                 'bairro' => $data['bairro'] ?? '',
-                'cep' => $data['cep'] ?? '',
+                'cep' => preg_replace('/\D/', '', $data['cep'] ?? ''),
                 'uf' => $data['uf'] ?? '',
                 'email' => $data['email'] ?? '',
                 'municipio' => $data['municipio'] ?? '',
-                'ibge' => $data['municipio_ibge'] ?? null,
+                'ibge' => $data['municipio_ibge'] ?? $data['codigo_municipio_ibge'] ?? null,
             ]);
         } catch (\Exception $e) {
             \Log::error("NfseController: Erro ao buscar CNPJ {$cnpj}: " . $e->getMessage(), [

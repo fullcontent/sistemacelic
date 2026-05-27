@@ -355,8 +355,6 @@
             $('.checkItem').prop('checked', $(this).is(':checked'));
         });
 
-
-
         // Atualizar displays ao digitar CNPJ manual
         $('#override_cnpj').on('input', function () {
             updateCnpjDisplays();
@@ -373,7 +371,7 @@
             $(this).html('<i class="fa fa-spinner fa-spin"></i>').prop('disabled', true);
 
             $.ajax({
-                url: "{{ url('admin/nfse/buscar-cnpj') }}/" + cnpj,
+                url: "{{ url('nfse/buscar-cnpj') }}/" + cnpj,
                 success: function (response) {
                     $('#override_razaoSocial').val(response.razaoSocial);
                     $('#override_email').val(response.email);
@@ -397,11 +395,52 @@
                     });
                 },
                 error: function (xhr) {
-                    let msg = 'Não foi possível localizar este CNPJ.';
-                    if (xhr.responseJSON && xhr.responseJSON.details) {
-                        msg += ' Detalhes: ' + xhr.responseJSON.details;
-                    }
-                    Swal.fire('Aviso', msg, 'warning');
+                    // Se a busca pelo servidor falhar (ex: por bloqueio de firewall de conexões de saída no host de produção),
+                    // realiza uma consulta de contingência diretamente pelo navegador do usuário (Client-Side) via ReceitaWS (JSONP)
+                    console.warn('A busca via servidor falhou. Tentando contingência direta do navegador via ReceitaWS...');
+                    
+                    $.ajax({
+                        url: "https://www.receitaws.com.br/v1/cnpj/" + cnpj,
+                        method: 'GET',
+                        dataType: 'jsonp',
+                        success: function(response) {
+                            if (response.status === 'OK') {
+                                $('#override_razaoSocial').val(response.nome);
+                                $('#override_email').val(response.email);
+                                $('#override_logradouro').val(response.logradouro);
+                                $('#override_numero').val(response.numero);
+                                $('#override_bairro').val(response.bairro);
+                                $('#override_cep').val(response.cep.replace(/\D/g, ''));
+                                $('#override_municipio').val(response.municipio);
+                                $('#override_uf').val(response.uf);
+                                $('#override_codigoCidade').val(''); // ReceitaWS grátis não retorna IBGE
+                                
+                                updateCnpjDisplays();
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Sucesso (Contingência)',
+                                    text: 'Dados recuperados com sucesso via ReceitaWS!',
+                                    toast: true,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
+                                    timer: 3000
+                                });
+                            } else {
+                                let msg = 'Não foi possível localizar este CNPJ.';
+                                if (xhr.responseJSON && xhr.responseJSON.details) {
+                                    msg += ' Detalhes: ' + xhr.responseJSON.details;
+                                }
+                                Swal.fire('Aviso', msg, 'warning');
+                            }
+                        },
+                        error: function() {
+                            let msg = 'Não foi possível localizar este CNPJ.';
+                            if (xhr.responseJSON && xhr.responseJSON.details) {
+                                msg += ' Detalhes: ' + xhr.responseJSON.details;
+                            }
+                            Swal.fire('Aviso', msg, 'warning');
+                        }
+                    });
                 },
                 complete: function () {
                     $('#btnConsutarCnpj').html('<i class="fa fa-search"></i> Consultar').prop('disabled', false);
@@ -434,7 +473,6 @@
                     Swal.showLoading();
                 }
             });
-        });
     });
 </script>
 @stop

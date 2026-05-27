@@ -340,7 +340,7 @@
                 showLoaderOnConfirm: true,
                 preConfirm: (motivo) => {
                     return $.ajax({
-                        url: "{{ url('admin/nfse/cancelar') }}/" + id,
+                        url: "{{ url('nfse/cancelar') }}/" + id,
                         method: 'POST',
                         data: {
                             _token: "{{ csrf_token() }}",
@@ -367,7 +367,7 @@
             btn.html('<i class="fa fa-sync fa-spin"></i>').prop('disabled', true);
 
             $.ajax({
-                url: "{{ url('admin/nfse/sync') }}/" + id,
+                url: "{{ url('nfse/sync') }}/" + id,
                 method: 'POST',
                 data: { _token: "{{ csrf_token() }}" },
                 success: function (response) {
