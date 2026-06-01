@@ -129,7 +129,7 @@
               <i class="fa fa-history"></i>
             </a>
           </li>
-
+          @auth
                      <!-- MENÇOES DO USUARIO -->
         <li class="dropdown notifications-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -241,6 +241,13 @@
                                 {{ csrf_field() }}
                             </form>
                         </li>
+          @else
+                        <li>
+                            <a href="{{ route('login') }}">
+                                <i class="fa fa-fw fa-sign-in"></i> {{ __('adminlte::adminlte.sign_in') }}
+                            </a>
+                        </li>
+          @endauth
                         @if(config('adminlte.right_sidebar') and (config('adminlte.layout') != 'top-nav'))
                         <!-- Control Sidebar Toggle Button -->
                             <li>

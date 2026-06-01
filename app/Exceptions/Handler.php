@@ -37,15 +37,15 @@ class Handler extends ExceptionHandler
         parent::report($exception);
     }
 
-    /**
-     * Render an exception into an HTTP response.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception  $exception
-     * @return \Illuminate\Http\Response
-     */
     public function render($request, Exception $exception)
     {
+        if ($exception instanceof \Illuminate\Session\TokenMismatchException) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Sua sessão expirou por inatividade.'], 419);
+            }
+            return redirect('/login')->with('error', 'Sua sessão expirou por inatividade. Por favor, faça login novamente.');
+        }
+
         return parent::render($request, $exception);
     }
 }

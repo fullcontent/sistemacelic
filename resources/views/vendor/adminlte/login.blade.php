@@ -15,6 +15,12 @@
         </div>
         <!-- /.login-logo -->
         <div class="login-box-body">
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible" style="border-radius: 4px; font-size: 13px; margin-bottom: 15px;">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <i class="icon fa fa-ban"></i> {{ session('error') }}
+                </div>
+            @endif
             <p class="login-box-msg">{{ __('adminlte::adminlte.login_message') }}</p>
             <h1>{{ $message ?? ''}}</h1>
             <form action="{{ url(config('adminlte.login_url', 'login')) }}" method="post">
