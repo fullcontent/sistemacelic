@@ -297,6 +297,51 @@
 			</div>
 		</div>
 	</div>
+
+	<!-- Modal para Clonar Proposta -->
+	<div class="modal fade" id="modalClonarProposta" tabindex="-1" role="dialog" aria-labelledby="modalClonarPropostaLabel">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content" style="border-radius: 8px;">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title" id="modalClonarPropostaLabel">Clonar Proposta</h4>
+				</div>
+				<form id="formClonarProposta">
+					@csrf
+					<div class="modal-body">
+						<input type="hidden" id="clonar_proposta_id" name="proposta_id">
+						<div class="form-group">
+							<label for="clonar_unidades_ids">Selecione as Filiais Destino</label>
+							<select name="unidades_ids[]" id="clonar_unidades_ids" class="form-control select2" multiple="multiple" style="width: 100%;" required>
+							</select>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal" style="border-radius: 50px;">Cancelar</button>
+						<button type="submit" class="btn btn-primary" style="border-radius: 50px;" id="btnSubmitClonar"><i class="fa fa-copy"></i> Clonar</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal de Sucesso na Clonagem -->
+	<div class="modal fade" id="modalSucessoClonagem" tabindex="-1" role="dialog" aria-labelledby="modalSucessoClonagemLabel">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content" style="border-radius: 8px;">
+				<div class="modal-header bg-success text-success" style="border-top-left-radius: 8px; border-top-right-radius: 8px;">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title" id="modalSucessoClonagemLabel" style="font-weight: 700;"><i class="fa fa-check-circle"></i> Sucesso</h4>
+				</div>
+				<div class="modal-body">
+					<p id="msgSucessoClonagem" style="font-size: 1.1em; margin: 10px 0;"></p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-success" data-dismiss="modal" style="border-radius: 50px; padding: 6px 20px;">Ok</button>
+				</div>
+			</div>
+		</div>
+	</div>
 @stop
 
 @section('content')
@@ -640,6 +685,8 @@
 							actions += ' <a href="' + row.remove_url + '" class="btn btn-default btn-action confirmation" data-id="' + data + '" title="Arquivar"><i class="fa fa-archive text-muted"></i></a>';
 						}
 
+						actions += ' <button class="btn btn-default btn-action btn-clonar-proposta" data-id="' + data + '" title="Clonar Proposta"><i class="fa fa-copy text-primary"></i></button>';
+
 						actions += '</div>';
 						return actions;
 					}
@@ -880,6 +927,79 @@
 			$('.select-proposta-checkbox').prop('checked', false);
 			$('#select-all-propostas').prop('checked', false);
 			updateBulkActionBar();
+		});
+
+		// Inicializa Select2 para as filiais de clonagem
+		$('#clonar_unidades_ids').select2({
+			dropdownParent: $('#modalClonarProposta'),
+			width: '100%',
+			placeholder: 'Selecione as filiais'
+		});
+
+		// Evento de clique para carregar as filiais e abrir o modal de clonagem
+		$(document).on('click', '.btn-clonar-proposta', function (e) {
+			e.preventDefault();
+			var propostaId = $(this).data('id');
+			$('#clonar_proposta_id').val(propostaId);
+			
+			// Limpa e reseta o select2
+			$('#clonar_unidades_ids').html('').trigger('change');
+			
+			// Abre modal
+			$('#modalClonarProposta').modal('show');
+			
+			// Carrega as filiais via Ajax
+			$.ajax({
+				url: "/admin/proposta/" + propostaId + "/outras-unidades",
+				method: "GET",
+				success: function (response) {
+					var options = '';
+					if (response && response.length > 0) {
+						$.each(response, function (i, u) {
+							options += '<option value="' + u.id + '">' + u.text + '</option>';
+						});
+						$('#clonar_unidades_ids').html(options).trigger('change');
+					} else {
+						$('#clonar_unidades_ids').html('<option disabled>Nenhuma outra filial encontrada</option>').trigger('change');
+					}
+				},
+				error: function () {
+					alert('Erro ao carregar as filiais.');
+				}
+			});
+		});
+
+		// Envia a requisição de clonagem
+		$('#formClonarProposta').on('submit', function (e) {
+			e.preventDefault();
+			var $btn = $('#btnSubmitClonar');
+			$btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Clonando...');
+			
+			$.ajax({
+				url: "{{ route('proposta.clonar') }}",
+				method: "POST",
+				data: $(this).serialize(),
+				success: function (response) {
+					if (response.success) {
+						$('#modalClonarProposta').modal('hide');
+						table.ajax.reload(null, false);
+						$('#msgSucessoClonagem').text(response.message);
+						$('#modalSucessoClonagem').modal('show');
+					} else {
+						alert(response.message || 'Erro ao clonar a proposta.');
+					}
+				},
+				error: function (xhr) {
+					var errorMsg = 'Erro ao processar clonagem.';
+					if (xhr.responseJSON && xhr.responseJSON.message) {
+						errorMsg = xhr.responseJSON.message;
+					}
+					alert(errorMsg);
+				},
+				complete: function() {
+					$btn.prop('disabled', false).html('<i class="fa fa-copy"></i> Clonar');
+				}
+			});
 		});
 	});
 </script>

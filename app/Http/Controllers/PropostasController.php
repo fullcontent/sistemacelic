@@ -1011,7 +1011,119 @@ class PropostasController extends Controller
         return response()->json(['success' => true, 'message' => "$count propostas aprovadas com sucesso."]);
     }
 
+    public function getOutrasUnidades($id)
+    {
+        $proposta = Proposta::find($id);
+        if (!$proposta) {
+            return response()->json(['message' => 'Proposta não encontrada.'], 404);
+        }
+
+        // Busca todas as unidades da mesma empresa, exceto a atual da proposta
+        $unidades = Unidade::where('empresa_id', $proposta->empresa_id)
+            ->where('id', '!=', $proposta->unidade_id)
+            ->orderBy('nomeFantasia', 'asc')
+            ->select('id', 'nomeFantasia', 'codigo')
+            ->get();
+
+        $response = $unidades->map(function ($u) {
+            return [
+                'id' => $u->id,
+                'text' => $u->codigo ? "{$u->codigo} - {$u->nomeFantasia}" : $u->nomeFantasia
+            ];
+        });
+
+        return response()->json($response);
+    }
+
+    public function clonar(Request $request)
+    {
+        $request->validate([
+            'proposta_id' => 'required|exists:propostas,id',
+            'unidades_ids' => 'required|array|min:1',
+            'unidades_ids.*' => 'exists:unidades,id'
+        ]);
+
+        $propostaOriginal = Proposta::with('servicos')->find($request->proposta_id);
+        
+        if (!$propostaOriginal) {
+            return response()->json(['success' => false, 'message' => 'Proposta original não encontrada.'], 404);
+        }
+
+        $clonedIds = [];
+        $unidadesNomes = [];
+
+        \DB::beginTransaction();
+        try {
+            foreach ($request->unidades_ids as $unidadeId) {
+                $unidade = Unidade::find($unidadeId);
+                $unidadesNomes[] = $unidade->nomeFantasia;
+
+                // Clona a proposta
+                $novaProposta = $propostaOriginal->replicate();
+                $novaProposta->unidade_id = $unidadeId;
+                $novaProposta->created_by = Auth::id(); // Atribui ao usuário atual que está clonando
+                
+                $currentNow = now();
+                $novaProposta->created_at = $currentNow;
+                $novaProposta->updated_at = $currentNow;
+
+                if ($novaProposta->sent_to_analysis_at) {
+                    $novaProposta->sent_to_analysis_at = $currentNow;
+                }
+                if ($novaProposta->approved_at) {
+                    $novaProposta->approved_at = $currentNow;
+                }
+                if ($novaProposta->refused_at) {
+                    $novaProposta->refused_at = $currentNow;
+                }
+
+                $novaProposta->save();
+
+                $clonedIds[] = $novaProposta->id;
+
+                // Mapeamento para relacionar sub-serviços aos novos serviços clonados correspondentes
+                $servicosPrincipaisMapeados = [];
+
+                // 1º Passo: Clonar serviços principais (sem servicoPrincipal)
+                foreach ($propostaOriginal->servicos->where('servicoPrincipal', null) as $servico) {
+                    $novoServico = $servico->replicate();
+                    $novoServico->proposta_id = $novaProposta->id;
+                    $novoServico->created_at = $currentNow;
+                    $novoServico->updated_at = $currentNow;
+                    $novoServico->save();
+
+                    $servicosPrincipaisMapeados[$servico->id] = $novoServico->id;
+                }
+
+                // 2º Passo: Clonar sub-serviços (que possuem servicoPrincipal)
+                foreach ($propostaOriginal->servicos->where('servicoPrincipal', '!=', null) as $servico) {
+                    $novoServico = $servico->replicate();
+                    $novoServico->proposta_id = $novaProposta->id;
+                    $novoServico->servicoPrincipal = $servicosPrincipaisMapeados[$servico->servicoPrincipal] ?? null;
+                    $novoServico->created_at = $currentNow;
+                    $novoServico->updated_at = $currentNow;
+                    $novoServico->save();
+                }
+            }
+
+            \DB::commit();
+
+            $msg = 'Proposta #' . $propostaOriginal->id . ' clonada com sucesso para: ' . implode(', ', $unidadesNomes) . ' (Criada(s) proposta(s) #' . implode(', #', $clonedIds) . ').';
+            
+            session()->flash('success', $msg);
+
+            return response()->json([
+                'success' => true,
+                'message' => $msg,
+                'cloned_ids' => $clonedIds
+            ]);
+
+        } catch (\Exception $e) {
+            \DB::rollback();
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao clonar proposta: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
-
-
-

@@ -151,6 +151,8 @@ Route::prefix('admin')->group(function () {
 	Route::post('/proposta/aprovar-lote', 'PropostasController@aprovarLote')->name('proposta.aprovarLote');
 	Route::post('/proposta/analisar-lote', 'PropostasController@analisarLote')->name('proposta.analisarLote');
 	Route::get('/propostas-list-data', 'PropostasController@listData')->name('proposta.listData');
+	Route::get('/proposta/{id}/outras-unidades', 'PropostasController@getOutrasUnidades')->name('proposta.outrasUnidades');
+	Route::post('/proposta/clonar', 'PropostasController@clonar')->name('proposta.clonar');
 
 
 
