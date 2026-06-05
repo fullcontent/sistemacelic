@@ -288,6 +288,11 @@ class AppServiceProvider extends ServiceProvider
                             'icon' => 'glyphicon glyphicon-align-justify'
                             ],
                             [
+                            'text' => 'Arquivos Digitais',
+                            'url' =>  route('cliente.arquivos'),
+                            'icon' => 'glyphicon glyphicon-folder-open'
+                            ],
+                            [
                             'text' => 'Serviços',
                             'url'  =>  route('cliente.servicos'),
                             'icon' => 'glyphicon glyphicon-wrench',

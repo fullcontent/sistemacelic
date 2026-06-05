@@ -318,6 +318,10 @@ Route::prefix('cliente')->group(function () {
 
 	});
 
+	Route::get('/arquivos', 'ClienteController@arquivosDigitais')->name('cliente.arquivos');
+	Route::get('/arquivos/download/servico/{tipo}/{servico_id}', 'ClienteController@downloadServicoFile')->name('cliente.servico.downloadFile');
+	Route::get('/arquivos/download/arquivo/{id}', 'ClienteController@downloadArquivo')->name('cliente.arquivo.download');
+
 });
 
 Route::get('admin/teste', function () {

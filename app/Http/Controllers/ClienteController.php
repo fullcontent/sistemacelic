@@ -578,5 +578,253 @@ class ClienteController extends Controller
     }
 
 
+    public function arquivosDigitais(Request $request)
+    {
+        if (app()->bound('debugbar')) {
+            app('debugbar')->disable();
+        }
+
+        $user = User::find(Auth::id());
+        $empresasIds = UserAccess::where('user_id', $user->id)->pluck('empresa_id');
+        
+        // Obter todas as unidades ordenadas por nome para o dropdown
+        $unidades = Unidade::whereIn('empresa_id', $empresasIds)->orderBy('nomeFantasia')->get();
+
+        // Determinar a unidade selecionada (padrão: primeira unidade)
+        $selectedUnitId = $request->query('unidade_id');
+        if (!$selectedUnitId && $unidades->isNotEmpty()) {
+            $selectedUnitId = $unidades->first()->id;
+        }
+
+        $selectedUnit = $selectedUnitId ? Unidade::find($selectedUnitId) : null;
+
+        $todosArquivos = [];
+
+        if ($selectedUnit) {
+            // Buscar apenas os serviços da unidade selecionada que possuem algum anexo válido
+            $servicos = Servico::where('unidade_id', $selectedUnit->id)
+                ->where(function($q) {
+                    $q->where(function($sub) {
+                        $sub->whereNotNull('licenca_anexo')->where('licenca_anexo', '<>', '');
+                    })->orWhere(function($sub) {
+                        $sub->whereNotNull('laudo_anexo')->where('laudo_anexo', '<>', '');
+                    })->orWhere(function($sub) {
+                        $sub->whereNotNull('protocolo_anexo')->where('protocolo_anexo', '<>', '');
+                    });
+                })
+                ->get();
+
+            // Buscar apenas arquivos associados a esta unidade
+            $arquivos = Arquivo::where('unidade_id', $selectedUnit->id)
+                ->whereNotNull('arquivo')
+                ->where('arquivo', '<>', '')
+                ->with(['servico'])
+                ->get();
+
+            // 1. Processar anexos dos serviços
+            foreach ($servicos as $servico) {
+                $unidCode = $selectedUnit->codigo;
+                $unidName = $selectedUnit->nomeFantasia;
+
+                if ($servico->licenca_anexo) {
+                    $todosArquivos[] = [
+                        'id' => $servico->id,
+                        'nome' => 'Licença: ' . $servico->nome,
+                        'tipo_arquivo' => 'licenca',
+                        'arquivo' => $servico->licenca_anexo,
+                        'unidade_id' => $selectedUnit->id,
+                        'unidade_codigo' => $unidCode,
+                        'unidade_name' => $unidName,
+                        'servico_id' => $servico->id,
+                        'servico_os' => $servico->os,
+                        'servico_nome' => $servico->nome,
+                        'servico_tipo' => $servico->tipo,
+                        'emissao' => $servico->licenca_emissao,
+                        'validade' => $servico->licenca_validade,
+                        'tipo_licenca' => $servico->tipoLicenca,
+                        'download_url' => '/cliente/arquivos/download/servico/licenca/' . $servico->id
+                    ];
+                }
+                if ($servico->laudo_anexo) {
+                    $todosArquivos[] = [
+                        'id' => $servico->id,
+                        'nome' => 'Laudo: ' . $servico->nome,
+                        'tipo_arquivo' => 'laudo',
+                        'arquivo' => $servico->laudo_anexo,
+                        'unidade_id' => $selectedUnit->id,
+                        'unidade_codigo' => $unidCode,
+                        'unidade_name' => $unidName,
+                        'servico_id' => $servico->id,
+                        'servico_os' => $servico->os,
+                        'servico_nome' => $servico->nome,
+                        'servico_tipo' => $servico->tipo,
+                        'emissao' => $servico->laudo_emissao,
+                        'validade' => null,
+                        'tipo_licenca' => null,
+                        'download_url' => '/cliente/arquivos/download/servico/laudo/' . $servico->id
+                    ];
+                }
+                if ($servico->protocolo_anexo) {
+                    $todosArquivos[] = [
+                        'id' => $servico->id,
+                        'nome' => 'Protocolo: ' . $servico->nome,
+                        'tipo_arquivo' => 'protocolo',
+                        'arquivo' => $servico->protocolo_anexo,
+                        'unidade_id' => $selectedUnit->id,
+                        'unidade_codigo' => $unidCode,
+                        'unidade_name' => $unidName,
+                        'servico_id' => $servico->id,
+                        'servico_os' => $servico->os,
+                        'servico_nome' => $servico->nome,
+                        'servico_tipo' => $servico->tipo,
+                        'emissao' => $servico->protocolo_emissao,
+                        'validade' => null,
+                        'tipo_licenca' => null,
+                        'download_url' => '/cliente/arquivos/download/servico/protocolo/' . $servico->id
+                    ];
+                }
+            }
+
+            // 2. Processar registros da tabela Arquivo
+            foreach ($arquivos as $arquivo) {
+                $unidCode = $selectedUnit->codigo;
+                $unidName = $selectedUnit->nomeFantasia;
+
+                $todosArquivos[] = [
+                    'id' => $arquivo->id,
+                    'nome' => $arquivo->nome,
+                    'tipo_arquivo' => 'geral',
+                    'arquivo' => $arquivo->arquivo,
+                    'unidade_id' => $selectedUnit->id,
+                    'unidade_codigo' => $unidCode,
+                    'unidade_name' => $unidName,
+                    'servico_id' => $arquivo->servico_id,
+                    'servico_os' => $arquivo->servico ? $arquivo->servico->os : null,
+                    'servico_nome' => $arquivo->servico ? $arquivo->servico->nome : null,
+                    'servico_tipo' => $arquivo->servico ? $arquivo->servico->tipo : 'geral',
+                    'emissao' => $arquivo->created_at,
+                    'validade' => null,
+                    'tipo_licenca' => null,
+                    'download_url' => '/cliente/arquivos/download/arquivo/' . $arquivo->id
+                ];
+            }
+        }
+
+        // Agrupar por Tipo de Serviço para a unidade selecionada
+        $arquivosPorTipoServico = [];
+        $tiposNomes = [
+            'licencaOperacao' => 'Licença de Operação',
+            'nRenovaveis' => 'Licenças/Projetos não renováveis',
+            'controleCertidoes' => 'Certidões',
+            'controleTaxas' => 'Taxas',
+            'facilitiesRealEstate' => 'Facilities/Real Estate',
+            'geral' => 'Arquivos Gerais / Sem Serviço específico'
+        ];
+
+        foreach ($todosArquivos as $arq) {
+            $tipo = $arq['servico_tipo'] ?: 'geral';
+            $arquivosPorTipoServico[$tipo][] = $arq;
+        }
+
+        // Apenas Licenças da unidade selecionada
+        $licencas = array_filter($todosArquivos, function($arq) {
+            return $arq['tipo_arquivo'] === 'licenca';
+        });
+
+        $totalUnidades = count($unidades);
+
+        return view('cliente.arquivos-digitais')->with([
+            'unidades' => $unidades,
+            'selectedUnit' => $selectedUnit,
+            'arquivosPorTipoServico' => $arquivosPorTipoServico,
+            'tiposNomes' => $tiposNomes,
+            'licencas' => $licencas,
+            'todosArquivos' => $todosArquivos,
+            'totalUnidades' => $totalUnidades
+        ]);
+    }
+
+    public function downloadServicoFile($tipo, $servico_id)
+    {
+        $empresasIds = UserAccess::where('user_id', Auth::id())->pluck('empresa_id');
+        $unidadesIds = Unidade::whereIn('empresa_id', $empresasIds)->pluck('id');
+
+        $servico = Servico::where('id', $servico_id)
+            ->where(function($query) use ($unidadesIds, $empresasIds) {
+                $query->whereIn('unidade_id', $unidadesIds)
+                      ->orWhereIn('empresa_id', $empresasIds);
+            })->first();
+
+        if (!$servico) {
+            abort(403, 'Acesso não autorizado ou serviço inexistente.');
+        }
+
+        switch ($tipo) {
+            case 'licenca':
+                $filename = $servico->licenca_anexo;
+                $tipoNome = "Licença";
+                break;
+            case 'laudo':
+                $filename = $servico->laudo_anexo;
+                $tipoNome = "Laudo";
+                break;
+            case 'protocolo':
+                $filename = $servico->protocolo_anexo;
+                $tipoNome = "Protocolo";
+                break;
+            default:
+                abort(404, 'Tipo de arquivo inválido.');
+        }
+
+        if (!$filename || !file_exists(public_path('uploads/'.$filename))) {
+            abort(404, 'Arquivo físico não encontrado no servidor.');
+        }
+
+        $extension = pathinfo($filename, PATHINFO_EXTENSION);
+        $unidadeNome = $servico->unidade ? $servico->unidade->nomeFantasia : 'Sem Unidade';
+        $unidadeCodigo = $servico->unidade ? $servico->unidade->codigo : 'S-U';
+        $arquivoNome = $tipoNome.' '.$unidadeCodigo.' - '.$unidadeNome.' - '.$servico->nome.'.'.$extension;
+
+        return response()->download(public_path('uploads/'.$filename), $arquivoNome);
+    }
+
+    public function downloadArquivo($id)
+    {
+        $arquivo = Arquivo::find($id);
+        if (!$arquivo) {
+            abort(404, 'Arquivo não encontrado.');
+        }
+
+        $empresasIds = UserAccess::where('user_id', Auth::id())->pluck('empresa_id');
+        $unidadesIds = Unidade::whereIn('empresa_id', $empresasIds)->pluck('id');
+
+        $hasAccess = false;
+        if ($arquivo->unidade_id && $unidadesIds->contains($arquivo->unidade_id)) {
+            $hasAccess = true;
+        } elseif ($arquivo->empresa_id && $empresasIds->contains($arquivo->empresa_id)) {
+            $hasAccess = true;
+        } elseif ($arquivo->servico_id) {
+            $servico = Servico::find($arquivo->servico_id);
+            if ($servico && ($unidadesIds->contains($servico->unidade_id) || $empresasIds->contains($servico->empresa_id))) {
+                $hasAccess = true;
+            }
+        }
+
+        if (!$hasAccess) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
+        $filename = $arquivo->arquivo;
+        if (!$filename || !file_exists(public_path('uploads/'.$filename))) {
+            abort(404, 'Arquivo físico não encontrado no servidor.');
+        }
+
+        $extension = pathinfo($filename, PATHINFO_EXTENSION);
+        $unidadeNome = $arquivo->unidade ? $arquivo->unidade->nomeFantasia : 'Sem Unidade';
+        $unidadeCodigo = $arquivo->unidade ? $arquivo->unidade->codigo : 'S-U';
+        $arquivoNome = $unidadeCodigo.' - '.$unidadeNome.' - '.$arquivo->nome.'.'.$extension;
+
+        return response()->download(public_path('uploads/'.$filename), $arquivoNome);
+    }
 
 }
