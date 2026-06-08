@@ -378,10 +378,10 @@ class NfseEmissionService
         if (!empty($payload['endereco']['cep'])) {
             $cep = preg_replace('/\D/', '', $payload['endereco']['cep']);
             $cepData = $this->plugNotasClient->getCepInfo($cep);
-
+            
             if ($cepData) {
                 $cityIbge = $cepData['city_ibge'] ?? $cepData['ibge'] ?? null;
-
+                
                 // Se não veio o IBGE no CEP, tenta buscar pelo nome da cidade retornado pelo CEP
                 if (!$cityIbge && !empty($cepData['city'])) {
                     $fallbackUf = $payload['endereco']['estado'] ?? $payload['endereco']['uf'] ?? '';

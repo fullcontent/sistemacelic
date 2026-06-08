@@ -24,7 +24,7 @@
                 <div style="word-wrap: break-word; white-space: pre-wrap;">
                     @if(strpos(session('error'), 'Resposta:') !== false)
                                 <?php 
-                                            $parts = explode(' | Resposta: ', session('error'));
+                                                            $parts = explode(' | Resposta: ', session('error'));
                         $mainMsg = $parts[0];
                         $jsonMsg = $parts[1] ?? '';
                         // Tenta formatar se for JSON
@@ -34,7 +34,7 @@
                         } else {
                             $formattedJson = $jsonMsg;
                         }
-                                        ?>
+                                                        ?>
                                 <p>{{ $mainMsg }}</p>
                                 <hr style="border-top: 1px solid rgba(255,255,255,0.2)">
                                 <strong>Detalhes da API:</strong>
@@ -313,9 +313,14 @@
 
 @section('js')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.6/jquery.inputmask.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.6/jquery.inputmask.min.js"></script>
 <script>
     $(document).ready(function () {
         const empresaCnpj = "{{ $faturamento->empresa->cnpj }}";
+
+        // Aplicar máscaras
+        $('#override_cnpj').inputmask("99.999.999/9999-99");
+        $('#override_cep').inputmask("99999-999");
 
         function updateCnpjDisplays() {
             const option = $('input[name="opcao_automatica"]:checked').val();
@@ -392,7 +397,7 @@
             $(this).html('<i class="fa fa-spinner fa-spin"></i>').prop('disabled', true);
 
             $.ajax({
-                url: "{{ url('nfse/buscar-cnpj') }}/" + cnpj,
+                url: "{{ url('admin/nfse/buscar-cnpj') }}/" + cnpj,
                 success: function (response) {
                     $('#override_razaoSocial').val(response.razaoSocial);
                     $('#override_email').val(response.email);
@@ -402,13 +407,25 @@
                     $('#override_cep').val(response.cep);
                     $('#override_municipio').val(response.municipio);
                     $('#override_uf').val(response.uf);
-                    $('#override_codigoCidade').val(response.ibge); // Se disponível
+                    $('#override_codigoCidade').val(response.ibge);
 
                     updateCnpjDisplays();
-                    Swal.fire('Sucesso', 'Dados recuperados da Receita Federal!', 'success');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Sucesso',
+                        text: 'Dados recuperados com sucesso!',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000
+                    });
                 },
-                error: function () {
-                    Swal.fire('Erro', 'Não foi possível localizar este CNPJ.', 'error');
+                error: function (xhr) {
+                    let msg = 'Não foi possível localizar este CNPJ.';
+                    if (xhr.responseJSON && xhr.responseJSON.details) {
+                        msg += ' Detalhes: ' + xhr.responseJSON.details;
+                    }
+                    Swal.fire('Aviso', msg, 'warning');
                 },
                 complete: function () {
                     $('#btnConsutarCnpj').html('<i class="fa fa-search"></i> Consultar').prop('disabled', false);
