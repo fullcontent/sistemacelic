@@ -8,10 +8,15 @@ class Empresa extends Model
 {
 
 
-    	public function unidades()
-		{
-			return $this->hasMany('App\Models\Unidade');
-		}
+    public function unidades()
+    {
+        return $this->hasMany('App\Models\Unidade');
+    }
+
+    public function dadosCastro()
+    {
+        return $this->belongsTo('App\Models\DadosCastro', 'dados_castro_id');
+    }
 
 
 		public function users()

@@ -38,3 +38,19 @@ Route::get('/management/analyst-workload', 'ManagementReportController@analystWo
 Route::get('/management/operational-indicators', 'ManagementReportController@operationalIndicators');
 Route::get('/management/tax-conference', 'ManagementReportController@taxConference');
 Route::get('/management/system-inconsistencies', 'ManagementReportController@systemInconsistencies');
+
+// NFS-e (backend only)
+Route::prefix('nfse')->group(function () {
+    Route::get('/configuracoes', 'NfseController@listConfigs');
+    Route::post('/configuracoes', 'NfseController@upsertConfig');
+
+    Route::get('/faturamentos/{faturamentoId}/servicos', 'NfseController@faturamentoServicos');
+    Route::get('/faturamentos/{faturamentoId}/status', 'NfseController@statusFaturamento');
+
+    Route::post('/emitir-automatico', 'NfseController@emitirAutomatico');
+    Route::post('/anexar-manual', 'NfseController@anexarManual');
+    Route::post('/nao-emitir', 'NfseController@naoEmitir');
+
+    Route::post('/webhooks/plugnotas', 'NfseController@webhookPlugNotas');
+    Route::get('/emissoes/{emissionId}/zip', 'NfseController@gerarZip');
+});

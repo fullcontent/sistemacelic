@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use Auth;
 use App\UserAccess;
 use App\Models\Empresa;
-
 use App\Models\Unidade;
+use App\Models\DadosCastro;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -97,6 +97,7 @@ class EmpresasController extends Controller
             $empresa->matriculaRI   = $request->matriculaRI;
             $empresa->area          = $request->area;
             $empresa->tipoImovel    = $request->tipoImovel;
+            $empresa->dados_castro_id = $request->dados_castro_id;
 
             $empresa->save();
 
@@ -141,7 +142,12 @@ class EmpresasController extends Controller
     public function edit($id)
     {   
         $empresa = Empresa::find($id);
-        return view('admin.editar-empresa')->with('empresa',$empresa);
+        $dadosCastro = DadosCastro::where('ativo', 1)->pluck('razaoSocial', 'id');
+
+        return view('admin.editar-empresa')->with([
+            'empresa' => $empresa,
+            'dadosCastro' => $dadosCastro
+        ]);
     }
 
     /**
@@ -231,6 +237,7 @@ class EmpresasController extends Controller
             $empresa->matriculaRI   = $request->matriculaRI;
             $empresa->area          = $request->area;
             $empresa->tipoImovel    = $request->tipoImovel;
+            $empresa->dados_castro_id = $request->dados_castro_id;
 
             $empresa->save();
             
@@ -243,6 +250,7 @@ class EmpresasController extends Controller
 
     public function cadastro()
     {
-        return view('admin.cadastro-empresa');
+        $dadosCastro = DadosCastro::where('ativo', 1)->pluck('razaoSocial', 'id');
+        return view('admin.cadastro-empresa')->with('dadosCastro', $dadosCastro);
     }
 }

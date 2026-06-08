@@ -12,6 +12,32 @@
 
 
 
+@section('js')
+<script>
+$(function() {
+    $('.btn-sync').on('click', function() {
+        const id = $(this).data('id');
+        const btn = $(this);
+        btn.html('<i class="fa fa-refresh fa-spin"></i> Sincronizando...').prop('disabled', true);
+        
+        $.ajax({
+            url: "{{ url('nfse/sync') }}/" + id,
+            method: 'POST',
+            data: { _token: "{{ csrf_token() }}" },
+            success: function(response) {
+                if (response.success) {
+                    location.reload();
+                }
+            },
+            error: function(err) {
+                alert('Erro ao sincronizar status.');
+                btn.html('<i class="fa fa-refresh"></i> Sincronizar Status').prop('disabled', false);
+            }
+        });
+    });
+});
+</script>
+@stop
 @endsection
 
 @section('content')
@@ -30,9 +56,16 @@
     <!-- info row -->
     <div class="row invoice-info">
       <div class="col-sm-6">
-        <p><b>RELATÓRIO DE FATURAMENTO: </b>{{$descricao}} <span><button type="button"
-              class="btn btn-xs btn-info no-print" data-toggle="modal" data-target="#edit-faturamento"><i
-                class="fa fa-edit"></i> Editar</button></span></p>
+        <p><b>RELATÓRIO DE FATURAMENTO: </b>{{$descricao}} 
+          <span class="no-print">
+            <button type="button" class="btn btn-xs btn-info" data-toggle="modal" data-target="#edit-faturamento"><i class="fa fa-edit"></i> Editar</button>
+            @if(!$faturamento->ultimaEmisao)
+              <a href="{{ route('nfse.emissao', $faturamento->id) }}" class="btn btn-xs btn-primary"><i class="fa fa-magic"></i> Gerar NFS-e</a>
+            @elseif(in_array(strtoupper($faturamento->ultimaEmisao->status), ['ERRO', 'CANCELADA', 'REJEITADO', 'REJEITADA', 'PENDENTE']))
+              <a href="{{ route('nfse.emissao', $faturamento->id) }}" class="btn btn-xs btn-warning"><i class="fa fa-refresh"></i> Re-emitir NFS-e</a>
+            @endif
+          </span>
+        </p>
         <p><b>Referência: </b>{{$obs}}</p>
 
 
@@ -40,6 +73,69 @@
 
     </div>
     <!-- /.row -->
+
+    @if($faturamento->ultimaEmisao)
+    <div class="row no-print" style="margin-bottom: 20px;">
+      <div class="col-xs-12">
+        <div class="box box-solid" style="border: 1px solid #d2d6de; background-color: #f9f9f9;">
+          <div class="box-header with-border">
+            <h3 class="box-title"><i class="fa fa-file-text-o"></i> Status NFS-e (PlugNotas)</h3>
+          </div>
+          <div class="box-body">
+            @php 
+               $emissao = $faturamento->ultimaEmisao;
+               $status = strtoupper($emissao->status);
+               $success = ($status == 'CONCLUIDA' || $status == 'CONCLUIDO' || $status == 'EMITIDA' || $status == 'CONCLUIDO');
+            @endphp
+            <div class="row">
+              <div class="col-sm-4">
+                <p><b>Status: </b>
+                  @if($success)
+                    <span class="label label-success">CONCLUÍDA</span>
+                  @elseif($status == 'PROCESSANDO')
+                    <span class="label label-primary"><i class="fa fa-spinner fa-spin"></i> PROCESSANDO</span>
+                  @elseif(in_array($status, ['ERRO', 'REJEITADA', 'REJEITADO']))
+                    <span class="label label-danger">{{ $status }}</span>
+                  @else
+                    <span class="label label-default">{{ $status }}</span>
+                  @endif
+                </p>
+                @if(in_array($status, ['ERRO', 'REJEITADA', 'REJEITADO']) && $emissao->mensagem_erro)
+                   <p class="text-danger"><small><b>Motivo:</b> {{ $emissao->mensagem_erro }}</small></p>
+                @endif
+              </div>
+              <div class="col-sm-4">
+                 @if($emissao->numero_nf)
+                   <p><b>Número NF:</b> <code>{{ $emissao->numero_nf }}</code></p>
+                 @endif
+              </div>
+              <div class="col-sm-4 text-right">
+                <div class="btn-group">
+                  @if($status == 'PROCESSANDO')
+                    <button type="button" class="btn btn-sm btn-info btn-sync" data-id="{{ $emissao->id }}">
+                      <i class="fa fa-refresh"></i> Sincronizar Status
+                    </button>
+                  @endif
+
+                  @if($emissao->pdf_url)
+                    <a href="{{ route('nfse.download.pdf', $emissao->id) }}" class="btn btn-sm btn-danger" target="_blank">
+                      <i class="fa fa-file-pdf-o"></i> Baixar PDF
+                    </a>
+                  @endif
+
+                  @if($emissao->xml_url)
+                    <a href="{{ route('nfse.download.xml', $emissao->id) }}" class="btn btn-sm btn-warning" target="_blank">
+                      <i class="fa fa-file-code-o"></i> Baixar XML
+                    </a>
+                  @endif
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    @endif
 
     <!-- Table row -->
     <div class="row">
@@ -108,10 +204,12 @@
     <!-- /.row -->
     <div class="col-xs-8" style="margin-top: 100px;">
       <p>__________________________________________________________________</p>
-      <p><b>{{$dadosCastro->razaoSocial}}
-        </b></p>
-      <p>CNPJ: {{$dadosCastro->cnpj}}
-      </p>
+      @if($dadosCastro)
+        <p><b>{{$dadosCastro->razaoSocial}}</b></p>
+        <p>CNPJ: {{$dadosCastro->cnpj}}</p>
+      @else
+        <p><b>Empresa/Tomador não vinculado</b></p>
+      @endif
 
     </div>
     <!-- this row will not appear when printing -->
