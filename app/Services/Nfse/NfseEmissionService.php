@@ -51,21 +51,6 @@ class NfseEmissionService
 
                 $emissionsCriadas = [];
 
-                $isAgrupada = ($opcao == '3' || $opcao == '4');
-                $useOverride = ($opcao == '2' || $opcao == '4' || !empty($tomadorOverride));
-
-                $emissionsCriadas = [];
-
-                if ($isAgrupada) {
-                    // Opção 3 ou 4: Agrupado (1 Nota Fiscal)
-                    $emission = NfseEmission::create([
-                        'faturamento_id' => $faturamento->id,
-                        'nfse_configuration_id' => $config->id,
-                        'modo' => 'automatico',
-                        'opcao_automatica' => $opcao,
-                        'status' => 'processando',
-                        'observacoes' => json_encode(['tomador_override' => $tomadorOverride]),
-                    ]);
                 if ($isAgrupada) {
                     // Opção 3 ou 4: Agrupado (1 Nota Fiscal)
                     $emission = NfseEmission::create([
@@ -84,13 +69,6 @@ class NfseEmissionService
                     $payload['tomador'] = $tomadorData;
 
                     $retorno = $this->plugNotasClient->emitirNfse($payload);
-                    $tomadorData = $this->resolveTomadorData($faturamento, null, $opcao, $tomadorOverride);
-                    $groupedItem = $this->buildGroupedItem($faturamentoServicos, $tomadorData['cpfCnpj']);
-
-                    $payload = NfsePayloadFactory::buildBasePayload($config->toArray(), $groupedItem, $camposAdicionais);
-                    $payload['tomador'] = $tomadorData;
-
-                    $retorno = $this->plugNotasClient->emitirNfse($payload);
 
                     $item = NfseEmissionItem::create([
                         'nfse_emission_id' => $emission->id,
@@ -98,31 +76,7 @@ class NfseEmissionService
                         'descricao_servico' => $groupedItem['descricao_servico'],
                         'valor_servico' => $groupedItem['valor_servico'],
                     ]);
-                    $item = NfseEmissionItem::create([
-                        'nfse_emission_id' => $emission->id,
-                        'cnpj_tomador' => $tomadorData['cpfCnpj'],
-                        'descricao_servico' => $groupedItem['descricao_servico'],
-                        'valor_servico' => $groupedItem['valor_servico'],
-                    ]);
 
-                    $this->updateItemFromPlugNotasStatus($item, $retorno);
-
-                    $emission->payload = json_encode([$payload]);
-                    $emission->retorno = json_encode([$retorno]);
-                    $emission->status = $this->resolveEmissionStatus([$item]);
-                    $emission->valor_total = $groupedItem['valor_servico'];
-                    $emission->pdf_url = $item->pdf_url;
-                    $emission->xml_url = $item->xml_url;
-                    $emission->numero_nf = $item->numero_nf;
-                    $emission->save();
-
-                    $emissionsCriadas[] = $emission->load('itens');
-                } else {
-                    // Opção 1 ou 2: Individual (1 Nota Fiscal por Serviço)
-                    foreach ($faturamentoServicos as $faturamentoServico) {
-                        $servico = $faturamentoServico->detalhes;
-                        if (!$servico)
-                            continue;
                     $this->updateItemFromPlugNotasStatus($item, $retorno);
 
                     $emission->payload = json_encode([$payload]);
@@ -150,24 +104,10 @@ class NfseEmissionService
                             'status' => 'processando',
                             'observacoes' => json_encode(['tomador_override' => $tomadorOverride, 'servico_id' => $servico->id]),
                         ]);
-                        $emission = NfseEmission::create([
-                            'faturamento_id' => $faturamento->id,
-                            'nfse_configuration_id' => $config->id,
-                            'modo' => 'automatico',
-                            'opcao_automatica' => $opcao,
-                            'status' => 'processando',
-                            'observacoes' => json_encode(['tomador_override' => $tomadorOverride, 'servico_id' => $servico->id]),
-                        ]);
 
                         $tomadorData = $this->resolveTomadorData($faturamento, $servico, $opcao, $tomadorOverride);
                         $itemData = $this->buildItemData($servico, $faturamentoServico, $tomadorData['cpfCnpj']);
-                        $tomadorData = $this->resolveTomadorData($faturamento, $servico, $opcao, $tomadorOverride);
-                        $itemData = $this->buildItemData($servico, $faturamentoServico, $tomadorData['cpfCnpj']);
 
-                        $payload = NfsePayloadFactory::buildBasePayload($config->toArray(), $itemData, $camposAdicionais);
-                        $payload['tomador'] = $tomadorData;
-
-                        $retorno = $this->plugNotasClient->emitirNfse($payload);
                         $payload = NfsePayloadFactory::buildBasePayload($config->toArray(), $itemData, $camposAdicionais);
                         $payload['tomador'] = $tomadorData;
 
@@ -192,35 +132,11 @@ class NfseEmissionService
                         $emission->xml_url = $item->xml_url;
                         $emission->numero_nf = $item->numero_nf;
                         $emission->save();
-                        $item = NfseEmissionItem::create([
-                            'nfse_emission_id' => $emission->id,
-                            'servico_id' => $servico->id,
-                            'faturamento_servico_id' => $faturamentoServico->id,
-                            'cnpj_tomador' => $tomadorData['cpfCnpj'],
-                            'descricao_servico' => $itemData['descricao_servico'],
-                            'valor_servico' => $itemData['valor_servico'],
-                        ]);
-
-                        $this->updateItemFromPlugNotasStatus($item, $retorno);
-
-                        $emission->payload = json_encode([$payload]);
-                        $emission->retorno = json_encode([$retorno]);
-                        $emission->status = $this->resolveEmissionStatus([$item]);
-                        $emission->valor_total = $itemData['valor_servico'];
-                        $emission->pdf_url = $item->pdf_url;
-                        $emission->xml_url = $item->xml_url;
-                        $emission->numero_nf = $item->numero_nf;
-                        $emission->save();
 
                         $emissionsCriadas[] = $emission->load('itens');
                     }
                 }
-                        $emissionsCriadas[] = $emission->load('itens');
-                    }
-                }
 
-                // Retorna o array de emissões geradas (ou a primeira se for agrupada para manter compatibilidade parcial)
-                return count($emissionsCriadas) === 1 ? $emissionsCriadas[0] : $emissionsCriadas;
                 // Retorna o array de emissões geradas (ou a primeira se for agrupada para manter compatibilidade parcial)
                 return count($emissionsCriadas) === 1 ? $emissionsCriadas[0] : $emissionsCriadas;
             });
@@ -280,8 +196,6 @@ class NfseEmissionService
                 $servico = $faturamentoServico->detalhes;
                 if (!$servico)
                     continue;
-                if (!$servico)
-                    continue;
 
                 $tomadorData = $this->resolveTomadorData($faturamento, $servico, $opcao, $tomadorOverride);
                 $itemData = $this->buildItemData($servico, $faturamentoServico, $tomadorData['cpfCnpj']);
@@ -339,7 +253,6 @@ class NfseEmissionService
                     'complemento' => null,
                     'tipoBairro' => 'Centro',
                     'bairro' => $servico->unidade->bairro ?? '',
-                    'codigoCidade' => IbgeHelper::getIbgeCode($servico->unidade->cidade, $servico->unidade->uf) ?? $servico->unidade->codigo_cidade ?? '',
                     'codigoCidade' => IbgeHelper::getIbgeCode($servico->unidade->cidade, $servico->unidade->uf) ?? $servico->unidade->codigo_cidade ?? '',
                     'descricaoCidade' => $servico->unidade->cidade ?? '',
                     'cep' => $clean($servico->unidade->cep ?? ''),
@@ -509,9 +422,6 @@ class NfseEmissionService
 
         foreach ($items as $item) {
             $status = strtolower((string) $item->status);
-
-        foreach ($items as $item) {
-            $status = strtolower((string) $item->status);
             if (in_array($status, ['concluido', 'emitida', 'concluida', 'anexada', 'processando', 'pendente'])) {
                 $valorTotal += (float) $item->valor_servico;
             }
@@ -578,24 +488,6 @@ class NfseEmissionService
 
 
         // Numero da nota
-        if (isset($data['numero']) && !empty($data['numero'])) {
-            $item->numero_nf = $data['numero'];
-
-            // Atualiza o campo nf no serviço relacionado
-            if ($item->servico_id) {
-                \App\Models\Servico::where('id', $item->servico_id)->update(['nf' => $item->numero_nf]);
-            } else {
-                $emission = $item->emissao;
-                if ($emission && $emission->faturamento_id) {
-                    $servicoIds = \App\Models\FaturamentoServico::where('faturamento_id', $emission->faturamento_id)->pluck('servico_id');
-                    if ($servicoIds->isNotEmpty()) {
-                        \App\Models\Servico::whereIn('id', $servicoIds)->update(['nf' => $item->numero_nf]);
-                    }
-                }
-            }
-        } else {
-            $item->numero_nf = $item->numero_nf;
-        }
         if (isset($data['numero']) && !empty($data['numero'])) {
             $item->numero_nf = $data['numero'];
 
@@ -787,8 +679,6 @@ class NfseEmissionService
             $externalId = isset($nota['id']) ? $nota['id'] : null;
             if (!$externalId)
                 continue;
-            if (!$externalId)
-                continue;
 
             $item = NfseEmissionItem::where('external_id', $externalId)->first();
             if ($item) {
@@ -803,8 +693,6 @@ class NfseEmissionService
 
 
                     $valorTotal = 0;
-                    foreach ($items as $it) {
-                        $st = strtolower((string) $it->status);
                     foreach ($items as $it) {
                         $st = strtolower((string) $it->status);
                         if (in_array($st, ['concluido', 'emitida', 'concluida', 'anexada', 'processando', 'pendente'])) {
@@ -837,17 +725,12 @@ class NfseEmissionService
         foreach ($items as $item) {
             $status = is_object($item) ? $item->status : (isset($item['status']) ? $item['status'] : null);
             $statuses[] = strtolower((string) $status);
-            $statuses[] = strtolower((string) $status);
         }
 
         if (in_array('erro', $statuses, true)) {
             return 'erro';
         }
         
-        if (in_array('rejeitada', $statuses, true) || in_array('rejeitado', $statuses, true)) {
-            return 'rejeitada';
-        }
-
         if (in_array('rejeitada', $statuses, true) || in_array('rejeitado', $statuses, true)) {
             return 'rejeitada';
         }

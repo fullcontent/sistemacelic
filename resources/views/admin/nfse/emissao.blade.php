@@ -142,7 +142,6 @@
                                         <th>OS</th>
                                         <th>Unidade</th>
                                         <th>CNPJ Tomador</th>
-                                        <th>CNPJ Tomador</th>
                                         <th>Serviço</th>
                                         <th>Valor Faturado</th>
                                     </tr>
@@ -155,12 +154,6 @@
                                                         checked class="checkItem"></td>
                                                 <td>{{ $item->detalhes->os }}</td>
                                                 <td>{{ $item->detalhes->unidade->nomeFantasia ?? '-' }}</td>
-                                                <td>
-                                                    <span class="cnpj-display"
-                                                        data-unit-cnpj="{{ $item->detalhes->unidade->cnpj ?? '-' }}">
-                                                        {{ $item->detalhes->unidade->cnpj ?? '-' }}
-                                                    </span>
-                                                </td>
                                                 <td>
                                                     <span class="cnpj-display"
                                                         data-unit-cnpj="{{ $item->detalhes->unidade->cnpj ?? '-' }}">
@@ -185,14 +178,11 @@
                             </h4>
 
                             <div id="tomadorManual" class="box box-warning box-solid">
-                                <div id="tomadorManual" class="box box-warning box-solid">
-                                    <div class="box-header with-border">
-                                        <h3 class="box-title">Informar Dados do Tomador</h3>
-                                        <h3 class="box-title">Informar Dados do Tomador</h3>
-                                    </div>
-                                    <div class="box-body">
-                                        <input type="hidden" name="nova_empresa" id="input_nova_empresa" value="1">
-                                        <input type="hidden" name="nova_empresa" id="input_nova_empresa" value="1">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">Informar Dados do Tomador</h3>
+                                </div>
+                                <div class="box-body">
+                                    <input type="hidden" name="nova_empresa" id="input_nova_empresa" value="1">
                                         <div class="row">
                                             <div class="col-md-4">
                                                 <div class="form-group">
@@ -271,7 +261,6 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -350,20 +339,13 @@
             $('#btnFinalizar').prop('disabled', false);
 
             // Se for opção 2 ou 4 (Manual), mostrar seção do tomador
-            // Se for opção 2 ou 4 (Manual), mostrar seção do tomador
             if (option == 2 || option == 4) {
-                $('#sectionTomador').fadeIn();
-                $('#input_nova_empresa').val('1');
                 $('#sectionTomador').fadeIn();
                 $('#input_nova_empresa').val('1');
             } else {
                 $('#sectionTomador').fadeOut();
                 $('#input_nova_empresa').val('0');
-                $('#sectionTomador').fadeOut();
-                $('#input_nova_empresa').val('0');
             }
-
-            updateCnpjDisplays();
 
             updateCnpjDisplays();
         });
@@ -373,12 +355,6 @@
             $('.checkItem').prop('checked', $(this).is(':checked'));
         });
 
-
-
-        // Atualizar displays ao digitar CNPJ manual
-        $('#override_cnpj').on('input', function () {
-            updateCnpjDisplays();
-        });
 
 
         // Atualizar displays ao digitar CNPJ manual
