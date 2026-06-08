@@ -344,6 +344,34 @@ Route::get('admin/teste', function () {
 
 });
 
+
+// ==========================================
+// 6. MÓDULO DE NFS-E (NOTA FISCAL DE SERVIÇO ELETRÔNICA)
+// ==========================================
+
+Route::prefix('nfse')->group(function () {
+
+	Route::get('/', 'NfseController@index')->name('nfse.index');
+	Route::get('/configuracoes', 'NfseController@indexConfig')->name('nfse.config');
+	Route::post('/configuracoes', 'NfseController@upsertConfig')->name('nfse.config.save');
+	Route::post('/configuracoes/sync', 'NfseController@syncEmpresa')->name('nfse.sync');
+	Route::post('/configuracoes/emitente', 'NfseController@storeEmitente')->name('nfse.emitente.store');
+	Route::delete('/configuracoes/emitente/{id}', 'NfseController@destroyEmitente')->name('nfse.emitente.destroy');
+
+	Route::get('/emissao/{faturamentoId}', 'NfseController@showEmissao')->name('nfse.emissao');
+	Route::post('/emissao/{faturamentoId}/preview', 'NfseController@previewEmissao')->name('nfse.preview');
+	Route::post('/emissao/{faturamentoId}', 'NfseController@processarEmissao')->name('nfse.processar');
+	Route::get('/status/{id}', 'NfseController@status')->name('nfse.status');
+
+	Route::get('/buscar-cnpj/{cnpj}', 'NfseController@buscarCnpjExterno')->name('nfse.buscar_cnpj');
+	Route::post('/cancelar/{id}', 'NfseController@cancelar')->name('nfse.cancelar');
+	Route::post('/sync-batch', 'NfseController@syncBatch')->name('nfse.sync_batch');
+	Route::post('/sync/{id}', 'NfseController@syncStatus')->name('nfse.sync');
+	Route::get('/pdf/{id}', 'NfseController@downloadPdf')->name('nfse.download.pdf');
+	Route::get('/xml/{id}', 'NfseController@downloadXml')->name('nfse.download.xml');
+
+});
+
 Route::get('/notAllowed', function () {
 
 	return view('errors.403');
