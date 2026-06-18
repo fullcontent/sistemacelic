@@ -218,9 +218,7 @@
               <li class="header"></li>
                 <li>
                     <ul class="menu">
-                    @if(auth()->user()->privileges == 'cliente')    
-                    <li><a href="{{route('cliente.usuario.editar')}}">Editar perfil</a></li>
-                    @elseif(auth()->user()->privileges == 'admin')
+                    @if(auth()->user()->privileges == 'admin')
                     <li><a href="{{route('usuario.editar',auth()->user()->id)}}">Editar perfil</a></li>
                     @endif
 

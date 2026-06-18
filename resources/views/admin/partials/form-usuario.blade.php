@@ -65,6 +65,27 @@
 						
 		</div>
 	</div>
+
+	<div class="col-md-12">
+		<div class="form-group">
+			{{ Form::label('Departamentos Autorizados (Apenas para Clientes)', null, ['class' => 'control-label']) }}
+			{!! Form::select('departamentos[]', array(
+				'licenciamento' => 'Licenciamento',
+				'permits' => 'Permits',
+				'permitsAmbiental' => 'Permits Ambiental',
+				'regulatorio' => 'Regulatório',
+				'regulatorioAmbiental' => 'Regulatório Ambiental',
+				'obras' => 'Obras',
+				'expansao' => 'Expansão',
+				'compras' => 'Compras',
+				'arquitetura' => 'Arquitetura',
+				'farmaceutico' => 'Farmacêutico',
+				'hubSaude' => 'Hub de Saúde',
+				'outros' => 'Outros'
+			), isset($usuario) ? $usuario->departamentos : null, ['class'=>'form-control', 'multiple'=>'multiple', 'id'=>'departamentos_user_access', 'style'=>'width: 100%;']) !!}
+			<p class="help-block" style="margin-top: 5px; color: #737373;"><i class="fa fa-info-circle text-info"></i> Se nenhum for selecionado, o cliente terá acesso a <strong>todos</strong> os departamentos.</p>
+		</div>
+	</div>
 	
 	@endunless
 

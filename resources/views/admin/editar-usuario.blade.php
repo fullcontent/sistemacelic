@@ -44,6 +44,10 @@
 
   	$("#empresas_user_access").select2();
   	$("#unidades_user_access").select2();
+  	$("#departamentos_user_access").select2({
+  		placeholder: "Selecione os departamentos...",
+  		allowClear: true
+  	});
   	document.getElementById("password").classList.add("form-control");
 
 	

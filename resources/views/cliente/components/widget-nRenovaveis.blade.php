@@ -1,4 +1,4 @@
-<div class="box box-primary  collapsed-box">
+<div class="box box-primary" style="display: flex; flex-direction: column; flex: 1; height: 100%;">
   <div class="box-header with-border">
     <a href="#" data-widget="collapse"><h3 class="box-title">Projetos/Licenças - não renováveis</h3></a>
 
@@ -9,9 +9,9 @@
               </div>
             </div>
             <!-- /.box-header -->
-            <div class="box-body">
+            <div class="box-body" style="flex: 1;">
               <div class="table-responsive">
-                <table class="table no-margin" id="servicos">
+                <table class="table no-margin" id="nRenovaveisTable">
                   <thead>
                   <tr>
                     

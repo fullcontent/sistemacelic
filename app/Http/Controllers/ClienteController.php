@@ -49,14 +49,32 @@ class ClienteController extends Controller
         } else {
             $servicos = $this->getServicosCliente();
             $pendencias = $this->getPendenciasCliente();
+            $unidades = $this->getUnidadesCliente();
+
+            if ($unidades && $servicos) {
+                foreach ($unidades as $unidade) {
+                    $licencas = $servicos->where('unidade_id', $unidade->id)->where('tipo', 'licencaOperacao');
+                    if ($licencas->isEmpty()) {
+                        $unidade->licenca_status = 'vencida';
+                    } else {
+                        $tem_vencida = false;
+                        foreach ($licencas as $licenca) {
+                            if ($licenca->licenca_validade < date('Y-m-d')) {
+                                $tem_vencida = true;
+                                break;
+                            }
+                        }
+                        $unidade->licenca_status = $tem_vencida ? 'vencida' : 'vigente';
+                    }
+                }
+            }
         }
 
         return view('cliente.dashboard')
             ->with([
                 'servicos' => $servicos,
                 'pendencias' => $pendencias,
-
-
+                'unidades' => $unidades,
             ]);
     }
 
@@ -86,8 +104,35 @@ class ClienteController extends Controller
 
     public function showPendencia($id)
     {
-        $pendencia = Pendencia::find($id);
-        $arquivos = Arquivo::where('servico_id', $pendencia->servico_id)->get();
+        $pendencia = Pendencia::with('servico', 'responsavel')->find($id);
+        if (!$pendencia) {
+            abort(404);
+        }
+
+        $arquivos = Arquivo::where('servico_id', $pendencia->servico_id)->with('user')->get();
+
+        if (request()->ajax()) {
+            $responsabilidadeMap = ['usuario' => 'Castro', 'cliente' => 'Cliente', 'op' => 'Orgão Público'];
+            return response()->json([
+                'id' => $pendencia->id,
+                'etapa' => $pendencia->etapa,
+                'os' => $pendencia->servico->os ?? 'N/A',
+                'pendencia' => $pendencia->pendencia,
+                'status' => $pendencia->status,
+                'responsabilidade' => $responsabilidadeMap[$pendencia->responsavel_tipo] ?? $pendencia->responsavel_tipo,
+                'responsavel' => $pendencia->responsavel->name ?? 'N/A',
+                'vencimento' => $pendencia->vencimento ? \Carbon\Carbon::parse($pendencia->vencimento)->format('d/m/Y') : 'N/A',
+                'observacoes' => $pendencia->observacoes ?? '',
+                'arquivos' => $arquivos->map(function($a) {
+                    return [
+                        'nome' => $a->nome,
+                        'user_name' => $a->user->name ?? 'N/A',
+                        'download_url' => route('cliente.arquivo.download', $a->id)
+                    ];
+                })
+            ]);
+        }
+
         $responsaveis = User::orderBy('name')->where('active', 1)->pluck('name', 'id')->toArray();
 
         return view('cliente.detalhe-pendencia')->with(
@@ -154,24 +199,7 @@ class ClienteController extends Controller
 
     public function servicos()
     {
-        $user = User::find(Auth::id());
-
-        if (count($user->empresas)) {
-            $servicos = $this->getServicosCliente();
-            $servicos = $servicos->where('situacao', '<>', 'arquivado');
-        } else {
-            return view('errors.403');
-        }
-
-
-
-
-
-        return view('cliente.lista-servicos-geral')
-            ->with('servicos', $servicos)
-            ->with('title', 'Listando todos os serviços');
-
-
+        abort(403, 'Acesso não autorizado.');
     }
 
     public function servicoShow($id)
@@ -448,7 +476,10 @@ class ClienteController extends Controller
 
     public function interacoes($id)
     {
-        $interacoes = Historico::where('servico_id', $id)->orderBy('created_at', 'desc')->get();
+        $interacoes = Historico::where('servico_id', $id)
+            ->where('observacoes', 'not like', '@%')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return view('cliente.lista-interacoes')->with('interacoes', $interacoes);
     }
@@ -458,21 +489,27 @@ class ClienteController extends Controller
     {
         $user = User::find(Auth::id());
 
-
         if (count($user->empresas)) {
-
             $unidades = Unidade::where('empresa_id', $user->empresas->pluck('id'))->pluck('id');
 
-            $servicos = Servico::orWhereIn('empresa_id', $user->empresas->pluck('id'))
-                ->orWhereIn('unidade_id', $unidades)
-                ->get();
+            $query = Servico::query();
 
-            return $servicos;
+            // Scope query by companies and units first
+            $query->where(function($q) use ($user, $unidades) {
+                $q->whereIn('empresa_id', $user->empresas->pluck('id'))
+                  ->orWhereIn('unidade_id', $unidades);
+            });
+
+            // Apply department filter if user has restrictions
+            $depts = $user->departamentos;
+            if (!empty($depts)) {
+                $query->whereIn('departamento', $depts);
+            }
+
+            return $query->get();
         } else {
-            $servicos = null;
-            return $servicos;
+            return null;
         }
-
     }
 
     public function getUnidadesCliente()
@@ -483,78 +520,36 @@ class ClienteController extends Controller
             $unidades = Unidade::where('empresa_id', $user->empresas->pluck('id'))->get();
             return $unidades;
         } else {
-            $unidades = [];
-            return $unidades;
+            return [];
         }
-
-
-
     }
 
     public function getPendenciasCliente()
     {
-        $pendencias = Pendencia::with('servico', 'unidade')
-            ->where('responsavel_id', Auth::id())
-            // ->whereIn('servico_id', $servicos)
-            // ->orWhere('responsavel_id',Auth::id())
-            ->get();
-
-
-        return $pendencias;
+        $user = User::find(Auth::id());
+        $depts = $user->departamentos;
+        
+        $query = Pendencia::with('servico', 'unidade')
+            ->where('responsavel_id', Auth::id());
+            
+        if (!empty($depts)) {
+            $query->whereHas('servico', function($q) use ($depts) {
+                $q->whereIn('departamento', $depts);
+            });
+        }
+        
+        return $query->get();
     }
 
 
     public function editarUsuario()
     {
-
-        $id = Auth::id();
-
-        $usuario = User::with('empresas', 'unidades')->find($id);
-        $empresas = Empresa::pluck('nomeFantasia', 'id');
-        $unidades = Unidade::pluck('nomeFantasia', 'id');
-
-        $access = UserAccess::with('empresa', 'unidade')->where('user_id', $id)->get();
-
-
-
-        return view('admin.editar-usuario')
-            ->with([
-                'usuario' => $usuario,
-                'empresas' => $empresas,
-                'unidades' => $unidades,
-                'user_access' => $access,
-            ]);
+        abort(403, 'Edição de perfil desabilitada para clientes.');
     }
 
     public function updateUsuario(Request $request)
     {
-
-
-
-        $id = Auth::id();
-
-        $usuario = User::find($id);
-
-
-        if ($request->password != null) {
-            $usuario->password = Hash::make($request->password);
-        }
-
-
-        $usuario->name = $request->name;
-        $usuario->email = $request->email;
-        // $usuario->privileges=   $request->privileges;
-
-
-        // $usuario->acesso_empresa()->sync($request->empresas_user_access);
-        // $usuario->acesso_unidade    ()->sync($request->unidades_user_access);
-
-        $usuario->save();
-
-
-
-        return $this->index();
-
+        abort(403, 'Edição de perfil desabilitada para clientes.');
     }
 
     public function getUnidadesList()
@@ -601,8 +596,10 @@ class ClienteController extends Controller
         $todosArquivos = [];
 
         if ($selectedUnit) {
+            $depts = $user->departamentos;
+
             // Buscar apenas os serviços da unidade selecionada que possuem algum anexo válido
-            $servicos = Servico::where('unidade_id', $selectedUnit->id)
+            $queryServicos = Servico::where('unidade_id', $selectedUnit->id)
                 ->where(function($q) {
                     $q->where(function($sub) {
                         $sub->whereNotNull('licenca_anexo')->where('licenca_anexo', '<>', '');
@@ -611,15 +608,28 @@ class ClienteController extends Controller
                     })->orWhere(function($sub) {
                         $sub->whereNotNull('protocolo_anexo')->where('protocolo_anexo', '<>', '');
                     });
-                })
-                ->get();
+                });
+
+            if (!empty($depts)) {
+                $queryServicos->whereIn('departamento', $depts);
+            }
+            $servicos = $queryServicos->get();
 
             // Buscar apenas arquivos associados a esta unidade
-            $arquivos = Arquivo::where('unidade_id', $selectedUnit->id)
+            $queryArquivos = Arquivo::where('unidade_id', $selectedUnit->id)
                 ->whereNotNull('arquivo')
                 ->where('arquivo', '<>', '')
-                ->with(['servico'])
-                ->get();
+                ->with(['servico']);
+
+            if (!empty($depts)) {
+                $queryArquivos->where(function($q) use ($depts) {
+                    $q->whereNull('servico_id')
+                      ->orWhereHas('servico', function($sub) use ($depts) {
+                          $sub->whereIn('departamento', $depts);
+                      });
+                });
+            }
+            $arquivos = $queryArquivos->get();
 
             // 1. Processar anexos dos serviços
             foreach ($servicos as $servico) {
@@ -749,11 +759,20 @@ class ClienteController extends Controller
         $empresasIds = UserAccess::where('user_id', Auth::id())->pluck('empresa_id');
         $unidadesIds = Unidade::whereIn('empresa_id', $empresasIds)->pluck('id');
 
-        $servico = Servico::where('id', $servico_id)
-            ->where(function($query) use ($unidadesIds, $empresasIds) {
-                $query->whereIn('unidade_id', $unidadesIds)
-                      ->orWhereIn('empresa_id', $empresasIds);
-            })->first();
+        $user = User::find(Auth::id());
+        $depts = $user->departamentos;
+
+        $query = Servico::where('id', $servico_id)
+            ->where(function($q) use ($unidadesIds, $empresasIds) {
+                $q->whereIn('unidade_id', $unidadesIds)
+                  ->orWhereIn('empresa_id', $empresasIds);
+            });
+
+        if (!empty($depts)) {
+            $query->whereIn('departamento', $depts);
+        }
+
+        $servico = $query->first();
 
         if (!$servico) {
             abort(403, 'Acesso não autorizado ou serviço inexistente.');
@@ -812,6 +831,17 @@ class ClienteController extends Controller
 
         if (!$hasAccess) {
             abort(403, 'Acesso não autorizado.');
+        }
+
+        $user = User::find(Auth::id());
+        $depts = $user->departamentos;
+        if (!empty($depts)) {
+            if ($arquivo->servico_id) {
+                $servico = Servico::find($arquivo->servico_id);
+                if ($servico && !in_array($servico->departamento, $depts)) {
+                    abort(403, 'Acesso não autorizado ao departamento deste arquivo.');
+                }
+            }
         }
 
         $filename = $arquivo->arquivo;

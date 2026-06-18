@@ -212,13 +212,7 @@
 
 <div class="row">
   
-<div class="col-sm-6">
-
-@include('cliente.components.widget-interacoesChat')
-</div>
-
-
-<div class="col-sm-6">
+<div class="col-sm-12">
       <div class="box box-black">
             <div class="box-header with-border">
               <h3 class="box-title">Histórico</h3>

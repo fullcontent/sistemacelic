@@ -282,12 +282,6 @@ class AppServiceProvider extends ServiceProvider
                             'icon' => 'glyphicon glyphicon-home'
                             ],
                             [
-                                'text' => 'Relatorio',
-                                'url' =>  route('cliente.servicos'),
-                                'icon' => 'glyphicon glyphicon-object-align-bottom
-                                '
-                                ],
-                            [
                             'text' => 'Empresas',
                             'url' =>  route('cliente.empresas'),
                             'icon' => 'glyphicon glyphicon-briefcase'
@@ -304,14 +298,9 @@ class AppServiceProvider extends ServiceProvider
                             ],
                             [
                             'text' => 'Serviços',
-                            'url'  =>  route('cliente.servicos'),
+                            'url'  =>  '#',
                             'icon' => 'glyphicon glyphicon-wrench',
                             'submenu'=>[
-                                [
-                                'text'=>'Todos os serviços',
-                                'url'  =>  route('cliente.servicos'),
-                                'icon'=>'glyphicon glyphicon-wrench',
-                                ],
                                 [
                             'text' => 'Em andamento',
                             'url'  =>  route('cliente.servico.andamento'),

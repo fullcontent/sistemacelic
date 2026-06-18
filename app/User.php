@@ -95,5 +95,36 @@ class User extends Authenticatable
             ->orWhere('analista1_id', $this->id)
             ->orWhere('analista2_id', $this->id);
     }
-    
+
+    // In-memory cache for user departments to avoid multiple file reads
+    protected static $cachedUserDepartments = null;
+
+    protected static function loadUserDepartments()
+    {
+        if (self::$cachedUserDepartments === null) {
+            $path = storage_path('app/user_departments.json');
+            if (file_exists($path)) {
+                $content = file_get_contents($path);
+                self::$cachedUserDepartments = json_decode($content, true) ?: [];
+            } else {
+                self::$cachedUserDepartments = [];
+            }
+        }
+        return self::$cachedUserDepartments;
+    }
+
+    public function getDepartamentosAttribute()
+    {
+        $depts = self::loadUserDepartments();
+        return $depts[$this->id] ?? null;
+    }
+
+    public function hasDepartmentAccess($departamento)
+    {
+        $allowed = $this->departamentos;
+        if ($allowed === null || !is_array($allowed) || count($allowed) === 0) {
+            return true;
+        }
+        return in_array($departamento, $allowed);
+    }
 }

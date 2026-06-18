@@ -84,8 +84,8 @@ class UsersController extends Controller
 
 	    $usuario->save();
 
+        $this->saveUserDepartments($usuario->id, $request->departamentos);
 
-	    
     	return redirect()->route('usuarios.index');
                     
     }
@@ -146,6 +146,8 @@ class UsersController extends Controller
 				}
 			}
 
+            $this->saveUserDepartments($usuario->id, $request->departamentos);
+
 			return redirect()->route('usuarios.index');
 
 
@@ -173,4 +175,29 @@ class UsersController extends Controller
 
 		return json_encode($users);
 	}
+
+    protected function saveUserDepartments($userId, array $departments = null)
+    {
+        $path = storage_path('app/user_departments.json');
+        
+        $dir = dirname($path);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+        
+        $depts = [];
+        if (file_exists($path)) {
+            $depts = json_decode(file_get_contents($path), true) ?: [];
+        }
+        
+        if (!empty($departments)) {
+            $depts[$userId] = $departments;
+        } else {
+            if (isset($depts[$userId])) {
+                unset($depts[$userId]);
+            }
+        }
+        
+        file_put_contents($path, json_encode($depts, JSON_PRETTY_PRINT));
+    }
 }
