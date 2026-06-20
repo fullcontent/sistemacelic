@@ -46,9 +46,13 @@ class ServicosController extends Controller
 
     public function __construct()
     {
-
         $this->middleware('admin');
-
+        $this->middleware(function ($request, $next) {
+            if (Auth::check() && !Auth::user()->permitir_acesso_servicos) {
+                abort(403, 'Acesso não autorizado às telas de serviço.');
+            }
+            return $next($request);
+        });
     }
 
 
@@ -405,7 +409,7 @@ class ServicosController extends Controller
         $tipoServico = $request->tipoServico;
 
         $id = $request->id;
-        $users = User::where('privileges', '=', 'admin')->where('active', 1)->orderBy('name')->pluck('name', 'id')->toArray();
+        $users = User::where('privileges', '=', 'admin')->where('active', 1)->where('permitir_acesso_servicos', 1)->orderBy('name')->pluck('name', 'id')->toArray();
 
         $servico = null;
         $servicoPrincipal = null;
@@ -818,7 +822,7 @@ class ServicosController extends Controller
 
         $servico = Servico::find($id);
 
-        $users = User::where('privileges', '=', 'admin')->where('active', 1)->orderBy('name')->pluck('name', 'id')->toArray();
+        $users = User::where('privileges', '=', 'admin')->where('active', 1)->where('permitir_acesso_servicos', 1)->orderBy('name')->pluck('name', 'id')->toArray();
 
         // $servico_lpu = ServicoLpu::where('empresa_id',$servico->unidade->empresa->id)->pluck('documento','id')->toArray();
 
@@ -1171,6 +1175,10 @@ class ServicosController extends Controller
 
     public function salvarInteracao(Request $request)
     {
+        if (!Auth::user()->permitir_interacoes) {
+            return redirect()->back()->with('error', 'Você não tem permissão para realizar interações.');
+        }
+
         $validator = Validator::make($request->all(), [
             'observacoes' => 'required',
         ])->validate();

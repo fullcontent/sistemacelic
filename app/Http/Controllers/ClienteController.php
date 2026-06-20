@@ -409,6 +409,9 @@ class ClienteController extends Controller
 
     public function salvarInteracao(Request $request)
     {
+        if (!Auth::user()->permitir_interacoes) {
+            return redirect()->back()->with('error', 'Você não tem permissão para realizar interações.');
+        }
 
         $validator = Validator::make($request->all(), [
 
@@ -562,7 +565,7 @@ class ClienteController extends Controller
 
     public function usersList()
     {
-        $users = User::all();
+        $users = User::where('active', 1)->get();
 
         foreach ($users as $u) {
 

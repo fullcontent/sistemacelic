@@ -317,19 +317,9 @@ class AppServiceProvider extends ServiceProvider
                             'icon'  =>  'glyphicon glyphicon-ok-sign text-green',
                             ],
                             [
-                            'text' => 'Vigentes',
-                            'url'  =>  route('cliente.servico.vigente'),
-                            'icon'  =>  'glyphicon glyphicon-tags text-aqua',
-                            ],
-                            [
                             'text' => 'Vencidos',
                             'url'  =>  route('cliente.servico.vencido'),
                             'icon'  =>  'glyphicon glyphicon-remove-sign text-red',
-                            ],
-                            [
-                            'text' => 'Unid. inativas',
-                            'url'  =>  route('cliente.servico.inativo'),
-                            'icon'  =>  'glyphicon glyphicon-ban-circle text-red',
                             ],
                                 
                             ]//EndSubmenu

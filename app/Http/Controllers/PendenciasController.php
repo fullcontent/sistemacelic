@@ -94,6 +94,9 @@ class PendenciasController extends Controller
      */
     public function create($servico_id)
     {
+        if (!Auth::user()->permitir_interacoes) {
+            return redirect()->back()->with('error', 'Você não tem permissão para criar pendências.');
+        }
         //
         $s = Servico::find($servico_id);
 
@@ -123,6 +126,9 @@ class PendenciasController extends Controller
      */
     public function store(Request $request)
     {   
+        if (!Auth::user()->permitir_interacoes) {
+            return redirect()->back()->with('error', 'Você não tem permissão para criar pendências.');
+        }
 
         $request->validate([
             'pendencia' => 'required',
@@ -194,6 +200,9 @@ class PendenciasController extends Controller
      */
     public function edit($id)
     {
+        if (!Auth::user()->permitir_interacoes) {
+            return redirect()->back()->with('error', 'Você não tem permissão para editar pendências.');
+        }
         //
         
 
@@ -242,6 +251,9 @@ class PendenciasController extends Controller
      */
     public function update(Request $request, $id)
     {
+        if (!Auth::user()->permitir_interacoes) {
+            return redirect()->back()->with('error', 'Você não tem permissão para editar pendências.');
+        }
         //
 
        $pendencia = Pendencia::find($id);

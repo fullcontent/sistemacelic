@@ -25,7 +25,7 @@ class UsersController extends Controller
     public function index()
     {
     	
-    	$usuarios = User::all();
+    	$usuarios = User::orderBy('active', 'desc')->orderBy('name', 'asc')->get();
     	
     	return view('admin.lista-usuarios')->with('usuarios',$usuarios);
 
@@ -77,6 +77,8 @@ class UsersController extends Controller
     	$usuario->email 	=	$request->email;
       	$usuario->privileges=	$request->privileges;
 		$usuario->active=	$request->active;
+		$usuario->permitir_interacoes = $request->has('permitir_interacoes') ? 1 : 0;
+		$usuario->permitir_acesso_servicos = $request->has('permitir_acesso_servicos') ? 1 : 0;
 
     	
 	    $usuario->acesso_empresa()->sync($request->empresas_user_access);
@@ -115,6 +117,8 @@ class UsersController extends Controller
 			$usuario->email 	=	$request->email;
 			$usuario->privileges=	$request->privileges;
 			$usuario->active=	$request->active;
+			$usuario->permitir_interacoes = $request->has('permitir_interacoes') ? 1 : 0;
+			$usuario->permitir_acesso_servicos = $request->has('permitir_acesso_servicos') ? 1 : 0;
 			$usuario->save();
 			
 			$empresas_user_access	= $request->empresas_user_access;
@@ -165,7 +169,7 @@ class UsersController extends Controller
 
 	public function usersList()
 	{
-		$users = User::all();
+		$users = User::where('active', 1)->get();
 
 		foreach($users as $u)
 		{
@@ -199,5 +203,29 @@ class UsersController extends Controller
         }
         
         file_put_contents($path, json_encode($depts, JSON_PRETTY_PRINT));
+    }
+
+    public function toggleInteracoes($id)
+    {
+        $user = User::findOrFail($id);
+        $user->permitir_interacoes = !$user->permitir_interacoes;
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'permitir_interacoes' => $user->permitir_interacoes
+        ]);
+    }
+
+    public function toggleAcessoServicos($id)
+    {
+        $user = User::findOrFail($id);
+        $user->permitir_acesso_servicos = !$user->permitir_acesso_servicos;
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'permitir_acesso_servicos' => $user->permitir_acesso_servicos
+        ]);
     }
 }

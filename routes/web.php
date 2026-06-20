@@ -146,6 +146,8 @@ Route::prefix('admin')->group(function () {
 	Route::post('/usuario/editar/{id}', 'UsersController@update')->name('usuario.update');
 	Route::post('/usuario', 'UsersController@store')->name('usuario.store');
 	Route::get('/usuario/delete/{id}', 'UsersController@delete')->name('usuario.delete');
+	Route::post('/usuario/toggle-interacoes/{id}', 'UsersController@toggleInteracoes')->name('usuario.toggleInteracoes');
+	Route::post('/usuario/toggle-acesso-servicos/{id}', 'UsersController@toggleAcessoServicos')->name('usuario.toggleAcessoServicos');
 
 	// Ações específicas de Serviços
 	Route::get('/servico/delete/{id}', 'ServicosController@delete')->name('servico.delete');

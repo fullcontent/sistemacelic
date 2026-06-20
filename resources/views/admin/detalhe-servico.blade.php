@@ -654,6 +654,7 @@
                   </li>
                 </ul>
 
+                @if(auth()->user()->permitir_interacoes)
                 <div class="box-footer">
 
                 <div class="box-header">
@@ -672,6 +673,11 @@
                 </div>
 
             </div>
+                @else
+                    <div class="box-footer text-center text-muted" style="padding: 15px;">
+                        <i class="fa fa-lock"></i> Permissão para realizar interações desabilitada.
+                    </div>
+                @endif
 
 
 

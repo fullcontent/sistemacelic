@@ -14,6 +14,17 @@ use Auth;
 
 class OrdemServicoController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('admin');
+        $this->middleware(function ($request, $next) {
+            if (Auth::check() && !Auth::user()->permitir_acesso_servicos) {
+                abort(403, 'Acesso não autorizado às telas de serviço.');
+            }
+            return $next($request);
+        });
+    }
+
     /**
      * Display a listing of the resource.
      *

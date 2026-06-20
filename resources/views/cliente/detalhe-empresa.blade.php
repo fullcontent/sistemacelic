@@ -33,12 +33,12 @@
 
 <!-- Licenças de Operação e Projetos/Licenças side-by-side with equal height -->
 <div class="row" style="display: flex; flex-wrap: wrap; margin-bottom: 0;">
-  @if(count($servicos->where('tipo','licencaOperacao')))
+  @if(count($servicos->where('tipo','licencaOperacao')->where('situacao','<>','arquivado')))
   <div class="col-md-6" style="display: flex; flex-direction: column; margin-bottom: 20px;">
       @include('cliente.components.widget-licencasOperacao')
   </div>
   @endif
-  @if(count($servicos->where('tipo','nRenovaveis')))
+  @if(count($servicos->where('tipo','nRenovaveis')->where('situacao','<>','arquivado')))
   <div class="col-md-6" style="display: flex; flex-direction: column; margin-bottom: 20px;">
       @include('cliente.components.widget-nRenovaveis')
   </div>
@@ -48,24 +48,33 @@
 
 <!-- Other widgets (Certidões, Taxas, Facilities) -->
 <div class="row">
-  @if(count($servicos->where('tipo','controleCertidoes')))
+  @if(count($servicos->where('tipo','controleCertidoes')->where('situacao','<>','arquivado')))
   <div class="col-md-6">
       @include('cliente.components.widget-controleCertidoes')
   </div>
   @endif
 
-  @if(count($servicos->where('tipo','controleTaxas')))
+  @if(count($servicos->where('tipo','controleTaxas')->where('situacao','<>','arquivado')))
   <div class="col-md-6">
       @include('cliente.components.widget-controleTaxas')
   </div>
   @endif
 
-  @if(count($servicos->where('tipo','facilitiesRealEstate')))
+  @if(count($servicos->where('tipo','facilitiesRealEstate')->where('situacao','<>','arquivado')))
   <div class="col-md-6">
       @include('cliente.components.widget-facilitiesRealEstate')
   </div>
   @endif
 </div>
+
+<!-- Serviços Arquivados -->
+@if(count($servicos->where('situacao','arquivado')))
+<div class="row">
+  <div class="col-md-12" style="margin-top: 10px; margin-bottom: 20px;">
+      @include('cliente.components.widget-arquivados')
+  </div>
+</div>
+@endif
 @endsection
 
 @section('js')

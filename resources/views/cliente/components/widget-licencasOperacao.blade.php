@@ -21,7 +21,7 @@
                   </tr>
                   </thead>
                   <tbody>
-                    @foreach($servicos->where('tipo','licencaOperacao') as $servico)
+                    @foreach($servicos->where('tipo','licencaOperacao')->where('situacao','<>','arquivado') as $servico)
                   <tr>
                     
                     <td><a href="{{route('cliente.servico.show',$servico->id)}}">{{$servico->os}} | {{$servico->nome}}</a></td>
