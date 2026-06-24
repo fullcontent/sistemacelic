@@ -101,7 +101,7 @@ class OrdemServicoController extends Controller
         // The loop iterates over the valorParcela array obtained from the request.
         foreach ($request->valorParcela as $v => $p) {
             // The value at a particular index is added as a key-value pair to the parcela array.
-            $parcela[$v]['valorParcela'] = $p;
+            $parcela[$v]['valorParcela'] = (float) str_replace(',', '.', $p);
         }
         
         // The loop iterates over the dataVencimento array obtained from the request.
@@ -143,7 +143,7 @@ class OrdemServicoController extends Controller
                 if ($p) {
                     $servicosVinculados[$v]['servicoVinculado_id'] = $p;
                     $servicosVinculados[$v]['servicoVinculado_nome'] = $request->servicoVinculado_nome[$v] ?? '---';
-                    $servicosVinculados[$v]['servicoVinculado_valor'] = $request->servicoVinculado_valor[$v] ?? 0;
+                    $servicosVinculados[$v]['servicoVinculado_valor'] = (float) str_replace(',', '.', $request->servicoVinculado_valor[$v] ?? 0);
                     $servicosVinculados[$v]['servicoVinculado_reembolso'] = $request->servicoVinculado_reembolso[$v] ?? 'nao';
                 }
             }
@@ -155,7 +155,7 @@ class OrdemServicoController extends Controller
         $ordemServico = new OrdemServico;
         $ordemServico->user_id = Auth::id();
         $ordemServico->prestador_id = $request->prestador_id;
-        $ordemServico->valorServico = $request->valorServico;
+        $ordemServico->valorServico = (float) str_replace(',', '.', $request->valorServico);
         $ordemServico->escopo = $request->escopo;
         $ordemServico->servico_id = $request->servico_id;
         $ordemServico->formaPagamento = $request->formaPagamento;
@@ -355,7 +355,7 @@ class OrdemServicoController extends Controller
 
         $ordemServico->user_id = Auth::id();
         $ordemServico->prestador_id = $request->prestador_id;
-        $ordemServico->valorServico = $request->valorServico;
+        $ordemServico->valorServico = (float) str_replace(',', '.', $request->valorServico);
         $ordemServico->escopo = $request->escopo;
         $ordemServico->formaPagamento = $request->formaPagamento;
         $ordemServico->situacao = $request->situacao ?? $ordemServico->situacao;
@@ -382,7 +382,7 @@ class OrdemServicoController extends Controller
                     $ocv = new OrdemServicoVinculo;
                     $ocv->ordemServico_id = $id;
                     $ocv->servico_id = $p;
-                    $ocv->valor = $request->servicoVinculado_valor[$v] ?? 0;
+                    $ocv->valor = (float) str_replace(',', '.', $request->servicoVinculado_valor[$v] ?? 0);
                     $ocv->reembolso = $request->servicoVinculado_reembolso[$v] ?? 'nao';
                     $ocv->save();
                 }
@@ -399,7 +399,7 @@ class OrdemServicoController extends Controller
                 $pag->ordemServico_id = $id;
                 $pag->formaPagamento = $ordemServico->formaPagamento;
                 $pag->parcela = $p + 1;
-                $pag->valor = $vParcela;
+                $pag->valor = (float) str_replace(',', '.', $vParcela);
                 
                 if(isset($request->dataVencimento[$p]) && $request->dataVencimento[$p]) {
                     $pag->dataVencimento = Carbon::createFromFormat('d/m/Y', $request->dataVencimento[$p])->toDateString();
