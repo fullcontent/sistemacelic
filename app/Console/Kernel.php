@@ -27,7 +27,9 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')
         //          ->hourly();
+        $schedule->command('servicos:check-renovacao')->daily();
     }
+
 
     /**
      * Register the commands for the application.

@@ -502,6 +502,25 @@
 	</div>
 </div>
 
+<div class="col-md-12" style="margin-top: 15px;">
+	<div class="row">
+		<div class="col-md-6">
+			<div class="form-group">
+				<label style="font-weight: normal; cursor: pointer; margin-top: 5px;">
+					{!! Form::checkbox('ativar_notificacao_renovacao', 1, null, ['id' => 'ativar_notificacao_renovacao']) !!}
+					<strong>Ativar notificação de renovação</strong>
+				</label>
+			</div>
+		</div>
+		<div class="col-md-6" id="dias_notificacao_container" style="display: none;">
+			<div class="form-group">
+				{!! Form::label('dias_para_notificacao_renovacao', 'Notificar X dias antes da renovação', array('class'=>'control-label')) !!}
+				{!! Form::number('dias_para_notificacao_renovacao', isset($servico) && $servico->dias_para_notificacao_renovacao ? $servico->dias_para_notificacao_renovacao : 180, ['class'=>'form-control','id'=>'dias_para_notificacao_renovacao', 'min' => 1]) !!}
+			</div>
+		</div>
+	</div>
+</div>
+
 </div>
 
 

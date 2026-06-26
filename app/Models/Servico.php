@@ -11,6 +11,13 @@ class Servico extends Model
         'laravel_through_key'
     ];
 
+    protected $casts = [
+        'ativar_notificacao_renovacao' => 'boolean',
+        'dias_para_notificacao_renovacao' => 'integer',
+        'notificacao_renovacao_enviada_at' => 'datetime',
+    ];
+
+
 
     public function unidade()
     {

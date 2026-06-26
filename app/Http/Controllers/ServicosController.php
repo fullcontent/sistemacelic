@@ -515,6 +515,7 @@ class ServicosController extends Controller
             'os' => 'required',
             'nome' => 'required',
             'solicitante' => 'required',
+            'dias_para_notificacao_renovacao' => 'nullable|integer|min:1',
 
         ]);
 
@@ -529,6 +530,16 @@ class ServicosController extends Controller
         $servico->situacao = $request->situacao;
         $servico->responsavel_id = $request->responsavel_id;
         $servico->coresponsavel_id = $request->coresponsavel_id;
+
+        $servico->ativar_notificacao_renovacao = $request->has('ativar_notificacao_renovacao');
+        if ($servico->ativar_notificacao_renovacao) {
+            $servico->dias_para_notificacao_renovacao = $request->filled('dias_para_notificacao_renovacao')
+                ? $request->input('dias_para_notificacao_renovacao')
+                : 180;
+        } else {
+            $servico->dias_para_notificacao_renovacao = null;
+        }
+
 
         $servico->analista1_id = $request->analista1_id;
         $servico->analista2_id = $request->analista2_id;
@@ -915,6 +926,7 @@ class ServicosController extends Controller
         $request->validate([
             'solicitante' => 'required',
             'valorTotal' => 'required',
+            'dias_para_notificacao_renovacao' => 'nullable|integer|min:1',
 
         ]);
 
@@ -930,6 +942,16 @@ class ServicosController extends Controller
         $servico->situacao = $request->situacao;
         $servico->responsavel_id = $request->responsavel_id;
         $servico->coresponsavel_id = $request->coresponsavel_id;
+
+        $servico->ativar_notificacao_renovacao = $request->has('ativar_notificacao_renovacao');
+        if ($servico->ativar_notificacao_renovacao) {
+            $servico->dias_para_notificacao_renovacao = $request->filled('dias_para_notificacao_renovacao')
+                ? $request->input('dias_para_notificacao_renovacao')
+                : 180;
+        } else {
+            $servico->dias_para_notificacao_renovacao = null;
+        }
+
 
         $servico->analista1_id = $request->analista1_id;
         $servico->analista2_id = $request->analista2_id;
@@ -1083,7 +1105,12 @@ class ServicosController extends Controller
 
 
         // dd($servico);
+        if ($servico->isDirty(['licenca_validade', 'dias_para_notificacao_renovacao', 'ativar_notificacao_renovacao'])) {
+            $servico->notificacao_renovacao_enviada_at = null;
+        }
+
         $servico->save();
+
 
 
         if (!$servico->wasRecentlyCreated) {

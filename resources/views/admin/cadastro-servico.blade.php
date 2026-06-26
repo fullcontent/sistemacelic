@@ -109,6 +109,22 @@
 
   	$("#os").val("{!! $os !!}");  	
 				
+		function toggleDiasNotificacao() {
+			if ($('#ativar_notificacao_renovacao').is(':checked')) {
+				$('#dias_notificacao_container').show();
+			} else {
+				$('#dias_notificacao_container').hide();
+			}
+		}
+		$('#ativar_notificacao_renovacao').on('change', function() {
+			if ($(this).is(':checked')) {
+				$('#dias_notificacao_container').slideDown();
+			} else {
+				$('#dias_notificacao_container').slideUp();
+			}
+		});
+		toggleDiasNotificacao();
+
 
 		document.getElementById('tipoLicenca').onchange = function()
 		{
