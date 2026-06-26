@@ -201,6 +201,7 @@ Route::prefix('admin')->group(function () {
 
 	// Interações e Históricos
 	Route::post('salvarInteracao', 'ServicosController@salvarInteracao')->name('interacao.store');
+	Route::post('/historico/{id}/update', 'ServicosController@updateInteracao')->name('interacao.update');
 	Route::get('/servico/{id}/interacoes', 'ServicosController@interacoes')->name('interacoes.lista');
 	Route::get('/servico/{id}/timeline', 'ServicosController@timeline')->name('timeline');
 	Route::get('/servico/{id}/timeline-new', 'ServicosController@timelineView')->name('timeline.new');

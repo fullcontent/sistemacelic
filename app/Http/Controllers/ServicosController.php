@@ -1188,6 +1188,8 @@ class ServicosController extends Controller
         $interacao->servico_id = $request->servico_id;
         $interacao->observacoes = $request->observacoes;
         $interacao->user_id = Auth::id();
+        $interacao->visibilidade = $request->input('visibilidade', 'publico');
+        $interacao->pendencia_id = $request->input('pendencia_id');
         $interacao->created_at = Carbon::now('America/Sao_Paulo');
         $interacao->save();
 
@@ -1242,7 +1244,51 @@ class ServicosController extends Controller
         return redirect()->route('servicos.show', $request->servico_id);
     }
 
+    public function updateInteracao(Request $request, $id)
+    {
+        $historico = Historico::findOrFail($id);
+        $user = Auth::user();
 
+        if ($user->privileges === 'admin') {
+            // Authorized
+        } elseif ($user->privileges === 'user' && $historico->user_id === $user->id) {
+            // Authorized
+        } else {
+            if ($request->ajax()) {
+                return response()->json(['error' => 'Você não tem permissão para editar este histórico.'], 403);
+            }
+            return redirect()->back()->with('error', 'Você não tem permissão para editar este histórico.');
+        }
+
+        $validator = Validator::make($request->all(), [
+            'observacoes' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            if ($request->ajax()) {
+                return response()->json(['error' => 'O campo observações é obrigatório.'], 422);
+            }
+            return redirect()->back()->withErrors($validator);
+        }
+
+        $historico->observacoes = $request->observacoes;
+        $historico->pendencia_id = $request->input('pendencia_id');
+        $historico->edited_at = Carbon::now('America/Sao_Paulo');
+        $historico->save();
+
+        if ($request->ajax()) {
+            $historico->load('pendencia');
+            return response()->json([
+                'success' => true,
+                'observacoes' => $historico->observacoes,
+                'pendencia_id' => $historico->pendencia_id,
+                'pendencia_nome' => $historico->pendencia ? $historico->pendencia->pendencia : null,
+                'updated_at' => $historico->edited_at->timezone('America/Sao_Paulo')->format('d/m/Y H:i'),
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Histórico atualizado com sucesso.');
+    }
 
     public function interacoes($id)
     {
@@ -1252,15 +1298,15 @@ class ServicosController extends Controller
 
 
 
-        $servico = Servico::select('os', 'id')->find($id);
-
+        $servico = Servico::find($id);
+        $pendencias = $servico->pendencias;
 
         return view('admin.lista-interacoes')->with(
             [
                 'interacoes' => $interacoes,
                 'interacoesSistema' => $interacoesSistema,
                 'servico' => $servico,
-
+                'pendencias' => $pendencias,
             ]
         );
     }

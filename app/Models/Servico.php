@@ -24,16 +24,28 @@ class Servico extends Model
     
     public function historico()
     {
-    	return $this->hasMany('App\Models\Historico')->orderBy('created_at','desc')->where('observacoes','not like',"%alterado %")->where('observacoes','not like',"Alterou %")->where('observacoes','not like',"%cadastrada.%")->where('observacoes','not like',"%cadastrado.%")->where('observacoes','not like','@%');
+    	$query = $this->hasMany('App\Models\Historico')->orderBy('created_at','desc')->where('observacoes','not like',"%alterado %")->where('observacoes','not like',"Alterou %")->where('observacoes','not like',"%cadastrada.%")->where('observacoes','not like',"%cadastrado.%")->where('observacoes','not like','@%');
+        if (\Auth::check() && \Auth::user()->privileges === 'cliente') {
+            $query->where('visibilidade', '!=', 'interno');
+        }
+        return $query;
     }
     public function ultimasInteracoes()
     {
-    	return $this->hasMany('App\Models\Historico')->orderBy('created_at','desc')->where('observacoes','not like',"%alterado %")->where('observacoes','not like',"%Concluiu%")->where('observacoes','not like',"Alterou %")->where('observacoes','not like',"%cadastrado.%")->where('observacoes','not like','@%')->take(5);
+    	$query = $this->hasMany('App\Models\Historico')->orderBy('created_at','desc')->where('observacoes','not like',"%alterado %")->where('observacoes','not like',"%Concluiu%")->where('observacoes','not like',"Alterou %")->where('observacoes','not like',"%cadastrado.%")->where('observacoes','not like','@%');
+        if (\Auth::check() && \Auth::user()->privileges === 'cliente') {
+            $query->where('visibilidade', '!=', 'interno');
+        }
+        return $query->take(5);
     }
 
     public function interacoes()
     {
-    	return $this->hasMany('App\Models\Historico')->orderBy('created_at','desc')->where('observacoes','like',"@%")->where('observacoes','not like',"%Concluiu%")->where('observacoes','not like',"Alterou%");
+    	$query = $this->hasMany('App\Models\Historico')->orderBy('created_at','desc')->where('observacoes','like',"@%")->where('observacoes','not like',"%Concluiu%")->where('observacoes','not like',"Alterou%");
+        if (\Auth::check() && \Auth::user()->privileges === 'cliente') {
+            $query->where('visibilidade', '!=', 'interno');
+        }
+        return $query;
     }
 
     public function taxas()

@@ -224,7 +224,7 @@
               </div>
             </div>
             <!-- /.box-header -->
-            
+            <div class="box-body">
              <ul class="timeline timeline-inverse">
                                  
                 
@@ -234,11 +234,34 @@
                     
                     <i class="fa fa-user bg-aqua"></i>
                     
-                    <div class="timeline-item">
-                      <span class="time"><i class="fa fa-clock"></i> {{\Carbon\Carbon::parse($historico->created_at)->format('d/m/Y H:m')}}</span>
-                      <h3 class="timeline-header"><a href="#">{{$historico->user->name ?? 'Robot'}}</a> {{$historico->observacoes}}</h3>
-
+                    <div class="timeline-item" style="box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 4px; background: #fff;">
+                      <span class="time" style="padding: 10px 15px;">
+                        <i class="fa fa-clock-o"></i> 
+                        {{\Carbon\Carbon::parse($historico->edited_at ?? $historico->created_at)->timezone('America/Sao_Paulo')->format('d/m/Y H:i')}}
+                        @if($historico->edited_at)
+                          <span class="text-warning" style="font-size: 10px; font-weight: bold; margin-left: 2px;">(editado)</span>
+                        @endif
+                      </span>
                       
+                      <h3 class="timeline-header" style="border-bottom: none; padding: 10px 15px; font-size: 14px; font-weight: bold;">
+                        <strong>{{$historico->user->name ?? 'Robot'}}</strong>
+                        <small class="text-muted" style="display: block; font-size: 11px; margin-top: 2px; font-weight: normal;">
+                          {{$historico->user->privileges == 'admin' ? 'Admin' : 'Operacional'}}
+                        </small>
+                      </h3>
+
+                      <div class="timeline-body" style="padding: 5px 15px 10px 15px; font-size: 13px; color: #444; border-bottom: none;">
+                        {{$historico->observacoes}}
+                      </div>
+
+                      <div class="timeline-footer" style="padding: 5px 15px 10px 15px; background: transparent; border-top: none; display: flex; align-items: center; gap: 8px;">
+                        @if($historico->pendencia)
+                          <div style="display: inline-flex; border: 1px solid #3c8dbc; border-radius: 4px; overflow: hidden; font-size: 11px;">
+                              <span style="background: #3c8dbc; color: #fff; padding: 3px 8px; font-weight: normal;"><i class="fa fa-link"></i> Vinculado à Pendência:</span>
+                              <span style="background: #f4f4f4; color: #444; padding: 3px 8px; font-weight: bold;">{{$historico->pendencia->pendencia}}</span>
+                          </div>
+                        @endif
+                      </div>
                     </div>
                   </li>
                   <!-- END timeline item -->
@@ -253,8 +276,9 @@
                     </div>
                   </li>
                 </ul>
+            </div>
 
-                <div class="box-footer">
+            <div class="box-footer">
                 
                
 

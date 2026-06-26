@@ -479,12 +479,17 @@ class ClienteController extends Controller
 
     public function interacoes($id)
     {
+        $servico = Servico::findOrFail($id);
         $interacoes = Historico::where('servico_id', $id)
             ->where('observacoes', 'not like', '@%')
+            ->where('visibilidade', '!=', 'interno')
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('cliente.lista-interacoes')->with('interacoes', $interacoes);
+        return view('cliente.lista-interacoes')->with([
+            'interacoes' => $interacoes,
+            'servico' => $servico
+        ]);
     }
 
 

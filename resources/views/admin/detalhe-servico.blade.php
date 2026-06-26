@@ -608,38 +608,104 @@
               </div>
             </div>
             <!-- /.box-header -->
+            <div class="box-body">
+                @if(auth()->user()->permitir_interacoes)
+                <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #f4f4f4;">
+                  {!! Form::open(['route'=>'interacao.store']) !!}
+                  {!! Form::hidden('servico_id',$servico->id) !!}
+                  <div class="input-group" style="margin-bottom: 10px;">
+                      <input type="text" name="observacoes" id="observacoes" class="form-control" placeholder="Digite o histórico do serviço..." spellcheck="true" lang="pt-BR" required autocomplete="off">
+                      <span class="input-group-btn">
+                          <button type="submit" class="btn btn-info btn-flat">Enviar</button>
+                      </span>
+                  </div>
+                  <div class="form-group" style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap; margin-bottom: 0;">
+                      <div style="display: flex; align-items: center; gap: 5px;">
+                          <label for="visibilidade" style="margin-bottom:0; font-weight: normal; color: #555; font-size: 12px;"><i class="fa fa-globe"></i> Visibilidade:</label>
+                          <select name="visibilidade" id="visibilidade" class="form-control input-sm" style="width: auto; display: inline-block; height: 30px; padding: 5px 10px;">
+                              <option value="publico">Público</option>
+                              <option value="interno">Interno</option>
+                          </select>
+                      </div>
+                      <div style="display: flex; align-items: center; gap: 5px;">
+                          <label for="pendencia_id" style="margin-bottom:0; font-weight: normal; color: #555; font-size: 12px;"><i class="fa fa-link"></i> Pendência:</label>
+                          <select name="pendencia_id" id="pendencia_id" class="form-control input-sm" style="width: auto; display: inline-block; max-width: 250px; height: 30px; padding: 5px 10px;">
+                              <option value="">Selecionar pendência</option>
+                              @foreach($pendencias->where('status', 'pendente') as $p)
+                                  <option value="{{$p->id}}">{{$p->pendencia}}</option>
+                              @endforeach
+                          </select>
+                      </div>
+                  </div>
+                  {!! Form::close() !!}
+                </div>
+                @else
+                    <div class="text-center text-muted" style="padding: 15px; margin-bottom: 20px; border-bottom: 1px solid #f4f4f4;">
+                        <i class="fa fa-lock"></i> Permissão para realizar interações desabilitada.
+                    </div>
+                @endif
 
-             <ul class="timeline timeline-inverse">
+                <ul class="timeline timeline-inverse">
 
 
                 @foreach($servico->ultimasInteracoes as $historico)
                   <!-- timeline item -->
-                  <li>
+                  <li class="historico-item-li" id="historico-li-{{$historico->id}}">
 
                     <i class="fa fa-user bg-aqua"></i>
 
-                    <div class="timeline-item">
-                      <span class="time"><i class="fa fa-clock"></i> {{\Carbon\Carbon::parse($historico->created_at)->format('d/m/Y H:m')}}</span>
-                      <h3 class="timeline-header"><a href="#">{{$historico->user->name ?? 'Robot'}}</a>
+                    <div class="timeline-item" style="box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 4px; background: #fff;">
+                      <span class="time" style="padding: 10px 15px;">
+                        <i class="fa fa-clock-o"></i> 
+                        <span class="time-text">{{\Carbon\Carbon::parse($historico->edited_at ?? $historico->created_at)->timezone('America/Sao_Paulo')->format('d/m/Y H:i')}}</span>
+                        <span class="editado-indicator text-warning" style="font-size: 10px; font-weight: bold; margin-left: 2px; {{$historico->edited_at ? '' : 'display: none;'}}">(editado)</span>
+                      </span>
+                      
+                      <h3 class="timeline-header" style="border-bottom: none; padding: 10px 15px; font-size: 14px; font-weight: bold;">
+                        <strong>{{$historico->user->name ?? 'Robot'}}</strong>
+                        <small class="text-muted" style="display: block; font-size: 11px; margin-top: 2px; font-weight: normal;">
+                          {{$historico->user->privileges == 'admin' ? 'Admin' : 'Operacional'}}
+                        </small>
+                      </h3>
+
+                      <div class="timeline-body" style="padding: 5px 15px 10px 15px; font-size: 13px; color: #444; border-bottom: none;">
                         @if(str_contains($historico->observacoes, 'Alterou solicitante'))
                           @php
-                              $id = preg_replace('/[^0-9]/', '', $historico->observacoes);
-                              $solicitante = \App\Models\Solicitante::where('id',$id)->value('nome');
+                              $id_sol = preg_replace('/[^0-9]/', '', $historico->observacoes);
+                              $solicitante = \App\Models\Solicitante::where('id',$id_sol)->value('nome');
                               echo "Alterou solicitante para ".$solicitante;
                           @endphp
                         @elseif(str_contains($historico->observacoes, 'Alterou responsavel_id'))
-                        @php
-                            $id = preg_replace('/[^0-9]/', '', $historico->observacoes);
-                            $solicitante = \App\User::where('id',$id)->value('name');
-                            echo "Alterou responsável para ".$solicitante;
-                        @endphp
+                          @php
+                              $id_resp = preg_replace('/[^0-9]/', '', $historico->observacoes);
+                              $solicitante = \App\User::where('id',$id_resp)->value('name');
+                              echo "Alterou responsável para ".$solicitante;
+                          @endphp
                         @else
-                        {{$historico->observacoes}}
+                          {{$historico->observacoes}}
                         @endif
-                      </h3>
+                      </div>
 
+                      <div class="timeline-footer" style="padding: 5px 15px 10px 15px; background: transparent; border-top: none; display: flex; align-items: center; gap: 8px;">
+                        <span class="pendencia-badge-container">
+                          @if($historico->pendencia)
+                            <div class="pendencia-badge" style="display: inline-flex; border: 1px solid #3c8dbc; border-radius: 4px; overflow: hidden; font-size: 11px; vertical-align: middle;">
+                                <span style="background: #3c8dbc; color: #fff; padding: 3px 8px; font-weight: normal;"><i class="fa fa-link"></i> Vinculado à Pendência:</span>
+                                <span class="pendencia-nome-span" style="background: #f4f4f4; color: #444; padding: 3px 8px; font-weight: bold;">{{$historico->pendencia->pendencia}}</span>
+                            </div>
+                          @endif
+                        </span>
 
+                        @if($historico->visibilidade === 'interno')
+                          <span class="label label-default" style="padding: 4px 8px; font-size: 11px; background: #b5bbc8; color: #fff; font-weight: normal; border-radius: 4px; vertical-align: middle;"><i class="fa fa-lock"></i> Interno</span>
+                        @endif
+
+                        @if(strtolower(auth()->user()->privileges) == 'admin' || auth()->user()->id == 1 || auth()->id() == 1 || (strtolower(auth()->user()->privileges) == 'user' && $historico->user_id == auth()->id()))
+                          <a href="#" class="btn-edit-historico text-muted" data-toggle="modal" data-target="#modal-edit-historico" data-id="{{$historico->id}}" data-observacoes="{{ e($historico->observacoes) }}" data-pendencia_id="{{$historico->pendencia_id}}" data-pendencia_nome="{{ $historico->pendencia ? e($historico->pendencia->pendencia) : '' }}" style="margin-left: auto; font-size: 14px; display: inline-block; vertical-align: middle; cursor: pointer;" title="Editar"><span class="glyphicon glyphicon-pencil"></span></a>
+                        @endif
+                      </div>
                     </div>
+
                   </li>
                   <!-- END timeline item -->
                 @endforeach
@@ -654,31 +720,6 @@
                   </li>
                 </ul>
 
-                @if(auth()->user()->permitir_interacoes)
-                <div class="box-footer">
-
-                <div class="box-header">
-
-                  {!! Form::open(['route'=>'interacao.store']) !!}
-                  <div class="input-group">
-                  {!! Form::text('observacoes', null, ['class'=>'form-control','id'=>'observacoes','placeholder'=>'Digite a mensagem']) !!}
-                  {!! Form::hidden('servico_id',$servico->id) !!}
-
-                      <span class="input-group-btn">
-                        <button type="submit" class="btn btn-info btn-flat">Enviar</button>
-                      </span>
-                </div>
-                {!! Form::close() !!}
-
-                </div>
-
-            </div>
-                @else
-                    <div class="box-footer text-center text-muted" style="padding: 15px;">
-                        <i class="fa fa-lock"></i> Permissão para realizar interações desabilitada.
-                    </div>
-                @endif
-
 
 
   </div>
@@ -687,8 +728,6 @@
   </div>
 
 </div>
-
-
 <div class="modal fade" id="anexar-laudo" style="display: none;">
   <div class="modal-dialog">
       <div class="modal-content">
@@ -786,4 +825,208 @@
 
 </div>
 
+<div class="modal fade" id="modal-edit-historico" style="display: none;">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">×</span></button>
+              <h4 class="modal-title"><i class="fa fa-pencil"></i> Editar Histórico</h4>
+          </div>
+          <form id="form-edit-historico">
+              <input type="hidden" id="edit-historico-id" name="id">
+              <div class="modal-body">
+                  <div class="form-group">
+                      <label for="edit-historico-observacoes">Mensagem</label>
+                      <textarea id="edit-historico-observacoes" name="observacoes" class="form-control" rows="4" required spellcheck="true" lang="pt-BR"></textarea>
+                  </div>
+                  <div class="form-group">
+                      <label for="edit-historico-pendencia_id"><i class="fa fa-link"></i> Pendência Vinculada</label>
+                      <select name="pendencia_id" id="edit-historico-pendencia_id" class="form-control">
+                          <option value="">Nenhuma pendência</option>
+                          @foreach($pendencias->where('status', '!=', 'concluido') as $p)
+                              <option value="{{$p->id}}">{{$p->pendencia}}</option>
+                          @endforeach
+                      </select>
+                  </div>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Fechar</button>
+                  <button type="submit" class="btn btn-primary">Salvar alterações</button>
+              </div>
+          </form>
+      </div>
+  </div>
+</div>
+
 @endsection
+
+@section('js')
+<script>
+$(document).ready(function() {
+    const autocorrectMap = {
+        "serviso": "serviço",
+        "servisos": "serviços",
+        "corresao": "correção",
+        "correcoes": "correções",
+        "pagemanto": "pagamento",
+        "pagemantos": "pagamentos",
+        "historico": "histórico",
+        "historicos": "históricos",
+        "pendencia": "pendência",
+        "pendencias": "pendências",
+        "atencao": "atenção",
+        "nao": "não",
+        "tbm": "também",
+        "tambem": "também",
+        "voce": "você",
+        "voces": "vocês",
+        "ja": "já",
+        "ate": "até",
+        "email": "e-mail",
+        "usuario": "usuário",
+        "usuarios": "usuários",
+        "situacao": "situação",
+        "situacoes": "situações",
+        "comunicacao": "comunicação",
+        "relatorio": "relatório",
+        "relatorios": "relatórios",
+        "codigo": "código",
+        "codigos": "códigos",
+        "duvida": "dúvida",
+        "duvidas": "dúvidas",
+        "notificacao": "notificação",
+        "notificacoes": "notificações",
+        "concluido": "concluído",
+        "alvara": "alvará",
+        "alvaras": "alvarás",
+        "licenca": "licença",
+        "licencas": "licenças",
+        "boletos": "boletos",
+        "boleto": "boleto"
+    };
+
+    function applyAutocorrect(input) {
+        const text = input.value;
+        const selectionStart = input.selectionStart;
+        const textBeforeCursor = text.substring(0, selectionStart);
+        const words = textBeforeCursor.split(/([\s,.\!?;\(\)\[\]\{\}])/);
+        
+        if (words.length > 0) {
+            const lastWordIndex = words.length - 1;
+            const lastWord = words[lastWordIndex];
+            const lowerWord = lastWord.toLowerCase();
+            
+            if (autocorrectMap.hasOwnProperty(lowerWord)) {
+                let corrected = autocorrectMap[lowerWord];
+                if (lastWord[0] === lastWord[0].toUpperCase() && lastWord[0] !== lastWord[0].toLowerCase()) {
+                    corrected = corrected.charAt(0).toUpperCase() + corrected.slice(1);
+                }
+                
+                words[lastWordIndex] = corrected;
+                const newTextBeforeCursor = words.join('');
+                const textAfterCursor = text.substring(selectionStart);
+                
+                input.value = newTextBeforeCursor + textAfterCursor;
+                const newCursorPos = newTextBeforeCursor.length;
+                input.setSelectionRange(newCursorPos, newCursorPos);
+            }
+        }
+    }
+
+    $('#observacoes, #edit-historico-observacoes').on('keydown', function(e) {
+        if (e.key === ' ' || e.key === ',' || e.key === '.' || e.key === '!' || e.key === '?' || e.key === ';') {
+            applyAutocorrect(this);
+        }
+    });
+
+    function escapeHtml(string) {
+        if (!string) return '';
+        return String(string)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    $(document).on('click', '.btn-edit-historico', function(e) {
+        e.preventDefault();
+        var id = $(this).attr('data-id');
+        var obs = $(this).attr('data-observacoes');
+        var pendenciaId = $(this).attr('data-pendencia_id');
+        var pendenciaNome = $(this).attr('data-pendencia_nome');
+        
+        $('#edit-historico-id').val(id);
+        $('#edit-historico-observacoes').val(obs);
+        
+        // Remove temporary completed pendency options
+        $('#edit-historico-pendencia_id option[data-temp="true"]').remove();
+        
+        if (pendenciaId) {
+            // Check if option already exists
+            if ($('#edit-historico-pendencia_id option[value="' + pendenciaId + '"]').length === 0) {
+                // If not, append it temporarily
+                var optionHtml = '<option value="' + pendenciaId + '" data-temp="true" selected>' + (pendenciaNome || 'Pendência Vinculada') + ' (Concluída)</option>';
+                $('#edit-historico-pendencia_id').append(optionHtml);
+            }
+        }
+        
+        $('#edit-historico-pendencia_id').val(pendenciaId || '');
+        $('#modal-edit-historico').modal('show');
+    });
+
+    $('#form-edit-historico').submit(function(e) {
+        e.preventDefault();
+        var id = $('#edit-historico-id').val();
+        var obs = $('#edit-historico-observacoes').val();
+        var pendenciaId = $('#edit-historico-pendencia_id').val();
+        var url = '/admin/historico/' + id + '/update';
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+                observacoes: obs,
+                pendencia_id: pendenciaId
+            },
+            success: function(response) {
+                if (response.success) {
+                    $('#modal-edit-historico').modal('hide');
+                    
+                    var $li = $('#historico-li-' + id);
+                    if ($li.length) {
+                        $li.find('.timeline-body').text(response.observacoes);
+                        $li.find('.time-text').text(response.updated_at);
+                        $li.find('.editado-indicator').show();
+                        
+                        var $editBtn = $li.find('.btn-edit-historico');
+                        $editBtn.attr('data-observacoes', response.observacoes);
+                        $editBtn.attr('data-pendencia_id', response.pendencia_id || '');
+                        
+                        var $badgeContainer = $li.find('.pendencia-badge-container');
+                        if (response.pendencia_id && response.pendencia_nome) {
+                            var badgeHtml = 
+                                '<div class="pendencia-badge" style="display: inline-flex; border: 1px solid #3c8dbc; border-radius: 4px; overflow: hidden; font-size: 11px; vertical-align: middle;">' +
+                                '    <span style="background: #3c8dbc; color: #fff; padding: 3px 8px; font-weight: normal;"><i class="fa fa-link"></i> Vinculado à Pendência:</span>' +
+                                '    <span class="pendencia-nome-span" style="background: #f4f4f4; color: #444; padding: 3px 8px; font-weight: bold;">' + escapeHtml(response.pendencia_nome) + '</span>' +
+                                '</div>';
+                            $badgeContainer.html(badgeHtml);
+                        } else {
+                            $badgeContainer.empty();
+                        }
+                    }
+                } else {
+                    alert('Erro: ' + response.error);
+                }
+            },
+            error: function(xhr) {
+                var err = xhr.responseJSON ? xhr.responseJSON.error : 'Erro desconhecido';
+                alert('Erro ao atualizar: ' + err);
+            }
+        });
+    });
+});
+</script>
+@stop
