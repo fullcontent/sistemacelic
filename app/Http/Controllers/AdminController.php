@@ -65,10 +65,27 @@ class AdminController extends Controller
             ->orWhere('responsavel_id', Auth::id())
             ->get();
 
-        $servicos = $servicos->where('licenca_validade', '<', \Carbon\Carbon::today()->addDays(60))
+        $servicos = $servicos->filter(function ($servico) {
+            if ($servico->situacao !== 'finalizado' && $servico->situacao !== 'andamento') {
+                return false;
+            }
 
-            ->where('situacao', '=', 'finalizado')
-            ->where('tipo', '=', 'licencaOperacao');
+            if (empty($servico->licenca_validade)) {
+                return false;
+            }
+
+            $dias = $servico->ativar_notificacao_renovacao 
+                ? ($servico->dias_para_notificacao_renovacao ?? 180) 
+                : 60;
+
+            $dataLimite = \Carbon\Carbon::today()->addDays($dias);
+            
+            $validade = $servico->licenca_validade instanceof \Carbon\Carbon 
+                ? $servico->licenca_validade 
+                : \Carbon\Carbon::parse($servico->licenca_validade);
+
+            return $validade->lt($dataLimite);
+        });
 
         return $servicos;
     }

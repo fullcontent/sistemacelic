@@ -15,7 +15,7 @@ class AddNotificacaoRenovacaoFieldsToServicosTable extends Migration
     {
         Schema::table('servicos', function (Blueprint $table) {
             $table->boolean('ativar_notificacao_renovacao')->default(false);
-            $table->integer('dias_para_notificacao_renovacao')->nullable();
+            $table->integer('dias_para_notificacao_renovacao')->default(180);
             $table->timestamp('notificacao_renovacao_enviada_at')->nullable();
         });
     }
