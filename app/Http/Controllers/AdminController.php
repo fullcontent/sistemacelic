@@ -66,7 +66,7 @@ class AdminController extends Controller
             ->get();
 
         $servicos = $servicos->filter(function ($servico) {
-            if ($servico->situacao !== 'finalizado' && $servico->situacao !== 'andamento') {
+            if ($servico->situacao !== 'finalizado') {
                 return false;
             }
 
