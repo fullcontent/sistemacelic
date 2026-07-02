@@ -682,7 +682,13 @@
                               echo "Alterou responsável para ".$solicitante;
                           @endphp
                         @else
-                          {!! nl2br(e(strip_tags(str_replace(['<br>', '<br />', '<br/>', '</p>'], "\n", $historico->observacoes)))) !!}
+                          @php
+                              $obs = strip_tags(str_replace(['<br>', '<br />', '<br/>', '</p>'], "\n", $historico->observacoes));
+                              $obs = html_entity_decode($obs, ENT_QUOTES, 'UTF-8');
+                              $obs = e($obs);
+                              $obs = preg_replace('~(https?://[^\s<]+)~i', '<a href="$1" target="_blank">$1</a>', $obs);
+                              echo nl2br($obs);
+                          @endphp
                         @endif
                       </div>
 
