@@ -309,7 +309,7 @@ class PendenciasController extends Controller
                     $history->servico_id = $pendencia->servico_id;
                     $history->user_id = Auth::id();
                     $history->observacoes = 'Pendencia '.$pendencia->pendencia.' alterado '.$value.' para "'.$key.'"';
-                    $history->created_at = Carbon::now('america/sao_paulo');
+                    $history->created_at = Carbon::now();
                     $history->save();
              }
             }
@@ -345,7 +345,7 @@ class PendenciasController extends Controller
                     $history->servico_id = $pendencia->servico_id;
                     $history->user_id = Auth::id();
                     $history->observacoes = 'Concluiu a pendência '.$pendencia->pendencia.'.';
-                    $history->created_at = Carbon::now('america/sao_paulo');
+                    $history->created_at = Carbon::now();
                     $history->save();
 
         
@@ -378,7 +378,7 @@ class PendenciasController extends Controller
                     $history->servico_id = $pendencia->servico_id;
                     $history->user_id = Auth::id();
                     $history->observacoes = 'Marcou a pendência '.$pendencia->pendencia.' como prioridade.';
-                    $history->created_at = Carbon::now('america/sao_paulo');
+                    $history->created_at = Carbon::now();
                     $history->save();
     }
     

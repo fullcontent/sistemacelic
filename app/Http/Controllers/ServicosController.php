@@ -403,7 +403,7 @@ class ServicosController extends Controller
         $history->servico_id = $servico->id;
         $history->user_id = Auth::id();
         $history->observacoes = "Serviço " . $servico->id . " não renovado.";
-        $history->created_at = Carbon::now('america/sao_paulo');
+        $history->created_at = Carbon::now();
         $history->save();
 
 
@@ -710,7 +710,7 @@ class ServicosController extends Controller
         $history->servico_id = $servico->id;
         $history->user_id = Auth::id();
         $history->observacoes = "Serviço " . $servico->id . " cadastrado.";
-        $history->created_at = Carbon::now('america/sao_paulo');
+        $history->created_at = Carbon::now();
         $history->save();
 
 
@@ -1016,7 +1016,7 @@ class ServicosController extends Controller
                 $history->servico_id = $servico->id;
                 $history->user_id = Auth::id();
                 $history->observacoes = 'Alterou ' . $value . ' para R$' . $key . '';
-                $history->created_at = Carbon::now('america/sao_paulo');
+                $history->created_at = Carbon::now();
                 $history->save();
             }
         }
@@ -1141,7 +1141,7 @@ class ServicosController extends Controller
                 $history->servico_id = $servico->id;
                 $history->user_id = Auth::id();
                 $history->observacoes = 'Alterou ' . $value . ' para "' . $key . '"';
-                $history->created_at = Carbon::now('america/sao_paulo');
+                $history->created_at = Carbon::now();
                 $history->save();
 
 
@@ -1207,7 +1207,7 @@ class ServicosController extends Controller
         $history->servico_id = $servico->id;
         $history->user_id = Auth::id();
         $history->observacoes = "Serviço " . $servico->id . " excluido.";
-        $history->created_at = Carbon::now('america/sao_paulo');
+        $history->created_at = Carbon::now();
         $history->save();
 
 
@@ -1234,7 +1234,7 @@ class ServicosController extends Controller
         $interacao->user_id = Auth::id();
         $interacao->visibilidade = $request->input('visibilidade', 'publico');
         $interacao->pendencia_id = $request->input('pendencia_id');
-        $interacao->created_at = Carbon::now('America/Sao_Paulo');
+        $interacao->created_at = Carbon::now();
         $interacao->save();
 
         // Find the associated service

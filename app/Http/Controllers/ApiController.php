@@ -683,7 +683,7 @@ class ApiController extends Controller
         $history->user_id = $request->user_id ?? 1; // Usuário padrão se não informado
         $history->observacoes = $request->observacoes;
         // Se a data do email for enviada, podemos tentar usar ela, caso contrário usa a atual
-        $history->created_at = $request->data ? \Carbon\Carbon::createFromFormat('d/m/Y, H:i:s', $request->data) : \Carbon\Carbon::now('america/sao_paulo');
+        $history->created_at = $request->data ? \Carbon\Carbon::createFromFormat('d/m/Y, H:i:s', $request->data) : \Carbon\Carbon::now();
         $history->save();
 
         return response()->json(['message' => 'Histórico adicionado com sucesso', 'id' => $history->id]);

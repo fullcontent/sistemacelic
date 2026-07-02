@@ -635,7 +635,7 @@ class PropostasController extends Controller
                 $history->servico_id = $servico->id;
                 $history->user_id = Auth::id();
                 $history->observacoes = "Serviço " . $servico->id . " cadastrado.";
-                $history->created_at = Carbon::now('america/sao_paulo');
+                $history->created_at = Carbon::now();
                 $history->save();
 
 
@@ -988,7 +988,7 @@ class PropostasController extends Controller
                     $history->servico_id = $servico->id;
                     $history->user_id = Auth::id();
                     $history->observacoes = "Serviço " . $servico->id . " cadastrado via aprovação em lote.";
-                    $history->created_at = Carbon::now('america/sao_paulo');
+                    $history->created_at = Carbon::now();
                     $history->save();
 
                     // Criar Pendência principal
