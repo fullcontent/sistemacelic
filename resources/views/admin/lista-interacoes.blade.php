@@ -83,7 +83,7 @@
                                             echo "Alterou responsável para ".$solicitante;
                                         @endphp
                                     @else
-                                        {{$historico->observacoes}}
+                                        {!! nl2br(e(strip_tags(str_replace(['<br>', '<br />', '<br/>', '</p>'], "\n", $historico->observacoes)))) !!}
                                     @endif
                                 </div>
 
@@ -102,7 +102,7 @@
                                     @endif
 
                                     @if(strtolower(auth()->user()->privileges) == 'admin' || auth()->user()->id == 1 || auth()->id() == 1 || (strtolower(auth()->user()->privileges) == 'user' && $historico->user_id == auth()->id()))
-                                        <a href="#" class="btn-edit-historico text-muted" data-toggle="modal" data-target="#modal-edit-historico" data-id="{{$historico->id}}" data-observacoes="{{ e($historico->observacoes) }}" data-pendencia_id="{{$historico->pendencia_id}}" data-pendencia_nome="{{ $historico->pendencia ? e($historico->pendencia->pendencia) : '' }}" style="margin-left: auto; font-size: 14px; display: inline-block; vertical-align: middle; cursor: pointer;" title="Editar"><span class="glyphicon glyphicon-pencil"></span></a>
+                                        <a href="{{ route('interacao.edit', $historico->id) }}" class="text-muted" style="margin-left: auto; font-size: 14px; display: inline-block; vertical-align: middle; cursor: pointer;" title="Editar"><span class="glyphicon glyphicon-pencil"></span></a>
                                     @endif
                                 </div>
                             </div>
@@ -171,7 +171,7 @@
                                             echo "Alterou responsável para ".$solicitante;
                                         @endphp
                                     @else
-                                        {{$historico->observacoes}}
+                                        {!! nl2br(e(strip_tags(str_replace(['<br>', '<br />', '<br/>', '</p>'], "\n", $historico->observacoes)))) !!}
                                     @endif
                                 </div>
 
@@ -190,7 +190,7 @@
                                     @endif
 
                                     @if(strtolower(auth()->user()->privileges) == 'admin' || auth()->user()->id == 1 || auth()->id() == 1 || (strtolower(auth()->user()->privileges) == 'user' && $historico->user_id == auth()->id()))
-                                        <a href="#" class="btn-edit-historico text-muted" data-toggle="modal" data-target="#modal-edit-historico" data-id="{{$historico->id}}" data-observacoes="{{ e($historico->observacoes) }}" data-pendencia_id="{{$historico->pendencia_id}}" data-pendencia_nome="{{ $historico->pendencia ? e($historico->pendencia->pendencia) : '' }}" style="margin-left: auto; font-size: 14px; display: inline-block; vertical-align: middle; cursor: pointer;" title="Editar"><span class="glyphicon glyphicon-pencil"></span></a>
+                                        <a href="#" class="btn-edit-historico text-muted" data-toggle="modal" data-target="#modal-edit-historico" data-id="{{$historico->id}}" data-observacoes="{{ $historico->observacoes }}" data-pendencia_id="{{$historico->pendencia_id}}" data-pendencia_nome="{{ $historico->pendencia ? $historico->pendencia->pendencia : '' }}" style="margin-left: auto; font-size: 14px; display: inline-block; vertical-align: middle; cursor: pointer;" title="Editar"><span class="glyphicon glyphicon-pencil"></span></a>
                                     @endif
                                 </div>
                             </div>
@@ -205,39 +205,7 @@
         </div>
     </div>
 
-    <!-- Modal de Edição -->
-    <div class="modal fade" id="modal-edit-historico" style="display: none;">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-                    <h4 class="modal-title"><i class="glyphicon glyphicon-pencil"></i> Editar Histórico</h4>
-                </div>
-                <form id="form-edit-historico">
-                    <input type="hidden" id="edit-historico-id" name="id">
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="edit-historico-observacoes">Mensagem</label>
-                            <textarea id="edit-historico-observacoes" name="observacoes" class="form-control" rows="4" required spellcheck="true" lang="pt-BR"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="edit-historico-pendencia_id"><i class="fa fa-link"></i> Pendência Vinculada</label>
-                            <select name="pendencia_id" id="edit-historico-pendencia_id" class="form-control">
-                                <option value="">Nenhuma pendência</option>
-                                @foreach($pendencias->where('status', '!=', 'concluido') as $p)
-                                    <option value="{{$p->id}}">{{$p->pendencia}}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Fechar</button>
-                        <button type="submit" class="btn btn-primary">Salvar alterações</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+
 @endsection
 
 @section('js')
@@ -331,88 +299,7 @@ $(document).ready(function() {
             .replace(/'/g, '&#039;');
     }
 
-    $(document).on('click', '.btn-edit-historico', function(e) {
-        e.preventDefault();
-        var id = $(this).attr('data-id');
-        var obs = $(this).attr('data-observacoes');
-        var pendenciaId = $(this).attr('data-pendencia_id');
-        var pendenciaNome = $(this).attr('data-pendencia_nome');
-        
-        $('#edit-historico-id').val(id);
-        $('#edit-historico-observacoes').val(obs);
-        
-        // Remove temporary completed pendency options
-        $('#edit-historico-pendencia_id option[data-temp="true"]').remove();
-        
-        if (pendenciaId) {
-            // Check if option already exists
-            if ($('#edit-historico-pendencia_id option[value="' + pendenciaId + '"]').length === 0) {
-                // If not, append it temporarily
-                var optionHtml = '<option value="' + pendenciaId + '" data-temp="true" selected>' + (pendenciaNome || 'Pendência Vinculada') + ' (Concluída)</option>';
-                $('#edit-historico-pendencia_id').append(optionHtml);
-            }
-        }
-        
-        $('#edit-historico-pendencia_id').val(pendenciaId || '');
-        $('#modal-edit-historico').modal('show');
-    });
 
-    $('#form-edit-historico').submit(function(e) {
-        e.preventDefault();
-        var id = $('#edit-historico-id').val();
-        var obs = $('#edit-historico-observacoes').val();
-        var pendenciaId = $('#edit-historico-pendencia_id').val();
-        var url = '/admin/historico/' + id + '/update';
-
-        $.ajax({
-            url: url,
-            type: 'POST',
-            data: {
-                _token: '{{ csrf_token() }}',
-                observacoes: obs,
-                pendencia_id: pendenciaId
-            },
-            success: function(response) {
-                if (response.success) {
-                    $('#modal-edit-historico').modal('hide');
-                    
-                    var $li = $('#historico-li-' + id);
-                    if ($li.length) {
-                        // Atualiza as observações (texto)
-                        $li.find('.timeline-body').text(response.observacoes);
-                        
-                        // Atualiza a data e exibe indicador (editado)
-                        $li.find('.time-text').text(response.updated_at);
-                        $li.find('.editado-indicator').show();
-                        
-                        // Atualiza os atributos de dados no botão de edição
-                        var $editBtn = $li.find('.btn-edit-historico');
-                        $editBtn.attr('data-observacoes', response.observacoes);
-                        $editBtn.attr('data-pendencia_id', response.pendencia_id || '');
-                        
-                        // Atualiza o container da pendência
-                        var $badgeContainer = $li.find('.pendencia-badge-container');
-                        if (response.pendencia_id && response.pendencia_nome) {
-                            var badgeHtml = 
-                                '<div class="pendencia-badge" style="display: inline-flex; border: 1px solid #3c8dbc; border-radius: 4px; overflow: hidden; font-size: 11px; vertical-align: middle;">' +
-                                '    <span style="background: #3c8dbc; color: #fff; padding: 3px 8px; font-weight: normal;"><i class="fa fa-link"></i> Vinculado à Pendência:</span>' +
-                                '    <span class="pendencia-nome-span" style="background: #f4f4f4; color: #444; padding: 3px 8px; font-weight: bold;">' + escapeHtml(response.pendencia_nome) + '</span>' +
-                                '</div>';
-                            $badgeContainer.html(badgeHtml);
-                        } else {
-                            $badgeContainer.empty();
-                        }
-                    }
-                } else {
-                    alert('Erro: ' + response.error);
-                }
-            },
-            error: function(xhr) {
-                var err = xhr.responseJSON ? xhr.responseJSON.error : 'Erro desconhecido';
-                alert('Erro ao atualizar: ' + err);
-            }
-        });
-    });
 });
 </script>
 @stop

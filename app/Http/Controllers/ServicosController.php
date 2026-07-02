@@ -1287,6 +1287,23 @@ class ServicosController extends Controller
         // Redirect to the show route for the service
         return redirect()->route('servicos.show', $request->servico_id);
     }
+    public function editInteracao($id)
+    {
+        $historico = Historico::with('servico', 'pendencia')->findOrFail($id);
+        $user = Auth::user();
+
+        if ($user->privileges === 'admin') {
+            // Authorized
+        } elseif ($user->privileges === 'user' && $historico->user_id === $user->id) {
+            // Authorized
+        } else {
+            return redirect()->back()->with('error', 'Você não tem permissão para editar este histórico.');
+        }
+
+        $pendencias = \App\Models\Pendencia::where('servico_id', $historico->servico_id)->get();
+
+        return view('admin.edit-interacao', compact('historico', 'pendencias'));
+    }
 
     public function updateInteracao(Request $request, $id)
     {
@@ -1317,7 +1334,7 @@ class ServicosController extends Controller
 
         $historico->observacoes = $request->observacoes;
         $historico->pendencia_id = $request->input('pendencia_id');
-        $historico->edited_at = Carbon::now('America/Sao_Paulo');
+        $historico->edited_at = Carbon::now();
         $historico->save();
 
         if ($request->ajax()) {
@@ -1329,6 +1346,10 @@ class ServicosController extends Controller
                 'pendencia_nome' => $historico->pendencia ? $historico->pendencia->pendencia : null,
                 'updated_at' => $historico->edited_at->timezone('America/Sao_Paulo')->format('d/m/Y H:i'),
             ]);
+        }
+
+        if ($request->has('return_url')) {
+            return redirect($request->return_url)->with('success', 'Histórico atualizado com sucesso.');
         }
 
         return redirect()->back()->with('success', 'Histórico atualizado com sucesso.');
