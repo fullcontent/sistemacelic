@@ -73,7 +73,7 @@
     @break
 
 @endswitch</td>
-                        <td>{{$s2->responsavel->name}}</td>
+                        <td>{{$s2->responsavel->name ?? ''}}</td>
                     </tr>
                    @endforeach
                   
