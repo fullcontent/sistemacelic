@@ -108,6 +108,7 @@ class PendenciasController extends Controller
                             ->pluck('os','id')
                             ->toArray();
       
+        $listaPendencias = self::getPendenciasDropdown();
         
         return view('admin.cadastro-pendencia')
                 ->with([
@@ -115,6 +116,7 @@ class PendenciasController extends Controller
                     'servico_id'=>$servico_id,
                     'responsaveis'=>$responsaveis,
                     'vinculo'=>$vinculo,
+                    'listaPendencias'=>$listaPendencias,
                 ]);
     }
 
@@ -227,7 +229,7 @@ class PendenciasController extends Controller
 
         $vinculos = $pendencia->vinculos->pluck('os','id');
 
-        
+        $listaPendencias = self::getPendenciasDropdown($pendencia);
         
         return view('admin.editar-pendencia')->with(
             [
@@ -238,6 +240,7 @@ class PendenciasController extends Controller
                 'responsaveis'=>$responsaveis,
                 'vinculo'=>$vinculo,
                 'vinculos'=>$vinculos,
+                'listaPendencias'=>$listaPendencias,
             ]
         );
     }
@@ -386,5 +389,85 @@ class PendenciasController extends Controller
     {
         $vinculo = PendenciasVinculos::where('servico_id',$servico_id)->where('pendencia_id',$id)->delete();
     
+    }
+
+    public static function getPendenciasDropdown($pendencia = null)
+    {
+        $path = storage_path('app/pendencias.json');
+        $data = [];
+        if (file_exists($path)) {
+            $content = file_get_contents($path);
+            $data = json_decode($content, true);
+        }
+
+        if (empty($data) || !is_array($data)) {
+            $data = [
+                'Responsabilidade Castro' => [
+                    'Adequação em projeto',
+                    'Comunicar cliente',
+                    'Contato com órgão',
+                    'Documental',
+                    'Elaboração',
+                    'Emissão de taxa',
+                    'Montar processo',
+                    'Pagamento de taxa',
+                    'Pedido de prazo',
+                    'Protocolar',
+                    'Protocolar reentrada',
+                    'RT',
+                    'Tramitação interna'
+                ],
+                'Responsabilidade Cliente' => [
+                    'Adequação física',
+                    'Adequação em projeto',
+                    'Documental',
+                    'Em análise',
+                    'Pagamento de taxa',
+                    'Retorno cliente'
+                ],
+                'Responsabilidade Órgão' => [
+                    'Em análise',
+                    'Emissão de alvará',
+                    'Retorno órgão'
+                ],
+                'Vinculada' => [
+                    'Vinculada'
+                ]
+            ];
+        }
+
+        $options = [];
+        foreach ($data as $category => $items) {
+            $options[$category] = [];
+            if (is_array($items)) {
+                foreach ($items as $item) {
+                    $options[$category][$item] = $item;
+                }
+            }
+        }
+
+        if ($pendencia) {
+            $currentValue = is_object($pendencia) ? $pendencia->pendencia : $pendencia;
+            $responsavelTipo = is_object($pendencia) ? $pendencia->responsavel_tipo : null;
+
+            $categoryMap = [
+                'usuario' => 'Responsabilidade Castro',
+                'cliente' => 'Responsabilidade Cliente',
+                'op' => 'Responsabilidade Órgão',
+                'vinculada' => 'Vinculada'
+            ];
+
+            $categoryName = isset($categoryMap[$responsavelTipo]) ? $categoryMap[$responsavelTipo] : 'Responsabilidade Castro';
+
+            if (!isset($options[$categoryName])) {
+                $options[$categoryName] = [];
+            }
+
+            if (!isset($options[$categoryName][$currentValue])) {
+                $options[$categoryName][$currentValue] = $currentValue;
+            }
+        }
+
+        return $options;
     }
 }

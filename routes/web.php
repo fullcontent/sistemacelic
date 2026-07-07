@@ -228,6 +228,8 @@ Route::prefix('admin')->group(function () {
 
 	// Outros Administrativos
 	Route::get('/relatorio/pendencias-ativas', 'RelatoriosController@pendenciasAtivas')->name('relatorio.pendencias_ativas');
+	Route::get('/configuracao-pendencias', 'AdminController@configurarPendencias')->name('admin.configuracao_pendencias');
+	Route::post('/configuracao-pendencias', 'AdminController@salvarConfiguracaoPendencias')->name('admin.salvar_configuracao_pendencias');
 	Route::get('teste', function () {
 		if ($pdo = DB::connection('mysql')->getPdo()) {
 			dump("Server Hostinger OK");

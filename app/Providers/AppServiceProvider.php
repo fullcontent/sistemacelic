@@ -231,13 +231,18 @@ class AppServiceProvider extends ServiceProvider
                                     );
                                 }
 
-                                $event->menu->add(
-                                    [
-                                        'text' => 'Listagem geral dos serviços',
-                                        'url'  =>  ''.Auth::user()->privileges.'/servicos',
-                                        'icon'  =>  'glyphicon glyphicon-th-list',
-                                    ]
-                                );
+                                 $event->menu->add(
+                                     [
+                                         'text' => 'Listagem geral dos serviços',
+                                         'url'  =>  ''.Auth::user()->privileges.'/servicos',
+                                         'icon'  =>  'glyphicon glyphicon-th-list',
+                                     ],
+                                     [
+                                         'text' => 'Configurar Pendências',
+                                         'url'  =>  route('admin.configuracao_pendencias'),
+                                         'icon' => 'fa fa-cogs',
+                                     ]
+                                 );
 
                                 if(Auth::id() <= 3)
                                 {

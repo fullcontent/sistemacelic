@@ -1675,6 +1675,85 @@ class AdminController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 
+    public function configurarPendencias()
+    {
+        $path = storage_path('app/pendencias.json');
+        $content = '';
+        if (file_exists($path)) {
+            $content = file_get_contents($path);
+        }
+
+        if (empty(trim($content)) || json_decode($content) === null) {
+            $default = [
+                "Responsabilidade Castro" => [
+                    "Adequação em projeto",
+                    "Comunicar cliente",
+                    "Contato com órgão",
+                    "Documental",
+                    "Elaboração",
+                    "Emissão de taxa",
+                    "Montar processo",
+                    "Pagamento de taxa",
+                    "Pedido de prazo",
+                    "Protocolar",
+                    "Protocolar reentrada",
+                    "RT",
+                    "Tramitação interna"
+                ],
+                "Responsabilidade Cliente" => [
+                    "Adequação física",
+                    "Adequação em projeto",
+                    "Documental",
+                    "Em análise",
+                    "Pagamento de taxa",
+                    "Retorno cliente"
+                ],
+                "Responsabilidade Órgão" => [
+                    "Em análise",
+                    "Emissão de alvará",
+                    "Retorno órgão"
+                ],
+                "Vinculada" => [
+                    "Vinculada"
+                ]
+            ];
+            $content = json_encode($default, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+        }
+
+        return view('admin.configuracao-pendencias')->with([
+            'jsonContent' => $content
+        ]);
+    }
+
+    public function salvarConfiguracaoPendencias(Request $request)
+    {
+        $json = $request->input('json_content');
+
+        $decoded = json_decode($json, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['json_content' => 'O formato do JSON é inválido: ' . json_last_error_msg()]);
+        }
+
+        if (!is_array($decoded)) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['json_content' => 'O JSON deve ser um objeto ou array estruturado.']);
+        }
+
+        $path = storage_path('app/pendencias.json');
+        
+        $dir = dirname($path);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        file_put_contents($path, json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+        return redirect()->back()->with('success', 'Configuração de pendências salva com sucesso!');
+    }
+
     // Este é o método auxiliar que você pode copiar para o seu AdminController
     private function fillWithZeros($number)
     {

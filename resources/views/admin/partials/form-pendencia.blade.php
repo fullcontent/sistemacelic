@@ -29,39 +29,7 @@
       <div class="col-md-5">
         <div class="form-group">
         {!! Form::label('pendencia', 'Descrição', array('class'=>'control-label')) !!}
-        {!! Form::select('pendencia', [
-    'Responsabilidade Castro' => [
-        'Adequação em projeto' => 'Adequação em projeto',
-        'Comunicar cliente' => 'Comunicar cliente',
-        'Contato com órgão' => 'Contato com órgão',
-        'Documental' => 'Documental',
-        'Elaboração' => 'Elaboração',
-        'Emissão de taxa' => 'Emissão de taxa',
-        'Montar processo' => 'Montar processo',
-        'Pagamento de taxa' => 'Pagamento de taxa',
-        'Pedido de prazo' => 'Pedido de prazo',
-        'Protocolar' => 'Protocolar',
-        'Protocolar reentrada' => 'Protocolar reentrada',
-        'RT' => 'RT',
-        'Tramitação interna' => 'Tramitação interna'
-    ],
-    'Responsabilidade Cliente' => [
-        'Adequação física' => 'Adequação física',
-        'Adequação em projeto' => 'Adequação em projeto',
-        'Documental' => 'Documental',
-        'Em análise' => 'Em análise',
-        'Pagamento de taxa' => 'Pagamento de taxa',
-        'Retorno cliente' => 'Retorno cliente'
-    ],
-    'Responsabilidade Órgão' => [
-        'Em análise' => 'Em análise',
-        'Emissão de alvará' => 'Emissão de alvará',
-        'Retorno órgão' => 'Retorno órgão'
-    ],
-    'Vinculada' => [
-        'Vinculada' => 'Vinculada'
-    ]
-], null, ['class' => 'form-control']) !!}
+        {!! Form::select('pendencia', $listaPendencias, null, ['class' => 'form-control', 'id' => 'pendencia']) !!}
         </div>
         
       </div>
