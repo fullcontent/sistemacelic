@@ -33,6 +33,7 @@ class UsuarioMencionado extends Mailable
         return $this->markdown('emails.usuarioMencionado')->with([
             'servico'=>$this->servico,
             'route'=>$this->route,
+            'userName' => auth()->user() ? auth()->user()->name : 'Sistema'
             ])->subject('Nova interação no serviço');
     }
 }

@@ -51,7 +51,8 @@ class UserMentioned extends Notification
             ->markdown('emails.usuarioMencionado', [
                 'servico' => $this->servico,
                 'route' => $this->route,
-                'resumo' => $this->resumo
+                'resumo' => $this->resumo,
+                'userName' => auth()->user() ? auth()->user()->name : 'Sistema'
             ]);
     }
 

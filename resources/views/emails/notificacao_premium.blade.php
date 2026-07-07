@@ -130,6 +130,10 @@
                         <td class="label">Situação:</td>
                         <td>{{ ucfirst($servico->situacao) }}</td>
                     </tr>
+                    <tr>
+                        <td class="label">Autor:</td>
+                        <td>{{ $interaction->user_name ?? ($interaction->user->name ?? ($userName ?? 'N/A')) }}</td>
+                    </tr>
                 </table>
 
                 @if($interaction->ai_summary)

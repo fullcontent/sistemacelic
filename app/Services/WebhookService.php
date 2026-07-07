@@ -42,7 +42,8 @@ class WebhookService
                     ],
                     'interaction' => [
                         'text' => $interactionText,
-                        'ai_summary' => $resumo
+                        'ai_summary' => $resumo,
+                        'user_name' => auth()->user() ? auth()->user()->name : 'Sistema'
                     ],
                     'system_context' => [
                         'app_name' => config('app.name'),
