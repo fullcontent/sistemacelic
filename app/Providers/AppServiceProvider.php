@@ -81,6 +81,37 @@ class AppServiceProvider extends ServiceProvider
                                     'icon' => 'fa fa-list',
                                 ];
 
+                                $pendenciasSubmenu = [
+                                    [
+                                        'text'=>'Minhas pendências',
+                                        'url' => route('pendencias.minhas'),
+                                        'icon'=>'fa fa-user-secret',
+                                    ],
+                                    [
+                                        'text' => 'Outras pendências',
+                                        'url' => route('pendencias.outras'),
+                                        'icon' => 'fa fa-child',
+                                    ],
+                                    [
+                                        'text' => 'Pendências Vinculadas',
+                                        'url' => route('pendencias.vinculadas'),
+                                        'icon' => 'fa fa-link',
+                                    ],
+                                    [
+                                        'text' => 'Relatório de Ativas',
+                                        'url' => route('relatorio.pendencias_ativas'),
+                                        'icon' => 'fa fa-file-alt',
+                                    ],
+                                ];
+
+                                if (Auth::user()->isCoordinatorOrAdmin()) {
+                                    $pendenciasSubmenu[] = [
+                                        'text' => 'Painel do Coordenador',
+                                        'url' => route('admin.pendencias.dashboard'),
+                                        'icon' => 'fa fa-dashboard',
+                                    ];
+                                }
+
                             $event->menu->add(
                             ['header' => 'main_navigation'],
                             [
@@ -167,29 +198,7 @@ class AppServiceProvider extends ServiceProvider
                             'text' => 'Pendências',
                             'url' => ''.Auth::user()->privileges.'/pendencias',
                             'icon' => 'fa fa-tasks',
-                            'submenu'=>[
-                            [
-                            'text'=>'Minhas pendências',
-                            'url' => route('pendencias.minhas'),
-                            'icon'=>'fa fa-user-secret',
-                            ],
-                            [
-                            'text' => 'Outras pendências',
-                            'url' => route('pendencias.outras'),
-                            'icon' => 'fa fa-child',
-                            ],
-                                [
-                                    'text' => 'Pendências Vinculadas',
-                                    'url' => route('pendencias.vinculadas'),
-                                    'icon' => 'fa fa-link',
-                                ],
-                                [
-                                    'text' => 'Relatório de Ativas',
-                                    'url' => route('relatorio.pendencias_ativas'),
-                                    'icon' => 'fa fa-file-alt',
-                                ],
-
-                            ]
+                            'submenu'=> $pendenciasSubmenu
                             ],
                             [
                             'text' => 'Propostas',
@@ -209,7 +218,7 @@ class AppServiceProvider extends ServiceProvider
 
                             );
 
-                            if(Auth::id() <= 3 || in_array(Auth::id(), [8, 27]))
+                            if(Auth::user()->isCoordinatorOrAdmin())
                             {
                                 $event->menu->add(
                                     ['header'=> 'Administração']

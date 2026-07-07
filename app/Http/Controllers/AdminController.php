@@ -25,22 +25,96 @@ class AdminController extends Controller
 
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        $user = Auth::user();
+        $dashboardPendenciasData = [];
 
-        // dd($this->pendencias()->id);
+        if ($user && $user->isCoordinatorOrAdmin()) {
+            $responsaveis = \App\User::where('active', 1)->orderBy('name')->pluck('name', 'id')->toArray();
+            $empresas = Empresa::orderBy('nomeFantasia')->pluck('nomeFantasia', 'id')->toArray();
 
-        // return $this->pendencias();
+            $responsavel_id = $request->get('responsavel_id');
+            $status = $request->get('status', 'todas'); // default to todas on main dashboard
+            $empresa_id = $request->get('empresa_id');
+            $unidade_id = $request->get('unidade_id');
+            $prioridade = $request->get('prioridade', 'todas');
+            $data_inicio = $request->get('data_inicio');
+            $data_fim = $request->get('data_fim');
+
+            $query = Pendencia::with(['servico.unidade.empresa', 'responsavel']);
+
+            if ($responsavel_id) {
+                $query->where('responsavel_id', $responsavel_id);
+            }
+            if ($empresa_id) {
+                $query->whereHas('servico.unidade', function ($sq) use ($empresa_id) {
+                    $sq->where('empresa_id', $empresa_id);
+                });
+            }
+            if ($unidade_id) {
+                $query->whereHas('servico', function ($sq) use ($unidade_id) {
+                    $sq->where('unidade_id', $unidade_id);
+                });
+            }
+            if ($prioridade !== 'todas') {
+                $query->where('prioridade', $prioridade === 'sim' ? 1 : 0);
+            }
+            if ($status === 'ativas') {
+                $query->where('status', 'pendente');
+            } elseif ($status === 'atrasadas') {
+                $query->where('status', 'pendente')->where('vencimento', '<', date('Y-m-d'));
+            } elseif ($status === 'concluidas') {
+                $query->where('status', 'concluido');
+            }
+
+            if ($data_inicio) {
+                if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $data_inicio)) {
+                    $query->where('vencimento', '>=', $data_inicio);
+                } else {
+                    $query->where('vencimento', '>=', Carbon::createFromFormat('d/m/Y', $data_inicio)->toDateString());
+                }
+            }
+            if ($data_fim) {
+                if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $data_fim)) {
+                    $query->where('vencimento', '<=', $data_fim);
+                } else {
+                    $query->where('vencimento', '<=', Carbon::createFromFormat('d/m/Y', $data_fim)->toDateString());
+                }
+            }
+
+            $dashboardPendencias = $query->orderBy('prioridade', 'desc')
+                                         ->orderBy('vencimento', 'asc')
+                                         ->paginate(15);
+
+            $selectedUnidade = null;
+            if ($unidade_id) {
+                $selectedUnidade = Unidade::find($unidade_id);
+            }
+
+            $dashboardPendenciasData = [
+                'dashboardPendencias' => $dashboardPendencias,
+                'responsaveis' => $responsaveis,
+                'empresas' => $empresas,
+                'responsavel_id' => $responsavel_id,
+                'status' => $status,
+                'empresa_id' => $empresa_id,
+                'unidade_id' => $unidade_id,
+                'selectedUnidade' => $selectedUnidade,
+                'prioridade' => $prioridade,
+                'data_inicio' => $data_inicio,
+                'data_fim' => $data_fim,
+            ];
+        }
 
         return view('admin.dashboard')
-            ->with([
+            ->with(array_merge([
                 'vencer' => $this->servicosVencer(),
                 'finalizados' => $this->servicosFinalizados(),
                 'andamento' => $this->servicosAndamento(),
                 'andamentoCoResponsavel' => $this->servicosAndamentoCoResponsavel(),
                 'pendencias' => $this->pendencias(),
-
-            ]);
+            ], $dashboardPendenciasData));
     }
 
     public function pendencias()

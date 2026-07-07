@@ -129,4 +129,9 @@ class User extends Authenticatable
         }
         return in_array($departamento, $allowed);
     }
+
+    public function isCoordinatorOrAdmin()
+    {
+        return $this->id <= 3 || in_array($this->id, [8, 27]);
+    }
 }

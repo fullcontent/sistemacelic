@@ -25,28 +25,34 @@ class ApiController extends Controller
     public function getUnidades(Request $request)
     {
 
-        // Get search input
+        // Get search input and company filter
         $search = $request->search;
+        $empresa_id = $request->empresa_id;
 
         // Create empty array for response
         $response = array();
 
-        // If there is no search input 
-        if ($search == '') {
-            // Get all unidades in the database, order by nameFantasia and select only their id and nameFantasia 
-            $unidades = Unidade::orderby('nomeFantasia', 'asc')->select('id', 'nomeFantasia')->get();
-        } else {
-            // Get only unidade where nomeFantasia matches search input
-            $unidades = Unidade::orderby('nomeFantasia', 'asc')->select('id', 'nomeFantasia')->where('nomeFantasia', 'like', '%' . $search . '%')->get();
+        $query = Unidade::orderby('nomeFantasia', 'asc')->select('id', 'nomeFantasia', 'codigo');
+
+        if ($empresa_id) {
+            $query->where('empresa_id', $empresa_id);
         }
+
+        if ($search != '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('nomeFantasia', 'like', '%' . $search . '%')
+                  ->orWhere('codigo', 'like', '%' . $search . '%');
+            });
+        }
+
+        $unidades = $query->get();
 
         // Loop through each unidade
         foreach ($unidades as $u) {
             // Add corresponding id and nameFantasia to the response array 
             $response[] = array(
                 "id" => $u->id,
-                "text" => $u->nomeFantasia,
-
+                "text" => $u->nomeFantasia . ($u->codigo ? ' (' . $u->codigo . ')' : ''),
             );
         }
 

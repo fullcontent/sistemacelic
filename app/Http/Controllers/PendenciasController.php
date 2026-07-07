@@ -470,4 +470,112 @@ class PendenciasController extends Controller
 
         return $options;
     }
+
+    public function dashboard(Request $request)
+    {
+        if (!Auth::check() || !Auth::user()->isCoordinatorOrAdmin()) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
+        $responsaveis = User::where('active', 1)->orderBy('name')->pluck('name', 'id')->toArray();
+        $empresas = \App\Models\Empresa::orderBy('nomeFantasia')->pluck('nomeFantasia', 'id')->toArray();
+
+        // Get filter values
+        $responsavel_id = $request->get('responsavel_id');
+        $status = $request->get('status', 'ativas'); // default to 'ativas' (pendente)
+        $empresa_id = $request->get('empresa_id');
+        $unidade_id = $request->get('unidade_id');
+        $prioridade = $request->get('prioridade', 'todas');
+        $data_inicio = $request->get('data_inicio');
+        $data_fim = $request->get('data_fim');
+
+        // Base query for listing
+        $query = Pendencia::with(['servico.unidade.empresa', 'responsavel']);
+
+        // Base query for counters (which includes all filters EXCEPT status)
+        $counterQuery = Pendencia::query();
+
+        // Helper closure to apply filters to both queries
+        $applyFilters = function ($q) use ($responsavel_id, $empresa_id, $unidade_id, $prioridade, $data_inicio, $data_fim) {
+            if ($responsavel_id) {
+                $q->where('responsavel_id', $responsavel_id);
+            }
+            if ($empresa_id) {
+                $q->whereHas('servico.unidade', function ($sq) use ($empresa_id) {
+                    $sq->where('empresa_id', $empresa_id);
+                });
+            }
+            if ($unidade_id) {
+                $q->whereHas('servico', function ($sq) use ($unidade_id) {
+                    $sq->where('unidade_id', $unidade_id);
+                });
+            }
+            if ($prioridade !== 'todas') {
+                $q->where('prioridade', $prioridade === 'sim' ? 1 : 0);
+            }
+            if ($data_inicio) {
+                if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $data_inicio)) {
+                    $q->where('vencimento', '>=', $data_inicio);
+                } else {
+                    $q->where('vencimento', '>=', Carbon::createFromFormat('d/m/Y', $data_inicio)->toDateString());
+                }
+            }
+            if ($data_fim) {
+                if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $data_fim)) {
+                    $q->where('vencimento', '<=', $data_fim);
+                } else {
+                    $q->where('vencimento', '<=', Carbon::createFromFormat('d/m/Y', $data_fim)->toDateString());
+                }
+            }
+        };
+
+        // Apply filters to list query
+        $applyFilters($query);
+
+        // Apply status filter specifically to listing
+        if ($status === 'ativas') {
+            $query->where('status', 'pendente');
+        } elseif ($status === 'atrasadas') {
+            $query->where('status', 'pendente')->where('vencimento', '<', date('Y-m-d'));
+        } elseif ($status === 'concluidas') {
+            $query->where('status', 'concluido');
+        }
+
+        // Apply filters to counter query
+        $applyFilters($counterQuery);
+
+        // Calculate counters
+        $totalPendencias = (clone $counterQuery)->count();
+        $emAtraso = (clone $counterQuery)->where('status', 'pendente')->where('vencimento', '<', date('Y-m-d'))->count();
+        $concluidas = (clone $counterQuery)->where('status', 'concluido')->count();
+
+        // Paginate listings
+        $pendencias = $query->orderBy('prioridade', 'desc')
+                            ->orderBy('vencimento', 'asc')
+                            ->paginate(50);
+
+        // If unity is selected, retrieve it to populate select2 correctly on load
+        $selectedUnidade = null;
+        if ($unidade_id) {
+            $selectedUnidade = \App\Models\Unidade::find($unidade_id);
+        }
+
+        return view('admin.dashboard-pendencias')->with([
+            'pendencias' => $pendencias,
+            'responsaveis' => $responsaveis,
+            'empresas' => $empresas,
+            'responsavel_id' => $responsavel_id,
+            'status' => $status,
+            'empresa_id' => $empresa_id,
+            'unidade_id' => $unidade_id,
+            'selectedUnidade' => $selectedUnidade,
+            'prioridade' => $prioridade,
+            'data_inicio' => $data_inicio,
+            'data_fim' => $data_fim,
+            'totalPendencias' => $totalPendencias,
+            'emAtraso' => $emAtraso,
+            'concluidas' => $concluidas,
+            'title' => 'Dashboard de Pendências'
+        ]);
+    }
 }
