@@ -1283,12 +1283,22 @@ class AdminController extends Controller
 
     }
 
-    // Função para listar os arquivos de relatórios gerados
-    public function listarRelatorios()
+    // Função para listar os arquivos de relatórios gerados com paginação (Opção B)
+    public function listarRelatorios(Request $request)
     {
         $directory = public_path('uploads/relatorios');
-        $files = File::files($directory);
 
+        if (!File::exists($directory)) {
+            return response()->json([
+                'data' => [],
+                'current_page' => 1,
+                'last_page' => 1,
+                'total' => 0,
+                'per_page' => 10
+            ]);
+        }
+
+        $files = File::files($directory);
         $reports = [];
 
         foreach ($files as $file) {
@@ -1304,10 +1314,23 @@ class AdminController extends Controller
             return $b['date'] <=> $a['date'];
         });
 
-        // Retornar apenas os últimos 25
-        $reports = array_slice($reports, 0, 25);
+        $total = count($reports);
+        $perPage = intval($request->input('per_page', 10));
+        $currentPage = intval($request->input('page', 1));
+        if ($currentPage < 1) $currentPage = 1;
 
-        return response()->json($reports);
+        $offset = ($currentPage - 1) * $perPage;
+        $paginatedReports = array_slice($reports, $offset, $perPage);
+        $lastPage = ceil($total / $perPage);
+        if ($lastPage < 1) $lastPage = 1;
+
+        return response()->json([
+            'data' => $paginatedReports,
+            'current_page' => $currentPage,
+            'last_page' => $lastPage,
+            'total' => $total,
+            'per_page' => $perPage
+        ]);
     }
 
     public function deleteRelatorio($filename)
