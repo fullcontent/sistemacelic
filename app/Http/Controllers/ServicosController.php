@@ -236,7 +236,7 @@ class ServicosController extends Controller
             ->get();
 
         $servicos = $servicos->filter(function ($servico) {
-            if ($servico->situacao !== 'finalizado' && $servico->situacao !== 'andamento') {
+            if ($servico->situacao !== 'finalizado') {
                 return false;
             }
 
@@ -244,14 +244,14 @@ class ServicosController extends Controller
                 return false;
             }
 
-            $dias = $servico->ativar_notificacao_renovacao 
-                ? ($servico->dias_para_notificacao_renovacao ?? 180) 
+            $dias = $servico->ativar_notificacao_renovacao
+                ? ($servico->dias_para_notificacao_renovacao ?? 180)
                 : 60;
 
             $dataLimite = \Carbon\Carbon::today()->addDays($dias);
-            
-            $validade = $servico->licenca_validade instanceof \Carbon\Carbon 
-                ? $servico->licenca_validade 
+
+            $validade = $servico->licenca_validade instanceof \Carbon\Carbon
+                ? $servico->licenca_validade
                 : \Carbon\Carbon::parse($servico->licenca_validade);
 
             return $validade->lt($dataLimite);
@@ -766,7 +766,7 @@ class ServicosController extends Controller
                     'arquivo' => 'servico',
                     'usuarios' => User::pluck('name', 'id')->toArray(),
                     'ordensServico' => OrdemServico::where('servico_id', $id)
-                        ->orWhereHas('vinculos', function($q) use ($id) {
+                        ->orWhereHas('vinculos', function ($q) use ($id) {
                             $q->where('servico_id', $id);
                         })->with(['prestador', 'pagamentos', 'vinculos'])->get(),
 
@@ -1569,11 +1569,12 @@ class ServicosController extends Controller
     public function timelineView($id)
     {
         $servico = Servico::find($id);
-        if (!$servico) abort(404);
+        if (!$servico)
+            abort(404);
         return view('admin.timeline-view')->with('servico', $servico);
     }
 
-    private function categorizarEvento($item) 
+    private function categorizarEvento($item)
     {
         // Check if it's a Pendencia or Taxa (Taxa doesn't have pendencia field directly, usually has 'nome')
         $texto = strtolower(($item->pendencia ?? ($item->nome ?? '')) . ' ' . ($item->observacoes ?? ''));
@@ -1609,7 +1610,8 @@ class ServicosController extends Controller
     public function timelineData($id)
     {
         $servico = Servico::with(['pendencias.responsavel', 'taxas'])->find($id);
-        if (!$servico) return response()->json(['error' => 'Not found'], 404);
+        if (!$servico)
+            return response()->json(['error' => 'Not found'], 404);
 
         $todosEventos = collect();
 
