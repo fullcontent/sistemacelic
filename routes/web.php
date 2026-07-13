@@ -231,6 +231,7 @@ Route::prefix('admin')->group(function () {
 	Route::get('/relatorio/pendencias-ativas', 'RelatoriosController@pendenciasAtivas')->name('relatorio.pendencias_ativas');
 	Route::get('/configuracao-pendencias', 'AdminController@configurarPendencias')->name('admin.configuracao_pendencias');
 	Route::post('/configuracao-pendencias', 'AdminController@salvarConfiguracaoPendencias')->name('admin.salvar_configuracao_pendencias');
+	Route::post('/configuracao-pendencias/renomear', 'AdminController@renomearPendenciaAjax')->name('admin.renomear_pendencia_ajax');
 	Route::get('teste', function () {
 		if ($pdo = DB::connection('mysql')->getPdo()) {
 			dump("Server Hostinger OK");

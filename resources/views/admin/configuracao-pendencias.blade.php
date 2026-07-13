@@ -94,13 +94,14 @@
     {!! Form::open(['route' => 'admin.salvar_configuracao_pendencias', 'method' => 'POST', 'id' => 'form-pendencias-config']) !!}
         <!-- Campo Oculto para enviar o JSON serializado -->
         <input type="hidden" name="json_content" id="json_content">
+        <!-- Campo Oculto para enviar o mapeamento de renomeações -->
+        <input type="hidden" name="renames_content" id="renames_content">
 
         <div class="row" style="margin-bottom: 20px;">
             <div class="col-md-12">
-                <a href="{{ route('dashboard') }}" class="btn btn-default">Cancelar</a>
-                <button type="submit" class="btn btn-primary pull-right">
-                    <i class="fa fa-save"></i> Salvar Configuração
-                </button>
+                <a href="{{ route('dashboard') }}" class="btn btn-default">
+                    <i class="fa fa-arrow-left"></i> Voltar ao Dashboard
+                </a>
             </div>
         </div>
 
@@ -120,9 +121,14 @@
                                                 <i class="fa fa-bars text-muted" style="margin-right: 10px; cursor: grab;"></i>
                                                 <span class="pendencia-item-text">{{ $item }}</span>
                                             </div>
-                                            <button type="button" class="remove-item-btn" title="Remover">
-                                                <i class="fa fa-trash"></i>
-                                            </button>
+                                            <div style="display: flex; align-items: center;">
+                                                <button type="button" class="edit-item-btn" style="color: #f39c12; margin-right: 8px; background: none; border: none; padding: 2px 5px;" title="Editar">
+                                                    <i class="fa fa-edit"></i>
+                                                </button>
+                                                <button type="button" class="remove-item-btn" title="Remover">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </div>
                                         </li>
                                     @endforeach
                                 @endif
@@ -219,7 +225,7 @@ $(document).ready(function() {
         document.querySelectorAll('.pendencia-item').forEach(item => {
             item.classList.remove('over');
         });
-        serializeJson();
+        saveConfigAutomatically();
     }
 
     // Ação de adicionar item
@@ -241,9 +247,14 @@ $(document).ready(function() {
                     <i class="fa fa-bars text-muted" style="margin-right: 10px; cursor: grab;"></i>
                     <span class="pendencia-item-text">${val}</span>
                 </div>
-                <button type="button" class="remove-item-btn" title="Remover">
-                    <i class="fa fa-trash"></i>
-                </button>
+                <div style="display: flex; align-items: center;">
+                    <button type="button" class="edit-item-btn" style="color: #f39c12; margin-right: 8px; background: none; border: none; padding: 2px 5px;" title="Editar">
+                        <i class="fa fa-edit"></i>
+                    </button>
+                    <button type="button" class="remove-item-btn" title="Remover">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </div>
             </li>
         `;
         
@@ -252,7 +263,7 @@ $(document).ready(function() {
         
         // Re-vincula eventos para o novo elemento
         initDragAndDrop();
-        serializeJson();
+        saveConfigAutomatically();
     });
 
     // Permitir adicionar apertando Enter
@@ -268,8 +279,116 @@ $(document).ready(function() {
         const item = $(this).closest('.pendencia-item');
         item.fadeOut(200, function() {
             item.remove();
-            serializeJson();
+            saveConfigAutomatically();
         });
+    });
+
+    // Ação de editar item
+    $(document).on('click', '.edit-item-btn', function() {
+        const item = $(this).closest('.pendencia-item');
+        const textSpan = item.find('.pendencia-item-text');
+        const oldVal = textSpan.text().trim();
+        
+        Swal.fire({
+            title: 'Editar nome da pendência',
+            input: 'text',
+            inputValue: oldVal,
+            showCancelButton: true,
+            confirmButtonText: 'Salvar',
+            cancelButtonText: 'Cancelar',
+            inputValidator: (value) => {
+                if (!value || value.trim() === '') {
+                    return 'O nome da pendência não pode ser vazio!';
+                }
+            }
+        }).then((result) => {
+            if (result.value) {
+                const newVal = result.value.trim();
+                if (newVal === oldVal) return;
+                
+                // Pergunta se deseja atualizar no banco em lote
+                Swal.fire({
+                    title: 'Atualizar histórico?',
+                    text: 'Deseja alterar o nome em todas as pendências históricas existentes no banco de dados?',
+                    type: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sim, atualizar tudo',
+                    cancelButtonText: 'Não, apenas na lista'
+                }).then((confirmResult) => {
+                    textSpan.text(newVal);
+                    
+                    let renames = {};
+                    const renamesInput = $('#renames_content');
+                    if (renamesInput.val()) {
+                        try {
+                            renames = JSON.parse(renamesInput.val());
+                        } catch (e) {
+                            renames = {};
+                        }
+                    }
+                    
+                    if (confirmResult.value) {
+                        // Exibe um loader
+                        Swal.fire({
+                            title: 'Atualizando...',
+                            text: 'Por favor, aguarde enquanto atualizamos as pendências históricas no banco de dados.',
+                            allowOutsideClick: false,
+                            onBeforeOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        $.post('{{ route("admin.renomear_pendencia_ajax") }}', {
+                            _token: '{{ csrf_token() }}',
+                            old_name: oldVal,
+                            new_name: newVal
+                        }).done(function(response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    title: 'Atualizado com Sucesso!',
+                                    text: response.updated_rows + ' pendências foram atualizadas no banco de dados em ' + response.time_taken.toFixed(2) + ' ms.',
+                                    type: 'success'
+                                }).then(() => {
+                                    saveConfigAutomatically();
+                                });
+                            } else {
+                                Swal.fire('Erro!', 'Falha ao atualizar o banco de dados: ' + (response.error || 'Erro desconhecido'), 'error');
+                            }
+                        }).fail(function(xhr) {
+                            Swal.fire('Erro!', 'Erro na requisição. Verifique a conexão com o servidor.', 'error');
+                        });
+
+                        // Registra a renomeação local
+                        let found = false;
+                        for (let originalKey in renames) {
+                            if (renames[originalKey] === oldVal) {
+                                renames[originalKey] = newVal;
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            renames[oldVal] = newVal;
+                        }
+                    } else {
+                        // Escolheu NÃO (ou fechou): remove qualquer agendamento de update do banco para essa chave se houver
+                        if (renames[oldVal]) {
+                            delete renames[oldVal];
+                        }
+                        saveConfigAutomatically();
+                    }
+                    
+                    renamesInput.val(JSON.stringify(renames));
+                });
+            }
+        });
+    });
+
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000
     });
 
     // Função de serialização em JSON
@@ -288,12 +407,36 @@ $(document).ready(function() {
         $('#json_content').val(JSON.stringify(data, null, 4));
     }
 
-    // Inicializa Drag and Drop e monta o JSON antes do envio
-    initDragAndDrop();
-    
-    $('#form-pendencias-config').submit(function(e) {
+    // Função para salvar a configuração de forma automática via AJAX
+    function saveConfigAutomatically() {
         serializeJson();
-    });
+        const jsonContent = $('#json_content').val();
+        
+        $.post('{{ route("admin.salvar_configuracao_pendencias") }}', {
+            _token: '{{ csrf_token() }}',
+            json_content: jsonContent
+        }).done(function(response) {
+            if (response.success) {
+                Toast.fire({
+                    type: 'success',
+                    title: 'Alterações salvas!'
+                });
+            } else {
+                Toast.fire({
+                    type: 'error',
+                    title: 'Erro ao salvar alterações.'
+                });
+            }
+        }).fail(function() {
+            Toast.fire({
+                type: 'error',
+                title: 'Erro de conexão ao salvar.'
+            });
+        });
+    }
+
+    // Inicializa Drag and Drop
+    initDragAndDrop();
 });
 </script>
 @stop

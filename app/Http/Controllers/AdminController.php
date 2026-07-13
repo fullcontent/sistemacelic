@@ -1828,12 +1828,18 @@ class AdminController extends Controller
 
         $decoded = json_decode($json, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'error' => 'O formato do JSON é inválido: ' . json_last_error_msg()]);
+            }
             return redirect()->back()
                 ->withInput()
                 ->withErrors(['json_content' => 'O formato do JSON é inválido: ' . json_last_error_msg()]);
         }
 
         if (!is_array($decoded)) {
+            if ($request->ajax()) {
+                return response()->json(['success' => false, 'error' => 'O JSON deve ser um objeto ou array estruturado.']);
+            }
             return redirect()->back()
                 ->withInput()
                 ->withErrors(['json_content' => 'O JSON deve ser um objeto ou array estruturado.']);
@@ -1848,7 +1854,60 @@ class AdminController extends Controller
 
         file_put_contents($path, json_encode($decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
-        return redirect()->back()->with('success', 'Configuração de pendências salva com sucesso!');
+        // Process renames in the database
+        $timeTaken = 0;
+        $totalUpdated = 0;
+        if ($request->has('renames_content')) {
+            $renames = json_decode($request->input('renames_content'), true);
+            if (is_array($renames)) {
+                $start = microtime(true);
+                foreach ($renames as $oldName => $newName) {
+                    if ($oldName && $newName && $oldName !== $newName) {
+                        $updated = \App\Models\Pendencia::where('pendencia', $oldName)
+                            ->update(['pendencia' => $newName]);
+                        $totalUpdated += $updated;
+                    }
+                }
+                $timeTaken = (microtime(true) - $start) * 1000; // em ms
+            }
+        }
+
+        $message = 'Configuração de pendências salva com sucesso!';
+        if ($totalUpdated > 0) {
+            $message .= sprintf(' (%d pendências atualizadas no banco em %.2f ms)', $totalUpdated, $timeTaken);
+        }
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'updated_rows' => $totalUpdated,
+                'time_taken' => $timeTaken
+            ]);
+        }
+
+        return redirect()->back()->with('success', $message);
+    }
+
+    public function renomearPendenciaAjax(Request $request)
+    {
+        $oldName = $request->input('old_name');
+        $newName = $request->input('new_name');
+
+        if (empty($oldName) || empty($newName) || $oldName === $newName) {
+            return response()->json(['success' => false, 'error' => 'Nomes inválidos.']);
+        }
+
+        $start = microtime(true);
+        $updated = \App\Models\Pendencia::where('pendencia', $oldName)
+            ->update(['pendencia' => $newName]);
+        $timeTaken = (microtime(true) - $start) * 1000; // em ms
+
+        return response()->json([
+            'success' => true,
+            'updated_rows' => $updated,
+            'time_taken' => $timeTaken
+        ]);
     }
 
     // Este é o método auxiliar que você pode copiar para o seu AdminController
