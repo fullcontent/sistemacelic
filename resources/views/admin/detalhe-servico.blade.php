@@ -23,6 +23,28 @@
     outline: 0;
     box-shadow: none;
 }
+.mentions-input-box {
+    flex: 1 !important;
+    width: 100% !important;
+    display: block !important;
+}
+.mentions-input-box textarea {
+    min-height: 34px !important;
+    height: auto !important;
+    padding: 6px 12px !important;
+    font-size: 14px !important;
+    line-height: 20px !important;
+    border: 1px solid #ccc !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    resize: vertical !important;
+    overflow-y: hidden !important;
+    background: #fff !important;
+}
+.mentions-input-box textarea:focus {
+    border-color: #3c8dbc !important;
+    outline: 0 !important;
+}
 </style>
 @stop
 
@@ -637,9 +659,9 @@
             <div class="box-body">
                 @if(auth()->user()->permitir_interacoes)
                 <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #f4f4f4;">
-                  {!! Form::open(['route'=>'interacao.store']) !!}
+                  {!! Form::open(['route'=>'interacao.store', 'style'=>'width: 100%;']) !!}
                   {!! Form::hidden('servico_id',$servico->id) !!}
-                  <div style="display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-end;">
+                  <div style="display: flex; width: 100%; gap: 10px; margin-bottom: 10px; align-items: flex-end;">
                       <textarea rows="1" name="observacoes" id="observacoes" class="form-control-simple" placeholder="Digite o histórico do serviço..." spellcheck="false" autocorrect="off" autocapitalize="off" data-gramm="false" data-enable-grammarly="false" lang="pt-BR" required autocomplete="off" style="resize: vertical; min-height: 34px; line-height: 20px; padding: 6px 12px; flex: 1;"></textarea>
                       <button type="submit" class="btn btn-info btn-flat" style="height: 34px; min-width: 80px;">Enviar</button>
                   </div>
@@ -958,6 +980,14 @@ $(document).ready(function() {
     $('#observacoes, #edit-historico-observacoes').on('keydown', function(e) {
         if (e.key === ' ' || e.key === ',' || e.key === '.' || e.key === '!' || e.key === '?' || e.key === ';') {
             applyAutocorrect(this);
+        }
+    });
+
+    // Enter submits the form for mentions textarea
+    $(document).on('keydown', '.mentions-input-box textarea', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            $(this).closest('form').submit();
         }
     });
 

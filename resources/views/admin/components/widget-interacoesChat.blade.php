@@ -93,23 +93,13 @@
         <!--/.direct-chat-messages-->
         @if(auth()->user()->permitir_interacoes)
         <div class="box-footer">
-                
-                <div class="box-header">
-                  
-                  {!! Form::open(['route'=>'interacao.store']) !!}
-                  <div class="input-group">
-                  
-                  {!! Form::text('observacoes', null, ['class'=>'form-control mention','id'=>'full','placeholder'=>'Digite a mensagem','autocomplete'=>'off']) !!}
-                  {!! Form::hidden('servico_id',$servico->id) !!}
-                  
-                      <span class="input-group-btn">
-                        <button type="submit" class="btn btn-info btn-flat">Enviar</button>
-                      </span>
-                </div>
+                  {!! Form::open(['route'=>'interacao.store', 'style'=>'width: 100%;']) !!}
+                  <div style="display: flex; width: 100%; gap: 10px; align-items: flex-end;">
+                      <textarea rows="1" name="observacoes" id="full" class="form-control-simple mention" placeholder="Digite a mensagem..." spellcheck="false" autocorrect="off" autocapitalize="off" data-gramm="false" data-enable-grammarly="false" required autocomplete="off" style="resize: vertical; min-height: 34px; line-height: 20px; padding: 6px 12px; flex: 1;"></textarea>
+                      {!! Form::hidden('servico_id',$servico->id) !!}
+                      <button type="submit" class="btn btn-info btn-flat" style="height: 34px; min-width: 80px;">Enviar</button>
+                  </div>
                 {!! Form::close() !!}   
-
-                </div>
-
             </div>
         @else
             <div class="box-footer text-center text-muted" style="padding: 15px;">
