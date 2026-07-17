@@ -51,9 +51,18 @@ class User extends Authenticatable
 
     public function getAvatarUrlAttribute()
     {
-        if ($this->avatar && file_exists(public_path('uploads/avatares/' . $this->avatar))) {
-            return asset('uploads/avatares/' . $this->avatar);
+        if (!$this->avatar) {
+            return null;
         }
+
+        // Em produção o document root não é /public/, então o path público inclui o prefixo
+        $prefix = app()->environment('production') ? 'public/uploads/' : 'uploads/';
+
+        $fullPath = public_path('uploads/' . $this->avatar);
+        if (file_exists($fullPath)) {
+            return asset($prefix . $this->avatar);
+        }
+
         return null;
     }
 
