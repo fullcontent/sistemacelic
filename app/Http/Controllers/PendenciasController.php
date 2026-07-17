@@ -101,7 +101,7 @@ class PendenciasController extends Controller
         $s = Servico::find($servico_id);
 
         $servico = Servico::where('id',$servico_id)->pluck('os','id')->toArray();
-        $responsaveis = User::orderBy('name')->where('active',1)->pluck('name','id')->toArray();
+        $responsaveis = User::orderBy('name')->where('active',1)->where('privileges','admin')->pluck('name','id')->toArray();
 
         $vinculo = Servico::where('unidade_id',$s->unidade->id)
                             ->where('situacao','andamento')
@@ -223,7 +223,7 @@ class PendenciasController extends Controller
                             ->toArray();
 
 
-        $responsaveis = User::orderBy('name')->where('active',1)->pluck('name','id')->toArray();
+        $responsaveis = User::orderBy('name')->where('active',1)->where('privileges','admin')->pluck('name','id')->toArray();
         
         $pendencias = Pendencia::where('servico_id',$pendencia->servico_id)->pluck('pendencia','id')->toArray();
 
