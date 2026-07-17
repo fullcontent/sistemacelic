@@ -55,15 +55,9 @@ class User extends Authenticatable
             return null;
         }
 
-        // Em produção o document root não é /public/, então o path público inclui o prefixo
-        $prefix = app()->environment('production') ? 'public/uploads/' : 'uploads/';
-
-        $fullPath = public_path('uploads/' . $this->avatar);
-        if (file_exists($fullPath)) {
-            return asset($prefix . $this->avatar);
-        }
-
-        return null;
+        // Em produção o document root não é /public/, precisa do prefixo
+        $prefix = app()->environment('production') ? 'public/uploads/avatares/' : 'uploads/avatares/';
+        return asset($prefix . $this->avatar);
     }
 
     public function sendPasswordResetNotification($token)
