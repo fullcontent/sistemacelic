@@ -1,5 +1,31 @@
 @extends('adminlte::page')
 
+@section('css')
+<style>
+.form-control-simple {
+    display: block;
+    width: 100%;
+    height: auto;
+    min-height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 0 !important;
+    box-shadow: none;
+    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+.form-control-simple:focus {
+    border-color: #3c8dbc;
+    outline: 0;
+    box-shadow: none;
+}
+</style>
+@stop
+
 @section('content_header')
     <h1>
         {{$servico->os}} <small>{{$servico->nome}}</small>
@@ -613,12 +639,32 @@
                 <div style="margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #f4f4f4;">
                   {!! Form::open(['route'=>'interacao.store']) !!}
                   {!! Form::hidden('servico_id',$servico->id) !!}
-                  <div class="input-group" style="margin-bottom: 10px;">
-                      <input type="text" name="observacoes" id="observacoes" class="form-control" placeholder="Digite o histórico do serviço..." spellcheck="true" lang="pt-BR" required autocomplete="off">
-                      <span class="input-group-btn">
-                          <button type="submit" class="btn btn-info btn-flat">Enviar</button>
-                      </span>
+                  <div style="display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-end;">
+                      <textarea rows="1" name="observacoes" id="observacoes" class="form-control-simple" placeholder="Digite o histórico do serviço..." spellcheck="false" autocorrect="off" autocapitalize="off" data-gramm="false" data-enable-grammarly="false" lang="pt-BR" required autocomplete="off" style="resize: vertical; min-height: 34px; line-height: 20px; padding: 6px 12px; flex: 1;"></textarea>
+                      <button type="submit" class="btn btn-info btn-flat" style="height: 34px; min-width: 80px;">Enviar</button>
                   </div>
+                  <script>
+                  (function() {
+                      var tx = document.getElementById('observacoes');
+                      if (tx) {
+                          tx.addEventListener('keydown', function(e) {
+                              if (e.key === 'Enter' && !e.shiftKey) {
+                                  e.preventDefault();
+                                  if (this.form) this.form.submit();
+                              }
+                          });
+                          tx.addEventListener('input', function() {
+                              this.style.height = 'auto';
+                              this.style.height = (this.scrollHeight + 2) + 'px';
+                          });
+                          // Initial trigger on load
+                          if (tx.value) {
+                              tx.style.height = 'auto';
+                              tx.style.height = (tx.scrollHeight + 2) + 'px';
+                          }
+                      }
+                  })();
+                  </script>
                   <div class="form-group" style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap; margin-bottom: 0;">
                       <div style="display: flex; align-items: center; gap: 5px;">
                           <label for="visibilidade" style="margin-bottom:0; font-weight: normal; color: #555; font-size: 12px;"><i class="fa fa-globe"></i> Visibilidade:</label>
@@ -904,6 +950,7 @@ $(document).ready(function() {
                 input.value = newTextBeforeCursor + textAfterCursor;
                 const newCursorPos = newTextBeforeCursor.length;
                 input.setSelectionRange(newCursorPos, newCursorPos);
+                input.dispatchEvent(new Event('input'));
             }
         }
     }
@@ -913,6 +960,8 @@ $(document).ready(function() {
             applyAutocorrect(this);
         }
     });
+
+
 
     function escapeHtml(string) {
         if (!string) return '';
