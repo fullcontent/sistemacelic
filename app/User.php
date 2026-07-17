@@ -19,7 +19,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'privileges', 'permitir_interacoes', 'permitir_acesso_servicos'
+        'name', 'email', 'password', 'privileges', 'permitir_interacoes', 'permitir_acesso_servicos', 'avatar'
     ];
 
     /**
@@ -47,6 +47,14 @@ class User extends Authenticatable
     {
     
     return $this->email;
+    }
+
+    public function getAvatarUrlAttribute()
+    {
+        if ($this->avatar && file_exists(public_path('uploads/avatares/' . $this->avatar))) {
+            return asset('uploads/avatares/' . $this->avatar);
+        }
+        return null;
     }
 
     public function sendPasswordResetNotification($token)

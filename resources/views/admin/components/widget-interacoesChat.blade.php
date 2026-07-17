@@ -19,7 +19,7 @@
             
 
         @foreach($servico->interacoes as $n)  
-          
+          @php $interactor = $n->user; @endphp
           
           @if($n->user_id == \Auth::id())
           
@@ -32,7 +32,13 @@
                     <span class="direct-chat-timestamp pull-right">{{\Carbon\Carbon::parse($n->created_at)->format('d/m/Y h:m')}}</span>
                   </div>
 
-                  <div class="direct-chat-img"> <i class="fa fa-user" style="font-size:35px;"></i></div>
+                  <div class="direct-chat-img">
+                    @if($interactor && $interactor->avatar_url)
+                      <img src="{{ $interactor->avatar_url }}" class="img-circle" style="width: 40px; height: 40px; object-fit: cover;" alt="{{ $interactor->name }}">
+                    @else
+                      <i class="fa fa-user" style="font-size:35px;"></i>
+                    @endif
+                  </div>
                  
             
             <!-- /.direct-chat-info -->
@@ -55,11 +61,17 @@
            <div class="direct-chat-msg right" >
               
               <div class="direct-chat-info clearfix">
-                  <span class="direct-chat-name pull-right"><b>{{\App\User::find($n->user_id)->name}}</b></span>
+                  <span class="direct-chat-name pull-right"><b>{{ $interactor ? $interactor->name : 'Usuário' }}</b></span>
                   
                   <span class="direct-chat-timestamp pull-left">{{\Carbon\Carbon::parse($n->created_at)->format('d/m/Y h:m')}}</span>
                 </div>
-              <div class="direct-chat-img"> <i class="fa fa-user text-aqua" style="font-size:35px;"></i></div>
+              <div class="direct-chat-img">
+                @if($interactor && $interactor->avatar_url)
+                  <img src="{{ $interactor->avatar_url }}" class="img-circle" style="width: 40px; height: 40px; object-fit: cover;" alt="{{ $interactor->name }}">
+                @else
+                  <i class="fa fa-user text-aqua" style="font-size:35px;"></i>
+                @endif
+              </div>
           
           <!-- /.direct-chat-info -->
           

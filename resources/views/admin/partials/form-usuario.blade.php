@@ -1,12 +1,52 @@
 <div class="box-body" style="padding: 25px;">
     
     <div class="row">
-        <!-- Coluna 1: Informações Gerais -->
+        <!-- Coluna 1: Informações Gerais + Avatar -->
         <div class="col-md-6">
             <h4 style="margin-top: 0; margin-bottom: 20px; font-weight: 700; color: #354256; border-bottom: 2px solid #f4f4f4; padding-bottom: 10px;">
                 <i class="fa fa-user"></i> Identificação
             </h4>
-            
+
+            {{-- Avatar Preview e Upload --}}
+            <div class="form-group">
+                <label class="control-label" style="color: #7f8c8d;">Foto de Perfil</label>
+                <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 10px;">
+                    {{-- Preview do avatar atual --}}
+                    <div id="avatar-preview-container">
+                        @if(isset($usuario) && $usuario->avatar_url)
+                            <img id="avatar-preview" src="{{ $usuario->avatar_url }}" alt="Avatar"
+                                 style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #ddd;">
+                        @else
+                            @php
+                                $words = explode(' ', isset($usuario) ? $usuario->name : '?');
+                                $initials = count($words) >= 2
+                                    ? strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 1))
+                                    : strtoupper(substr($words[0] ?? 'U', 0, 2));
+                                $colorPalette = ['#34495e', '#2ecc71', '#3498db', '#9b59b6', '#e67e22', '#e74c3c', '#1abc9c'];
+                                $color = isset($usuario) ? $colorPalette[($usuario->id) % count($colorPalette)] : '#3498db';
+                            @endphp
+                            <div id="avatar-initials" style="width: 80px; height: 80px; border-radius: 50%; background-color: {{ $color }}; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 1.6em; border: 3px solid #ddd;">
+                                {{ $initials }}
+                            </div>
+                        @endif
+                    </div>
+                    <div>
+                        <label for="avatar" class="btn btn-default btn-sm" style="cursor: pointer; border-radius: 6px;">
+                            <i class="fa fa-camera"></i> Escolher foto
+                            <input type="file" id="avatar" name="avatar" accept="image/jpeg,image/png,image/gif" style="display: none;">
+                        </label>
+                        @if(isset($usuario) && $usuario->avatar)
+                            <div style="margin-top: 6px;">
+                                <label style="font-size: 0.85em; color: #999; cursor: pointer;">
+                                    <input type="checkbox" name="remover_avatar" value="1" id="remover_avatar"> Remover foto atual
+                                </label>
+                            </div>
+                        @endif
+                        <p class="help-block" style="font-size: 0.8em; margin-top: 4px;">JPG, PNG ou GIF. Máx. 2MB.</p>
+                    </div>
+                </div>
+            </div>
+
             <div class="form-group">
                 {!! Form::label('name', 'Nome Completo', array('class'=>'control-label', 'style'=>'color: #7f8c8d;')) !!}
                 {!! Form::text('name', null, ['class'=>'form-control','id'=>'name', 'style'=>'border-radius: 6px; padding: 10px;']) !!}
@@ -110,3 +150,22 @@
     @endunless
 
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var avatarInput = document.getElementById('avatar');
+    if (avatarInput) {
+        avatarInput.addEventListener('change', function () {
+            if (this.files && this.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var container = document.getElementById('avatar-preview-container');
+                    // Replace whatever is inside container with the new image preview
+                    container.innerHTML = '<img id="avatar-preview" src="' + e.target.result + '" alt="Preview" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #27ae60;">';
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    }
+});
+</script>

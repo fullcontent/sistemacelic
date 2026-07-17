@@ -19,10 +19,10 @@
 	
 	@if(auth()->user()->privileges == 'admin')
 	
-	{!! Form::model($usuario,['route'=>['usuario.update', $usuario->id]]) !!}
+	{!! Form::model($usuario,['route'=>['usuario.update', $usuario->id], 'files' => true]) !!}
 
 	@elseif(auth()->user()->privileges == 'cliente')
-	{!! Form::model($usuario,['route'=>['cliente.usuario.update']]) !!}
+	{!! Form::model($usuario,['route'=>['cliente.usuario.update'], 'files' => true]) !!}
 	@endif
 	
 	

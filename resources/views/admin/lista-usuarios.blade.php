@@ -170,10 +170,14 @@
 							$colorPalette = ['#34495e', '#2ecc71', '#3498db', '#9b59b6', '#e67e22', '#e74c3c', '#1abc9c'];
 							$color = $colorPalette[($user->id) % count($colorPalette)];
 						@endphp
-						<div class="user-avatar" style="background-color: {{ $color }};">
-							{{ $initials }}
-						</div>
-						<span style="font-weight: 600; color: #333; vertical-align: middle;">{{$user->name}}</span>
+							@if($user->avatar_url)
+					<img src="{{ $user->avatar_url }}" class="user-avatar" style="object-fit: cover;" alt="{{ $user->name }}">
+					@else
+					<div class="user-avatar" style="background-color: {{ $color }};">
+						{{ $initials }}
+					</div>
+					@endif
+					<span style="font-weight: 600; color: #333; vertical-align: middle;">{{$user->name}}</span>
 					</td>
 					<td>{{$user->email}}</td>
 					<td>

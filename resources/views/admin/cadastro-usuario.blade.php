@@ -10,7 +10,7 @@
 		<h3 class="box-title">Cadastrar usuário</h3>
 	</div>
 	
-	{!! Form::open(['route'=>'usuario.store']) !!}
+	{!! Form::open(['route'=>'usuario.store', 'files' => true]) !!}
 
 	@include('admin.partials.form-usuario')
 

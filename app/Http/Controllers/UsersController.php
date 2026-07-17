@@ -80,6 +80,36 @@ class UsersController extends Controller
 		$usuario->permitir_interacoes = $request->has('permitir_interacoes') ? 1 : 0;
 		$usuario->permitir_acesso_servicos = $request->has('permitir_acesso_servicos') ? 1 : 0;
 
+        // Tratar upload/remoção do avatar
+        if ($request->has('remover_avatar') && $request->remover_avatar == 1) {
+            if ($usuario->avatar) {
+                $oldPath = public_path('uploads/avatares/' . $usuario->avatar);
+                if (file_exists($oldPath)) {
+                    @unlink($oldPath);
+                }
+                $usuario->avatar = null;
+            }
+        } elseif ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
+            if ($usuario->avatar) {
+                $oldPath = public_path('uploads/avatares/' . $usuario->avatar);
+                if (file_exists($oldPath)) {
+                    @unlink($oldPath);
+                }
+            }
+
+            $name = uniqid(date('HisYmd'));
+            $extension = $request->avatar->getClientOriginalExtension();
+            $nameFile = "{$name}.{$extension}";
+
+            $dir = public_path('uploads/avatares');
+            if (!is_dir($dir)) {
+                mkdir($dir, 0755, true);
+            }
+
+            $request->avatar->move($dir, $nameFile);
+            $usuario->avatar = $nameFile;
+        }
+
     	
 	    $usuario->acesso_empresa()->sync($request->empresas_user_access);
 	    $usuario->acesso_unidade	()->sync($request->unidades_user_access);
