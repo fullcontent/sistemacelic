@@ -55,9 +55,12 @@ class User extends Authenticatable
             return null;
         }
 
-        // Em produção o document root não é /public/, precisa do prefixo
-        $prefix = app()->environment('production') ? 'public/uploads/avatares/' : 'uploads/avatares/';
-        return asset($prefix . $this->avatar);
+        // Usa a URL base real da requisição (não APP_URL que pode apontar pra produção)
+        // AVATAR_URL_PREFIX: vazio no local, "public/" em produção (definido no .env)
+        $prefix = env('AVATAR_URL_PREFIX', '');
+        $base   = rtrim(request()->root(), '/');
+
+        return $base . '/' . $prefix . 'uploads/avatares/' . $this->avatar;
     }
 
     public function sendPasswordResetNotification($token)
