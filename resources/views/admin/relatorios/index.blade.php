@@ -130,6 +130,10 @@
 				<a href="{{route('relatorioReembolsosCSV')}}" target="_blank" class="btn btn-block btn-default btn-pill" style="text-align: left; font-size: 1em; margin-bottom: 10px; padding: 10px 15px;">
 					<i class="fa fa-money-bill-wave text-warning" style="margin-right: 8px; width: 16px;"></i> Reembolsos
 				</a>
+
+				<a href="{{route('relatorioOrdemServico')}}" target="_blank" class="btn btn-block btn-default btn-pill" style="text-align: left; font-size: 1em; margin-bottom: 10px; padding: 10px 15px;">
+					<i class="fa fa-file-excel text-success" style="margin-right: 8px; width: 16px;"></i> Ordens de Serviço
+				</a>
 			</div>
 		</div>
 	</div>
@@ -190,7 +194,71 @@
 	</div>
 </div>
 
-<div class="row" style="margin-top: 15px;">
+<div class="row">
+	<!-- Card 4: Ordens de Serviço -->
+	<div class="col-md-12" style="margin-top: 20px;">
+		<div class="form-container" style="min-height: auto;">
+			{!! Form::open(['route'=>'relatorioOrdemServicoFilter','method'=>"post", 'style'=>'width:100%;']) !!}
+			<div>
+				<h3 class="box-title-custom"><i class="fa fa-file-excel text-muted"></i> Ordens de Serviço</h3>
+				<p class="text-muted" style="font-size: 0.9em; margin-bottom: 20px;">Filtros completos para exportação em Excel (CSV)</p>
+				
+				<div class="row">
+					<!-- Prestador -->
+					<div class="col-md-4 form-group">
+						{!! Form::label('prestador_id', 'Prestador:', array('class'=>'control-label', 'style'=>'color: #7f8c8d; font-size: 0.9em;')) !!}
+						{{ Form::select('prestador_id', ['all' => 'Todos os Prestadores'] + $prestadores->toArray(), 'all', ['class'=>'form-control','id'=>'prestadores_select','style'=>'width:100%']) }}
+					</div>
+
+					<!-- Situação da OS -->
+					<div class="col-md-4 form-group">
+						{!! Form::label('situacao_os', 'Situação da OS:', array('class'=>'control-label', 'style'=>'color: #7f8c8d; font-size: 0.9em;')) !!}
+						{{ Form::select('situacao_os', ['all' => 'Todas as Situações', 'aberto'=>'Aberta', 'faturado'=>'Faturada', 'cancelado'=>'Cancelada', 'pago'=>'Paga'], 'all', ['class'=>'form-control','id'=>'situacao_os_select','style'=>'width:100%']) }}
+					</div>
+
+					<!-- Situação da Parcela -->
+					<div class="col-md-4 form-group">
+						{!! Form::label('situacao_parcela', 'Situação da Parcela:', array('class'=>'control-label', 'style'=>'color: #7f8c8d; font-size: 0.9em;')) !!}
+						{{ Form::select('situacao_parcela', ['all' => 'Todas as Situações', 'aberto'=>'Aberta', 'pago'=>'Paga'], 'all', ['class'=>'form-control','id'=>'situacao_parcela_select','style'=>'width:100%']) }}
+					</div>
+				</div>
+
+				<div class="row" style="margin-top: 15px;">
+					<!-- Tipo de Data e Datas -->
+					<div class="col-md-3 form-group">
+						{!! Form::label('tipo_data', 'Filtrar Data por:', array('class'=>'control-label', 'style'=>'color: #7f8c8d; font-size: 0.9em;')) !!}
+						{!! Form::select('tipo_data', ['criacao'=>'Criação da OS', 'vencimento'=>'Vencimento da Parcela', 'pagamento'=>'Pagamento da Parcela'], 'criacao', ['class'=>'form-control', 'style'=>'border-radius: 6px;']) !!}
+					</div>
+
+					<div class="col-md-3 form-group">
+						{!! Form::label('data_inicio', 'Data Início:', array('class'=>'control-label', 'style'=>'color: #7f8c8d; font-size: 0.9em;')) !!}
+						{!! Form::text('data_inicio', null, ['class'=>'form-control datepicker', 'placeholder'=>'dd/mm/aaaa', 'autocomplete'=>'off', 'style'=>'border-radius: 6px;']) !!}
+					</div>
+
+					<div class="col-md-3 form-group">
+						{!! Form::label('data_fim', 'Data Fim:', array('class'=>'control-label', 'style'=>'color: #7f8c8d; font-size: 0.9em;')) !!}
+						{!! Form::text('data_fim', null, ['class'=>'form-control datepicker', 'placeholder'=>'dd/mm/aaaa', 'autocomplete'=>'off', 'style'=>'border-radius: 6px;']) !!}
+					</div>
+
+					<!-- Forma de Pagamento -->
+					<div class="col-md-3 form-group">
+						{!! Form::label('forma_pagamento', 'Forma de Pagamento:', array('class'=>'control-label', 'style'=>'color: #7f8c8d; font-size: 0.9em;')) !!}
+						{{ Form::select('forma_pagamento', ['all' => 'Todas as Formas', 'boleto'=>'Boleto', 'pix'=>'Pix', 'deposito'=>'Depósito', 'transferencia'=>'Transferência', 'dinheiro'=>'Dinheiro', 'outros'=>'Outros'], 'all', ['class'=>'form-control','id'=>'forma_pagamento_select','style'=>'width:100%']) }}
+					</div>
+				</div>
+			</div>
+
+			<div class="row" style="margin-top: 25px;">
+				<div class="col-md-4 col-md-offset-4">
+					<button type="submit" class="btn btn-primary btn-block btn-pill"><i class="fa fa-file-download" style="margin-right: 5px;"></i> Exportar Relatório de OS</button>
+				</div>
+			</div>
+			{!! Form::close() !!}
+		</div>
+	</div>
+</div>
+
+<div class="row" style="margin-top: 25px;">
 	<div class="col-md-12">
 		<div class="table-container">
 			<h3 class="box-title-custom"><i class="fa fa-history text-muted"></i> Histórico de Relatórios Gerados</h3>
@@ -387,6 +455,34 @@ $(document).ready(function () {
 	$("#selectNone2").click(function(e) {
 		e.preventDefault();
 		$('#empresas2').val(null).trigger('change');
+	});
+
+	// Select2 para Ordens de Serviço (Filtro único com 'Todos' por padrão)
+	$("#prestadores_select").select2({
+		placeholder: 'Todos os Prestadores',
+		allowClear: false
+	});
+
+	$("#situacao_os_select").select2({
+		placeholder: 'Todas as Situações',
+		allowClear: false
+	});
+
+	$("#situacao_parcela_select").select2({
+		placeholder: 'Todas as Situações',
+		allowClear: false
+	});
+
+	$("#forma_pagamento_select").select2({
+		placeholder: 'Todas as Formas',
+		allowClear: false
+	});
+
+	// Datepicker para os campos de data
+	$('.datepicker').datepicker({
+		autoclose: true,
+		format: 'dd/mm/yyyy',
+		language: 'pt-BR'
 	});
 });
 </script>

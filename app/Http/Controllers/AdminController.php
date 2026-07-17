@@ -1925,5 +1925,185 @@ class AdminController extends Controller
         return $number;
     }
 
+    public function ordemServicoCSV(Request $request)
+    {
+        $fileName = 'Celic_Relatorio_OrdemServico_' . date('d-m-Y_H-i-s') . '.csv';
 
+        // Definindo os cabeçalhos da resposta
+        $headers = [
+            "Content-type"        => "text/csv; charset=UTF-8",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0",
+        ];
+
+        // Colunas do CSV
+        $columns = [
+            'ID da OS',
+            'Nome do Prestador',
+            'Escopo da OS',
+            'Valor Total da OS',
+            'Forma de Pagamento da OS',
+            'Situação da OS',
+            'Data de Criação da OS',
+            'Número da Parcela',
+            'Valor da Parcela',
+            'Data de Vencimento da Parcela',
+            'Data de Pagamento da Parcela',
+            'Situação da Parcela',
+            'Comprovante da Parcela',
+            'Observação da Parcela',
+            'IDs dos Serviços Vinculados',
+            'Nomes dos Serviços Vinculados',
+            'Detalhes Completos dos Vínculos'
+        ];
+
+        $callback = function () use ($columns, $request) {
+            // Limpa qualquer buffer de saída ativo para evitar sujeira HTML no CSV
+            if (ob_get_level() > 0) {
+                ob_end_clean();
+            }
+
+            $file = fopen('php://output', 'w');
+            
+            // Adiciona o UTF-8 BOM para garantir acentos corretos no Excel
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+            
+            fputcsv($file, $columns, ';'); // Vamos usar ponto e vírgula como delimitador padrão no Brasil
+
+            $query = \App\Models\OrdemServico::with([
+                'prestador',
+                'vinculos.servico.unidade.empresa',
+                'pagamentos'
+            ]);
+
+            // Filtrar por prestador_id (valor único ou todos)
+            if ($request->filled('prestador_id') && $request->input('prestador_id') !== 'all') {
+                $query->where('prestador_id', $request->input('prestador_id'));
+            }
+
+            // Filtrar por situacao_os
+            if ($request->filled('situacao_os') && $request->input('situacao_os') !== 'all') {
+                $query->where('situacao', $request->input('situacao_os'));
+            }
+
+            // Filtrar por forma_pagamento
+            if ($request->filled('forma_pagamento') && $request->input('forma_pagamento') !== 'all') {
+                $query->where('formaPagamento', $request->input('forma_pagamento'));
+            }
+
+            // Filtrar por situacao_parcela
+            if ($request->filled('situacao_parcela') && $request->input('situacao_parcela') !== 'all') {
+                $situacaoParcela = $request->input('situacao_parcela');
+                $query->whereHas('pagamentos', function ($q) use ($situacaoParcela) {
+                    $q->where('situacao', $situacaoParcela);
+                });
+            }
+
+            // Filtro de data
+            $tipoData = $request->input('tipo_data', 'criacao');
+            $dataInicio = $request->filled('data_inicio') 
+                ? Carbon::createFromFormat('d/m/Y', $request->input('data_inicio'))->startOfDay()->toDateTimeString() 
+                : null;
+            $dataFim = $request->filled('data_fim') 
+                ? Carbon::createFromFormat('d/m/Y', $request->input('data_fim'))->endOfDay()->toDateTimeString() 
+                : null;
+
+            if ($request->filled('data_inicio') || $request->filled('data_fim')) {
+                if ($tipoData === 'criacao') {
+                    if ($dataInicio) $query->where('created_at', '>=', $dataInicio);
+                    if ($dataFim) $query->where('created_at', '<=', $dataFim);
+                } elseif ($tipoData === 'vencimento') {
+                    $query->whereHas('pagamentos', function ($q) use ($dataInicio, $dataFim) {
+                        if ($dataInicio) $q->where('dataVencimento', '>=', Carbon::parse($dataInicio)->toDateString());
+                        if ($dataFim) $q->where('dataVencimento', '<=', Carbon::parse($dataFim)->toDateString());
+                    });
+                } elseif ($tipoData === 'pagamento') {
+                    $query->whereHas('pagamentos', function ($q) use ($dataInicio, $dataFim) {
+                        if ($dataInicio) $q->where('dataPagamento', '>=', Carbon::parse($dataInicio)->toDateString());
+                        if ($dataFim) $q->where('dataPagamento', '<=', Carbon::parse($dataFim)->toDateString());
+                    });
+                }
+            }
+
+            $situacaoParcelaFilter = $request->input('situacao_parcela', 'all');
+            $dataInicioDateOnly = $dataInicio ? Carbon::parse($dataInicio)->toDateString() : null;
+            $dataFimDateOnly = $dataFim ? Carbon::parse($dataFim)->toDateString() : null;
+
+            $query->cursor()->each(function ($s) use ($file, $situacaoParcelaFilter, $tipoData, $dataInicioDateOnly, $dataFimDateOnly) {
+                // Agregar serviços vinculados
+                $servicosIds = [];
+                $servicosNomes = [];
+                $servicosDetalhes = [];
+
+                foreach ($s->vinculos as $v) {
+                    $servicosIds[] = $v->servico_id;
+                    $nomeServico = $v->servico ? ($v->servico->nome ?? $v->servico->licenciamento ?? '---') : '---';
+                    $empresaNome = $v->servico && $v->servico->unidade && $v->servico->unidade->empresa 
+                        ? $v->servico->unidade->empresa->nomeFantasia 
+                        : '---';
+                    $servicosNomes[] = $nomeServico;
+                    $servicosDetalhes[] = "ID: {$v->servico_id} | Servico: {$nomeServico} | Cliente: {$empresaNome} | Valor: R$ " . ($v->valor !== null ? number_format($v->valor, 2, ',', '.') : '0,00') . " | Reembolso: " . ($v->reembolso === 'sim' ? 'Sim' : 'Não');
+                }
+
+                $servicosIdsStr = implode(', ', $servicosIds);
+                $servicosNomesStr = implode('; ', $servicosNomes);
+                $servicosDetalhesStr = implode(' | ', $servicosDetalhes);
+
+                $pagamentos = $s->pagamentos;
+
+                $escreverLinha = function ($file, $s, $pag = null) use ($servicosIdsStr, $servicosNomesStr, $servicosDetalhesStr) {
+                    fputcsv($file, [
+                        $s->id,
+                        $s->prestador ? ($s->prestador->nome ?? '---') : '---',
+                        $s->escopo ?? '---',
+                        $s->valorServico !== null ? number_format($s->valorServico, 2, ',', '.') : '0,00',
+                        $s->formaPagamento ?? '---',
+                        $s->situacao ?? '---',
+                        $s->created_at ? $s->created_at->format('d/m/Y H:i:s') : '---',
+                        $pag ? $pag->parcela : '---',
+                        $pag ? ($pag->valor !== null ? number_format($pag->valor, 2, ',', '.') : '0,00') : '---',
+                        $pag && $pag->dataVencimento ? Carbon::parse($pag->dataVencimento)->format('d/m/Y') : '---',
+                        $pag && $pag->dataPagamento ? Carbon::parse($pag->dataPagamento)->format('d/m/Y') : '---',
+                        $pag ? ($pag->situacao ?? '---') : '---',
+                        $pag && $pag->comprovante ? $pag->comprovante : '---',
+                        $pag && $pag->obs ? str_replace(["\r", "\n", ";"], [" ", " ", " "], $pag->obs) : '---',
+                        $servicosIdsStr ?: '---',
+                        $servicosNomesStr ?: '---',
+                        $servicosDetalhesStr ?: '---'
+                    ], ';');
+                };
+
+                if ($pagamentos->isEmpty()) {
+                    // Se não houver pagamentos e não houver filtro de parcela ou data de parcela, escrevemos uma linha com dados da OS apenas
+                    if ($situacaoParcelaFilter === 'all' && $tipoData === 'criacao') {
+                        $escreverLinha($file, $s);
+                    }
+                } else {
+                    foreach ($pagamentos as $pag) {
+                        // Aplicar filtro de situação da parcela se houver
+                        if ($situacaoParcelaFilter !== 'all' && $pag->situacao !== $situacaoParcelaFilter) {
+                            continue;
+                        }
+
+                        // Aplicar filtro de data da parcela se houver
+                        if ($tipoData === 'vencimento') {
+                            if ($dataInicioDateOnly && $pag->dataVencimento < $dataInicioDateOnly) continue;
+                            if ($dataFimDateOnly && $pag->dataVencimento > $dataFimDateOnly) continue;
+                        } elseif ($tipoData === 'pagamento') {
+                            if ($dataInicioDateOnly && $pag->dataPagamento < $dataInicioDateOnly) continue;
+                            if ($dataFimDateOnly && $pag->dataPagamento > $dataFimDateOnly) continue;
+                        }
+
+                        $escreverLinha($file, $s, $pag);
+                    }
+                }
+            });
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }

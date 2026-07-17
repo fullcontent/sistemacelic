@@ -56,8 +56,15 @@ Route::prefix('admin')->group(function () {
 
 	Route::get('/relatorios', function () {
 		$empresas = \App\Models\Empresa::orderBy('nomeFantasia')->pluck('nomeFantasia', 'id');
-		return view('admin.relatorios.index')->with(['empresas' => $empresas]);
+		$prestadores = \App\Models\Prestador::orderBy('nome')->pluck('nome', 'id');
+		return view('admin.relatorios.index')->with([
+			'empresas' => $empresas,
+			'prestadores' => $prestadores
+		]);
 	})->name('relatorios.index');
+
+	Route::post('/relatorioOrdemServicoFilter', 'AdminController@ordemServicoCSV')->name('relatorioOrdemServicoFilter');
+	Route::get('/relatorioOrdemServico', 'AdminController@ordemServicoCSV')->name('relatorioOrdemServico');
 
 	// Recursos Básicos (CRUDs)
 	Route::resource('/empresas', 'EmpresasController');
