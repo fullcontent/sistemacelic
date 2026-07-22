@@ -54,3 +54,15 @@ Route::prefix('nfse')->group(function () {
     Route::post('/webhooks/plugnotas', 'NfseController@webhookPlugNotas');
     Route::get('/emissoes/{emissionId}/zip', 'NfseController@gerarZip');
 });
+
+// =========================================================================
+// API PARA AGENTES DE IA (CelicOps & RAG)
+// =========================================================================
+Route::prefix('agent')->group(function () {
+    Route::get('/insights', 'AgentInsightsController@getDailyInsights');
+    Route::get('/cliente/{empresa_id}', 'AgentInsightsController@getClienteResumo');
+    
+    // IA RAG Dossiê
+    Route::post('/projetos/{servico_id}/dossie', 'DossieIAController@gerarDossie');
+});
+

@@ -916,4 +916,40 @@ class FaturamentoController extends Controller
 
         return $pdf->download($filename);
     }
+
+    /**
+     * INTEGRAÇÃO DA IA - Auditoria de Boletos (Fase 1)
+     * Esse método simula o momento após o upload de um comprovante no sistema.
+     */
+    public function auditarComprovante(\Illuminate\Http\Request $request, $boleto_id)
+    {
+        $boleto = \App\Models\Boleto::findOrFail($boleto_id);
+        
+        // Simulação do upload do comprovante
+        $comprovantePath = $request->file('comprovante')->store('comprovantes');
+        
+        $comprovante = new \App\Models\Comprovante();
+        $comprovante->boleto_id = $boleto->id;
+        $comprovante->arquivo_path = $comprovantePath;
+        $comprovante->save();
+
+        // Aciona o serviço de OCR (IA)
+        $auditoriaService = new \App\Services\BoletoAuditoriaService();
+        
+        $dadosBoleto = $auditoriaService->extrairDadosDocumento($boleto->arquivo_path, 'boleto');
+        $boleto->valor = $dadosBoleto['valor'];
+        $boleto->favorecido = $dadosBoleto['favorecido'];
+        $boleto->save();
+
+        $dadosComprovante = $auditoriaService->extrairDadosDocumento($comprovante->arquivo_path, 'comprovante');
+        $comprovante->valor_pago = $dadosComprovante['valor'];
+        $comprovante->favorecido_pago = $dadosComprovante['favorecido'];
+        $comprovante->save();
+
+        // Aciona a validação de regras de Reembolso (IA)
+        $reembolsoService = new \App\Services\IAReembolsoService();
+        $resultado = $reembolsoService->validarComprovante($boleto, $comprovante);
+
+        return redirect()->back()->with('success', 'Upload concluído e auditado pela IA. Status: ' . ($resultado['divergencia'] ? 'Divergência Encontrada' : 'Validado'));
+    }
 }
