@@ -7,6 +7,8 @@
             <th>Empresa</th>
             <th>Serviço</th>
             <th>OS</th>
+            <th>ID OS</th>
+            <th>ID Taxa</th>
             <th>Código</th>
             <th>Unidade</th>
             <th>CNPJ</th>
@@ -33,6 +35,8 @@
                     <td>{{$s->unidade->empresa->nomeFantasia}}</td>
                     <td>{{$s->nome}}</td>
                     <td>{{$s->os}}</td>
+                    <td>{{$s->id}}</td>
+                    <td>{{$t->id}}</td>
                     <td>{{$s->unidade->codigo}}</td>
                     <td>{{$s->unidade->nomeFantasia}}</td>
                     <td>{{$s->unidade->cnpj}}</td>

@@ -17,9 +17,6 @@ composer.phar
 /public/uploads
 
 config/app.php
-<<<<<<< HEAD
 .agent
-=======
 .agent/
 scripts/*
->>>>>>> feature/nfse
