@@ -1,5 +1,6 @@
-<div class="box-body">
-
+<div class="dashboard-card">
+    <div class="dashboard-card-title"><i class="fa fa-info-circle"></i> Informações Principais</div>
+    <div class="row">
   
     {!! Form::hidden('user_id', Auth::id(), ['class'=>'form-control']) !!}
     {!! Form::hidden('servico_id', optional($servico)->id, ['class'=>'form-control', 'id' => 'hidden_servico_id']) !!}
@@ -47,6 +48,23 @@
            
         </div>
     </div>
+
+
+
+    <div class="col-md-12">
+        <div class="form-group">
+            {!! Form::label('escopo', 'Escopo') !!}
+            {!! Form::textarea('escopo', null, ['class'=>'form-control', 'rows'=>3]) !!}
+        </div>
+    </div>  
+
+    </div> <!-- Close Row -->
+</div> <!-- Close Card Principais -->
+
+<div class="dashboard-card">
+    <div class="dashboard-card-title"><i class="fa fa-money"></i> Parcelas de Pagamento</div>
+    <div class="row">
+
 
 
     
@@ -147,14 +165,29 @@
         </div>
     </div>
 
-    <div class="col-md-12">
-        <div class="form-group">
-            {!! Form::label('escopo', 'Escopo') !!}
-            {!! Form::textarea('escopo', null, ['class'=>'form-control']) !!}
-        </div>
-    </div>  
+    </div> <!-- Close Row for Parcelas -->
+</div> <!-- Close Card Parcelas -->
 
-<h4>Serviços vinculados</h4>
+<div class="dashboard-card">
+    <div class="dashboard-card-title"><i class="fa fa-file-text-o"></i> Contrato</div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                {!! Form::label('contrato', 'Contrato com Prestador (PDF/Imagem)') !!}
+                @if(Route::is('ordemServico.edit') && optional($ordemServico)->contrato)
+                    <div style="margin-bottom: 10px;">
+                        <a href="{{ url("public/uploads/" . $ordemServico->contrato) }}" target="_blank" class="btn btn-xs btn-success" style="border-radius: 50px; padding: 4px 15px;"><i class="fa fa-eye"></i> Visualizar Contrato Atual</a>
+                    </div>
+                @endif
+                {!! Form::file('contrato', ['class'=>'form-control']) !!}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-card">
+    <div class="dashboard-card-title"><i class="fa fa-link"></i> Serviços Vinculados</div>
+    <div class="row">
 
 
 <div class="col-md-1">
@@ -274,8 +307,10 @@
 
 
 
-</div>
+</div> <!-- /servicos -->
 
+    </div> <!-- /row -->
+</div> <!-- /dashboard-card -->
 @section('js')
 <script>
 $(document).ready(function () {

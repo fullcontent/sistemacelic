@@ -160,6 +160,18 @@ class OrdemServicoController extends Controller
         $ordemServico->servico_id = $request->servico_id;
         $ordemServico->formaPagamento = $request->formaPagamento;
         $ordemServico->situacao = $request->situacao;
+
+        if ($request->hasFile('contrato')) {
+            $file = $request->file('contrato');
+            if ($file->isValid()) {
+                $name = uniqid(date('HisYmd'));
+                $extension = $file->extension();
+                $nameFile = "{$name}.{$extension}";
+                $file->move(public_path('uploads'), $nameFile);
+                $ordemServico->contrato = $nameFile;
+            }
+        }
+
         $ordemServico->save();
 
 
@@ -359,6 +371,18 @@ class OrdemServicoController extends Controller
         $ordemServico->escopo = $request->escopo;
         $ordemServico->formaPagamento = $request->formaPagamento;
         $ordemServico->situacao = $request->situacao ?? $ordemServico->situacao;
+
+        if ($request->hasFile('contrato')) {
+            $file = $request->file('contrato');
+            if ($file->isValid()) {
+                $name = uniqid(date('HisYmd'));
+                $extension = $file->extension();
+                $nameFile = "{$name}.{$extension}";
+                $file->move(public_path('uploads'), $nameFile);
+                $ordemServico->contrato = $nameFile;
+            }
+        }
+
         $ordemServico->save();
 
         // Atualizar vínculos
