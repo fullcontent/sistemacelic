@@ -552,7 +552,7 @@ class PendenciasController extends Controller
         // Paginate listings
         $pendencias = $query->orderBy('prioridade', 'desc')
                             ->orderBy('vencimento', 'asc')
-                            ->get();
+                            ->paginate(50);
 
         // If unity is selected, retrieve it to populate select2 correctly on load
         $selectedUnidade = null;

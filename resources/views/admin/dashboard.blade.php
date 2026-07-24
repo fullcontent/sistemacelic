@@ -314,7 +314,9 @@
                             </tbody>
                         </table>
                     </div>
-
+                    <div class="text-center">
+                        {{ $dashboardPendencias->appends(request()->all())->links() }}
+                    </div>
                 </div>
             </div>
         </div>

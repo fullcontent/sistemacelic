@@ -248,7 +248,9 @@
                         </tbody>
                     </table>
                 </div>
-
+                <div class="text-center">
+                    {{ $pendencias->appends(request()->all())->links() }}
+                </div>
             </div>
         </div>
     </div>
