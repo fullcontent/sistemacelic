@@ -109,6 +109,7 @@
 @endif
 
 
+@if(!in_array(Auth::id(), [2, 28]))
 @if(count($pendencias->where('status','pendente')) > 0)
 
 @include('admin.components.widget-pendencias-usuario')
@@ -318,6 +319,7 @@
             </div>
         </div>
     </div>
+@endif
 @endif
 
 @stop
