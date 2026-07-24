@@ -248,9 +248,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="text-center">
-                    {{ $pendencias->appends(request()->all())->links() }}
-                </div>
+
             </div>
         </div>
     </div>
@@ -281,6 +279,14 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
 $(function () {
+    // Inicializa DataTable
+    $('#tabela-dashboard-pendencias').DataTable({
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
+        },
+        "order": []
+    });
+
     // Inicializa Select2 simples
     $('.select2:not(#unidade_id)').select2();
 

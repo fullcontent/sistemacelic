@@ -313,9 +313,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="text-center">
-                        {{ $dashboardPendencias->appends(request()->all())->links() }}
-                    </div>
+
                 </div>
             </div>
         </div>
@@ -350,6 +348,14 @@
 <script>
 $(function () {
     @if(Auth::check() && Auth::user()->isCoordinatorOrAdmin())
+        // Inicializa DataTable
+        $('#tabela-dashboard-geral-pendencias').DataTable({
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
+            },
+            "order": []
+        });
+
         // Inicializa Select2 simples
         $('.select2:not(#unidade_id)').select2();
 

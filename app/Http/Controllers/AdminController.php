@@ -85,7 +85,7 @@ class AdminController extends Controller
 
             $dashboardPendencias = $query->orderBy('prioridade', 'desc')
                                          ->orderBy('vencimento', 'asc')
-                                         ->paginate(15);
+                                         ->get();
 
             $selectedUnidade = null;
             if ($unidade_id) {
