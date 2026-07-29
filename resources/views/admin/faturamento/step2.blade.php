@@ -117,6 +117,10 @@
 
 									@if(isset($s->servicoFinalizado->finalizado))
 										<td>{{ \Carbon\Carbon::parse($s->servicoFinalizado->finalizado)->format('d/m/Y')}}</td>
+									@elseif($s->situacao == 'cancelado')
+										<td>Cancelado</td>
+									@elseif($s->situacao == 'arquivado')
+										<td>Arquivado</td>
 									@else
 										<td>Andamento</td>
 									@endif
