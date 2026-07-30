@@ -54,21 +54,21 @@
 
 			<div class="col-md-12">
 
-				<table class="table table-hover">
+				<table class="table table-hover" id="tabela-faturamento">
 					<thead>
-						<th></th>
-						<th>Cód.</th>
-						<th>Loja</th>
-						<th>Cidade</th>
-						<th>CNPJ</th>
-						<th>Serviço</th>
-						<th>NF</th>
-						<th>Valor Total</th>
-						<th>Valor em Aberto</th>
-						<th>%</th>
-						<th>Valor Faturar</th>
-
-
+						<tr>
+							<th></th>
+							<th>Cód.</th>
+							<th>Loja</th>
+							<th>Cidade</th>
+							<th>CNPJ</th>
+							<th>Serviço</th>
+							<th>NF</th>
+							<th>Valor Total</th>
+							<th>Valor em Aberto</th>
+							<th>%</th>
+							<th>Valor Faturar</th>
+						</tr>
 					</thead>
 					<tbody>
 
@@ -212,6 +212,18 @@
 
 
 		$('#link').prop('checked', false);
+
+		$('#tabela-faturamento').DataTable({
+			"paging": false,
+			"lengthChange": false,
+			"searching": true,
+			"ordering": true,
+			"info": false,
+			"autoWidth": false,
+			"language": {
+				"url": "//cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"
+			}
+		});
 
 
 	</script>

@@ -328,7 +328,7 @@ class FaturamentoController extends Controller
 
 
 
-        $servicosFaturar = Servico::with('financeiro')
+        $servicosFaturar = Servico::with(['financeiro', 'unidade'])
             ->whereIn('id', $request->servicos)
             ->get();
 
