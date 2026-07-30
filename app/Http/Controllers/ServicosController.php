@@ -265,15 +265,33 @@ class ServicosController extends Controller
             ->with('servicos', $servicos);
     }
 
-    public function meusServicos()
+    public function meusServicos(Request $request)
     {
-        $servicos = Servico::porUsuario(Auth::id())
-            ->where('situacao', '<>', 'arquivado')
-            ->with('unidade', 'empresa', 'responsavel')
-            ->get();
+        $situacao = $request->get('situacao', 'ativos');
+
+        $query = Servico::porUsuario(Auth::id())
+            ->with('unidade', 'empresa', 'responsavel');
+
+        if ($situacao === 'antigos' || $situacao === 'concluidos_arquivados') {
+            $query->whereIn('situacao', ['finalizado', 'arquivado', 'nRenovado', 'cancelado']);
+        } elseif ($situacao === 'arquivado') {
+            $query->where('situacao', 'arquivado');
+        } elseif ($situacao === 'finalizado') {
+            $query->where('situacao', 'finalizado');
+        } elseif ($situacao === 'andamento') {
+            $query->where('situacao', 'andamento');
+        } elseif ($situacao === 'todos') {
+            // Todos os serviços (sem filtro de situacao)
+        } else {
+            // Padrão 'ativos': excluir arquivados
+            $query->where('situacao', '<>', 'arquivado');
+        }
+
+        $servicos = $query->get();
 
         return view('admin.lista-servicos')
-            ->with('servicos', $servicos);
+            ->with('servicos', $servicos)
+            ->with('situacaoAtual', $situacao);
     }
 
     public function listaInativo()

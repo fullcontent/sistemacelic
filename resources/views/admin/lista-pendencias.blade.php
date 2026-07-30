@@ -34,20 +34,18 @@
                   <tbody>
                     @foreach($pendencias->where('status','pendente') as $p)
                   <tr>
-                  <td width="2%" class="prioridade">
+                  <td width="8%" class="prioridade text-center">
                       @if($p->prioridade == 1)
-                      <span style="display:none;">{{$p->prioridade}}</span>
-                      <i class="fa fa-exclamation priorize" style="color:red" data-id="{{$p->id}}"></i>
-                      
+                      <span style="display:none;">1</span>
+                      <span class="label label-danger priorize" style="cursor:pointer;" data-id="{{$p->id}}" data-toggle="tooltip" data-placement="top" title="{{ $p->observacoes ?: 'Pendência com Prioridade/Urgência Alta' }}">
+                          <i class="fa fa-exclamation-triangle"></i> Alta
+                      </span>
                       @else
-                      <span style="display:none;">{{$p->prioridade}}</span>
-                      <input type="checkbox" data-id="{{$p->id}}" id="{{$p->id}}">                
-                      
+                      <span style="display:none;">0</span>
+                      <span class="label label-default" style="cursor:pointer;" data-toggle="tooltip" data-placement="top" title="{{ $p->observacoes ?: 'Prioridade Normal' }}">
+                          <input type="checkbox" data-id="{{$p->id}}" id="{{$p->id}}"> Normal
+                      </span>
                       @endif
-                  
-                  
-                  
-                  
                   </td>
                   <td><a href="{{route('empresas.show',$p->servico['unidade']['empresa']['id'])}}">{{$p->servico['unidade']['empresa']['nomeFantasia']}}</a></td>
                     <td><a href="{{route('servicos.show',$p->servico_id)}}">{{$p->servico['unidade']['codigo']}}</a></td>
@@ -105,6 +103,8 @@
 <script src="http://cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"></script>
 <script>
 		$(function () {
+			$('[data-toggle="tooltip"]').tooltip();
+
 		    $('#lista-pendencias').DataTable({
 		      "paging": true,
 		      "lengthChange": false,
@@ -117,46 +117,33 @@
             }           
   });
 
-  $('input:checkbox').click(function() {
-
-
-var pendenciaID = $(this).data('id');
-var row = $(this).closest("tr");
-
+  $(document).on('click', 'input:checkbox', function() {
+    var pendenciaID = $(this).data('id');
+    var row = $(this).closest("tr");
     
-$.ajax({
-          url: '{{url('admin/pendencia/priority')}}/'+pendenciaID+'',
-          method: 'GET',
-          success: function(data) {
+    $.ajax({
+      url: '{{url('admin/pendencia/priority')}}/'+pendenciaID+'',
+      method: 'GET',
+      success: function(data) {
+        row.find(".prioridade").html('<span style="display:none;">1</span><span class="label label-danger priorize" style="cursor:pointer;" data-id="'+pendenciaID+'" data-toggle="tooltip" data-placement="top" title="Pendência com Prioridade/Urgência Alta"><i class="fa fa-exclamation-triangle"></i> Alta</span>');
+        $('[data-toggle="tooltip"]').tooltip();
+      },
+    });
+  });
 
-            $(this).data('status', data.completed);
-                    
-            
-            row.find(".prioridade").html('<i class="fa fa-exclamation priorize" style="color:red" data-id='+pendenciaID+'></i>');
-            },
-          })
+  $(document).on('click', '.priorize', function(){
+    var pendenciaID = $(this).data('id');
+    var row = $(this).closest("tr");
+    $.ajax({
+      url: '{{url('admin/pendencia/unPriority')}}/'+pendenciaID+'',
+      method: 'GET',
+      success: function(data) {
+        row.find(".prioridade").html('<span style="display:none;">0</span><span class="label label-default" style="cursor:pointer;" data-toggle="tooltip" data-placement="top" title="Prioridade Normal"><input type="checkbox" data-id="'+pendenciaID+'"> Normal</span>');
+        $('[data-toggle="tooltip"]').tooltip();
+      },
+    });
+  });
 
-});
-
-$('.priorize').click(function(){
-
-var pendenciaID = $(this).data('id');
-var row = $(this).closest("tr");
-$.ajax({
-          url: '{{url('admin/pendencia/unPriority')}}/'+pendenciaID+'',
-          method: 'GET',
-          success: function(data) {
-
-            $(this).data('status', data.completed);
-                    
-            
-            row.find(".prioridade").html('<input type="checkbox" data-id='+pendenciaID+'> ');
-            },
-          })
-})
-
-     
 });			
-			
 </script>
-  @stop
+@stop

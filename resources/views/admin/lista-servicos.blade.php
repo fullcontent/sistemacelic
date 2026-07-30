@@ -8,11 +8,21 @@
 	
 	<div class="box" style="padding: 5px;">
 				<div class="box-header">
-					
+					@if(Route::is('servico.meus') || isset($situacaoAtual))
+						<div class="btn-group pull-left" style="margin-bottom: 10px;">
+							<a href="{{ route('servico.meus', ['situacao' => 'ativos']) }}" class="btn btn-sm {{ ($situacaoAtual ?? 'ativos') == 'ativos' ? 'btn-primary' : 'btn-default' }}">Ativos</a>
+							<a href="{{ route('servico.meus', ['situacao' => 'andamento']) }}" class="btn btn-sm {{ ($situacaoAtual ?? '') == 'andamento' ? 'btn-primary' : 'btn-default' }}">Em Andamento</a>
+							<a href="{{ route('servico.meus', ['situacao' => 'finalizado']) }}" class="btn btn-sm {{ ($situacaoAtual ?? '') == 'finalizado' ? 'btn-primary' : 'btn-default' }}">Finalizados</a>
+							<a href="{{ route('servico.meus', ['situacao' => 'arquivado']) }}" class="btn btn-sm {{ ($situacaoAtual ?? '') == 'arquivado' ? 'btn-primary' : 'btn-default' }}">Arquivados</a>
+							<a href="{{ route('servico.meus', ['situacao' => 'antigos']) }}" class="btn btn-sm {{ ($situacaoAtual ?? '') == 'antigos' ? 'btn-primary' : 'btn-default' }}"><i class="fa fa-archive"></i> Antigos (Concluídos/Arquivados)</a>
+							<a href="{{ route('servico.meus', ['situacao' => 'todos']) }}" class="btn btn-sm {{ ($situacaoAtual ?? '') == 'todos' ? 'btn-primary' : 'btn-default' }}">Todos</a>
+						</div>
+					@endif
 				</div>
 				<table id="lista-servicos" class="table table-bordered table-hover">
                 <thead>
                 <tr>
+                  <th>Prioridade</th>
                   <th>Cliente</th>
 				  <th>OS</th>
                   <th>Serviço</th>
@@ -34,6 +44,17 @@
 						$tmp = \App\Models\Empresa::find($servico->unidade->empresa_id);
 						?>
 						
+						<td>
+							@if(isset($servico->prioridade) && $servico->prioridade == 1)
+								<span class="label label-danger" data-toggle="tooltip" data-placement="top" title="{{ $servico->observacoes ?: 'Serviço com Urgência / Prioridade alta' }}">
+									<i class="fa fa-exclamation-triangle"></i> Alta
+								</span>
+							@else
+								<span class="label label-default" data-toggle="tooltip" data-placement="top" title="{{ $servico->observacoes ?: 'Prioridade Normal' }}">
+									Normal
+								</span>
+							@endif
+						</td>
 						<td>{{ $tmp->nomeFantasia }}</td>
 					<td>{{$servico->os}}@if($servico->servicoPrincipal) <small class="label bg-red">S</small>@endif</td>
 					 
@@ -98,6 +119,7 @@
 
 	              				@endif
 								
+								
 	              				@break
 
 	              			@case('arquivado')
@@ -151,6 +173,7 @@
 <script src="http://cdn.datatables.net/plug-ins/1.10.20/i18n/Portuguese-Brasil.json"></script>
 <script>
 		$(function () {
+			$('[data-toggle="tooltip"]').tooltip();
 		    $('#lista-servicos').DataTable({
 		      "paging": true,
 		      "lengthChange": true,

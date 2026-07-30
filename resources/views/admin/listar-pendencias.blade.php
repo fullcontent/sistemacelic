@@ -29,17 +29,18 @@
                 <li @if($pendencia->status == 'concluido') class='done' @endif>
                   <!-- drag handle -->
                   @if($pendencia->prioridade == 1)
-                      <span style="display:none;">{{$pendencia->prioridade}}</span>
+                      <span style="display:none;">1</span>
                       <a href="#" onClick="unPriorize({{$pendencia->id}})">
-                      <i class="fa fa-exclamation priorize" style="color:red" data-prioridadeID="{{$pendencia->id}}"></i></a>
-                      
-                      @else
-                      <span style="display:none;">{{$pendencia->prioridade}}</span>
-                      <a href="#" onClick="unPriorize({{$pendencia->id}})">
-                      <i class="priorize" style="color:red" data-prioridadeID="{{$pendencia->id}}"></i></a>
-                              
-                      
-                      @endif
+                      <span class="label label-danger" data-toggle="tooltip" data-placement="top" title="{{ $pendencia->observacoes ?: 'Pendência com Prioridade/Urgência Alta' }}" data-prioridadeID="{{$pendencia->id}}">
+                          <i class="fa fa-exclamation-triangle"></i> Alta
+                      </span></a>
+                  @else
+                      <span style="display:none;">0</span>
+                      <a href="#" onClick="priorize({{$pendencia->id}})">
+                      <span class="label label-default" data-toggle="tooltip" data-placement="top" title="{{ $pendencia->observacoes ?: 'Prioridade Normal' }}" data-prioridadeID="{{$pendencia->id}}">
+                          Normal
+                      </span></a>
+                  @endif
                   <!-- checkbox -->
                   <input type="checkbox" data-id="{{$pendencia->id}}" @if($pendencia->status == 'concluido') checked="" @endif>
                   <!-- todo text -->
@@ -97,8 +98,9 @@
 
 @section('js')
     <script>
-        
-      
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
         
        $('#todo-list').todoList({ 
 
