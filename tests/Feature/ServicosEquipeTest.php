@@ -95,4 +95,55 @@ class ServicosEquipeTest extends TestCase
         $this->assertEquals($coordenador->id, $servico->coresponsavel_id);
         $this->assertEquals($analista->id, $servico->analista1_id);
     }
+
+    public function test_dashboard_exibe_apenas_pendencias_proprias()
+    {
+        $userA = User::create([
+            'name' => 'Kauane',
+            'email' => 'kauane@sistemacelic.com',
+            'password' => bcrypt('password'),
+            'privileges' => 'usuario',
+            'permitir_acesso_servicos' => true,
+            'active' => true
+        ]);
+
+        $userB = User::create([
+            'name' => 'Rodrigo',
+            'email' => 'rodrigo@sistemacelic.com',
+            'password' => bcrypt('password'),
+            'privileges' => 'usuario',
+            'permitir_acesso_servicos' => true,
+            'active' => true
+        ]);
+
+        $servico = Servico::create([
+            'tipo' => 'alvara',
+            'nome' => 'Servico Compartilhado',
+            'os' => 'OS99999',
+            'situacao' => 'andamento',
+            'responsavel_id' => $userB->id,
+            'coresponsavel_id' => $userA->id
+        ]);
+
+        // Pendência atribuída EXCLUSIVAMENTE ao Rodrigo (userB)
+        $pendenciaRodrigo = \App\Models\Pendencia::create([
+            'servico_id' => $servico->id,
+            'pendencia' => 'Elaborar documento',
+            'responsavel_id' => $userB->id,
+            'status' => 'pendente'
+        ]);
+
+        // Simula login de Kauane (userA)
+        $this->actingAs($userA);
+        $adminController = new \App\Http\Controllers\AdminController();
+
+        $pendenciasKauane = $adminController->pendencias();
+        $this->assertCount(0, $pendenciasKauane);
+
+        // Simula login de Rodrigo (userB)
+        $this->actingAs($userB);
+        $pendenciasRodrigo = $adminController->pendencias();
+        $this->assertCount(1, $pendenciasRodrigo);
+        $this->assertEquals($pendenciaRodrigo->id, $pendenciasRodrigo->first()->id);
+    }
 }

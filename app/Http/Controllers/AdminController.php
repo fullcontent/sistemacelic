@@ -119,13 +119,8 @@ class AdminController extends Controller
 
     public function pendencias()
     {
-        $servicoIds = Servico::select('id')->porUsuario(Auth::id())->pluck('id')->toArray();
-
         $pendencias = Pendencia::with('servico', 'unidade')
-            ->where(function($q) use ($servicoIds) {
-                $q->where('responsavel_id', Auth::id())
-                  ->orWhereIn('servico_id', $servicoIds);
-            })
+            ->where('responsavel_id', Auth::id())
             ->where('status', 'pendente')
             ->whereDoesntHave('vinculos')
             ->get();
@@ -179,7 +174,7 @@ class AdminController extends Controller
     public function servicosAndamento()
     {
         $servicos = Servico::with('unidade', 'empresa', 'responsavel')
-            ->porUsuario(Auth::id())
+            ->comoResponsavelPrincipal(Auth::id())
             ->get();
 
         $servicos = $servicos->where('situacao', '=', 'andamento')
@@ -191,7 +186,7 @@ class AdminController extends Controller
     public function servicosAndamentoCoResponsavel()
     {
         $servicos = Servico::with('unidade', 'empresa', 'responsavel')
-            ->porUsuario(Auth::id()) // PorUsuario já engloba coresponsavel, mas mantemos o método por compatibilidade de rotas/dashboard
+            ->comoEquipeOuCoResponsavel(Auth::id())
             ->get();
 
         $servicos = $servicos->where('situacao', '=', 'andamento')

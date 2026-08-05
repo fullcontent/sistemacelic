@@ -215,6 +215,26 @@ class Servico extends Model
         });
     }
 
+    public function scopeComoResponsavelPrincipal($query, $userId)
+    {
+        return $query->where('responsavel_id', $userId);
+    }
+
+    public function scopeComoEquipeOuCoResponsavel($query, $userId)
+    {
+        return $query->where(function($q) use ($userId) {
+            $q->where('coresponsavel_id', $userId)
+              ->orWhere('analista1_id', $userId)
+              ->orWhere('analista2_id', $userId)
+              ->orWhereHas('membrosEquipeAtivos', function($sq) use ($userId) {
+                  $sq->where('user_id', $userId);
+              });
+        })->where(function($q) use ($userId) {
+            $q->where('responsavel_id', '!=', $userId)
+              ->orWhereNull('responsavel_id');
+        });
+    }
+
     public function analiseProtocoloLaudos()
     {
         return $this->hasMany('App\Models\AnaliseProtocoloLaudo', 'servico_id')->orderBy('created_at', 'desc');
