@@ -181,4 +181,15 @@ class Servico extends Model
         });
     }
 
+    public function analiseProtocoloLaudos()
+    {
+        return $this->hasMany('App\Models\AnaliseProtocoloLaudo', 'servico_id')->orderBy('created_at', 'desc');
+    }
+
+    public function cicloAtivo()
+    {
+        return $this->analiseProtocoloLaudos()->where('status', 'em_andamento')->first();
+    }
+
 }
+

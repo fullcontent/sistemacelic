@@ -11,8 +11,11 @@ use Auth;
 use App\User;
 
 use App\Models\Pendencia;
-use App\Models\Servico;
 use Carbon\Carbon;
+use App\Models\Protocolo;
+use App\Models\Laudo;
+use App\Models\Documento;
+use App\Models\Servico;
 
 
 
@@ -350,4 +353,49 @@ class ArquivosController extends Controller
     return new StreamedResponse($callback, 200, $headers);
 }
 
+    public function downloadCicloFile($tipo, $id)
+    {
+        switch ($tipo) {
+            case 'protocolo':
+                $fileRecord = Protocolo::findOrFail($id);
+                $filename = $fileRecord->anexo;
+                $tipoNome = 'Protocolo';
+                break;
+            case 'laudo':
+                $fileRecord = Laudo::findOrFail($id);
+                $filename = $fileRecord->anexo;
+                $tipoNome = 'Laudo';
+                break;
+            case 'documento':
+                $fileRecord = Documento::findOrFail($id);
+                $filename = $fileRecord->arquivo;
+                $tipoNome = $fileRecord->nome;
+                break;
+            default:
+                abort(404);
+        }
+
+        if (empty($filename) || !file_exists(public_path('uploads/' . $filename))) {
+            abort(404);
+        }
+
+        $servico = $fileRecord->analise->servico;
+        $extension = pathinfo($filename, PATHINFO_EXTENSION);
+        
+        // Strip original extension if already present in Documento name
+        if (substr($tipoNome, -strlen($extension) - 1) === '.' . $extension) {
+            $tipoNome = substr($tipoNome, 0, -strlen($extension) - 1);
+        }
+
+        $arquivo = $tipoNome . ' - ' . $servico->unidade->codigo . ' - ' . $servico->unidade->nomeFantasia . ' - ' . $servico->nome . '.' . $extension;
+        $arquivo = str_replace(['/', '\\', '?', '%', '*', ':', '|', '"', '<', '>'], '-', $arquivo);
+
+        $headers = [
+            'Content-Disposition' => 'inline; filename="' . $arquivo . '"',
+        ];
+                       
+        return response()->file(public_path('uploads/' . $filename), $headers);
+    }
+
 }
+

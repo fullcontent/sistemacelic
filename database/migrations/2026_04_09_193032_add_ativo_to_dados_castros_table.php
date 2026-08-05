@@ -13,9 +13,13 @@ class AddAtivoToDadosCastrosTable extends Migration
      */
     public function up()
     {
-        Schema::table('dados_castros', function (Blueprint $table) {
-            $table->boolean('ativo')->default(true)->after('conta');
-        });
+        if (Schema::hasTable('dados_castros')) {
+            Schema::table('dados_castros', function (Blueprint $table) {
+                if (!Schema::hasColumn('dados_castros', 'ativo')) {
+                    $table->boolean('ativo')->default(true)->after('conta');
+                }
+            });
+        }
     }
 
     /**
@@ -25,8 +29,10 @@ class AddAtivoToDadosCastrosTable extends Migration
      */
     public function down()
     {
-        Schema::table('dados_castros', function (Blueprint $table) {
-            $table->dropColumn('ativo');
-        });
+        if (Schema::hasTable('dados_castros')) {
+            Schema::table('dados_castros', function (Blueprint $table) {
+                $table->dropColumn('ativo');
+            });
+        }
     }
 }

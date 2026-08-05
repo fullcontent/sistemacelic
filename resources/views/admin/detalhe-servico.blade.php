@@ -619,8 +619,9 @@
 
 @endif
 
-
-
+<div class="col-md-12">
+  @include('admin.components.widget-ciclosAnalise')
+</div>
 
 <div class="col-md-7">
   @include('admin.components.widget-taxas')

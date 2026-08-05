@@ -13,15 +13,13 @@ class AddDadosCastroIdToEmpresasTable extends Migration
      */
     public function up()
     {
-        Schema::table('empresas', function (Blueprint $table) {
-            if (!Schema::hasColumn('empresas', 'dados_castro_id')) {
-                $table->unsignedInteger('dados_castro_id')->nullable()->after('status');
-            }
-            
-            // Assuming dados_castros is the table name for DadosCastro model
-            // We'll skip the foreign key constraint if the table doesn't have a PK
-            // $table->foreign('dados_castro_id')->references('id')->on('dados_castros')->onDelete('set null');
-        });
+        if (Schema::hasTable('empresas')) {
+            Schema::table('empresas', function (Blueprint $table) {
+                if (!Schema::hasColumn('empresas', 'dados_castro_id')) {
+                    $table->unsignedInteger('dados_castro_id')->nullable()->after('status');
+                }
+            });
+        }
     }
 
     /**
@@ -31,9 +29,12 @@ class AddDadosCastroIdToEmpresasTable extends Migration
      */
     public function down()
     {
-        Schema::table('empresas', function (Blueprint $table) {
-            $table->dropForeign(['dados_castro_id']);
-            $table->dropColumn('dados_castro_id');
-        });
+        if (Schema::hasTable('empresas')) {
+            Schema::table('empresas', function (Blueprint $table) {
+                if (Schema::hasColumn('empresas', 'dados_castro_id')) {
+                    $table->dropColumn('dados_castro_id');
+                }
+            });
+        }
     }
 }

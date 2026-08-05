@@ -16,12 +16,11 @@ use App\Models\Historico;
 use App\Models\ServicoLpu;
 use App\Models\Pendencia;
 use App\Models\Solicitante;
-use App\Models\PendenciasVinculos;
-
-
-
-
 use App\Models\ServicoFinanceiro;
+use App\Models\AnaliseProtocoloLaudo;
+use App\Models\Protocolo;
+use App\Models\Laudo;
+use App\Models\Documento;
 use App\Models\ServicoFinalizado;
 use App\Models\Faturamento;
 
@@ -1669,5 +1668,286 @@ class ServicosController extends Controller
         }
 
         return $todosEventos->sortBy('data')->values();
+    }
+
+    public function iniciarCiclo(Request $request)
+    {
+        $servico = Servico::find($request->servico_id);
+        if (!$servico) {
+            abort(404);
+        }
+
+        // Se já tiver ciclo em andamento, não inicia outro
+        $cicloAtivo = $servico->cicloAtivo();
+        if ($cicloAtivo) {
+            return redirect()->back()->with('error', 'Já existe um ciclo de análise em andamento.');
+        }
+
+        $ciclo = AnaliseProtocoloLaudo::create([
+            'servico_id' => $servico->id,
+            'status' => 'em_andamento',
+            'descricao' => $request->descricao ?: 'Primeira Análise',
+        ]);
+
+        if ($request->protocolo_numero || $request->hasFile('protocolo_anexo')) {
+            $protocolo = new Protocolo([
+                'analise_protocolo_laudo_id' => $ciclo->id,
+                'numero' => $request->protocolo_numero,
+                'tipo' => 'inicial',
+            ]);
+
+            if ($request->protocolo_emissao) {
+                $protocolo->data_protocolo = Carbon::createFromFormat('d/m/Y', $request->protocolo_emissao)->toDateString();
+            }
+
+            if ($request->hasFile('protocolo_anexo') && $request->file('protocolo_anexo')->isValid()) {
+                $name = uniqid(date('HisYmd'));
+                $extension = $request->protocolo_anexo->extension();
+                $nameFile = "{$name}.{$extension}";
+                $upload = $request->protocolo_anexo->storeAs('protocolos', $nameFile);
+                $protocolo->anexo = $upload;
+            }
+
+            $protocolo->save();
+
+            // Atualiza campos originais no serviço para manter compatibilidade
+            $servico->protocolo_numero = $protocolo->numero;
+            $servico->protocolo_emissao = $protocolo->data_protocolo;
+            if (isset($protocolo->anexo)) {
+                $servico->protocolo_anexo = $protocolo->anexo;
+            }
+            $servico->save();
+        }
+
+        // Anexar documentos juntados se houver
+        if ($request->hasFile('documentos_juntados')) {
+            foreach ($request->file('documentos_juntados') as $docFile) {
+                if ($docFile->isValid()) {
+                    $name = uniqid(date('HisYmd'));
+                    $extension = $docFile->extension();
+                    $nameFile = "{$name}.{$extension}";
+                    $upload = $docFile->storeAs('documentos_juntados', $nameFile);
+
+                    Documento::create([
+                        'analise_protocolo_laudo_id' => $ciclo->id,
+                        'nome' => $docFile->getClientOriginalName(),
+                        'arquivo' => $upload,
+                        'tipo' => 'juntada',
+                    ]);
+                }
+            }
+        }
+
+        return redirect()->route('servicos.show', $servico->id)->with('success', 'Ciclo de análise iniciado com sucesso.');
+    }
+
+    public function finalizarCicloSucesso(Request $request)
+    {
+        $servico = Servico::find($request->servico_id);
+        if (!$servico) {
+            abort(404);
+        }
+
+        $cicloAtivo = $servico->cicloAtivo();
+        if (!$cicloAtivo) {
+            return redirect()->back()->with('error', 'Nenhum ciclo de análise ativo para finalizar.');
+        }
+
+        // Finaliza o ciclo ativo como aprovado
+        $cicloAtivo->status = 'aprovada';
+        $cicloAtivo->save();
+
+        // Salvar licença/documento final no serviço (mantém compatibilidade)
+        $servico->situacao = 'finalizado';
+        if ($request->licenca_emissao) {
+            $servico->licenca_emissao = Carbon::createFromFormat('d/m/Y', $request->licenca_emissao)->toDateString();
+        }
+        if ($request->licenca_validade) {
+            $servico->licenca_validade = Carbon::createFromFormat('d/m/Y', $request->licenca_validade)->toDateString();
+        }
+        $servico->tipoLicenca = $request->tipoLicenca;
+
+        if ($request->hasFile('licenca_anexo') && $request->file('licenca_anexo')->isValid()) {
+            $name = uniqid(date('HisYmd'));
+            $extension = $request->licenca_anexo->extension();
+            $nameFile = "{$name}.{$extension}";
+            $upload = $request->licenca_anexo->storeAs('licencas', $nameFile);
+            $servico->licenca_anexo = $upload;
+        }
+
+        if ($servico->tipoLicenca == 'n/a' || $servico->tipoLicenca == 'definitiva') {
+            $servico->licenca_validade = '2059-12-31';
+        }
+
+        $servico->save();
+
+        // Registra histórico
+        $historico = new Historico;
+        $historico->servico_id = $servico->id;
+        $historico->user_id = Auth::id();
+        $historico->observacoes = 'Alterou situacao para "finalizado"';
+        $historico->save();
+
+        // Registra finalização do serviço
+        $servicoFinalizado = new ServicoFinalizado;
+        $servicoFinalizado->servico_id = $servico->id;
+        $servicoFinalizado->finalizado = date('Y-m-d');
+        $servicoFinalizado->save();
+
+        return redirect()->route('servicos.show', $servico->id)->with('success', 'Ciclo de análise aprovado e licença registrada.');
+    }
+
+    public function registrarExigencia(Request $request)
+    {
+        $servico = Servico::find($request->servico_id);
+        if (!$servico) {
+            abort(404);
+        }
+
+        $cicloAtivo = $servico->cicloAtivo();
+        if (!$cicloAtivo) {
+            return redirect()->back()->with('error', 'Nenhum ciclo de análise ativo para registrar exigência.');
+        }
+
+        // Finaliza o ciclo ativo como "com_exigencia"
+        $cicloAtivo->status = 'com_exigencia';
+        $cicloAtivo->save();
+
+        // Cria o laudo de exigência vinculado a esse ciclo
+        $laudo = new Laudo([
+            'analise_protocolo_laudo_id' => $cicloAtivo->id,
+            'numero' => $request->laudo_numero,
+        ]);
+
+        if ($request->laudo_emissao) {
+            $laudo->data_emissao = Carbon::createFromFormat('d/m/Y', $request->laudo_emissao)->toDateString();
+        }
+
+        if ($request->hasFile('laudo_anexo') && $request->file('laudo_anexo')->isValid()) {
+            $name = uniqid(date('HisYmd'));
+            $extension = $request->laudo_anexo->extension();
+            $nameFile = "{$name}.{$extension}";
+            $upload = $request->laudo_anexo->storeAs('laudos', $nameFile);
+            $laudo->anexo = $upload;
+        }
+
+        $laudo->save();
+
+        // Atualiza campos de laudo no serviço para compatibilidade
+        $servico->laudo_numero = $laudo->numero;
+        $servico->laudo_emissao = $laudo->data_emissao;
+        if (isset($laudo->anexo)) {
+            $servico->laudo_anexo = $laudo->anexo;
+        }
+        $servico->save();
+
+        // Inicia automaticamente o novo ciclo de análise
+        $numeroProximoCiclo = $servico->analiseProtocoloLaudos()->count() + 1;
+        $novoCiclo = AnaliseProtocoloLaudo::create([
+            'servico_id' => $servico->id,
+            'status' => 'em_andamento',
+            'descricao' => "Análise de Exigência " . ($numeroProximoCiclo - 1),
+        ]);
+
+        // Associa o novo protocolo de solicitação/reapresentação se enviado
+        if ($request->novo_protocolo_numero || $request->hasFile('novo_protocolo_anexo')) {
+            $novoProtocolo = new Protocolo([
+                'analise_protocolo_laudo_id' => $novoCiclo->id,
+                'numero' => $request->novo_protocolo_numero,
+                'tipo' => 'reapresentacao',
+            ]);
+
+            if ($request->novo_protocolo_emissao) {
+                $novoProtocolo->data_protocolo = Carbon::createFromFormat('d/m/Y', $request->novo_protocolo_emissao)->toDateString();
+            }
+
+            if ($request->hasFile('novo_protocolo_anexo') && $request->file('novo_protocolo_anexo')->isValid()) {
+                $name = uniqid(date('HisYmd'));
+                $extension = $request->novo_protocolo_anexo->extension();
+                $nameFile = "{$name}.{$extension}";
+                $upload = $request->novo_protocolo_anexo->storeAs('protocolos', $nameFile);
+                $novoProtocolo->anexo = $upload;
+            }
+
+            $novoProtocolo->save();
+
+            // Atualiza campos no serviço para compatibilidade
+            $servico->protocolo_numero = $novoProtocolo->numero;
+            $servico->protocolo_emissao = $novoProtocolo->data_protocolo;
+            if (isset($novoProtocolo->anexo)) {
+                $servico->protocolo_anexo = $novoProtocolo->anexo;
+            }
+            $servico->save();
+        }
+
+        // Associa novos documentos juntados ao novo ciclo se enviados
+        if ($request->hasFile('novos_documentos_juntados')) {
+            foreach ($request->file('novos_documentos_juntados') as $docFile) {
+                if ($docFile->isValid()) {
+                    $name = uniqid(date('HisYmd'));
+                    $extension = $docFile->extension();
+                    $nameFile = "{$name}.{$extension}";
+                    $upload = $docFile->storeAs('documentos_juntados', $nameFile);
+
+                    Documento::create([
+                        'analise_protocolo_laudo_id' => $novoCiclo->id,
+                        'nome' => $docFile->getClientOriginalName(),
+                        'arquivo' => $upload,
+                        'tipo' => 'juntada',
+                    ]);
+                }
+            }
+        }
+
+        return redirect()->route('servicos.show', $servico->id)->with('success', 'Exigência registrada e novo ciclo iniciado.');
+    }
+
+    public function anexarDocumento(Request $request)
+    {
+        $servico = Servico::find($request->servico_id);
+        if (!$servico) {
+            abort(404);
+        }
+
+        $cicloAtivo = $servico->cicloAtivo();
+        if (!$cicloAtivo) {
+            return redirect()->back()->with('error', 'Nenhum ciclo de análise ativo para anexar documentos.');
+        }
+
+        if ($request->hasFile('documentos')) {
+            foreach ($request->file('documentos') as $docFile) {
+                if ($docFile->isValid()) {
+                    $name = uniqid(date('HisYmd'));
+                    $extension = $docFile->extension();
+                    $nameFile = "{$name}.{$extension}";
+                    $upload = $docFile->storeAs('documentos_juntados', $nameFile);
+
+                    Documento::create([
+                        'analise_protocolo_laudo_id' => $cicloAtivo->id,
+                        'nome' => $docFile->getClientOriginalName(),
+                        'arquivo' => $upload,
+                        'tipo' => 'juntada',
+                    ]);
+                }
+            }
+        }
+
+        return redirect()->route('servicos.show', $servico->id)->with('success', 'Documentos anexados com sucesso.');
+    }
+
+    public function excluirDocumento($id)
+    {
+        $documento = Documento::find($id);
+        if (!$documento) {
+            return redirect()->back()->with('error', 'Documento não encontrado.');
+        }
+
+        $servicoId = $documento->analise->servico_id;
+
+        // Exclui do storage
+        \Storage::delete($documento->arquivo);
+        $documento->delete();
+
+        return redirect()->route('servicos.show', $servicoId)->with('success', 'Documento excluído com sucesso.');
     }
 }

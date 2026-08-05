@@ -13,9 +13,13 @@ class AddProductionFlagToNfseConfigurations extends Migration
      */
     public function up()
     {
-        Schema::table('nfse_configurations', function (Blueprint $table) {
-            $table->boolean('producao')->default(false);
-        });
+        if (Schema::hasTable('nfse_configurations')) {
+            Schema::table('nfse_configurations', function (Blueprint $table) {
+                if (!Schema::hasColumn('nfse_configurations', 'producao')) {
+                    $table->boolean('producao')->default(false);
+                }
+            });
+        }
     }
 
     /**
@@ -25,8 +29,10 @@ class AddProductionFlagToNfseConfigurations extends Migration
      */
     public function down()
     {
-        Schema::table('nfse_configurations', function (Blueprint $table) {
-            $table->dropColumn('producao');
-        });
+        if (Schema::hasTable('nfse_configurations')) {
+            Schema::table('nfse_configurations', function (Blueprint $table) {
+                $table->dropColumn('producao');
+            });
+        }
     }
 }

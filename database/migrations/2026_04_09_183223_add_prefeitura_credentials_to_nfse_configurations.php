@@ -13,11 +13,15 @@ class AddPrefeituraCredentialsToNfseConfigurations extends Migration
      */
     public function up()
     {
-        Schema::table('nfse_configurations', function (Blueprint $table) {
-            $table->string('login_prefeitura')->nullable();
-            $table->string('senha_prefeitura')->nullable();
-            $table->string('certificado')->nullable();
-        });
+        if (Schema::hasTable('nfse_configurations')) {
+            Schema::table('nfse_configurations', function (Blueprint $table) {
+                if (!Schema::hasColumn('nfse_configurations', 'login_prefeitura')) {
+                    $table->string('login_prefeitura')->nullable();
+                    $table->string('senha_prefeitura')->nullable();
+                    $table->string('certificado')->nullable();
+                }
+            });
+        }
     }
 
     /**
@@ -27,8 +31,10 @@ class AddPrefeituraCredentialsToNfseConfigurations extends Migration
      */
     public function down()
     {
-        Schema::table('nfse_configurations', function (Blueprint $table) {
-            $table->dropColumn(['login_prefeitura', 'senha_prefeitura', 'certificado']);
-        });
+        if (Schema::hasTable('nfse_configurations')) {
+            Schema::table('nfse_configurations', function (Blueprint $table) {
+                $table->dropColumn(['login_prefeitura', 'senha_prefeitura', 'certificado']);
+            });
+        }
     }
 }

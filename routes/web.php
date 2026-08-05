@@ -203,6 +203,15 @@ Route::prefix('admin')->group(function () {
 	Route::get('/servico/removerProtocolo/{id}', 'ServicosController@removerProtocolo')->name('servico.removerProtocolo');
 	Route::get('/servico/removerLicenca/{id}', 'ServicosController@removerLicenca')->name('servico.removerLicenca');
 
+	// Novos ciclos de análise (Issue #403)
+	Route::post('/servico/ciclo/iniciar', 'ServicosController@iniciarCiclo')->name('servico.ciclo.iniciar');
+	Route::post('/servico/ciclo/finalizar-sucesso', 'ServicosController@finalizarCicloSucesso')->name('servico.ciclo.finalizarCicloSucesso');
+	Route::post('/servico/ciclo/registrar-exigencia', 'ServicosController@registrarExigencia')->name('servico.ciclo.registrarExigencia');
+	Route::post('/servico/ciclo/anexar-documento', 'ServicosController@anexarDocumento')->name('servico.ciclo.anexarDocumento');
+	Route::get('/servico/ciclo/download/{tipo}/{id}', 'ArquivosController@downloadCicloFile')->name('servico.ciclo.download');
+	Route::get('/servico/ciclo/excluir-documento/{id}', 'ServicosController@excluirDocumento')->name('servico.ciclo.excluirDocumento');
+
+
 	// Geral de Arquivos
 	Route::get('/arquivo/download/{id}', 'ArquivosController@download')->name('arquivo.download');
 	Route::get('/arquivo/delete/{id}', 'ArquivosController@delete')->name('arquivo.delete');
