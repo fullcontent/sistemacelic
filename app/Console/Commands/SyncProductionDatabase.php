@@ -67,6 +67,8 @@ class SyncProductionDatabase extends Command
             "--host={$prodHost}",
             "--user={$prodUser}",
             "--password={$prodPass}",
+            '--single-transaction',
+            '--quick',
             '--column-statistics=0',
             $prodDb,
             '--result-file=' . $tempFile
