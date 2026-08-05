@@ -28,21 +28,21 @@ class ReembolsoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        
+        $query = Reembolso::with(['empresa', 'dadosCastro']);
 
-    //     $reembolsos = Reembolso::query()
-    //    ->select('id','valorTotal','created_at','nome','empresa_id')
-    //      ->with(['empresa' => function($query) {
-    //         $query->select('id','nomeFantasia');
-    //     }])
-    //     ->get();
+        if ($request->filled('dadosCastro_id')) {
+            $query->where('dadosCastro_id', $request->dadosCastro_id);
+        }
 
-        $reembolsos = Reembolso::all();
+        $reembolsos = $query->get();
+        $dadosCastroList = DadosCastro::pluck('razaoSocial', 'id');
 
         return view('admin.reembolso.lista-reembolsos')->with([
-            'reembolsos'=>$reembolsos,
+            'reembolsos' => $reembolsos,
+            'dadosCastroList' => $dadosCastroList,
+            'selectedDadosCastro' => $request->get('dadosCastro_id'),
         ]);
 
     }
@@ -184,9 +184,9 @@ class ReembolsoController extends Controller
         $data = \Carbon\Carbon::now()->formatLocalized('%d de %B de %Y');
         
 
-        $this->salvarReembolso($taxasReembolsar, $total, $request->descricao, $request->obs, $request->empresa_id);
+        $this->salvarReembolso($taxasReembolsar, $total, $request->descricao, $request->obs, $request->empresa_id, $request->dadosCastro);
 
-        $dadosCastro = DadosCastro::find($request->dadosCastro);
+        $dadosCastro = DadosCastro::find($request->dadosCastro) ?? ($empresa ? $empresa->dadosCastro : null);
 
        
         
@@ -229,6 +229,8 @@ class ReembolsoController extends Controller
         $empresa = Empresa::find($reembolso->empresa_id);
 
 
+        $dadosCastro = $reembolso->dadosCastro ?? ($empresa ? $empresa->dadosCastro : null);
+
         return view('admin.reembolso.detalhe-reembolso')->with([
             
             'reembolsoItens'=>$reembolso->taxas,
@@ -238,7 +240,7 @@ class ReembolsoController extends Controller
             'data'=>$reembolso->created_at,
             'empresa'=>$empresa,
             'id'=>$this->fillWithZeros($reembolso->id),
-            'dadosCastro'=>$reembolso->dadosCastro,
+            'dadosCastro'=>$dadosCastro,
         ]);
     }
 
@@ -298,7 +300,7 @@ class ReembolsoController extends Controller
          return $this->index();
     }
 
-    public function salvarReembolso($taxas, $total, $descricao, $obs, $empresa_id)
+    public function salvarReembolso($taxas, $total, $descricao, $obs, $empresa_id, $dadosCastro_id = null)
     {
        
         $reembolso = new Reembolso;
@@ -307,6 +309,15 @@ class ReembolsoController extends Controller
         $reembolso->nome = $descricao;
         $reembolso->obs = $obs;
         $reembolso->valorTotal = $total;
+
+        if ($dadosCastro_id) {
+            $reembolso->dadosCastro_id = $dadosCastro_id;
+        } else {
+            $empresa = Empresa::find($empresa_id);
+            if ($empresa && $empresa->dados_castro_id) {
+                $reembolso->dadosCastro_id = $empresa->dados_castro_id;
+            }
+        }
 
         $reembolso->save();
 
@@ -332,7 +343,7 @@ class ReembolsoController extends Controller
       
 
         $id = $this->fillWithZeros($reembolso->id);
-    
+        $dadosCastro = $reembolso->dadosCastro ?? ($empresa ? $empresa->dadosCastro : null);
 
         $reembolsoR = \PDF::loadview('admin.reembolso.pdf',[
             'empresa'=>$empresa,
@@ -342,7 +353,7 @@ class ReembolsoController extends Controller
             'data'=>$reembolso->created_at,
             'totalReembolso'=>$reembolso->valorTotal,
             'id'=>$id,
-            'dadosCastro'=>$reembolso->dadosCastro,
+            'dadosCastro'=>$dadosCastro,
             ])->setPaper('a4', 'portrait');
             
         

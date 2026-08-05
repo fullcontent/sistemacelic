@@ -45,7 +45,7 @@
 		<div class="col-md-3">
 
 			{!! Form::label('dadosCastro', 'CNPJ Castro') !!}
-			{!! Form::select('dadosCastro', $dadosCastro, ['id'=>'dadosCastro','class'=>'form-control']) !!}
+			{!! Form::select('dadosCastro', $dadosCastro, $empresa->dados_castro_id, ['id'=>'dadosCastro','class'=>'form-control']) !!}
 
 		</div>
 		

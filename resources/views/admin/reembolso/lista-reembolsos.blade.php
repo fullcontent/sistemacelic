@@ -27,12 +27,11 @@
 				@foreach($reembolsos as $r)
 					@php
 						$controller = new \App\Http\Controllers\ReembolsoController;
-
 					@endphp
 					<tr>
 						<td><a href="{{route('reembolso.show', $r->id)}}">{{$controller->fillWithZeros($r->id)}}</a></td>
 						<td><a href="{{route('reembolso.show', $r->id)}}">{{$r->nome}}</a></td>
-						<td>{{$r->empresa->nomeFantasia}}</td>
+						<td>{{$r->empresa->nomeFantasia ?? '-'}}</td>
 						<td><span
 								style="display:none;">{{$r->created_at}}</span>{{ \Carbon\Carbon::parse($r->created_at)->format('d/m/Y')}}
 						</td>

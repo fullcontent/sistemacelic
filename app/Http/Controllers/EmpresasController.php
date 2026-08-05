@@ -97,7 +97,7 @@ class EmpresasController extends Controller
             $empresa->matriculaRI   = $request->matriculaRI;
             $empresa->area          = $request->area;
             $empresa->tipoImovel    = $request->tipoImovel;
-            $empresa->dados_castro_id = $request->dados_castro_id;
+            $empresa->dados_castro_id = $request->dados_castro_id ?: 1;
 
             $empresa->save();
 
