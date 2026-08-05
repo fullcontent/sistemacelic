@@ -90,6 +90,37 @@ class Servico extends Model
         return $this->belongsTo('App\User','analista2_id','id');
     }
 
+    public function membrosEquipe()
+    {
+        return $this->hasMany('App\Models\ServicoEquipe', 'servico_id');
+    }
+
+    public function membrosEquipeAtivos()
+    {
+        return $this->membrosEquipe()->where('ativo', true);
+    }
+
+    public function coordenadores()
+    {
+        return $this->belongsToMany('App\User', 'servico_equipe', 'servico_id', 'user_id')
+            ->wherePivot('papel', 'coordenador')
+            ->wherePivot('ativo', true);
+    }
+
+    public function responsaveisTecnicos()
+    {
+        return $this->belongsToMany('App\User', 'servico_equipe', 'servico_id', 'user_id')
+            ->wherePivot('papel', 'responsavel_tecnico')
+            ->wherePivot('ativo', true);
+    }
+
+    public function analistasEquipe()
+    {
+        return $this->belongsToMany('App\User', 'servico_equipe', 'servico_id', 'user_id')
+            ->wherePivot('papel', 'analista')
+            ->wherePivot('ativo', true);
+    }
+
     public function arquivos()
     {
         return $this->hasMany('App\Models\Arquivo');
@@ -177,7 +208,10 @@ class Servico extends Model
             $q->where('responsavel_id', $userId)
               ->orWhere('coresponsavel_id', $userId)
               ->orWhere('analista1_id', $userId)
-              ->orWhere('analista2_id', $userId);
+              ->orWhere('analista2_id', $userId)
+              ->orWhereHas('membrosEquipeAtivos', function($sq) use ($userId) {
+                  $sq->where('user_id', $userId);
+              });
         });
     }
 

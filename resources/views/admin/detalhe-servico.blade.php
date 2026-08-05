@@ -417,6 +417,13 @@
                   <p><b>Proposta: </b>@if($servico->proposta_id)
 					      <a href="{{route('proposta.edit',$servico->proposta_id)}}" class="btn btn-info btn-xs">{{$servico->proposta_id}}</a>@else{{$servico->proposta}}@endif</p>
 
+                  @php
+                      $coordenadorAtivo = $servico->membrosEquipeAtivos()->where('papel', 'coordenador')->first();
+                  @endphp
+                  @if($coordenadorAtivo && $coordenadorAtivo->user)
+                  <p><b>Coordenador: </b>{{$coordenadorAtivo->user->name}}</p>
+                  @endif
+
                   <p><b>Responsável: </b>{{$servico->responsavel->name ?? ''}}</p>
 
                   @if($servico->coresponsavel)
@@ -621,6 +628,10 @@
 
 <div class="col-md-12">
   @include('admin.components.widget-ciclosAnalise')
+</div>
+
+<div class="col-md-12">
+  @include('admin.components.widget-equipe')
 </div>
 
 <div class="col-md-7">

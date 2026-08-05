@@ -99,6 +99,16 @@
                     </label>
                 </div>
             </div>
+
+            <div class="form-group" style="margin-top: 25px; margin-bottom: 25px;">
+                {{ Form::label('Coordenador', null, ['class' => 'control-label', 'style'=>'color: #7f8c8d;']) }}
+                <div class="checkbox" style="margin-top: 5px;">
+                    <label style="padding-left: 0; font-weight: 600;">
+                        {!! Form::checkbox('is_coordinator', 1, isset($usuario) ? $usuario->is_coordinator : false, ['id'=>'is_coordinator']) !!}
+                        Definir usuário como Coordenador (Diego manda lista de coordenadores)
+                    </label>
+                </div>
+            </div>
             @endunless
         </div>
     </div>

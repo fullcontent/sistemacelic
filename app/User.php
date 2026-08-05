@@ -19,7 +19,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'privileges', 'permitir_interacoes', 'permitir_acesso_servicos', 'avatar'
+        'name', 'email', 'password', 'privileges', 'permitir_interacoes', 'permitir_acesso_servicos', 'avatar', 'is_coordinator'
     ];
 
     /**
@@ -40,6 +40,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'permitir_interacoes' => 'boolean',
         'permitir_acesso_servicos' => 'boolean',
+        'is_coordinator' => 'boolean',
     ];
 
 
@@ -146,6 +147,11 @@ class User extends Authenticatable
 
     public function isCoordinatorOrAdmin()
     {
-        return $this->id <= 3 || in_array($this->id, [8, 27]);
+        return $this->is_coordinator || $this->privileges === 'admin' || $this->id <= 3 || in_array($this->id, [8, 27]);
+    }
+
+    public function equipeServicos()
+    {
+        return $this->hasMany('App\Models\ServicoEquipe', 'user_id');
     }
 }

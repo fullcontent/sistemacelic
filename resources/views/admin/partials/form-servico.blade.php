@@ -80,57 +80,154 @@
 	</div>
 </div>
 
-<div class="col-md-2">
-	
-	<div class="form-group">
-		
-		 <div class="form-group">
-          
-          {!! Form::label('responsavel_id', 'Responsável', array('class'=>'control-label')) !!}
-		  
-		  
-		  @if(Route::is('servicos.edit'))
-		  {!! Form::select('responsavel_id', $users, null, ['class'=>'form-control','id'=>'responsavel']) !!}
-		  @elseif(Route::is('servicos.create'))
-		  {!! Form::select('responsavel_id', $users, Auth::id(), ['class'=>'form-control','id'=>'responsavel']) !!}
-		  @endif
-
-
+<div class="col-md-12" style="margin-top: 15px; margin-bottom: 25px;">
+    <div class="box box-solid box-default" style="border: 1px solid #d2d6de; border-radius: 6px;">
+        <div class="box-header with-border" style="background-color: #f9fafc;">
+            <h4 class="box-title" style="font-weight: 600; color: #354256;"><i class="fa fa-users"></i> Equipe Responsável</h4>
+            <div class="box-tools pull-right">
+                <button type="button" class="btn btn-success btn-xs add-membro" style="border-radius: 4px; padding: 5px 10px;">
+                    <i class="fa fa-plus"></i> Adicionar Membro
+                </button>
+            </div>
         </div>
-		
-	</div>
+        <div class="box-body" id="container-equipe" style="padding: 15px;">
+            <!-- Linha padrão/cópia invisível -->
+            <div class="row membro-row hide" id="membro-template" style="margin-bottom: 10px;">
+                <div class="col-md-5">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        {!! Form::select('equipe_cargo_template', [
+                            'coordenador' => 'Coordenador',
+                            'responsavel_tecnico' => 'Responsável Técnico',
+                            'analista' => 'Analista'
+                        ], null, ['class'=>'form-control cargo-select', 'placeholder'=>'Selecione o Cargo...']) !!}
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        {!! Form::select('equipe_user_id_template', $users, null, ['class'=>'form-control user-select', 'placeholder'=>'Selecione o Usuário...']) !!}
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-danger btn-block remover-membro"><i class="fa fa-trash"></i> Remover</button>
+                </div>
+            </div>
+
+            <!-- Listagem de membros dinâmicos existentes (Edição) -->
+            @if(Route::is('servicos.edit') && isset($servico))
+                @php
+                    $membrosAtivos = $servico->membrosEquipeAtivos()->get();
+                @endphp
+                @if($membrosAtivos->count() > 0)
+                    @foreach($membrosAtivos as $index => $membro)
+                        <div class="row membro-row" style="margin-bottom: 10px;">
+                            <div class="col-md-5">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    {!! Form::select('equipe_cargo[]', [
+                                        'coordenador' => 'Coordenador',
+                                        'responsavel_tecnico' => 'Responsável Técnico',
+                                        'analista' => 'Analista'
+                                    ], $membro->papel, ['class'=>'form-control cargo-select', 'required']) !!}
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    {!! Form::select('equipe_user_id[]', $users, $membro->user_id, ['class'=>'form-control user-select', 'required']) !!}
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-danger btn-block remover-membro"><i class="fa fa-trash"></i> Remover</button>
+                            </div>
+                        </div>
+                    @endforeach
+                @else
+                    {{-- Sincroniza campos clássicos caso a pivot esteja vazia para serviços antigos --}}
+                    @if($servico->responsavel_id)
+                        <div class="row membro-row" style="margin-bottom: 10px;">
+                            <div class="col-md-5">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    {!! Form::select('equipe_cargo[]', [
+                                        'coordenador' => 'Coordenador',
+                                        'responsavel_tecnico' => 'Responsável Técnico',
+                                        'analista' => 'Analista'
+                                    ], 'responsavel_tecnico', ['class'=>'form-control cargo-select', 'required']) !!}
+                                </div>
+                            </div>
+                            <div class="col-md-5">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    {!! Form::select('equipe_user_id[]', $users, $servico->responsavel_id, ['class'=>'form-control user-select', 'required']) !!}
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-danger btn-block remover-membro"><i class="fa fa-trash"></i> Remover</button>
+                            </div>
+                        </div>
+                    @endif
+                @endif
+            @else
+                <!-- Na criação, inicia com uma linha vazia para facilitar a UX -->
+                <div class="row membro-row" style="margin-bottom: 10px;">
+                    <div class="col-md-5">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            {!! Form::select('equipe_cargo[]', [
+                                'coordenador' => 'Coordenador',
+                                'responsavel_tecnico' => 'Responsável Técnico',
+                                'analista' => 'Analista'
+                            ], 'responsavel_tecnico', ['class'=>'form-control cargo-select', 'required']) !!}
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            {!! Form::select('equipe_user_id[]', $users, Auth::id(), ['class'=>'form-control user-select', 'placeholder'=>'Selecione o Usuário...', 'required']) !!}
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-danger btn-block remover-membro"><i class="fa fa-trash"></i> Remover</button>
+                    </div>
+                </div>
+            @endif
+        </div>
+    </div>
 </div>
 
-<div class="col-md-2">
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Adicionar membro
+    var btnAdd = document.querySelector('.add-membro');
+    if (btnAdd) {
+        btnAdd.addEventListener('click', function () {
+            var template = document.getElementById('membro-template');
+            var clone = template.cloneNode(true);
+            
+            clone.removeAttribute('id');
+            
+            var cargoSelect = clone.querySelector('.cargo-select');
+            cargoSelect.setAttribute('name', 'equipe_cargo[]');
+            cargoSelect.setAttribute('required', 'required');
+            
+            var userSelect = clone.querySelector('.user-select');
+            userSelect.setAttribute('name', 'equipe_user_id[]');
+            userSelect.setAttribute('required', 'required');
+            
+            clone.classList.remove('hide');
+            
+            document.getElementById('container-equipe').appendChild(clone);
+        });
+    }
 
-	<div class="form-group">
-		{!! Form::label('corresponsavel_id', 'Co-Responsável', array('class'=>'control-label')) !!}
-				
-		{!! Form::select('coresponsavel_id', $users, null, ['class'=>'form-control','id'=>'corresponsavel']) !!}
-
-
-	</div>
-</div>
-
-<div class="col-md-2">
-
-	<div class="form-group">
-		{!! Form::label('analista1_id', 'Analista 1', array('class'=>'control-label')) !!}
-				
-		{!! Form::select('analista1_id', $users, null, ['class'=>'form-control','id'=>'analista1_id']) !!}
-
-	</div>
-</div>
-
-<div class="col-md-2">
-
-	<div class="form-group">
-		{!! Form::label('analista2_id', 'Analista2', array('class'=>'control-label')) !!}
-				
-		{!! Form::select('analista2_id', $users, null, ['class'=>'form-control','id'=>'analista2_id']) !!}
-
-
-	</div>
+    // Remover membro (delegação de evento)
+    var container = document.getElementById('container-equipe');
+    if (container) {
+        container.addEventListener('click', function (e) {
+            if (e.target && (e.target.classList.contains('remover-membro') || e.target.closest('.remover-membro'))) {
+                var row = e.target.closest('.membro-row');
+                if (row) {
+                    row.remove();
+                }
+            }
+        });
+    }
+});
+</script>
 </div>
 
 

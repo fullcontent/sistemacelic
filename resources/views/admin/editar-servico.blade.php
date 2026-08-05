@@ -34,56 +34,7 @@
 	$(document).ready(function() {
 
 
-		$("#corresponsavel").select2({
-            placeholder: 'Algum co-responsável?',
-            allowClear: true,
-        });
 
-        $("#corresponsavel").val('{{$servico->coresponsavel_id}}').trigger('change');
-
-
-		$("#responsavel").select2({
-            placeholder: 'Quem é o responsável?',
-            allowClear: true,
-			sorter: function(data) {
-        return data.sort();
-    }
-        });
-
-		$("#responsavel").val('{{$servico->responsavel_id}}').trigger('change');
-
-		
-		$("#corresponsavel").on("change", function(){
-
-			var responsavel_id = $("#responsavel").val();
-			var corresponsavel_id = $("#corresponsavel").val();
-
-
-			if(responsavel_id == corresponsavel_id)
-			{
-				alert("Co-Responsável não pode ser igual ao responsável!");
-				$("#corresponsavel").val('').trigger('change');
-
-			}
-
-					
-		})
-
-		$("#analista1_id").select2({
-            placeholder: 'Algum analista?',
-            allowClear: true,
-        });
-
-        $("#analista1_id").val('{{$servico->analista1_id ?? ''}}').trigger('change');
-
-
-
-		$("#analista2_id").select2({
-            placeholder: 'Algum outro analista?',
-            allowClear: true,
-        });
-
-        $("#analista2_id").val('{{$servico->analista2_id ?? ''}}').trigger('change');
 
   	$("#protocolo_emissao").datepicker();
   	$("#licenca_emissao").datepicker();

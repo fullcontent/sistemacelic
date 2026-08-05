@@ -119,12 +119,13 @@ class AdminController extends Controller
 
     public function pendencias()
     {
-
-        $servicos = Servico::select('id')->where('responsavel_id', Auth::id())->get();
+        $servicoIds = Servico::select('id')->porUsuario(Auth::id())->pluck('id')->toArray();
 
         $pendencias = Pendencia::with('servico', 'unidade')
-            ->where('responsavel_id', Auth::id())
-            // ->orWhereIn('pendencias.servico_id',$servicos)
+            ->where(function($q) use ($servicoIds) {
+                $q->where('responsavel_id', Auth::id())
+                  ->orWhereIn('servico_id', $servicoIds);
+            })
             ->where('status', 'pendente')
             ->whereDoesntHave('vinculos')
             ->get();
@@ -135,8 +136,7 @@ class AdminController extends Controller
     public function servicosVencer()
     {
         $servicos = Servico::with('unidade', 'empresa', 'responsavel')
-            // ->whereIn('unidade_id',$this->getUnidadesList())
-            ->orWhere('responsavel_id', Auth::id())
+            ->porUsuario(Auth::id())
             ->get();
 
         $servicos = $servicos->filter(function ($servico) {
@@ -167,13 +167,10 @@ class AdminController extends Controller
     public function servicosFinalizados()
     {
         $servicos = Servico::with('unidade', 'empresa', 'responsavel')
-
-            // ->whereIn('unidade_id',$this->getUnidadesList())
-            ->orWhere('responsavel_id', Auth::id())
+            ->porUsuario(Auth::id())
             ->get();
 
         $servicos = $servicos->where('situacao', '=', 'finalizado')
-
             ->where('situacao', '<>', 'arquivado');
 
         return $servicos;
@@ -182,13 +179,10 @@ class AdminController extends Controller
     public function servicosAndamento()
     {
         $servicos = Servico::with('unidade', 'empresa', 'responsavel')
-
-            // ->whereIn('unidade_id',$this->getUnidadesList())
-            ->orWhere('responsavel_id', Auth::id())
+            ->porUsuario(Auth::id())
             ->get();
 
         $servicos = $servicos->where('situacao', '=', 'andamento')
-
             ->where('situacao', '<>', 'arquivado');
 
         return $servicos;
@@ -197,13 +191,10 @@ class AdminController extends Controller
     public function servicosAndamentoCoResponsavel()
     {
         $servicos = Servico::with('unidade', 'empresa', 'responsavel')
-
-            // ->whereIn('unidade_id',$this->getUnidadesList())
-            ->orWhere('coresponsavel_id', Auth::id())
+            ->porUsuario(Auth::id()) // PorUsuario já engloba coresponsavel, mas mantemos o método por compatibilidade de rotas/dashboard
             ->get();
 
         $servicos = $servicos->where('situacao', '=', 'andamento')
-
             ->where('situacao', '<>', 'arquivado');
 
         return $servicos;

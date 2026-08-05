@@ -18,6 +18,7 @@ use App\Models\Pendencia;
 use App\Models\Solicitante;
 use App\Models\ServicoFinanceiro;
 use App\Models\AnaliseProtocoloLaudo;
+use App\Models\ServicoEquipe;
 use App\Models\Protocolo;
 use App\Models\Laudo;
 use App\Models\Documento;
@@ -444,6 +445,7 @@ class ServicosController extends Controller
 
         $id = $request->id;
         $users = User::where('privileges', '=', 'admin')->where('active', 1)->where('permitir_acesso_servicos', 1)->orderBy('name')->pluck('name', 'id')->toArray();
+        $coordenadores = User::where('is_coordinator', 1)->where('active', 1)->orderBy('name')->pluck('name', 'id')->toArray();
 
         $servico = null;
         $servicoPrincipal = null;
@@ -523,14 +525,13 @@ class ServicosController extends Controller
                 't' => $tipo,
                 'id' => $id,
                 'users' => $users,
+                'coordenadores' => $coordenadores,
                 'os' => $os,
                 'servico' => $servico,
                 // 'servico_lpu'=>$servico_lpu,
                 'tipoServico' => $tipoServico,
                 'servicoPrincipal' => $servicoPrincipal,
                 'solicitantes' => $solicitantes,
-
-
             ]);
     }
 
@@ -562,8 +563,33 @@ class ServicosController extends Controller
         $servico->os = $request->os;
         $servico->nome = $request->nome;
         $servico->situacao = $request->situacao;
-        $servico->responsavel_id = $request->responsavel_id;
-        $servico->coresponsavel_id = $request->coresponsavel_id;
+
+        // Processa os arrays dinâmicos da equipe
+        $equipeCargo = $request->input('equipe_cargo', []);
+        $equipeUserId = $request->input('equipe_user_id', []);
+
+        $novosMembros = [];
+        for ($i = 0; $i < count($equipeUserId); $i++) {
+            $uId = $equipeUserId[$i];
+            $papel = $equipeCargo[$i] ?? null;
+            if ($uId && $papel) {
+                $novosMembros[] = [
+                    'user_id' => $uId,
+                    'papel' => $papel
+                ];
+            }
+        }
+
+        // Sincroniza as colunas físicas legadas da tabela servicos para compatibilidade
+        $responsavelTecnico = collect($novosMembros)->where('papel', 'responsavel_tecnico')->first();
+        $servico->responsavel_id = $responsavelTecnico ? $responsavelTecnico['user_id'] : null;
+
+        $coordenador = collect($novosMembros)->where('papel', 'coordenador')->first();
+        $servico->coresponsavel_id = $coordenador ? $coordenador['user_id'] : null;
+
+        $analistas = collect($novosMembros)->where('papel', 'analista')->values();
+        $servico->analista1_id = isset($analistas[0]) ? $analistas[0]['user_id'] : null;
+        $servico->analista2_id = isset($analistas[1]) ? $analistas[1]['user_id'] : null;
 
         $servico->ativar_notificacao_renovacao = $request->has('ativar_notificacao_renovacao');
         if ($servico->ativar_notificacao_renovacao) {
@@ -573,10 +599,6 @@ class ServicosController extends Controller
         } else {
             $servico->dias_para_notificacao_renovacao = null;
         }
-
-
-        $servico->analista1_id = $request->analista1_id;
-        $servico->analista2_id = $request->analista2_id;
 
         $servico->protocolo_numero = $request->protocolo_numero;
 
@@ -730,10 +752,8 @@ class ServicosController extends Controller
         $history->created_at = Carbon::now();
         $history->save();
 
-
-
-
-
+        // Sincroniza a equipe dinâmica na pivot
+        $this->sincronizarEquipeDinamica($servico->id, $novosMembros);
 
         return redirect()->route('pendencia.create', $servico->id);
 
@@ -868,6 +888,8 @@ class ServicosController extends Controller
         $servico = Servico::find($id);
 
         $users = User::where('privileges', '=', 'admin')->where('active', 1)->where('permitir_acesso_servicos', 1)->orderBy('name')->pluck('name', 'id')->toArray();
+        $coordenadores = User::where('is_coordinator', 1)->where('active', 1)->orderBy('name')->pluck('name', 'id')->toArray();
+        $coordenadorSelecionadoId = $servico->membrosEquipeAtivos()->where('papel', 'coordenador')->value('user_id');
 
         // $servico_lpu = ServicoLpu::where('empresa_id',$servico->unidade->empresa->id)->pluck('documento','id')->toArray();
 
@@ -939,12 +961,13 @@ class ServicosController extends Controller
                 'dados' => $dados,
                 'route' => $route,
                 'users' => $users,
+                'coordenadores' => $coordenadores,
+                'coordenadorSelecionadoId' => $coordenadorSelecionadoId,
                 // 'servico_lpu'=>$servico_lpu,
                 'financeiro' => $servico->financeiro,
                 'ps' => $servico->tipo,
                 'solicitantes' => $solicitantes,
                 'licenciamento' => $servico->licenciamento,
-
             ]);
     }
 
@@ -970,12 +993,38 @@ class ServicosController extends Controller
 
         //
         $servico = Servico::find($id);
+
         $servico->tipo = $request->tipo;
         $servico->os = $request->os;
         $servico->nome = $request->nome;
         $servico->situacao = $request->situacao;
-        $servico->responsavel_id = $request->responsavel_id;
-        $servico->coresponsavel_id = $request->coresponsavel_id;
+
+        // Processa os arrays dinâmicos da equipe
+        $equipeCargo = $request->input('equipe_cargo', []);
+        $equipeUserId = $request->input('equipe_user_id', []);
+
+        $novosMembros = [];
+        for ($i = 0; $i < count($equipeUserId); $i++) {
+            $uId = $equipeUserId[$i];
+            $papel = $equipeCargo[$i] ?? null;
+            if ($uId && $papel) {
+                $novosMembros[] = [
+                    'user_id' => $uId,
+                    'papel' => $papel
+                ];
+            }
+        }
+
+        // Sincroniza as colunas físicas legadas da tabela servicos para compatibilidade
+        $responsavelTecnico = collect($novosMembros)->where('papel', 'responsavel_tecnico')->first();
+        $servico->responsavel_id = $responsavelTecnico ? $responsavelTecnico['user_id'] : null;
+
+        $coordenador = collect($novosMembros)->where('papel', 'coordenador')->first();
+        $servico->coresponsavel_id = $coordenador ? $coordenador['user_id'] : null;
+
+        $analistas = collect($novosMembros)->where('papel', 'analista')->values();
+        $servico->analista1_id = isset($analistas[0]) ? $analistas[0]['user_id'] : null;
+        $servico->analista2_id = isset($analistas[1]) ? $analistas[1]['user_id'] : null;
 
         $servico->ativar_notificacao_renovacao = $request->has('ativar_notificacao_renovacao');
         if ($servico->ativar_notificacao_renovacao) {
@@ -985,10 +1034,6 @@ class ServicosController extends Controller
         } else {
             $servico->dias_para_notificacao_renovacao = null;
         }
-
-
-        $servico->analista1_id = $request->analista1_id;
-        $servico->analista2_id = $request->analista2_id;
 
 
         if ($request->licenciamento) {
@@ -1186,6 +1231,9 @@ class ServicosController extends Controller
 
 
 
+
+        // Sincroniza a equipe dinâmica na pivot
+        $this->sincronizarEquipeDinamica($servico->id, $novosMembros);
 
         return redirect()->route('servicos.show', $servico->id);
 
@@ -1949,5 +1997,49 @@ class ServicosController extends Controller
         $documento->delete();
 
         return redirect()->route('servicos.show', $servicoId)->with('success', 'Documento excluído com sucesso.');
+    }
+
+    protected function sincronizarEquipeDinamica($servicoId, array $novosMembros)
+    {
+        $agora = Carbon::now();
+
+        // 1. Puxa os membros ativos atuais do banco
+        $membrosAtivosBanco = ServicoEquipe::where('servico_id', $servicoId)
+            ->where('ativo', true)
+            ->get();
+
+        // 2. Identifica quais devem ser desvinculados
+        foreach ($membrosAtivosBanco as $ativoBanco) {
+            // Verifica se o par (user_id, papel) existe na nova lista
+            $existeNaNovaLista = collect($novosMembros)->contains(function ($membro) use ($ativoBanco) {
+                return $membro['user_id'] == $ativoBanco->user_id && $membro['papel'] == $ativoBanco->papel;
+            });
+
+            if (!$existeNaNovaLista) {
+                // Desvincula e marca data de desvínculo
+                $ativoBanco->update([
+                    'ativo' => false,
+                    'data_desvinculo' => $agora
+                ]);
+            }
+        }
+
+        // 3. Identifica quais devem ser inseridos
+        foreach ($novosMembros as $membroNovo) {
+            $jaEstaAtivo = $membrosAtivosBanco->contains(function ($ativoBanco) use ($membroNovo) {
+                return $ativoBanco->user_id == $membroNovo['user_id'] && $ativoBanco->papel == $membroNovo['papel'];
+            });
+
+            if (!$jaEstaAtivo) {
+                // Cria novo vínculo ativo
+                ServicoEquipe::create([
+                    'servico_id' => $servicoId,
+                    'user_id' => $membroNovo['user_id'],
+                    'papel' => $membroNovo['papel'],
+                    'data_vinculo' => $agora,
+                    'ativo' => true
+                ]);
+            }
+        }
     }
 }

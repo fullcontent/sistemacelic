@@ -79,6 +79,7 @@ class UsersController extends Controller
 		$usuario->active=	$request->active;
 		$usuario->permitir_interacoes = $request->has('permitir_interacoes') ? 1 : 0;
 		$usuario->permitir_acesso_servicos = $request->has('permitir_acesso_servicos') ? 1 : 0;
+		$usuario->is_coordinator = $request->has('is_coordinator') ? 1 : 0;
 
         // Tratar upload/remoção do avatar
         if ($request->has('remover_avatar') && $request->remover_avatar == 1) {
@@ -149,6 +150,7 @@ class UsersController extends Controller
 			$usuario->active=	$request->active;
 			$usuario->permitir_interacoes = $request->has('permitir_interacoes') ? 1 : 0;
 			$usuario->permitir_acesso_servicos = $request->has('permitir_acesso_servicos') ? 1 : 0;
+			$usuario->is_coordinator = $request->has('is_coordinator') ? 1 : 0;
 			$usuario->save();
 			
 			$empresas_user_access	= $request->empresas_user_access;

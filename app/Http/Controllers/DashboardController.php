@@ -73,7 +73,7 @@ class DashboardController extends Controller
     public function getServicosUsuarioByStatus($user)
     {
       
-        $sU = Servico::where('responsavel_id', $user)->get()->groupBy('situacao');
+        $sU = Servico::porUsuario($user)->get()->groupBy('situacao');
 
         foreach($sU as $key => $sU){
             $situacao = $key;
@@ -220,7 +220,7 @@ class DashboardController extends Controller
 
     public static function getUserServicesCount($user_id)
     {
-        return Servico::where('responsavel_id',$user_id)->count();
+        return Servico::porUsuario($user_id)->count();
 
         // dump("Total de Servicos: ".Servico::where('responsavel_id',$user_id)->count());
         // dump("Total de Servicos Finalizados: ".Servico::where('responsavel_id',$user_id)->whereHas('servicoFinalizado')->count());
