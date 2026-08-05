@@ -33,8 +33,8 @@
               $valorRelacionado = $vinculoAtual ? $vinculoAtual->valor : 0;
               
               $clean_escopo = strip_tags($oc->escopo);
-              if (strlen($clean_escopo) > 50) {
-                  $clean_escopo = substr($clean_escopo, 0, 50) . '...';
+              if (mb_strlen($clean_escopo) > 50) {
+                  $clean_escopo = mb_substr($clean_escopo, 0, 50) . '...';
               }
             @endphp
             <tr>

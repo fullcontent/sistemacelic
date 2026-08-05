@@ -569,8 +569,8 @@ class OrdemServicoController extends Controller
             
             // Clean HTML from scope
             $clean_escopo = strip_tags($oc->escopo);
-            if (strlen($clean_escopo) > 80) {
-                $clean_escopo = substr($clean_escopo, 0, 80) . '...';
+            if (mb_strlen($clean_escopo) > 80) {
+                $clean_escopo = mb_substr($clean_escopo, 0, 80) . '...';
             }
 
             // Rating logic: Use Median for individual OS and Overview
