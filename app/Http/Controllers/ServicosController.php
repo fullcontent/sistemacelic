@@ -1183,12 +1183,23 @@ class ServicosController extends Controller
 
 
 
-        // dd($servico);
+        $previousStatus = $servico->getOriginal('situacao');
+        $statusChanged = $servico->isDirty('situacao');
+
         if ($servico->isDirty(['licenca_validade', 'dias_para_notificacao_renovacao', 'ativar_notificacao_renovacao'])) {
             $servico->notificacao_renovacao_enviada_at = null;
         }
 
         $servico->save();
+
+        if ($statusChanged) {
+            try {
+                $webhookService = new \App\Services\WebhookService();
+                $webhookService->sendStatusChangeEmail($servico, $previousStatus, $servico->situacao, $request->input('observacoes', ''));
+            } catch (\Exception $e) {
+                \Log::error('Erro ao disparar WebhookService em update: ' . $e->getMessage());
+            }
+        }
 
 
 
@@ -1827,7 +1838,15 @@ class ServicosController extends Controller
             $servico->licenca_validade = '2059-12-31';
         }
 
+        $previousStatus = $servico->getOriginal('situacao');
         $servico->save();
+
+        try {
+            $webhookService = new \App\Services\WebhookService();
+            $webhookService->sendStatusChangeEmail($servico, $previousStatus, 'finalizado', 'Ciclo de análise aprovado e serviço finalizado');
+        } catch (\Exception $e) {
+            \Log::error('Erro ao disparar WebhookService em finalizarCicloAnalise: ' . $e->getMessage());
+        }
 
         // Registra histórico
         $historico = new Historico;
