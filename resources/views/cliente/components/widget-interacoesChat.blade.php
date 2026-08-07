@@ -29,7 +29,7 @@
                 <div class="direct-chat-info clearfix">
                     <span class="direct-chat-name pull-left"><b>Você: </b></span>
                    
-                    <span class="direct-chat-timestamp pull-right">{{\Carbon\Carbon::parse($n->created_at)->format('d/m/Y h:m')}}</span>
+                    <span class="direct-chat-timestamp pull-right">{{\Carbon\Carbon::parse($n->created_at)->format('d/m/Y H:i')}}</span>
                   </div>
 
                   <div class="direct-chat-img">
@@ -63,7 +63,7 @@
               <div class="direct-chat-info clearfix">
                   <span class="direct-chat-name pull-right"><b>{{ $interactor ? $interactor->name : 'Usuário' }}</b></span>
                   
-                  <span class="direct-chat-timestamp pull-left">{{\Carbon\Carbon::parse($n->created_at)->format('d/m/Y h:m')}}</span>
+                  <span class="direct-chat-timestamp pull-left">{{\Carbon\Carbon::parse($n->created_at)->format('d/m/Y H:i')}}</span>
                 </div>
               <div class="direct-chat-img">
                 @if($interactor && $interactor->avatar_url)

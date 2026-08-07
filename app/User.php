@@ -56,6 +56,11 @@ class User extends Authenticatable
             return null;
         }
 
+        // Valida se o arquivo de fato existe no disco
+        if (!file_exists(public_path('uploads/avatares/' . $this->avatar))) {
+            return null;
+        }
+
         // Usa a URL base real da requisição (não APP_URL que pode apontar pra produção)
         // AVATAR_URL_PREFIX: vazio no local, "public/" em produção (definido no .env)
         $prefix = env('AVATAR_URL_PREFIX', '');
