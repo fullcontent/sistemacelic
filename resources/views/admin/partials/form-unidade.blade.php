@@ -232,6 +232,28 @@
 
   </div>
 
+  <div class="col-md-3">
+
+    <div class="form-group">
+
+      {!! Form::label('latitude', 'Latitude (Manual)', array('class' => 'control-label')) !!}
+      {!! Form::text('latitude', null, ['class' => 'form-control', 'id' => 'latitude', 'placeholder' => 'Ex: -23.550520']) !!}
+
+    </div>
+
+  </div>
+
+  <div class="col-md-3">
+
+    <div class="form-group">
+
+      {!! Form::label('longitude', 'Longitude (Manual)', array('class' => 'control-label')) !!}
+      {!! Form::text('longitude', null, ['class' => 'form-control', 'id' => 'longitude', 'placeholder' => 'Ex: -46.633308']) !!}
+
+    </div>
+
+  </div>
+
   <div class="col-md-4">
 
     <div class="form-group">

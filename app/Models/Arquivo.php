@@ -26,4 +26,9 @@ class Arquivo extends Model
     {
     	return $this->belongsTo('App\User');
     }
+
+    public function pendencia()
+    {
+        return $this->belongsTo('App\Models\Pendencia', 'pendencia_id');
+    }
 }

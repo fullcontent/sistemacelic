@@ -159,6 +159,18 @@ class UnidadesController extends Controller
             $empresa->areaTerreno   = $request->areaTerreno;
             $empresa->tipoImovel    = $request->tipoImovel;
 
+            if ($request->filled('latitude') && $request->filled('longitude')) {
+                $empresa->latitude = $request->latitude;
+                $empresa->longitude = $request->longitude;
+            } else {
+                $fullAddr = "{$empresa->endereco}, {$empresa->numero} - {$empresa->bairro}, {$empresa->cidade} - {$empresa->uf}, Brasil";
+                $geo = DashboardController::getGeoCode($fullAddr);
+                if ($geo) {
+                    $empresa->latitude = $geo['latitude'];
+                    $empresa->longitude = $geo['longitude'];
+                }
+            }
+
             $empresa->save();
 
             return redirect()->route('unidades.show',$empresa->id)
@@ -325,9 +337,17 @@ class UnidadesController extends Controller
             $empresa->areaTerreno   = $request->areaTerreno;
             $empresa->tipoImovel    = $request->tipoImovel;
 
-
-
-            // return $request->all();
+            if ($request->filled('latitude') && $request->filled('longitude')) {
+                $empresa->latitude = $request->latitude;
+                $empresa->longitude = $request->longitude;
+            } else {
+                $fullAddr = "{$empresa->endereco}, {$empresa->numero} - {$empresa->bairro}, {$empresa->cidade} - {$empresa->uf}, Brasil";
+                $geo = DashboardController::getGeoCode($fullAddr);
+                if ($geo) {
+                    $empresa->latitude = $geo['latitude'];
+                    $empresa->longitude = $geo['longitude'];
+                }
+            }
 
             $empresa->save();
             

@@ -109,12 +109,14 @@ class PendenciasController extends Controller
                             ->toArray();
       
         $listaPendencias = self::getPendenciasDropdown();
+        $clientesList = User::where('privileges', 'cliente')->where('active', 1)->orderBy('name')->pluck('name', 'id')->toArray();
         
         return view('admin.cadastro-pendencia')
                 ->with([
                     'servico'=> $servico,
                     'servico_id'=>$servico_id,
                     'responsaveis'=>$responsaveis,
+                    'clientesList'=>$clientesList,
                     'vinculo'=>$vinculo,
                     'listaPendencias'=>$listaPendencias,
                 ]);
@@ -134,12 +136,8 @@ class PendenciasController extends Controller
 
         $request->validate([
             'pendencia' => 'required',
-            // 'vencimento'=>'required',
-                       
         ]);
-       
 
-         
         $pendencia = new Pendencia;
 
         $pendencia->created_by = Auth::id();
@@ -154,18 +152,34 @@ class PendenciasController extends Controller
             $pendencia->dataLimite = Carbon::createFromFormat('d/m/Y', $request->dataLimite)->toDateString(); 
         }
         
-        
-        
         $pendencia->responsavel_tipo = $request->responsavel_tipo;
         $pendencia->responsavel_id = $request->responsavel_id;
+
+        if ($request->has('responsavel_cliente_id')) {
+            if (Auth::user()->is_coordinator == 1 || Auth::user()->privileges == 'admin') {
+                $pendencia->responsavel_cliente_id = $request->responsavel_cliente_id ?: null;
+            }
+        }
+
         $pendencia->status = $request->status;
         $pendencia->observacoes = $request->observacoes;
         $pendencia->etapa = $request->etapa;
-        // $pendencia->vinculo = $request->vinculo;
-
-
                
         $pendencia->save();
+
+        if ($pendencia->responsavel_cliente_id) {
+            $clienteUser = User::find($pendencia->responsavel_cliente_id);
+            if ($clienteUser) {
+                try {
+                    $clienteUser->notify(new \App\Notifications\PendenciaClienteUpdated(
+                        $pendencia,
+                        "Você foi atribuído como responsável pela pendência #" . $pendencia->id . " (" . $pendencia->pendencia . ")"
+                    ));
+                } catch (\Exception $e) {
+                    \Log::error('Erro ao notificar cliente responsavel: ' . $e->getMessage());
+                }
+            }
+        }
 
         if($request->vinculo)
         {
@@ -176,59 +190,31 @@ class PendenciasController extends Controller
                 $vinculo->pendencia_id = $pendencia->id;
                 $vinculo->save();
             }
-    
         }
         
         return redirect(route('servicos.show',$pendencia->servico_id));
-
    }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         if (!Auth::user()->permitir_interacoes) {
             return redirect()->back()->with('error', 'Você não tem permissão para editar pendências.');
         }
-        //
-        
 
         $pendencia = Pendencia::find($id);
-
         $pendencia->vencimento = date('d/m/Y', strtotime($pendencia->vencimento));
         $pendencia->dataLimite = date('d/m/Y', strtotime($pendencia->dataLimite));
 
-
         $servico = Servico::where('id',$pendencia->servico_id)->pluck('os','id')->toArray();
-
-
         $vinculo = Servico::where('unidade_id',$pendencia->servico->unidade->id)
                             ->where('situacao','andamento')
                             ->pluck('os','id')
                             ->toArray();
 
-
         $responsaveis = User::orderBy('name')->where('active',1)->where('privileges','admin')->pluck('name','id')->toArray();
-        
+        $clientesList = User::where('privileges', 'cliente')->where('active', 1)->orderBy('name')->pluck('name', 'id')->toArray();
         $pendencias = Pendencia::where('servico_id',$pendencia->servico_id)->pluck('pendencia','id')->toArray();
-
         $vinculos = $pendencia->vinculos->pluck('os','id');
-
         $listaPendencias = self::getPendenciasDropdown($pendencia);
         
         return view('admin.editar-pendencia')->with(
@@ -238,6 +224,7 @@ class PendenciasController extends Controller
                 'servico_id'=>$pendencia->servico_id,
                 'pendencias' => $pendencias,
                 'responsaveis'=>$responsaveis,
+                'clientesList'=>$clientesList,
                 'vinculo'=>$vinculo,
                 'vinculos'=>$vinculos,
                 'listaPendencias'=>$listaPendencias,
@@ -245,22 +232,13 @@ class PendenciasController extends Controller
         );
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
         if (!Auth::user()->permitir_interacoes) {
             return redirect()->back()->with('error', 'Você não tem permissão para editar pendências.');
         }
-        //
 
-       $pendencia = Pendencia::find($id);
-
+        $pendencia = Pendencia::find($id);
         $pendencia->created_by = Auth::id();
         $pendencia->servico_id = $request->servico_id;
         $pendencia->pendencia  = $request->pendencia;
@@ -270,21 +248,39 @@ class PendenciasController extends Controller
             $pendencia->vencimento = Carbon::createFromFormat('d/m/Y', $request->vencimento)->toDateString();
         }
         
-         if($request->dataLimite)
+        if($request->dataLimite)
         {
             $pendencia->dataLimite = Carbon::createFromFormat('d/m/Y', $request->dataLimite)->toDateString();
         }
 
-
         $pendencia->responsavel_tipo = $request->responsavel_tipo;
         $pendencia->responsavel_id = $request->responsavel_id;
+
+        if ($request->has('responsavel_cliente_id')) {
+            if (Auth::user()->is_coordinator == 1 || Auth::user()->privileges == 'admin') {
+                $pendencia->responsavel_cliente_id = $request->responsavel_cliente_id ?: null;
+            }
+        }
+
         $pendencia->status = $request->status;
         $pendencia->observacoes = $request->observacoes;
         $pendencia->vinculoPendencia = $request->vinculoPendencia;
-        // $pendencia->vinculo = $request->vinculo;
-
 
         $pendencia->save();
+
+        if ($pendencia->responsavel_cliente_id) {
+            $clienteUser = User::find($pendencia->responsavel_cliente_id);
+            if ($clienteUser) {
+                try {
+                    $clienteUser->notify(new \App\Notifications\PendenciaClienteUpdated(
+                        $pendencia,
+                        "Você foi atribuído ou a pendência #" . $pendencia->id . " (" . $pendencia->pendencia . ") foi atualizada."
+                    ));
+                } catch (\Exception $e) {
+                    \Log::error('Erro ao notificar cliente responsavel: ' . $e->getMessage());
+                }
+            }
+        }
 
         if($request->vinculo)
         {

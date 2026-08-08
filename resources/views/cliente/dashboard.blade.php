@@ -3,46 +3,89 @@
 
 
 
+@section('content_header')
+    <h1 style="font-weight: 700; color: #2c3e50; font-size: 24px; margin-bottom: 5px;">Dashboard do Cliente</h1>
+@stop
+
 @section('content')
 
+@php
+    $user = Auth::user();
+    $userName = strtolower(trim($user ? $user->name : ''));
+    $meusAndamentoCount = $servicos ? $servicos->where('situacao', 'andamento')->filter(function($s) use ($userName) {
+        return strtolower(trim($s->solicitante)) === $userName;
+    })->count() : 0;
+    $todosAndamentoCount = $servicos ? $servicos->where('situacao', 'andamento')->count() : 0;
+    $finalizadosCount = $servicos ? $servicos->where('situacao', 'finalizado')->count() : 0;
+    $standByCount = $servicos ? $servicos->where('situacao', 'standBy')->count() : 0;
+    $pendenciasCount = $pendencias ? $pendencias->where('status', 'pendente')->count() : 0;
+@endphp
 
-
-
-  <div class="row">
-
-    <div class="col-lg-3 col-xs-6">
-      <!-- small box -->
-      <div class="small-box bg-aqua">
-        <div class="inner">
-          <h3>{{count($servicos->where('situacao', 'andamento'))}}</h3>
-
-          <p>Serviços em andamento</p>
+  <div class="row" style="margin-bottom: 20px;">
+    <!-- Card 1.1: Meus serviços em andamento -->
+    <div class="col-lg-2 col-md-4 col-sm-6 col-xs-12" style="margin-bottom: 15px;">
+      <div class="dash-card" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); color: #fff; border-radius: 12px; padding: 18px; position: relative; box-shadow: 0 4px 12px rgba(14,165,233,0.25);">
+        <div style="font-size: 28px; font-weight: 700; line-height: 1;">{{ $meusAndamentoCount }}</div>
+        <div style="font-size: 12px; font-weight: 600; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.95;">Meus em andamento</div>
+        <div style="margin-top: 14px;">
+          <a href="{{ route('cliente.servico.meus_andamento') }}" class="btn-pill-card" style="display: inline-block; background: rgba(255,255,255,0.2); color: #fff; border-radius: 50px; padding: 4px 12px; font-size: 11px; font-weight: 600; text-decoration: none; backdrop-filter: blur(4px);">
+            Mais informações <i class="fa fa-arrow-circle-right"></i>
+          </a>
         </div>
-        <div class="icon">
-          <i class="ion ion-stats-bars"></i>
-        </div>
-        <a href="{{route('cliente.servico.andamento')}}" class="small-box-footer">Mais informações <i
-            class="fa fa-arrow-circle-right"></i></a>
       </div>
     </div>
-    <!-- ./col -->
-    <div class="col-lg-3 col-xs-6">
-      <!-- small box -->
-      <div class="small-box bg-green">
-        <div class="inner">
-          <h3>{{count($servicos->where('situacao', 'finalizado'))}}</h3>
 
-          <p>Serviços finalizados</p>
+    <!-- Card 1.2: Todos os serviços em andamento -->
+    <div class="col-lg-2 col-md-4 col-sm-6 col-xs-12" style="margin-bottom: 15px;">
+      <div class="dash-card" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: #fff; border-radius: 12px; padding: 18px; position: relative; box-shadow: 0 4px 12px rgba(99,102,241,0.25);">
+        <div style="font-size: 28px; font-weight: 700; line-height: 1;">{{ $todosAndamentoCount }}</div>
+        <div style="font-size: 12px; font-weight: 600; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.95;">Todos em andamento</div>
+        <div style="margin-top: 14px;">
+          <a href="{{ route('cliente.servico.andamento') }}" class="btn-pill-card" style="display: inline-block; background: rgba(255,255,255,0.2); color: #fff; border-radius: 50px; padding: 4px 12px; font-size: 11px; font-weight: 600; text-decoration: none; backdrop-filter: blur(4px);">
+            Mais informações <i class="fa fa-arrow-circle-right"></i>
+          </a>
         </div>
-        <div class="icon">
-          <i class="ion ion-stats-bars"></i>
-        </div>
-        <a href="{{route('cliente.servico.finalizado')}}" class="small-box-footer">Mais informações <i
-            class="fa fa-arrow-circle-right"></i></a>
       </div>
     </div>
-    <!-- ./col -->
 
+    <!-- Card 1.3: Serviços finalizados -->
+    <div class="col-lg-2 col-md-4 col-sm-6 col-xs-12" style="margin-bottom: 15px;">
+      <div class="dash-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #fff; border-radius: 12px; padding: 18px; position: relative; box-shadow: 0 4px 12px rgba(16,185,129,0.25);">
+        <div style="font-size: 28px; font-weight: 700; line-height: 1;">{{ $finalizadosCount }}</div>
+        <div style="font-size: 12px; font-weight: 600; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.95;">Serviços finalizados</div>
+        <div style="margin-top: 14px;">
+          <a href="{{ route('cliente.servico.finalizado') }}" class="btn-pill-card" style="display: inline-block; background: rgba(255,255,255,0.2); color: #fff; border-radius: 50px; padding: 4px 12px; font-size: 11px; font-weight: 600; text-decoration: none; backdrop-filter: blur(4px);">
+            Mais informações <i class="fa fa-arrow-circle-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 1.4: Serviços em stand-by -->
+    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12" style="margin-bottom: 15px;">
+      <div class="dash-card" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #fff; border-radius: 12px; padding: 18px; position: relative; box-shadow: 0 4px 12px rgba(245,158,11,0.25);">
+        <div style="font-size: 28px; font-weight: 700; line-height: 1;">{{ $standByCount }}</div>
+        <div style="font-size: 12px; font-weight: 600; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.95;">Serviços em stand-by</div>
+        <div style="margin-top: 14px;">
+          <a href="{{ route('cliente.servico.standBy') }}" class="btn-pill-card" style="display: inline-block; background: rgba(255,255,255,0.2); color: #fff; border-radius: 50px; padding: 4px 12px; font-size: 11px; font-weight: 600; text-decoration: none; backdrop-filter: blur(4px);">
+            Mais informações <i class="fa fa-arrow-circle-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 1.5: Minhas pendências em aberto -->
+    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12" style="margin-bottom: 15px;">
+      <div class="dash-card" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: #fff; border-radius: 12px; padding: 18px; position: relative; box-shadow: 0 4px 12px rgba(239,68,68,0.25);">
+        <div style="font-size: 28px; font-weight: 700; line-height: 1;">{{ $pendenciasCount }}</div>
+        <div style="font-size: 12px; font-weight: 600; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.95;">Minhas pendências em aberto</div>
+        <div style="margin-top: 14px;">
+          <a href="{{ route('cliente.pendencias.lista') }}" class="btn-pill-card" style="display: inline-block; background: rgba(255,255,255,0.2); color: #fff; border-radius: 50px; padding: 4px 12px; font-size: 11px; font-weight: 600; text-decoration: none; backdrop-filter: blur(4px);">
+            Mais informações <i class="fa fa-arrow-circle-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Tabs structure (Licenças and Projetos) and Map -->
@@ -134,12 +177,25 @@
 @section('css')
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <style>
+  .content-header .breadcrumb { display: none !important; }
   #map {
-    border-radius: 3px;
+    border-radius: 8px;
   }
   .leaflet-svg-icon {
     background: transparent;
     border: none;
+  }
+  .dash-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .dash-card:hover {
+    transform: translateY(-3px);
+  }
+  .btn-pill-card {
+    transition: all 0.2s ease;
+  }
+  .btn-pill-card:hover {
+    background: rgba(255,255,255,0.35) !important;
   }
 </style>
 @endsection
@@ -217,7 +273,7 @@
       if (value.latitude && value.longitude) {
         var lat = parseFloat(value.latitude);
         var lng = parseFloat(value.longitude);
-        if (!isNaN(lat) && !isNaN(lng)) {
+        if (!isNaN(lat) && !isNaN(lng) && lat >= -33.75 && lat <= 5.27 && lng >= -73.99 && lng <= -34.79) {
           var icon = getMarkerIcon(value.licenca_status);
           var marker = L.marker([lat, lng], { icon: icon }).addTo(map);
           

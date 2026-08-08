@@ -131,40 +131,45 @@ class DashboardController extends Controller
 
 
     public static function getGeoCode($address)
-        {
-                
-                $queryString = http_build_query([
-                    'access_key' => '1a2222fee9845d7422678d2af5883f97',
-                    'query' => $address,
-                    'output' => 'json',
-                    'limit' => 1,
-                  ]);
-                  
-                  $ch = curl_init(sprintf('%s?%s', 'http://api.positionstack.com/v1/forward', $queryString));
-                  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                  
-                  $json = curl_exec($ch);
-                  
-                  curl_close($ch);
-                  
-                  $apiResult = json_decode($json);
-                    
-                  if($apiResult->data)
-                  {
-                    dump($apiResult->data);
-                  }
-                  
-
-                  if($apiResult)
-                  {
-                    $data['latitude'] = $apiResult->data[0]->latitude;
-                    $data['longitude'] = $apiResult->data[0]->longitude;
-                  }
-                  
-                    
-
-                  return $data;
+    {
+        $apiKey = config('services.google_maps.api_key') ?: env('GOOGLE_MAPS_API_KEY');
+        if (!$apiKey) {
+            return null;
         }
+
+        $fullAddress = $address;
+        if (!preg_match('/brasil|brazil/i', $fullAddress)) {
+            $fullAddress .= ', Brasil';
+        }
+
+        $url = 'https://maps.googleapis.com/maps/api/geocode/json?' . http_build_query([
+            'address' => $fullAddress,
+            'key' => $apiKey,
+        ]);
+
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        $json = curl_exec($ch);
+        curl_close($ch);
+
+        $result = json_decode($json, true);
+
+        if (!empty($result['results'][0]['geometry']['location'])) {
+            $lat = (float) $result['results'][0]['geometry']['location']['lat'];
+            $lng = (float) $result['results'][0]['geometry']['location']['lng'];
+
+            // Bounding box check for Brazil: lat [-33.75, 5.27], lng [-73.99, -34.79]
+            if ($lat >= -33.75 && $lat <= 5.27 && $lng >= -73.99 && $lng <= -34.79) {
+                return [
+                    'latitude' => $lat,
+                    'longitude' => $lng,
+                ];
+            }
+        }
+
+        return null;
+    }
 
 
     public function mapa()

@@ -44,12 +44,12 @@ class ClienteController extends Controller
 
         $user = User::find(Auth::id());
 
-        if (!count($user->empresas)) {
+        if (!$user || !count($user->empresas)) {
             return view('errors.403');
         } else {
-            $servicos = $this->getServicosCliente();
-            $pendencias = $this->getPendenciasCliente();
-            $unidades = $this->getUnidadesCliente();
+            $servicos = $this->getServicosCliente($user);
+            $pendencias = $this->getPendenciasCliente($user);
+            $unidades = $this->getUnidadesCliente($user);
 
             if ($unidades && $servicos) {
                 foreach ($unidades as $unidade) {
@@ -104,12 +104,17 @@ class ClienteController extends Controller
 
     public function showPendencia($id)
     {
-        $pendencia = Pendencia::with('servico', 'responsavel')->find($id);
+        $pendencia = Pendencia::with(['servico', 'responsavel', 'responsavelCliente'])->find($id);
         if (!$pendencia) {
             abort(404);
         }
 
         $arquivos = Arquivo::where('servico_id', $pendencia->servico_id)->with('user')->get();
+        $historicos = Historico::where('pendencia_id', $pendencia->id)
+            ->where('visibilidade', '!=', 'interno')
+            ->with('user')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         if (request()->ajax()) {
             $responsabilidadeMap = ['usuario' => 'Castro', 'cliente' => 'Cliente', 'op' => 'Orgão Público'];
@@ -121,6 +126,7 @@ class ClienteController extends Controller
                 'status' => $pendencia->status,
                 'responsabilidade' => $responsabilidadeMap[$pendencia->responsavel_tipo] ?? $pendencia->responsavel_tipo,
                 'responsavel' => $pendencia->responsavel->name ?? 'N/A',
+                'responsavel_cliente' => $pendencia->responsavelCliente->name ?? 'N/A',
                 'vencimento' => $pendencia->vencimento ? \Carbon\Carbon::parse($pendencia->vencimento)->format('d/m/Y') : 'N/A',
                 'observacoes' => $pendencia->observacoes ?? '',
                 'arquivos' => $arquivos->map(function($a) {
@@ -135,13 +141,92 @@ class ClienteController extends Controller
 
         $responsaveis = User::orderBy('name')->where('active', 1)->pluck('name', 'id')->toArray();
 
-        return view('cliente.detalhe-pendencia')->with(
-            [
-                'pendencia' => $pendencia,
-                'arquivos' => $arquivos,
-                'responsaveis' => $responsaveis,
-            ]
-        );
+        return view('cliente.detalhe-pendencia')->with([
+            'pendencia' => $pendencia,
+            'arquivos' => $arquivos,
+            'historicos' => $historicos,
+            'responsaveis' => $responsaveis,
+        ]);
+    }
+
+    public function responderPendencia(Request $request, $id)
+    {
+        $pendencia = Pendencia::with('servico')->findOrFail($id);
+
+        $request->validate([
+            'observacoes' => 'required|string',
+            'arquivo.*' => 'nullable|file|max:20480',
+        ]);
+
+        $user = Auth::user();
+
+        // 1. Registrar histórico da resposta
+        $cleanObservacao = trim(strip_tags(html_entity_decode($request->observacoes)));
+        $historico = new Historico();
+        $historico->pendencia_id = $pendencia->id;
+        $historico->servico_id = $pendencia->servico_id;
+        $historico->user_id = $user->id;
+        $historico->observacoes = "Resposta do cliente: " . $cleanObservacao;
+        $historico->visibilidade = 'cliente';
+        $historico->created_at = \Carbon\Carbon::now();
+        $historico->save();
+
+        // 2. Anexar arquivos
+        if ($request->hasFile('arquivo')) {
+            $files = is_array($request->file('arquivo')) ? $request->file('arquivo') : [$request->file('arquivo')];
+            foreach ($files as $file) {
+                if ($file->isValid()) {
+                    $name = uniqid(date('HisYmd'));
+                    $extension = $file->getClientOriginalExtension();
+                    $nameFile = "{$name}.{$extension}";
+                    $upload = $file->storeAs('arquivos', $nameFile);
+
+                    $arq = new Arquivo();
+                    $arq->nome = "Anexo Pendência: " . ($file->getClientOriginalName() ?: $nameFile);
+                    $arq->arquivo = $upload;
+                    $arq->user_id = $user->id;
+                    $arq->pendencia_id = $pendencia->id;
+                    $arq->servico_id = $pendencia->servico_id;
+                    if ($pendencia->servico) {
+                        $arq->unidade_id = $pendencia->servico->unidade_id;
+                        $arq->empresa_id = $pendencia->servico->empresa_id;
+                    }
+                    $arq->save();
+                }
+            }
+        }
+
+        // 3. Marcar data de resposta na pendência original
+        $pendencia->respondida_em = \Carbon\Carbon::now();
+        $pendencia->save();
+
+        // 4. Criar pendência interna para coordenador "Avaliar resposta cliente"
+        $coordenadorId = null;
+        if ($pendencia->servico) {
+            $coordenador = $pendencia->servico->coordenadores()->first();
+            if ($coordenador) {
+                $coordenadorId = $coordenador->id;
+            } else {
+                $coordenadorId = $pendencia->servico->responsavel_id ?: $pendencia->responsavel_id;
+            }
+        } else {
+            $coordenadorId = $pendencia->responsavel_id;
+        }
+
+        $novaPendencia = new Pendencia();
+        $novaPendencia->created_by = $user->id;
+        $novaPendencia->servico_id = $pendencia->servico_id;
+        $novaPendencia->pendencia = "Avaliar resposta do cliente (Pendência #" . $pendencia->id . ")";
+        $novaPendencia->vencimento = \Carbon\Carbon::now()->addDays(2)->toDateString();
+        $novaPendencia->responsavel_tipo = 'usuario';
+        $novaPendencia->responsavel_id = $coordenadorId;
+        $novaPendencia->status = 'pendente';
+        $novaPendencia->observacoes = "O cliente " . $user->name . " respondeu à pendência '" . $pendencia->pendencia . "'. Observação: " . $cleanObservacao;
+        $novaPendencia->etapa = 1;
+        $novaPendencia->prioridade = 1;
+        $novaPendencia->save();
+
+        return redirect()->back()->with('success', 'Sua resposta foi enviada com sucesso e a equipe da Castro foi notificada!');
     }
 
     public function unidadeShow($id)
@@ -493,12 +578,73 @@ class ClienteController extends Controller
     }
 
 
-    public function getServicosCliente()
+    public function listaMeusAndamento()
     {
         $user = User::find(Auth::id());
 
-        if (count($user->empresas)) {
-            $unidades = Unidade::where('empresa_id', $user->empresas->pluck('id'))->pluck('id');
+        if ($user && count($user->empresas)) {
+            $servicos = $this->getServicosCliente($user);
+            $userName = strtolower(trim($user->name));
+
+            $servicos = $servicos->where('situacao', 'andamento')
+                ->where('situacao', '<>', 'arquivado')
+                ->filter(function($servico) use ($userName) {
+                    return strtolower(trim($servico->solicitante)) === $userName;
+                });
+        } else {
+            return view('errors.403');
+        }
+
+        return view('cliente.lista-servicos')
+            ->with([
+                'servicos' => $servicos,
+                'title' => 'Meus Serviços em Andamento',
+            ]);
+    }
+
+    public function listaStandBy()
+    {
+        $user = User::find(Auth::id());
+
+        if ($user && count($user->empresas)) {
+            $servicos = $this->getServicosCliente($user);
+
+            $servicos = $servicos->where('situacao', 'standBy')
+                ->where('situacao', '<>', 'arquivado');
+        } else {
+            return view('errors.403');
+        }
+
+        return view('cliente.lista-servicos')
+            ->with([
+                'servicos' => $servicos,
+                'title' => 'Serviços em Stand-by',
+            ]);
+    }
+
+    public function listaPendencias()
+    {
+        $user = User::find(Auth::id());
+
+        if ($user && count($user->empresas)) {
+            $pendencias = $this->getPendenciasCliente($user);
+        } else {
+            return view('errors.403');
+        }
+
+        return view('cliente.lista-pendencias')
+            ->with([
+                'pendencias' => $pendencias,
+                'title' => 'Minhas Pendências em Aberto',
+            ]);
+    }
+
+    public function getServicosCliente($user = null)
+    {
+        $user = $user ?: User::find(Auth::id());
+
+        if ($user && count($user->empresas)) {
+            $unidades = Unidade::whereIn('empresa_id', $user->empresas->pluck('id'))->pluck('id');
 
             $query = Servico::query();
 
@@ -514,31 +660,36 @@ class ClienteController extends Controller
                 $query->whereIn('departamento', $depts);
             }
 
-            return $query->get();
+            return $query->with(['unidade', 'empresa', 'responsavel'])->get();
         } else {
-            return null;
+            return collect();
         }
     }
 
-    public function getUnidadesCliente()
+    public function getUnidadesCliente($user = null)
     {
-        $user = User::find(Auth::id());
+        $user = $user ?: User::find(Auth::id());
 
-        if (count($user->empresas)) {
-            $unidades = Unidade::where('empresa_id', $user->empresas->pluck('id'))->get();
+        if ($user && count($user->empresas)) {
+            $unidades = Unidade::whereIn('empresa_id', $user->empresas->pluck('id'))->get();
             return $unidades;
         } else {
-            return [];
+            return collect();
         }
     }
 
-    public function getPendenciasCliente()
+    public function getPendenciasCliente($user = null)
     {
-        $user = User::find(Auth::id());
-        $depts = $user->departamentos;
+        $user = $user ?: User::find(Auth::id());
+        $depts = $user ? $user->departamentos : [];
+        $userId = $user ? $user->id : Auth::id();
         
-        $query = Pendencia::with('servico', 'unidade')
-            ->where('responsavel_id', Auth::id());
+        $query = Pendencia::with(['servico', 'unidade', 'responsavel', 'responsavelCliente'])
+            ->where(function($q) use ($userId) {
+                $q->where('responsavel_id', $userId)
+                  ->orWhere('responsavel_cliente_id', $userId)
+                  ->orWhere('responsavel_tipo', 'cliente');
+            });
             
         if (!empty($depts)) {
             $query->whereHas('servico', function($q) use ($depts) {
@@ -863,6 +1014,38 @@ class ClienteController extends Controller
         $arquivoNome = $unidadeCodigo.' - '.$unidadeNome.' - '.$arquivo->nome.'.'.$extension;
 
         return response()->download(public_path('uploads/'.$filename), $arquivoNome);
+    }
+
+    public function uploadArquivo(Request $request)
+    {
+        $request->validate([
+            'nome' => 'required|string|max:255',
+            'arquivo' => 'required|file|max:20480',
+        ]);
+
+        $a = new Arquivo();
+        if ($request->hasFile('arquivo') && $request->file('arquivo')->isValid()) {
+            $name = uniqid(date('HisYmd'));
+            $extension = $request->file('arquivo')->getClientOriginalExtension();
+            $nameFile = "{$name}.{$extension}";
+            $upload = $request->file('arquivo')->storeAs('arquivos', $nameFile);
+            $a->arquivo = $upload;
+        }
+
+        $a->nome = $request->nome;
+        $a->user_id = Auth::id();
+        if ($request->unidade_id) {
+            $a->unidade_id = $request->unidade_id;
+        }
+        if ($request->empresa_id) {
+            $a->empresa_id = $request->empresa_id;
+        }
+        if ($request->servico_id) {
+            $a->servico_id = $request->servico_id;
+        }
+        $a->save();
+
+        return redirect()->back()->with('success', 'Arquivo enviado com sucesso!');
     }
 
 }

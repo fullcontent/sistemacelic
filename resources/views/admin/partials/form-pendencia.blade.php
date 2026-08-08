@@ -51,12 +51,22 @@
 
       <div class="col-md-3">
         <div class="form-group">
-        {!! Form::label('responsavel_id', 'Responsável', array('class'=>'control-label')) !!}
+        {!! Form::label('responsavel_id', 'Responsável Castro', array('class'=>'control-label')) !!}
         @if(Route::is('pendencia.create'))
         {!! Form::select('responsavel_id', $responsaveis , Auth::id(), ['class'=>'form-control','id'=>'responsavel_id']) !!}
         @else
         {!! Form::select('responsavel_id', $responsaveis , null, ['class'=>'form-control','id'=>'responsavel_id']) !!}
         @endif
+        </div>
+      </div>
+
+      @php
+        $canEditClienteResp = (Auth::user()->is_coordinator == 1 || Auth::user()->privileges == 'admin');
+      @endphp
+      <div class="col-md-3">
+        <div class="form-group">
+          {!! Form::label('responsavel_cliente_id', 'Responsável Cliente', array('class'=>'control-label')) !!}
+          {!! Form::select('responsavel_cliente_id', ['' => '-- Selecione o Cliente --'] + ($clientesList ?? []), null, ['class'=>'form-control','id'=>'responsavel_cliente_id', !($canEditClienteResp) ? 'disabled' : '']) !!}
         </div>
       </div>
 

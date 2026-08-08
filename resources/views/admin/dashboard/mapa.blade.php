@@ -22,7 +22,7 @@
 
 @section('js')
 <script
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDOIxyXtEWnbcGYXUEQmVHHagZizBplcfI&callback=initMap&v=weekly"
+      src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.api_key') }}&callback=initMap&v=weekly"
       defer
     ></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -45,12 +45,16 @@
           });
 
           $.each(unidades, function (index, value) {
-
+              var lat = parseFloat(value.latitude);
+              var lng = parseFloat(value.longitude);
+              if (isNaN(lat) || isNaN(lng) || lat < -33.75 || lat > 5.27 || lng < -73.99 || lng > -34.79) {
+                  return;
+              }
               
               const marker = new google.maps.Marker({
                   position: {
-                      lat: parseFloat(value.latitude),
-                      lng: parseFloat(value.longitude)
+                      lat: lat,
+                      lng: lng
                   },
                   map: map,
                   icon: 'http://sistemacelic.com/public/img/favicon/favicon-32x32.png',

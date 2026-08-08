@@ -277,8 +277,10 @@ Route::prefix('cliente')->group(function () {
 	Route::get('/unidades', 'ClienteController@unidades')->name('cliente.unidades');
 	Route::get('/unidade/{id}', 'ClienteController@unidadeShow')->name('cliente.unidade.show');
 	Route::get('/servicos', 'ClienteController@servicos')->name('cliente.servicos');
+	Route::get('/servico/meus-andamento/', 'ClienteController@listaMeusAndamento')->name('cliente.servico.meus_andamento');
 	Route::get('/servico/andamento/', 'ClienteController@listaAndamento')->name('cliente.servico.andamento');
 	Route::get('/servico/finalizados/', 'ClienteController@listaFinalizados')->name('cliente.servico.finalizado');
+	Route::get('/servico/standby/', 'ClienteController@listaStandBy')->name('cliente.servico.standBy');
 	Route::get('/servico/vigentes/', 'ClienteController@listaVigentes')->name('cliente.servico.vigente');
 	Route::get('/servico/vencidos/', 'ClienteController@listaVencidos')->name('cliente.servico.vencido');
 	Route::get('/servico/vencer/', 'ClienteController@listaVencer')->name('cliente.servico.vencer');
@@ -290,7 +292,9 @@ Route::prefix('cliente')->group(function () {
 	Route::post('/usuario/editar/', 'ClienteController@updateUsuario')->name('cliente.usuario.update');
 	Route::get('/servico/{id}/taxas/{taxa}', 'ClienteController@showTaxa')->name('cliente.taxa.show');
 
+	Route::get('/pendencias', 'ClienteController@listaPendencias')->name('cliente.pendencias.lista');
 	Route::get('/pendencia/{pendencia}', 'ClienteController@showPendencia')->name('cliente.pendencia.show');
+	Route::post('/pendencia/{pendencia}/responder', 'ClienteController@responderPendencia')->name('cliente.pendencia.responder');
 	Route::post('/arquivo/anexar', 'ArquivosController@anexar')->name('cliente.arquivo.anexar');
 	Route::get('/users/list', 'ClienteController@usersList')->name('cliente.users.list');
 
@@ -299,6 +303,7 @@ Route::prefix('cliente')->group(function () {
 	});
 
 	Route::get('/arquivos', 'ClienteController@arquivosDigitais')->name('cliente.arquivos');
+	Route::post('/arquivo/upload', 'ClienteController@uploadArquivo')->name('cliente.arquivo.upload');
 	Route::get('/arquivos/download/servico/{tipo}/{servico_id}', 'ClienteController@downloadServicoFile')->name('cliente.servico.downloadFile');
 	Route::get('/arquivos/download/arquivo/{id}', 'ClienteController@downloadArquivo')->name('cliente.arquivo.download');
 });

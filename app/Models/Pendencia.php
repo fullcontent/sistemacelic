@@ -41,5 +41,14 @@ class Pendencia extends Model
     {
         return $this->belongsTo('App\Models\Servico','vinculo_os');
     }
-        
+
+    public function responsavelCliente()
+    {
+        return $this->belongsTo('App\User', 'responsavel_cliente_id');
+    }
+
+    public function arquivos()
+    {
+        return $this->hasMany('App\Models\Arquivo', 'pendencia_id');
+    }
 }
