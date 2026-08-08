@@ -182,12 +182,37 @@ class ApiController extends Controller
             'analista2',
             'financeiro',
             'servicoFinalizado',
-            'vinculos',
-            'historico'
+            'vinculos'
         ])
             ->whereNotIn('responsavel_id', [1])
             // ->take(100)
             ->get();
+
+        $whereVisibilidade = "";
+        if (\Auth::check() && \Auth::user()->privileges === 'cliente') {
+            $whereVisibilidade = "AND visibilidade != 'interno'";
+        }
+
+        $historicos = \DB::select("
+            SELECT servico_id, created_at, observacoes
+            FROM (
+                SELECT servico_id, created_at, observacoes,
+                       ROW_NUMBER() OVER (PARTITION BY servico_id ORDER BY created_at DESC) as rn
+                FROM historicos
+                WHERE observacoes NOT LIKE '%alterado %'
+                  AND observacoes NOT LIKE 'Alterou %'
+                  AND observacoes NOT LIKE '%cadastrada.%'
+                  AND observacoes NOT LIKE '%cadastrado.%'
+                  AND observacoes NOT LIKE '@%'
+                  $whereVisibilidade
+            ) t
+            WHERE rn <= 3
+        ");
+
+        $groupedHistory = [];
+        foreach ($historicos as $h) {
+            $groupedHistory[$h->servico_id][] = $h;
+        }
 
         $data = [];
 
@@ -271,8 +296,9 @@ class ApiController extends Controller
             $dataInauguracao = $s->unidade->dataInauguracao ? \Carbon\Carbon::parse($s->unidade->dataInauguracao)->format('d/m/Y') : null;
 
             $interacoes = [];
-            if ($s->historico) {
-                foreach ($s->historico as $key => $i) {
+            $sh = $groupedHistory[$s->id] ?? null;
+            if ($sh) {
+                foreach ($sh as $key => $i) {
                     $interacoes[$key] = ltrim(\Carbon\Carbon::parse($i->created_at)->format('d/m/Y'), ',') . " - " . $i->observacoes . "\n";
                 }
             }
@@ -353,34 +379,43 @@ class ApiController extends Controller
 
     public function getClienteServicesJSON()
     {
-
         $user = User::find(Auth::id());
-
+        $servicos = collect();
 
         if (count($user->empresas)) {
-
             $unidades = Unidade::where('empresa_id', $user->empresas->pluck('id'))->pluck('id');
 
             $servicos = Servico::orWhereIn('empresa_id', $user->empresas->pluck('id'))
                 ->orWhereIn('unidade_id', $unidades)
                 ->with('unidade', 'responsavel', 'financeiro', 'servicoFinalizado', 'vinculos')
                 ->get();
-
-
         }
 
+        $whereVisibilidade = "";
+        if (\Auth::check() && \Auth::user()->privileges === 'cliente') {
+            $whereVisibilidade = "AND visibilidade != 'interno'";
+        }
 
+        $historicos = \DB::select("
+            SELECT servico_id, created_at, observacoes
+            FROM (
+                SELECT servico_id, created_at, observacoes,
+                       ROW_NUMBER() OVER (PARTITION BY servico_id ORDER BY created_at DESC) as rn
+                FROM historicos
+                WHERE observacoes NOT LIKE '%alterado %'
+                  AND observacoes NOT LIKE 'Alterou %'
+                  AND observacoes NOT LIKE '%cadastrada.%'
+                  AND observacoes NOT LIKE '%cadastrado.%'
+                  AND observacoes NOT LIKE '@%'
+                  $whereVisibilidade
+            ) t
+            WHERE rn <= 3
+        ");
 
-
-
-
-
-        // $servicos = Servico::with('unidade','responsavel','financeiro','servicoFinalizado','vinculos')
-        // ->whereNotIn('responsavel_id',[1])
-        // ->where('responsavel_id')
-        // // ->take(100)
-        // ->get();
-
+        $groupedHistory = [];
+        foreach ($historicos as $h) {
+            $groupedHistory[$h->servico_id][] = $h;
+        }
 
         $data = [];
 
@@ -474,10 +509,10 @@ class ApiController extends Controller
                 $dataInauguracao = null;
             }
 
-            if ($s->historico) {
-                $interacoes = [];
-                foreach ($s->historico as $key => $i) {
-
+            $interacoes = [];
+            $sh = $groupedHistory[$s->id] ?? null;
+            if ($sh) {
+                foreach ($sh as $key => $i) {
                     $interacoes[$key] = ltrim(\Carbon\Carbon::parse($i->created_at)->format('d/m/Y'), ',') . " - " . $i->observacoes . "\n";
                 }
             }
