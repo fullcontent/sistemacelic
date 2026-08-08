@@ -69,40 +69,42 @@ class ClienteController extends Controller
 
     public function index()
     {
-
         $user = User::find(Auth::id());
 
         if (!$user || !count($user->empresas)) {
             return view('errors.403');
-        } else {
-            $servicos = $this->getServicosCliente($user);
-            $pendencias = $this->getPendenciasCliente($user);
-            $unidades = $this->getUnidadesCliente($user);
+        }
 
-            if ($unidades && $servicos) {
-                foreach ($unidades as $unidade) {
-                    $licencas = $servicos->where('unidade_id', $unidade->id)->where('tipo', 'licencaOperacao');
-                    if ($licencas->isEmpty()) {
-                        $unidade->licenca_status = 'vencida';
-                    } else {
-                        $tem_vencida = false;
-                        foreach ($licencas as $licenca) {
-                            if ($licenca->licenca_validade < date('Y-m-d')) {
-                                $tem_vencida = true;
-                                break;
-                            }
-                        }
-                        $unidade->licenca_status = $tem_vencida ? 'vencida' : 'vigente';
-                    }
-                }
+        // Single query: load all services for this client (with relations eager-loaded)
+        $servicos = $this->getServicosCliente($user);
+        $pendencias = $this->getPendenciasCliente($user);
+
+        // Derive unidades from already-loaded servicos — avoids a second SELECT on unidades
+        $unidades = $this->getUnidadesCliente($user);
+
+        // Compute licenca_status in PHP using the already-fetched collection (no extra queries)
+        $today = date('Y-m-d');
+        $licencasByUnidade = $servicos
+            ->where('tipo', 'licencaOperacao')
+            ->groupBy('unidade_id');
+
+        foreach ($unidades as $unidade) {
+            $licencas = $licencasByUnidade->get($unidade->id, collect());
+            if ($licencas->isEmpty()) {
+                $unidade->licenca_status = 'vencida';
+            } else {
+                $vencida = $licencas->first(function($l) use ($today) {
+                    return $l->licenca_validade < $today;
+                });
+                $unidade->licenca_status = $vencida ? 'vencida' : 'vigente';
             }
         }
 
         return view('cliente.dashboard')
             ->with([
-                'servicos' => $servicos,
+                'servicos'  => $servicos,
                 'pendencias' => $pendencias,
-                'unidades' => $unidades,
+                'unidades'  => $unidades,
             ]);
     }
 
@@ -703,39 +705,40 @@ class ClienteController extends Controller
     {
         $user = $user ?: User::find(Auth::id());
 
-        if ($user && count($user->empresas)) {
-            $unidades = Unidade::whereIn('empresa_id', $user->empresas->pluck('id'))->pluck('id');
-
-            $query = Servico::query();
-
-            // Scope query by companies and units first
-            $query->where(function($q) use ($user, $unidades) {
-                $q->whereIn('empresa_id', $user->empresas->pluck('id'))
-                  ->orWhereIn('unidade_id', $unidades);
-            });
-
-            // Apply department filter if user has restrictions
-            $depts = $user->departamentos;
-            if (!empty($depts)) {
-                $query->whereIn('departamento', $depts);
-            }
-
-            return $query->with(['unidade', 'empresa', 'responsavel'])->get();
-        } else {
+        if (!$user || !count($user->empresas)) {
             return collect();
         }
+
+        // Pluck once and reuse — avoids calling pluck() twice on the same relation
+        $empresaIds = $user->empresas->pluck('id');
+        $unidadeIds = Unidade::whereIn('empresa_id', $empresaIds)->pluck('id');
+
+        $query = Servico::query()->where(function($q) use ($empresaIds, $unidadeIds) {
+            $q->whereIn('empresa_id', $empresaIds)
+              ->orWhereIn('unidade_id', $unidadeIds);
+        });
+
+        // Apply department filter if user has restrictions
+        $depts = $user->departamentos;
+        if (!empty($depts)) {
+            $query->whereIn('departamento', $depts);
+        }
+
+        return $query->with(['unidade', 'empresa', 'responsavel'])->get();
     }
 
     public function getUnidadesCliente($user = null)
     {
         $user = $user ?: User::find(Auth::id());
 
-        if ($user && count($user->empresas)) {
-            $unidades = Unidade::whereIn('empresa_id', $user->empresas->pluck('id'))->get();
-            return $unidades;
-        } else {
+        if (!$user || !count($user->empresas)) {
             return collect();
         }
+
+        // Select only the columns needed (map + licenca_status computation)
+        return Unidade::whereIn('empresa_id', $user->empresas->pluck('id'))
+            ->select(['id', 'empresa_id', 'codigo', 'nomeFantasia', 'cidade', 'uf', 'latitude', 'longitude', 'status'])
+            ->get();
     }
 
     public function getPendenciasCliente($user = null)
@@ -743,20 +746,34 @@ class ClienteController extends Controller
         $user = $user ?: User::find(Auth::id());
         $depts = $user ? $user->departamentos : [];
         $userId = $user ? $user->id : Auth::id();
-        
+
+        // Scope pendências to the client's companies to avoid pulling other tenants' data
+        $empresaIds = $user ? $user->empresas->pluck('id') : collect();
+        $unidadeIds = $empresaIds->isNotEmpty()
+            ? Unidade::whereIn('empresa_id', $empresaIds)->pluck('id')
+            : collect();
+
         $query = Pendencia::with(['servico', 'unidade', 'responsavel', 'responsavelCliente'])
             ->where(function($q) use ($userId) {
-                $q->where('responsavel_id', $userId)
-                  ->orWhere('responsavel_cliente_id', $userId)
-                  ->orWhere('responsavel_tipo', 'cliente');
+                $q->where('responsavel_cliente_id', $userId)
+                  ->orWhere(function($q2) use ($userId) {
+                      $q2->where('responsavel_tipo', 'cliente')
+                         ->where('responsavel_id', $userId);
+                  });
+            })
+            ->where(function($q) use ($empresaIds, $unidadeIds) {
+                $q->whereHas('servico', function($sq) use ($empresaIds, $unidadeIds) {
+                    $sq->whereIn('empresa_id', $empresaIds)
+                       ->orWhereIn('unidade_id', $unidadeIds);
+                });
             });
-            
+
         if (!empty($depts)) {
             $query->whereHas('servico', function($q) use ($depts) {
                 $q->whereIn('departamento', $depts);
             });
         }
-        
+
         return $query->get();
     }
 

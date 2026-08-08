@@ -225,7 +225,17 @@
     initLeafletMap();
   });
 
-  var unidades = {!! json_encode($unidades) !!};
+  var unidades = {!! json_encode($unidades->map(function($u) {
+      return [
+          'id'           => $u->id,
+          'nomeFantasia' => $u->nomeFantasia,
+          'cidade'       => $u->cidade,
+          'uf'           => $u->uf,
+          'latitude'     => $u->latitude,
+          'longitude'    => $u->longitude,
+          'licenca_status' => $u->licenca_status ?? 'vencida',
+      ];
+  })) !!};
 
   function getMarkerIcon(status) {
     var color = '#dd4b39'; // Red (not vigente by default)
