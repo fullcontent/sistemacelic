@@ -228,8 +228,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
-</div>
-
 
 
 @switch($t ?? '')
@@ -616,6 +614,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			</div>
 		</div>
 	</div>
+</div>
+
 </div>
 
 </div>
