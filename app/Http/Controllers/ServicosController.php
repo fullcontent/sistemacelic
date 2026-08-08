@@ -206,21 +206,29 @@ class ServicosController extends Controller
 
     public function listaVencidos()
     {
-
-
         $servicos = Servico::with('unidade', 'empresa', 'responsavel')
-            // ->whereIn('unidade_id',$this->getUnidadesList())
             ->orWhere('responsavel_id', Auth::id())
             ->orWhere('coresponsavel_id', Auth::id())
             ->get();
 
-        $servicos = $servicos->where('unidade.status', '=', 'Ativa')
-            ->where('licenca_validade', '<', date('Y-m-d'))
-            ->where('tipo', '=', 'licencaOperacao')
-            ->where('situacao', '<>', 'arquivado');
+        $today = date('Y-m-d');
+        $servicos = $servicos->filter(function ($servico) use ($today) {
+            if (empty($servico->licenca_validade)) {
+                return false;
+            }
+            if (in_array($servico->situacao, ['arquivado', 'cancelado', 'nRenovado'])) {
+                return false;
+            }
+            if ($servico->unidade && $servico->unidade->status !== 'Ativa') {
+                return false;
+            }
+            if ($servico->licenca_validade >= '2059-01-01') {
+                return false;
+            }
 
-
-
+            $validade = \Carbon\Carbon::parse($servico->licenca_validade)->format('Y-m-d');
+            return $validade < $today;
+        });
 
         return view('admin.lista-servicos')
             ->with('servicos', $servicos);
@@ -228,14 +236,14 @@ class ServicosController extends Controller
 
     public function listaVencer()
     {
-
         $servicos = Servico::with('unidade', 'empresa', 'responsavel')
-            // ->whereIn('unidade_id',$this->getUnidadesList())
             ->orWhere('responsavel_id', Auth::id())
             ->orWhere('coresponsavel_id', Auth::id())
             ->get();
 
+        $today = \Carbon\Carbon::today();
         $servicos = $servicos->filter(function ($servico) {
+            $today = \Carbon\Carbon::today();
             if ($servico->situacao !== 'finalizado') {
                 return false;
             }
@@ -244,22 +252,22 @@ class ServicosController extends Controller
                 return false;
             }
 
+            if ($servico->licenca_validade >= '2059-01-01') {
+                return false;
+            }
+
             $dias = $servico->ativar_notificacao_renovacao
                 ? ($servico->dias_para_notificacao_renovacao ?? 180)
                 : 60;
 
-            $dataLimite = \Carbon\Carbon::today()->addDays($dias);
+            $dataLimite = $today->copy()->addDays($dias);
 
             $validade = $servico->licenca_validade instanceof \Carbon\Carbon
                 ? $servico->licenca_validade
                 : \Carbon\Carbon::parse($servico->licenca_validade);
 
-            return $validade->lt($dataLimite);
+            return $validade->gte($today) && $validade->lte($dataLimite);
         });
-
-
-
-        // $servicos = $servicos->where('unidade.status','Ativa')->where('situacao','Finalizado');
 
         return view('admin.lista-servicos')
             ->with('servicos', $servicos);

@@ -410,91 +410,110 @@ class ClienteController extends Controller
 
     public function listaVigentes()
     {
-
         $user = User::find(Auth::id());
 
-
-
         if (count($user->empresas)) {
-
             $servicos = $this->getServicosCliente();
 
+            $today = date('Y-m-d');
+            $servicos = $servicos->filter(function ($servico) use ($today) {
+                if (empty($servico->licenca_validade)) {
+                    return false;
+                }
+                if (in_array($servico->situacao, ['arquivado', 'cancelado', 'nRenovado'])) {
+                    return false;
+                }
+                if ($servico->unidade && $servico->unidade->status !== 'Ativa') {
+                    return false;
+                }
 
-            $servicos = $servicos->where('unidade.status', '=', 'Ativa')
-                ->where('licenca_validade', '>', date('Y-m-d'))
-                ->where('tipo', 'licencaOperacao')
-                ->where('situacao', '<>', 'arquivado');
+                $validade = \Carbon\Carbon::parse($servico->licenca_validade)->format('Y-m-d');
+                return $validade >= $today;
+            });
         } else {
             return view('errors.403');
         }
 
-
-
         return view('cliente.lista-servicos')
-            ->with(
-                [
-                    'servicos' => $servicos,
-                    'title' => 'Serviços com licenças vigentes',
-                ]
-            );
+            ->with([
+                'servicos' => $servicos,
+                'title' => 'Serviços com Licenças Vigentes',
+            ]);
     }
 
     public function listaVencidos()
     {
-
-
         $user = User::find(Auth::id());
-
-
 
         if (count($user->empresas)) {
             $servicos = $this->getServicosCliente();
 
-            $servicos = $servicos->where('unidade.status', '=', 'Ativa')
-                ->where('licenca_validade', '<', date('Y-m-d'))
-                ->where('tipo', '=', 'licencaOperacao')
-                ->where('situacao', '<>', 'arquivado');
+            $today = date('Y-m-d');
+            $servicos = $servicos->filter(function ($servico) use ($today) {
+                if (empty($servico->licenca_validade)) {
+                    return false;
+                }
+                if (in_array($servico->situacao, ['arquivado', 'cancelado', 'nRenovado'])) {
+                    return false;
+                }
+                if ($servico->unidade && $servico->unidade->status !== 'Ativa') {
+                    return false;
+                }
+                if ($servico->licenca_validade >= '2059-01-01') {
+                    return false;
+                }
+
+                $validade = \Carbon\Carbon::parse($servico->licenca_validade)->format('Y-m-d');
+                return $validade < $today;
+            });
         } else {
             return view('errors.403');
         }
 
-
-
-
-
-
         return view('cliente.lista-servicos')
-            ->with(
-                [
-                    'servicos' => $servicos,
-                    'title' => 'Serviços com licenças vencidas',
-                ]
-            );
+            ->with([
+                'servicos' => $servicos,
+                'title' => 'Serviços com Licenças Vencidas',
+            ]);
     }
 
     public function listaVencer()
     {
         $user = User::find(Auth::id());
 
-
         if (count($user->empresas)) {
             $servicos = $this->getServicosCliente();
 
-            $servicos = $servicos->where('licenca_validade', '<', \Carbon\Carbon::today()->addDays(60))
-                ->where('situacao', '=', 'finalizado');
+            $today = \Carbon\Carbon::today();
+            $servicos = $servicos->filter(function ($servico) use ($today) {
+                if ($servico->situacao !== 'finalizado') {
+                    return false;
+                }
+                if (empty($servico->licenca_validade)) {
+                    return false;
+                }
+                if ($servico->licenca_validade >= '2059-01-01') {
+                    return false;
+                }
+
+                $dias = $servico->ativar_notificacao_renovacao
+                    ? ($servico->dias_para_notificacao_renovacao ?? 180)
+                    : 60;
+
+                $dataLimite = $today->copy()->addDays($dias);
+                $validade = \Carbon\Carbon::parse($servico->licenca_validade);
+
+                return $validade->gte($today) && $validade->lte($dataLimite);
+            });
         } else {
             return view('errors.403');
         }
 
-
-
         return view('cliente.lista-servicos')
-            ->with(
-                [
-                    'servicos' => $servicos,
-                    'title' => 'Serviços com licenças a vencer',
-                ]
-            );
+            ->with([
+                'servicos' => $servicos,
+                'title' => 'Serviços com Licenças a Vencer',
+            ]);
     }
 
     public function listaInativo()
