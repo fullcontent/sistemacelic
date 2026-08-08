@@ -643,13 +643,14 @@ class ClienteController extends Controller
 
         if ($user && count($user->empresas)) {
             $servicos = $this->getServicosCliente($user);
-            $userName = strtolower(trim($user->name));
 
-            $servicos = $servicos->where('situacao', 'andamento')
-                ->where('situacao', '<>', 'arquivado')
-                ->filter(function($servico) use ($userName) {
-                    return strtolower(trim($servico->solicitante)) === $userName;
-                });
+            // Filter in-progress services for this client's companies.
+            // NOTE: servicos.solicitante stores a Solicitante ID (integer), not the
+            // user's name — so filtering by user->name would always return zero results.
+            // "Meus Andamentos" shows all in-progress services scoped to the client's companies.
+            $servicos = $servicos->filter(function($servico) {
+                return $servico->situacao === 'andamento';
+            });
         } else {
             return view('errors.403');
         }
