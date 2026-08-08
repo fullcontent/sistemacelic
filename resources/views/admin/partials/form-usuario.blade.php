@@ -105,9 +105,16 @@
                 <div class="checkbox" style="margin-top: 5px;">
                     <label style="padding-left: 0; font-weight: 600;">
                         {!! Form::checkbox('is_coordinator', 1, isset($usuario) ? $usuario->is_coordinator : false, ['id'=>'is_coordinator']) !!}
-                        Definir usuário como Coordenador (Diego manda lista de coordenadores)
+                        Definir usuário como Coordenador
                     </label>
                 </div>
+                <p class="help-block" style="font-size: 0.85em; margin-top: 5px; color: #95a5a6;">
+                    <i class="fa fa-info-circle text-muted"></i>
+                    Para usuários internos, habilita permissões de coordenador (ex.: definir o Responsável cliente em pendências).
+                    Para usuários <strong>Cliente</strong>, define o coordenador da empresa: no portal do cliente, o card/filtro
+                    "Meus serviços" mostra os serviços cujo Solicitante é o próprio coordenador; para os demais usuários da mesma
+                    empresa (analistas), mostra os serviços cujo Solicitante é o coordenador deles.
+                </p>
             </div>
             @endunless
         </div>

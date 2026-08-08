@@ -11,10 +11,13 @@
 
 @php
     $user = Auth::user();
-    // NOTE: servicos.solicitante stores a Solicitante ID (integer), not user->name.
-    // "Meus em andamento" shows all in-progress services scoped to the client's companies
-    // (the same scope used by listaMeusAndamento in ClienteController).
-    $meusAndamentoCount = $servicos ? $servicos->where('situacao', 'andamento')->count() : 0;
+    // "Meus serviços" filtra apenas os serviços cujo Solicitante é o próprio
+    // usuário (se coordenador) ou o coordenador dele (se analista) — ver
+    // ClienteController::resolveMeusSolicitanteValues().
+    $meuSolicitanteValores = $meuSolicitanteValores ?? [];
+    $meusAndamentoCount = ($servicos && !empty($meuSolicitanteValores))
+        ? $servicos->whereIn('solicitante', $meuSolicitanteValores)->where('situacao', 'andamento')->count()
+        : 0;
     $todosAndamentoCount = $servicos ? $servicos->where('situacao', 'andamento')->count() : 0;
     $finalizadosCount = $servicos ? $servicos->where('situacao', 'finalizado')->count() : 0;
     $standByCount = $servicos ? $servicos->where('situacao', 'standBy')->count() : 0;
@@ -22,7 +25,20 @@
 @endphp
 
   <div class="row" style="margin-bottom: 20px;">
-    <!-- Card 1.1: Serviços em andamento -->
+    <!-- Card 1.1: Meus serviços em andamento (solicitante = eu / meu coordenador) -->
+    <div class="col-lg-2 col-md-4 col-sm-6 col-xs-12" style="margin-bottom: 15px;">
+      <div class="dash-card" style="background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%); color: #fff; border-radius: 12px; padding: 18px; position: relative; box-shadow: 0 4px 12px rgba(99,102,241,0.25);">
+        <div style="font-size: 28px; font-weight: 700; line-height: 1;">{{ $meusAndamentoCount }}</div>
+        <div style="font-size: 12px; font-weight: 600; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.95;">Meus serviços</div>
+        <div style="margin-top: 14px;">
+          <a href="{{ route('cliente.servico.meus_andamento') }}" class="btn-pill-card" style="display: inline-block; background: rgba(255,255,255,0.2); color: #fff; border-radius: 50px; padding: 4px 12px; font-size: 11px; font-weight: 600; text-decoration: none; backdrop-filter: blur(4px);">
+            Mais informações <i class="fa fa-arrow-circle-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 1.2: Todos os serviços em andamento -->
     <div class="col-lg-2 col-md-4 col-sm-6 col-xs-12" style="margin-bottom: 15px;">
       <div class="dash-card" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); color: #fff; border-radius: 12px; padding: 18px; position: relative; box-shadow: 0 4px 12px rgba(14,165,233,0.25);">
         <div style="font-size: 28px; font-weight: 700; line-height: 1;">{{ $todosAndamentoCount }}</div>

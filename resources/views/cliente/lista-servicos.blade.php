@@ -6,6 +6,27 @@
 
 @section('content')
 
+@php
+    $isMeuAtivo = request()->boolean('meu');
+    $paramsTodos = collect(request()->except('meu'))->toArray();
+    $paramsMeus = array_merge($paramsTodos, ['meu' => 1]);
+@endphp
+
+<div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
+    <div class="btn-group" role="group" style="border-radius: 50px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+        <a href="{{ route(Route::currentRouteName(), $paramsTodos) }}"
+           class="btn {{ $isMeuAtivo ? 'btn-default' : 'btn-primary' }}"
+           style="border-radius: 50px 0 0 50px; font-weight: 600; padding: 6px 18px; margin: 0;">
+            Todos
+        </a>
+        <a href="{{ route(Route::currentRouteName(), $paramsMeus) }}"
+           class="btn {{ $isMeuAtivo ? 'btn-primary' : 'btn-default' }}"
+           style="border-radius: 0 50px 50px 0; font-weight: 600; padding: 6px 18px; margin: 0;">
+            Meus serviços
+        </a>
+    </div>
+</div>
+
 <div class="table-container" style="background: #fff; border-radius: 10px; padding: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border: 1px solid #ebf0f5; margin-bottom: 25px;">
     <div class="table-responsive">
         <table id="lista-servicos" class="table table-hover align-middle" style="width:100%;">

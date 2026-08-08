@@ -100,11 +100,16 @@ class ClienteController extends Controller
             }
         }
 
+        // Valores de "solicitante" que identificam os serviços do cliente logado
+        // (ele mesmo, se coordenador; ou o(s) coordenador(es) dele, se analista).
+        $meuSolicitanteValores = $this->resolveMeusSolicitanteValues($user);
+
         return view('cliente.dashboard')
             ->with([
                 'servicos'  => $servicos,
                 'pendencias' => $pendencias,
                 'unidades'  => $unidades,
+                'meuSolicitanteValores' => $meuSolicitanteValores,
             ]);
     }
 
@@ -644,12 +649,10 @@ class ClienteController extends Controller
         $user = User::find(Auth::id());
 
         if ($user && count($user->empresas)) {
-            $servicos = $this->getServicosCliente($user);
+            // "Meus serviços": coordenador cliente -> solicitante é ele mesmo;
+            // analista cliente -> solicitante é o coordenador dele.
+            $servicos = $this->getServicosCliente($user, true);
 
-            // Filter in-progress services for this client's companies.
-            // NOTE: servicos.solicitante stores a Solicitante ID (integer), not the
-            // user's name — so filtering by user->name would always return zero results.
-            // "Meus Andamentos" shows all in-progress services scoped to the client's companies.
             $servicos = $servicos->filter(function($servico) {
                 return $servico->situacao === 'andamento';
             });
@@ -701,7 +704,7 @@ class ClienteController extends Controller
             ]);
     }
 
-    public function getServicosCliente($user = null)
+    public function getServicosCliente($user = null, $meu = null)
     {
         $user = $user ?: User::find(Auth::id());
 
@@ -724,7 +727,65 @@ class ClienteController extends Controller
             $query->whereIn('departamento', $depts);
         }
 
+        // "Meus serviços" filter: coordenador cliente -> solicitante é ele mesmo;
+        // analista cliente -> solicitante tem que ser o coordenador dele.
+        $meu = $meu ?? request()->boolean('meu');
+        if ($meu) {
+            $valores = $this->resolveMeusSolicitanteValues($user);
+            $query->whereIn('solicitante', $valores ?: ['__nenhum__']);
+        }
+
         return $query->with(['unidade', 'empresa', 'responsavel'])->get();
+    }
+
+    /**
+     * Resolve os valores de "solicitante" (id do Solicitante e/ou nome legado)
+     * que identificam os serviços "meus" para o cliente logado:
+     * - cliente coordenador: apenas ele mesmo;
+     * - cliente analista: o(s) coordenador(es) cliente da mesma empresa.
+     */
+    private function resolveMeusSolicitanteValues(User $user)
+    {
+        if ($user->is_coordinator) {
+            $nomes = collect([$user->name]);
+        } else {
+            $empresaIds = $user->empresas->pluck('id');
+            $coordenadorIds = UserAccess::whereIn('empresa_id', $empresaIds)->pluck('user_id');
+            $nomes = User::whereIn('id', $coordenadorIds)
+                ->where('privileges', 'cliente')
+                ->where('is_coordinator', true)
+                ->pluck('name');
+        }
+
+        $nomes = $nomes->filter()->map(fn($n) => trim($n))->unique()->values();
+        if ($nomes->isEmpty()) {
+            return [];
+        }
+
+        $nomesLower = $nomes->map(fn($n) => mb_strtolower($n));
+
+        // Nomes de usuário costumam vir como "Empresa - Nome da Pessoa" (ex.: "Pague
+        // Menos - Marcos Samuel"), enquanto o cadastro de Solicitante guarda só o nome
+        // da pessoa (ex.: "Marcos Samuel"). Por isso, além da igualdade exata, também
+        // consideramos quando o nome do Solicitante aparece contido no nome do usuário.
+        $solicitantesEncontrados = \App\Models\Solicitante::get(['id', 'nome'])
+            ->filter(function ($s) use ($nomesLower) {
+                $solNome = mb_strtolower(trim((string) $s->nome));
+                if ($solNome === '') {
+                    return false;
+                }
+                return $nomesLower->contains(function ($nome) use ($solNome) {
+                    return $nome === $solNome || strpos($nome, $solNome) !== false;
+                });
+            });
+
+        return $solicitantesEncontrados->pluck('id')->map(fn($id) => (string) $id)
+            ->merge($solicitantesEncontrados->pluck('nome'))
+            ->merge($nomes)
+            ->filter()
+            ->unique()
+            ->values()
+            ->toArray();
     }
 
     public function getUnidadesCliente($user = null)

@@ -57,7 +57,7 @@
                             <td style="padding: 10px; font-weight: 600; color: #1e293b;">
                                 <a href="javascript:void(0)" class="abrir-taxa-modal" 
                                    data-nome="{{ $taxa->nome }}"
-                                   data-valor="R$ {{ number_format((float)str_replace(['.', ','], ['', '.'], $taxa->valor), 2, ',', '.') }}"
+                                   data-valor="R$ {{ number_format((float)$taxa->valor, 2, ',', '.') }}"
                                    data-vencimento="{{ $taxa->vencimento ? \Carbon\Carbon::parse($taxa->vencimento)->format('d/m/Y') : '-' }}"
                                    data-pagamento="{{ $taxa->pagamento ? \Carbon\Carbon::parse($taxa->pagamento)->format('d/m/Y') : '-' }}"
                                    data-status="{{ $isPago ? 'Pago' : ($isVencida ? 'Vencida' : 'Aberto') }}"
@@ -70,7 +70,7 @@
                                 </a>
                             </td>
                             <td style="padding: 10px; font-weight: 700; color: #0f172a;">
-                                R$ {{ number_format((float)str_replace(['.', ','], ['', '.'], $taxa->valor), 2, ',', '.') }}
+                                R$ {{ number_format((float)$taxa->valor, 2, ',', '.') }}
                             </td>
                             <td style="padding: 10px; color: #64748b;">
                                 {{ $taxa->vencimento ? \Carbon\Carbon::parse($taxa->vencimento)->format('d/m/Y') : '-' }}
@@ -87,7 +87,7 @@
                             <td style="padding: 10px; text-align: center;">
                                 <button type="button" class="btn btn-default btn-xs btn-pill abrir-taxa-modal"
                                    data-nome="{{ $taxa->nome }}"
-                                   data-valor="R$ {{ number_format((float)str_replace(['.', ','], ['', '.'], $taxa->valor), 2, ',', '.') }}"
+                                   data-valor="R$ {{ number_format((float)$taxa->valor, 2, ',', '.') }}"
                                    data-vencimento="{{ $taxa->vencimento ? \Carbon\Carbon::parse($taxa->vencimento)->format('d/m/Y') : '-' }}"
                                    data-pagamento="{{ $taxa->pagamento ? \Carbon\Carbon::parse($taxa->pagamento)->format('d/m/Y') : '-' }}"
                                    data-status="{{ $isPago ? 'Pago' : ($isVencida ? 'Vencida' : 'Aberto') }}"

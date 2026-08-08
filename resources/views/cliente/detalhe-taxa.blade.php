@@ -18,7 +18,7 @@
             <p><b>Taxa: </b>{{$taxa->nome}}</p>
             <p><b>OS: </b>{{$taxa->servico->os}}</p>
             
-            <p><b>Valor: </b>R$ {{$taxa->valor}}</p>
+            <p><b>Valor: </b>R$ {{number_format((float)$taxa->valor, 2, ',', '.')}}</p>
             <p><b>Vencimento: </b>@switch($taxa->vencimento)
 
                 @case($taxa->vencimento >= date('Y-m-d'))
