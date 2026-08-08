@@ -90,7 +90,7 @@
 		<a href="{{route('pendencia.create', ['servico_id'=>$servico->id])}}" class="btn btn-primary btn-pill"><i class="fa fa-plus" style="margin-right: 5px;"></i> Adicionar Pendência</a>
 	</div>
 </div>
-@endsectionction
+@endsection
 
 @section('js')
     <script>
