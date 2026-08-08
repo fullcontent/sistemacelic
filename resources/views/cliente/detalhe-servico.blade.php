@@ -304,13 +304,44 @@
     @endif
 </div>
 
-<!-- Histórico de Atualizações & Interações com Avatares -->
+<!-- Card de Nova Interação (Acima do Histórico - Referência Admin Mentions) -->
+@if(auth()->user()->permitir_interacoes)
 <div class="row" style="margin-top: 10px;">
+    <div class="col-md-12">
+        <div class="box box-primary" style="border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border: 1px solid #ebf0f5; overflow: hidden; background: #fff; margin-bottom: 20px;">
+            <div class="box-header with-border" style="background: #fff; border-bottom: 1px solid #ebf0f5; padding: 16px 22px;">
+                <h3 class="box-title" style="font-weight: 700; color: #1e293b; font-size: 16px; margin: 0;">
+                    <i class="fa fa-commenting text-primary" style="margin-right: 8px;"></i> Nova Interação / Mensagem
+                </h3>
+            </div>
+            <div class="box-body" style="padding: 20px;">
+                <form action="{{ route('cliente.interacao.salvar') }}" method="POST" style="width: 100%;">
+                    @csrf
+                    <input type="hidden" name="servico_id" value="{{ $servico->id }}">
+                    <div style="display: flex; flex-direction: column; width: 100%; gap: 12px;">
+                        <div style="width: 100%;">
+                            <textarea rows="3" name="observacoes" id="full" class="form-control-simple mention" placeholder="Digite sua mensagem (use @ para mencionar o coordenador)..." spellcheck="true" autocomplete="off" required style="width: 100%; resize: vertical; min-height: 50px; line-height: 20px; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 14px; background: #fff; box-sizing: border-box;"></textarea>
+                        </div>
+                        <div style="display: flex; justify-content: flex-end; width: 100%;">
+                            <button type="submit" class="btn btn-primary btn-pill" style="border-radius: 50px; padding: 8px 26px; font-weight: 700; background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); border: none; height: 38px; display: flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 2px 6px rgba(14, 165, 233, 0.3);">
+                                <i class="fa fa-paper-plane"></i> Enviar Interação
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
+<!-- Histórico de Atualizações & Interações com Avatares -->
+<div class="row">
     <div class="col-md-12">
         <div class="box box-default" style="border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); border: 1px solid #ebf0f5; overflow: hidden; background: #fff; margin-bottom: 25px;">
             <div class="box-header with-border" style="background: #fff; border-bottom: 1px solid #ebf0f5; padding: 20px 25px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;">
                 <h3 class="box-title" style="font-weight: 700; color: #1e293b; font-size: 17px; margin: 0;">
-                    <i class="fa fa-comments-o text-primary" style="margin-right: 8px;"></i> Histórico de Interações & Atividades
+                    <i class="fa fa-history text-info" style="margin-right: 8px;"></i> Histórico de Interações & Atividades
                 </h3>
                 <a href="{{ route('cliente.interacoes.lista', $servico->id) }}" class="btn btn-pill btn-default btn-xs" style="border-radius: 50px; padding: 6px 18px; font-weight: 600;">
                     Ver Histórico Completo
@@ -387,5 +418,36 @@
     .content-header .breadcrumb { display: none !important; }
     .btn-pill { transition: all 0.2s ease; }
     .btn-pill:hover { transform: translateY(-1px); }
+    .mentions-input-box { width: 100% !important; flex: 1 !important; }
+    .mentions-input-box textarea { width: 100% !important; box-sizing: border-box !important; }
 </style>
+@endsection
+
+@section('js')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var $ = window.jQuery || window.$;
+    if (!$) return;
+
+    if ($.fn.mentionsInput) {
+        $('#full').mentionsInput({
+            onDataRequest: function (mode, query, callback) {
+                $.getJSON('{{ route("cliente.users.list") }}?servico_id={{ $servico->id }}', function(responseData) {
+                    responseData = _.filter(responseData, function(item) { 
+                        return item.name.toLowerCase().indexOf(query.toLowerCase()) > -1;
+                    });
+                    callback.call(this, responseData);        
+                });
+            }    
+        });
+    }
+
+    $(document).on('keydown', '.mentions-input-box textarea', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            $(this).closest('form').submit();
+        }
+    });
+});
+</script>
 @endsection

@@ -2,9 +2,37 @@
 
 namespace App\Http\Controllers;
 
+if (!function_exists('App\Http\Controllers\cleanObsText')) {
+    function cleanObsText($text) {
+        if (empty($text)) return '';
+        $clean = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $clean = str_replace(["\xc2\xa0", '&nbsp;'], ' ', $clean);
+        $clean = preg_replace('/<br\s*\/?>/i', "\n", $clean);
+        $clean = preg_replace('/<\/p>/i', "\n", $clean);
+        $clean = strip_tags($clean);
+        $clean = str_replace(["\r\n", "\r"], "\n", $clean);
+        $lines = array_map('trim', explode("\n", $clean));
+        $filteredLines = [];
+        $prevEmpty = false;
+        foreach ($lines as $line) {
+            if ($line === '') {
+                if (!$prevEmpty) {
+                    $filteredLines[] = '';
+                    $prevEmpty = true;
+                }
+            } else {
+                $filteredLines[] = $line;
+                $prevEmpty = false;
+            }
+        }
+        return trim(implode("\n", $filteredLines));
+    }
+}
+
 use App\User;
 use App\UserAccess;
 use App\Models\Taxa;
+use Carbon\Carbon;
 
 
 use App\Models\Empresa;
@@ -498,68 +526,80 @@ class ClienteController extends Controller
             return redirect()->back()->with('error', 'Você não tem permissão para realizar interações.');
         }
 
-        $validator = Validator::make($request->all(), [
+        $request->validate([
+            'servico_id' => 'required|exists:servicos,id',
+            'observacoes' => 'required|string',
+        ]);
 
-            'observacoes' => 'required',
+        $user = User::find(Auth::id());
 
-        ])->validate();
+        // Verificar se o cliente tem acesso ao serviço
+        $servicosCliente = $this->getServicosCliente();
+        $servico = $servicosCliente->where('id', $request->servico_id)->first();
 
-        $interacao = new Historico;
+        if (!$servico) {
+            abort(403, 'Acesso não autorizado a este serviço.');
+        }
 
-        $interacao->servico_id = $request->servico_id;
-        $interacao->observacoes = $request->observacoes;
+        $cleanText = cleanObsText($request->observacoes);
+        if (empty($cleanText)) {
+            return redirect()->back()->with('error', 'Por favor, digite uma mensagem válida.');
+        }
+
+        // Criar o Histórico de Interação
+        $interacao = new Historico();
+        $interacao->servico_id = $servico->id;
+        $interacao->observacoes = $cleanText;
         $interacao->user_id = Auth::id();
-
+        $interacao->visibilidade = 'publico'; // Regra 4.2: Forçar 'publico' (nunca 'interno')
+        $interacao->created_at = Carbon::now();
         $interacao->save();
-        $servico = Servico::with('unidade')->find($request->servico_id);
 
-        $mentions = preg_match_all('/\B@[a-zA-Z\wÀ-ú]+\s\w+/', $request->observacoes, $users);
+        // Processar Menções permitidas para Cliente (Regra 4.2)
+        $mentions = preg_match_all('/\B@[a-zA-Z\wÀ-ú]+\s\w+/', $cleanText, $matches);
 
         if ($mentions > 0) {
+            // Obter coordenadores do serviço
+            $coordenadoresIds = $servico->coordenadores()->pluck('users.id')->toArray();
+            
+            // Obter outros clientes com acesso às mesmas empresas do cliente logado
+            $empresasIds = UserAccess::where('user_id', Auth::id())->pluck('empresa_id');
+            $clientesEmpresaIds = UserAccess::whereIn('empresa_id', $empresasIds)->pluck('user_id')->toArray();
+
+            $allowedUserIds = array_unique(array_merge($coordenadoresIds, $clientesEmpresaIds));
+
             $openAIService = new \App\Services\OpenAIService();
             $resumo = $openAIService->generateContextualSummary([
                 'nome' => $servico->nome,
-                'unidade' => $servico->unidade ? $servico->unidade->nomeFantasia : 'N/A',
+                'unidade' => $servico->unidade ? $servico->unidade->nomeFantasia : '',
                 'situacao' => $servico->situacao,
                 'tipo' => $servico->tipo
-            ], $request->observacoes);
+            ], $cleanText);
 
             $emailErrors = [];
             $webhookService = new \App\Services\WebhookService();
 
-            foreach ($users[0] as $u) {
-                $u = ltrim($u, "@");
+            foreach ($matches[0] as $m) {
+                $uName = ltrim($m, "@");
+                $mUser = User::where('name', 'like', '%' . $uName . '%')->first();
 
-                $user = User::where('name', 'like', '%' . $u . '%')->first();
-                if ($user) {
-                    // 1. Notificação Padrão (Sininho)
+                if ($mUser && in_array($mUser->id, $allowedUserIds)) {
                     try {
-                        $route = $user->privileges == 'admin' ? 'servicos.show' : 'cliente.servico.show';
-                        $user->notify(new UserMentioned($servico, $route, $resumo));
+                        $route = $mUser->privileges == 'admin' ? 'servicos.show' : 'cliente.servico.show';
+                        $mUser->notify(new UserMentioned($servico, $route, $resumo));
                     } catch (\Exception $e) {
-                        \Log::error('ClienteController: Erro na notificação interna: ' . $e->getMessage());
+                        \Log::error('Erro na notificação de menção iniciada por cliente: ' . $e->getMessage());
                     }
 
-                    // 2. Email via Webhook
-                    $success = $webhookService->sendMentionEmail($user, $servico, $resumo, $request->observacoes);
+                    $success = $webhookService->sendMentionEmail($mUser, $servico, $resumo, $cleanText);
                     if (!$success) {
-                        $emailErrors[] = $user->name;
+                        $emailErrors[] = $mUser->name;
                     }
                 }
             }
-
-            if (!empty($emailErrors)) {
-                $names = implode(', ', $emailErrors);
-                session()->flash('error', "A interação foi salva, mas ocorreu um erro ao enviar notificação para: {$names}.");
-            } else {
-                session()->flash('success', "Interação salva e notificações enfileiradas com sucesso.");
-            }
-        } else {
-            session()->flash('success', "Interação salva com sucesso.");
         }
 
-
-        return redirect()->route('cliente.servico.show', $request->servico_id);
+        return redirect()->back()->with('success', 'Interação enviada com sucesso!');
     }
 
     public function interacoes($id)
@@ -719,16 +759,41 @@ class ClienteController extends Controller
     }
 
 
-    public function usersList()
+    public function usersList(Request $request)
     {
-        $users = User::where('active', 1)->get();
+        $user = User::find(Auth::id());
+        $empresasIds = UserAccess::where('user_id', $user->id)->pluck('empresa_id');
+
+        // Se for passado um servico_id, priorizar coordenadores do serviço + clientes das mesmas empresas
+        $servicoId = $request->query('servico_id');
+        if ($servicoId) {
+            $servico = Servico::find($servicoId);
+            if ($servico) {
+                $coordenadores = $servico->coordenadores()->get();
+                $outrosClientes = User::where('active', 1)
+                    ->where('privileges', 'cliente')
+                    ->whereIn('id', UserAccess::whereIn('empresa_id', $empresasIds)->pluck('user_id'))
+                    ->get();
+                
+                $users = $coordenadores->merge($outrosClientes)->unique('id');
+            } else {
+                $users = User::where('active', 1)->whereIn('id', UserAccess::whereIn('empresa_id', $empresasIds)->pluck('user_id'))->get();
+            }
+        } else {
+            // Apenas administradores/coordenadores + outros clientes das mesmas empresas
+            $coordenadores = User::where('active', 1)->where('is_coordinator', 1)->get();
+            $outrosClientes = User::where('active', 1)
+                ->where('privileges', 'cliente')
+                ->whereIn('id', UserAccess::whereIn('empresa_id', $empresasIds)->pluck('user_id'))
+                ->get();
+            $users = $coordenadores->merge($outrosClientes)->unique('id');
+        }
 
         foreach ($users as $u) {
-
             $u->name = "@" . $u->name . " ";
         }
 
-        return json_encode($users);
+        return json_encode($users->values());
     }
 
 

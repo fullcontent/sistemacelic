@@ -1329,11 +1329,18 @@ class ServicosController extends Controller
 
             $emailErrors = [];
             $webhookService = new \App\Services\WebhookService();
+            $isCoordinator = (Auth::user()->is_coordinator == 1);
 
             foreach ($users[0] as $u) {
                 $u = ltrim($u, "@");
                 $user = User::where('name', 'like', '%' . $u . '%')->first();
                 if ($user) {
+                    // Regra 4.1: Apenas coordenadores podem mencionar clientes em interações
+                    if ($user->privileges == 'cliente' && !$isCoordinator) {
+                        \Log::info("Menção ao cliente {$user->name} bloqueada na interação pois o autor (" . Auth::user()->name . ") não é coordenador.");
+                        continue;
+                    }
+
                     // 1. Notificação Padrão (Sininho do sistema) - Instantânea no banco
                     try {
                         $route = $user->privileges == 'admin' ? 'servicos.show' : 'cliente.servico.show';
