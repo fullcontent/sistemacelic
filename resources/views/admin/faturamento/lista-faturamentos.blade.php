@@ -10,7 +10,7 @@
 <style>
 	.dashboard-card {
 		border-radius: 8px;
-		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 		padding: 20px;
 		margin-bottom: 20px;
 		transition: transform 0.2s;
@@ -20,6 +20,7 @@
 
 	.dashboard-card:hover {
 		transform: translateY(-5px);
+		box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
 	}
 
 	.card-label {
@@ -60,6 +61,51 @@
 		margin-bottom: 20px;
 		border: 1px solid #eaeaec;
 	}
+
+	.table-container {
+		background: #fff;
+		border-radius: 8px;
+		padding: 20px;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+		border: 1px solid #ebf0f5;
+		margin-bottom: 25px;
+	}
+
+	.btn-action {
+		width: 32px;
+		height: 32px;
+		line-height: 32px;
+		padding: 0;
+		text-align: center;
+		border-radius: 6px;
+		margin: 0 2px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.2s;
+		border: 1px solid #ddd;
+		background: #fff;
+	}
+
+	.btn-action:hover {
+		transform: scale(1.1);
+		box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+		text-decoration: none;
+	}
+
+	.btn-pill {
+		border-radius: 50px;
+		padding: 6px 20px;
+		font-weight: 600;
+		transition: all 0.2s;
+	}
+
+	.btn-pill:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+	}
+
+	.content-header .breadcrumb { display: none !important; }
 </style>
 @stop
 
@@ -218,23 +264,23 @@
 		</form>
 	</div>
 
-	<div class="box" style="padding: 10px;">
-		<table id="lista-faturamentos" class="table table-bordered table-hover">
+	<div class="table-container">
+		<table id="lista-faturamentos" class="table table-hover" style="width: 100%;">
 			<thead>
-				<tr>
+				<tr style="background: #fcfcfc;">
 					<th># Faturamento</th>
 					<th>Cliente</th>
 					<th>Data</th>
 					<th>Total</th>
 					<th>Status NFS-e</th>
 					<th>Pagamento</th>
-					<th>Ações</th>
+					<th width="150" class="text-center">Ações</th>
 				</tr>
 			</thead>
 			<tbody>
 				@foreach($faturamentos as $f)
 					<tr>
-						<td><a href="{{route('faturamento.show', $f->id)}}">{{$f->nome}}</a></td>
+						<td><a href="{{route('faturamento.show', $f->id)}}" style="font-weight: 600; color: #3c8dbc;">{{$f->nome}}</a></td>
 						<td>{{$f->empresa->nomeFantasia}}</td>
 						<td><span
 								style="display:none;">{{$f->created_at}}</span>{{ \Carbon\Carbon::parse($f->created_at)->format('d/m/Y')}}
@@ -244,23 +290,23 @@
 							@if($f->ultimaEmisao)
 								@php $emissao = $f->ultimaEmisao; @endphp
 								@if($emissao->status == 'CONCLUIDA' || strtolower($emissao->status) == 'emitida')
-									<span class="label label-success" title="NFS-e Automática"><i class="fa fa-check-circle"></i> Emitida</span>
+									<span class="label label-success" style="border-radius: 4px; padding: 3px 8px;" title="NFS-e Automática"><i class="fa fa-check-circle"></i> Emitida</span>
 								@elseif($emissao->status == 'PROCESSANDO')
-									<span class="label label-primary" title="NFS-e em processamento na PlugNotas"><i class="fa fa-spinner fa-spin"></i> Processando</span>
+									<span class="label label-primary" style="border-radius: 4px; padding: 3px 8px;" title="NFS-e em processamento na PlugNotas"><i class="fa fa-spinner fa-spin"></i> Processando</span>
 								@elseif(in_array(strtoupper($emissao->status), ['ERRO', 'REJEITADA', 'REJEITADO']))
-									<span class="label label-danger" title="{{ $emissao->mensagem_erro ?? 'Erro na emissão automática' }}"><i class="fa fa-exclamation-triangle"></i> {{ strtoupper($emissao->status) == 'ERRO' ? 'Erro na Emissão' : 'Rejeitada' }}</span>
+									<span class="label label-danger" style="border-radius: 4px; padding: 3px 8px;" title="{{ $emissao->mensagem_erro ?? 'Erro na emissão automática' }}"><i class="fa fa-exclamation-triangle"></i> {{ strtoupper($emissao->status) == 'ERRO' ? 'Erro na Emissão' : 'Rejeitada' }}</span>
 								@else
-									<span class="label label-default">{{ strtoupper($emissao->status) }}</span>
+									<span class="label label-default" style="border-radius: 4px; padding: 3px 8px;">{{ strtoupper($emissao->status) }}</span>
 								@endif
 							@elseif($f->nf || $f->servicos->whereNotNull('nf')->count() > 0)
-								<span class="label label-success">Emitida (Manual)</span>
+								<span class="label label-success" style="border-radius: 4px; padding: 3px 8px;">Emitida (Manual)</span>
 							@else
-								<div class="row">
-									<div class="col-xs-12">
-										<a href="{{ route('nfse.emissao', $f->id) }}" class="btn btn-xs btn-primary btn-block" style="margin-bottom: 5px;">
-											<i class="fa fa-magic"></i> Gerar NFS-e (Novo)
+								<div class="row" style="margin: 0;">
+									<div class="col-xs-12" style="padding: 0;">
+										<a href="{{ route('nfse.emissao', $f->id) }}" class="btn btn-xs btn-primary btn-block" style="margin-bottom: 5px; border-radius: 4px;">
+											<i class="fa fa-magic"></i> Gerar NFS-e
 										</a>
-										<a href="#" class="label label-warning btn-block cadastroNF" data-id="{{ $f->id }}"
+										<a href="#" class="label label-warning btn-block cadastroNF" style="border-radius: 4px; display: block; padding: 3px; cursor: pointer;" data-id="{{ $f->id }}"
 											data-cliente="{{ $f->empresa->nomeFantasia }}" data-nome="{{ $f->nome }}">
 											Registrar Manual
 										</a>
@@ -295,25 +341,21 @@
 								}
 							@endphp
 
-							<span class="label label-{{ $corStatus }}">{{ $statusFaturamento }}</span>
+							<span class="label label-{{ $corStatus }}" style="border-radius: 4px; padding: 3px 8px;">{{ $statusFaturamento }}</span>
 						</td>
-						<td>
-							<div class="btn-group">
-								<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown"
-									aria-expanded="false">
-									Ações <span class="caret"></span>
+						<td class="text-center" style="white-space: nowrap;">
+							<a href="{{route('faturamento.show', $f->id)}}" class="btn btn-default btn-action" title="Ver Detalhes">
+								<i class="fa fa-eye text-info"></i>
+							</a>
+							<a href="{{route('faturamento.pdf', $f->id)}}" class="btn btn-default btn-action" target="_blank" title="Baixar PDF">
+								<i class="fa fa-file-pdf text-success"></i>
+							</a>
+							
+							<div class="btn-group" style="display: inline-block;">
+								<button type="button" class="btn btn-default btn-action dropdown-toggle" data-toggle="dropdown" aria-expanded="false" title="Mais Opções">
+									<i class="fa fa-ellipsis-v text-muted"></i>
 								</button>
-								<ul class="dropdown-menu pull-right" role="menu">
-									<li>
-										<a href="{{route('faturamento.show', $f->id)}}">
-											<i class="fa fa-eye"></i> Ver Detalhes
-										</a>
-									</li>
-									<li>
-										<a href="{{route('faturamento.pdf', $f->id)}}" target="_blank">
-											<i class="fa fa-file"></i> Baixar PDF
-										</a>
-									</li>
+								<ul class="dropdown-menu dropdown-menu-right pull-right" role="menu">
 									<li>
 										<a href="#" data-toggle="modal" data-target="#myModal"
 											data-faturamento_id="{{ $f->id }}" data-dados_id="{{ $f->dadosCastro_id}}">
@@ -344,7 +386,7 @@
 									@endif
 									<li class="divider"></li>
 									<li>
-										<a href="{{route('faturamento.destroy', $f->id)}}" class="confirmation">
+										<a href="{{route('faturamento.destroy', $f->id)}}" class="confirmation text-danger">
 											<i class="fa fa-trash"></i> Excluir
 										</a>
 									</li>

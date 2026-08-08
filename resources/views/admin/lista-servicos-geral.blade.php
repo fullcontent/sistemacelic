@@ -1,15 +1,16 @@
 @extends('adminlte::page')
 
 @section('content_header')
-    <h1>Listagem de serviços</h1>
+<div class="row" style="margin-bottom: 15px;">
+	<div class="col-sm-12">
+		<h1 style="margin: 0; font-weight: 700; color: #333;">Listagem Geral de Serviços</h1>
+	</div>
+</div>
 @stop
 
 @section('content')
-    
-    <div class="box" style="padding: 5px; overflow:scroll">
-        <div class="box-header">
-            </div>
-        <table id="example" class="display" style="width:100%">
+    <div class="table-container" style="overflow-x: auto;">
+        <table id="example" class="table table-hover" style="width:100%">
             <thead>
                 <tr>
                     <th>ServicoID</th>
@@ -81,6 +82,17 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/datetime/1.4.1/css/dataTables.dateTime.min.css">
 
     <style>
+		.table-container {
+			background: #fff;
+			border-radius: 8px;
+			padding: 20px;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+			border: 1px solid #ebf0f5;
+			margin-bottom: 25px;
+		}
+
+		.content-header .breadcrumb { display: none !important; }
+
         div.dt-button-collection button.dt-button.active:not(.disabled) {
             background: none;
             background-color: aquamarine;

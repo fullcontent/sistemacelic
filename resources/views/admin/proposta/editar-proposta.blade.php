@@ -1,63 +1,112 @@
 @extends('adminlte::page')
 
+@section('title', 'Editar Proposta')
 
+@section('css')
+<style>
+	.form-container {
+		background: #fff;
+		border-radius: 8px;
+		padding: 25px;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+		border: 1px solid #ebf0f5;
+		margin-bottom: 25px;
+	}
 
-@section('content_header')
+	.btn-pill {
+		border-radius: 50px;
+		padding: 6px 20px;
+		font-weight: 600;
+		transition: all 0.2s;
+	}
 
-@if($proposta->status == "Revisando")
-    <h1>Revisar Proposta {{$proposta->id}}</h1>
-@else
-    <h1>Editar Proposta {{$proposta->id}}</h1>
-@endif
+	.btn-pill:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+	}
 
+	.form-container .form-control {
+		border-radius: 6px;
+		border: 1px solid #d2d6de;
+		box-shadow: none;
+		transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+	}
+
+	.form-container .form-control:focus {
+		border-color: #3c8dbc;
+		box-shadow: none;
+	}
+
+	.invoice {
+		background: #fff;
+		border: 1px solid #ebf0f5;
+		border-radius: 8px;
+		box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+		padding: 30px;
+		margin-top: 20px;
+	}
+
+	.content-header .breadcrumb { display: none !important; }
+</style>
 @stop
 
-
-
-
-
+@section('content_header')
+<div class="row" style="margin-bottom: 15px;">
+	<div class="col-sm-12">
+		<h1 style="margin: 0; font-weight: 700; color: #333;">
+			@if($proposta->status == "Revisando")
+				Revisar Proposta {{$proposta->id}}
+			@else
+				Editar Proposta {{$proposta->id}}
+			@endif
+		</h1>
+	</div>
+</div>
+@stop
 
 @section('content')
 
+    <div style="margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <a href="{{route('propostaPDF', $proposta->id)}}" class="btn btn-info btn-pill" target="_blank"> 
+            <i class="fa fa-file-pdf" style="margin-right: 5px;"></i> Gerar PDF
+        </a>
 
-    <a href="{{route('propostaPDF', $proposta->id)}}" class="btn btn-info" target="_blank"> <i
-            class="glyphicon glyphicon-file"></i>Gerar PDF</a>
+        @if($proposta->status != "Arquivada")
+            <button type="button" class="btn btn-default btn-pill no-print" data-toggle="modal" data-target="#adicionar-servico">
+                <i class="fa fa-plus" style="margin-right: 5px;"></i> Adicionar Serviço
+            </button>
+        @endif
 
-    @if($proposta->status != "Arquivada")
-        <button type="button" class="btn btn-default no-print" data-toggle="modal" data-target="#adicionar-servico">
-            <i class="fa fa-plus"></i> Adicionar Serviço
+        <button type="button" class="btn btn-primary btn-pill btn-clonar-proposta no-print" data-id="{{$proposta->id}}">
+            <i class="fa fa-copy" style="margin-right: 5px;"></i> Clonar Proposta
         </button>
-    @endif
 
-    <button type="button" class="btn btn-primary btn-clonar-proposta no-print" data-id="{{$proposta->id}}">
-        <i class="fa fa-copy"></i> Clonar Proposta
-    </button>
-
-    @if($proposta->status == "Aprovada")
-        @if(!count($proposta->servicosCriados))
-            <a href="#" data-id="{{$proposta->id}}" class="btn btn-warning atualizar"><i class="glyphicon glyphicon-wrench"></i></a>
-        @endif
-    @endif
-
-    <div class="pull-right no-print">
-        @if($proposta->status == 'Revisando')
-            <a href="#" class="btn btn-default  status" data-id="{{$proposta->id}}">{{$proposta->status}}</a>
-            <a href="#" data-id="{{$proposta->id}}" class="btn btn-info  analisar"><i class="glyphicon glyphicon-send"></i></a>
-
-        @elseif($proposta->status == 'Em análise')
-            <a href="#" class="btn btn-info ">Em análise</a>
-
-        @elseif($proposta->status == 'Aprovada')
-            <a href="#" class="btn btn-success ">Aprovada</a>
-
-        @elseif($proposta->status == 'Recusada')
-            <a href="#" class="btn btn-danger ">Recusada</a>
-            <a href="#" data-id="{{$proposta->id}}" class="btn btn-info revisar"><i class="fa fa-undo"></i></a>
-        @elseif($proposta->status == 'Arquivada')
-            <a href="#" class="btn btn-default ">Arquivada</a>
-
+        @if($proposta->status == "Aprovada")
+            @if(!count($proposta->servicosCriados))
+                <a href="#" data-id="{{$proposta->id}}" class="btn btn-warning btn-pill atualizar">
+                    <i class="fa fa-wrench" style="margin-right: 5px;"></i> Criar Serviços
+                </a>
+            @endif
         @endif
 
+        <div class="no-print" style="margin-left: auto; display: flex; gap: 8px;">
+            @if($proposta->status == 'Revisando')
+                <a href="#" class="btn btn-default btn-pill status" data-id="{{$proposta->id}}">{{$proposta->status}}</a>
+                <a href="#" data-id="{{$proposta->id}}" class="btn btn-info btn-pill analisar"><i class="fa fa-paper-plane" style="margin-right: 5px;"></i> Enviar p/ Análise</a>
+
+            @elseif($proposta->status == 'Em análise')
+                <a href="#" class="btn btn-info btn-pill">{{$proposta->status}}</a>
+
+            @elseif($proposta->status == 'Aprovada')
+                <a href="#" class="btn btn-success btn-pill">Aprovada</a>
+
+            @elseif($proposta->status == 'Recusada')
+                <a href="#" class="btn btn-danger btn-pill">Recusada</a>
+                <a href="#" data-id="{{$proposta->id}}" class="btn btn-info btn-pill revisar"><i class="fa fa-undo" style="margin-right: 5px;"></i> Revisar</a>
+            @elseif($proposta->status == 'Arquivada')
+                <a href="#" class="btn btn-default btn-pill">Arquivada</a>
+            @endif
+        </div>
     </div>
 
 

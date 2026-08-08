@@ -1,15 +1,19 @@
 @extends('adminlte::page')
 
 @section('content_header')
-    <h1>
-        Interações da O.S. {{$servico->os}} <small>{{$servico->nome}}</small>
-    </h1>
+<div class="row" style="margin-bottom: 15px;">
+	<div class="col-sm-12">
+		<h1 style="margin: 0; font-weight: 700; color: #333;">
+			Interações da O.S. {{$servico->os}} <small style="color: #777;">{{$servico->nome}}</small>
+		</h1>
+	</div>
+</div>
 @stop
 
 @section('content')
 
     @if (session('success'))
-        <div class="alert alert-success alert-dismissible">
+        <div class="alert alert-success alert-dismissible" style="border-radius: 6px;">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
             <h4><i class="icon fa fa-check"></i> Sucesso!</h4>
             {{ session('success') }}
@@ -17,28 +21,24 @@
     @endif
 
     @if (session('error'))
-        <div class="alert alert-danger alert-dismissible">
+        <div class="alert alert-danger alert-dismissible" style="border-radius: 6px;">
             <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
             <h4><i class="icon fa fa-ban"></i> Erro!</h4>
             {{ session('error') }}
         </div>
     @endif
 
-    <div style="margin-bottom: 15px;">
-        <a href="{{route('servicos.show',$servico->id)}}" class="btn btn-default"><i class="fa fa-chevron-left"></i> Voltar para o Serviço</a>
-        <a href="{{route('timeline',$servico->id)}}" class='btn btn-info' target="_blank"><i class="glyphicon glyphicon-time"></i> Ver Timeline</a>
+    <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+        <a href="{{route('servicos.show',$servico->id)}}" class="btn btn-default btn-pill"><i class="fa fa-chevron-left" style="margin-right: 5px;"></i> Voltar para o Serviço</a>
+        <a href="{{route('timeline',$servico->id)}}" class='btn btn-info btn-pill' target="_blank"><i class="fa fa-history" style="margin-right: 5px;"></i> Ver Timeline</a>
     </div>
 
     <!-- Box de Interações de Usuários -->
-    <div class="box box-info">
-        <div class="box-header with-border">
-            <h3 class="box-title"><i class="fa fa-comments"></i> Histórico de Mensagens</h3>
-            <div class="box-tools pull-right">
-                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-            </div>
+    <div class="table-container">
+        <div style="border-bottom: 1px solid #f4f4f4; padding-bottom: 15px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #333;"><i class="fa fa-comments text-muted" style="margin-right: 8px;"></i> Histórico de Mensagens</h3>
         </div>
-        <!-- /.box-header -->
-        <div class="box-body">
+        <div>
             @if(count($interacoes) > 0)
                 <ul class="timeline timeline-inverse">
                     @foreach($interacoes as $historico)
@@ -55,9 +55,9 @@
                         <li class="historico-item-li" id="historico-li-{{$historico->id}}">
                             <i class="{{$label}}"></i>
                             
-                            <div class="timeline-item" style="box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 4px; background: #fff; margin-bottom: 15px;">
+                            <div class="timeline-item" style="box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-radius: 6px; border: 1px solid #ebf0f5; background: #fff; margin-bottom: 15px;">
                                 <span class="time" style="padding: 10px 15px;">
-                                    <i class="fa fa-clock-o"></i> 
+                                    <i class="fa fa-clock"></i> 
                                     <span class="time-text">{{\Carbon\Carbon::parse($historico->edited_at ?? $historico->created_at)->timezone('America/Sao_Paulo')->format('d/m/Y H:i')}}</span>
                                     <span class="editado-indicator text-warning" style="font-size: 10px; font-weight: bold; margin-left: 2px; {{$historico->edited_at ? '' : 'display: none;'}}">(editado)</span>
                                 </span>
@@ -108,7 +108,7 @@
                                     @endif
 
                                     @if(strtolower(auth()->user()->privileges) == 'admin' || auth()->user()->id == 1 || auth()->id() == 1 || (strtolower(auth()->user()->privileges) == 'user' && $historico->user_id == auth()->id()))
-                                        <a href="{{ route('interacao.edit', $historico->id) }}" class="text-muted" style="margin-left: auto; font-size: 14px; display: inline-block; vertical-align: middle; cursor: pointer;" title="Editar"><span class="glyphicon glyphicon-pencil"></span></a>
+                                        <a href="{{ route('interacao.edit', $historico->id) }}" class="text-muted" style="margin-left: auto; font-size: 14px; display: inline-block; vertical-align: middle; cursor: pointer;" title="Editar"><span class="fa fa-edit text-info"></span></a>
                                     @endif
                                 </div>
                             </div>
@@ -122,18 +122,14 @@
                 </div>
             @endif
         </div>
-        <!-- /.box-body -->
     </div>
 
     <!-- Box de Interações do Sistema (Logs de alteração de campos) -->
-    <div class="box box-default collapsed-box">
-        <div class="box-header with-border">
-            <h3 class="box-title"><a href="" data-widget="collapse"><i class="fa fa-cog"></i> Histórico de Alterações do Sistema</a></h3>
-            <div class="box-tools pull-right">
-                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i></button>
-            </div>
+    <div class="table-container">
+        <div style="border-bottom: 1px solid #f4f4f4; padding-bottom: 15px; margin-bottom: 20px;">
+            <h3 style="margin: 0; font-size: 1.2em; font-weight: 700; color: #333;"><i class="fa fa-cog text-muted" style="margin-right: 8px;"></i> Histórico de Alterações do Sistema</h3>
         </div>
-        <div class="box-body">
+        <div>
             @if(count($interacoesSistema) > 0)
                 <ul class="timeline timeline-inverse">
                     @foreach($interacoesSistema as $historico)
@@ -149,9 +145,9 @@
                         <li class="historico-item-li" id="historico-li-{{$historico->id}}">
                             <i class="{{$label}}"></i>
 
-                            <div class="timeline-item" style="box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 4px; background: #fff; margin-bottom: 15px;">
+                            <div class="timeline-item" style="box-shadow: 0 1px 3px rgba(0,0,0,0.05); border-radius: 6px; border: 1px solid #ebf0f5; background: #fff; margin-bottom: 15px;">
                                 <span class="time" style="padding: 10px 15px;">
-                                    <i class="fa fa-clock-o"></i> 
+                                    <i class="fa fa-clock"></i> 
                                     <span class="time-text">{{\Carbon\Carbon::parse($historico->edited_at ?? $historico->created_at)->timezone('America/Sao_Paulo')->format('d/m/Y H:i')}}</span>
                                     <span class="editado-indicator text-warning" style="font-size: 10px; font-weight: bold; margin-left: 2px; {{$historico->edited_at ? '' : 'display: none;'}}">(editado)</span>
                                 </span>
@@ -202,7 +198,7 @@
                                     @endif
 
                                     @if(strtolower(auth()->user()->privileges) == 'admin' || auth()->user()->id == 1 || auth()->id() == 1 || (strtolower(auth()->user()->privileges) == 'user' && $historico->user_id == auth()->id()))
-                                        <a href="#" class="btn-edit-historico text-muted" data-toggle="modal" data-target="#modal-edit-historico" data-id="{{$historico->id}}" data-observacoes="{{ $historico->observacoes }}" data-pendencia_id="{{$historico->pendencia_id}}" data-pendencia_nome="{{ $historico->pendencia ? $historico->pendencia->pendencia : '' }}" style="margin-left: auto; font-size: 14px; display: inline-block; vertical-align: middle; cursor: pointer;" title="Editar"><span class="glyphicon glyphicon-pencil"></span></a>
+                                        <a href="#" class="btn-edit-historico text-muted" data-toggle="modal" data-target="#modal-edit-historico" data-id="{{$historico->id}}" data-observacoes="{{ $historico->observacoes }}" data-pendencia_id="{{$historico->pendencia_id}}" data-pendencia_nome="{{ $historico->pendencia ? $historico->pendencia->pendencia : '' }}" style="margin-left: auto; font-size: 14px; display: inline-block; vertical-align: middle; cursor: pointer;" title="Editar"><span class="fa fa-edit text-info"></span></a>
                                     @endif
                                 </div>
                             </div>
@@ -217,8 +213,34 @@
         </div>
     </div>
 
-
 @endsection
+
+@section('css')
+<style>
+	.table-container {
+		background: #fff;
+		border-radius: 8px;
+		padding: 20px;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+		border: 1px solid #ebf0f5;
+		margin-bottom: 25px;
+	}
+
+	.btn-pill {
+		border-radius: 50px;
+		padding: 6px 20px;
+		font-weight: 600;
+		transition: all 0.2s;
+	}
+
+	.btn-pill:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+	}
+
+	.content-header .breadcrumb { display: none !important; }
+</style>
+@stop
 
 @section('js')
 <script>

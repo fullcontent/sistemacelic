@@ -1,97 +1,53 @@
 @extends('adminlte::page')
-@section('content_header')
-<h1>Listagem de prestadores</h1>
-@stop
 
-
-@section('content')
-
-  <div class="box">
-    <div class="box-header">
-      <a class="btn btn-app" href="{{route('prestador.create')}}">
-        <i class="fa fa-plus"></i> Cadastrar
-      </a>
-    </div>
-    <table id="lista-prestadores" class="table table-bordered table-hover">
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Telefone</th>
-          <th>Email</th>
-          <th>Qualificação</th>
-          <th>UF</th>
-          <th>Cidade(s)</th>
-          <th>Avaliações</th>
-          <th></th>
-        </tr>
-      </thead>
-
-      <tbody>
-        @foreach($prestadores as $p)
-          <tr>
-
-            <td><a href="{{route('prestador.edit', $p->id)}}" class="link">{{$p->nome}}</a></td>
-            <td>{{$p->telefone}}</td>
-            <td>{{$p->email}}</td>
-            <td>{{$p->qualificacao}}</td>
-            <td>{{strtoupper($p->ufAtuacao)}}</td>
-            <td>
-              @foreach(json_decode($p->cidadeAtuacao) ?? [] as $c)
-                <span class="btn btn-default btn-xs">{{$c}}</span>
-              @endforeach
-            </td>
-            <td>
-              @if(optional($p->rating)->count())
-
-
-                <span class="pull-right">({{$p->rating->median('rating')}})</span>
-                <div class="Stars" style="--rating: {{$p->rating->median('rating')}};"></div>
-
-
-              @else
-
-              @endif
-            </td>
-            <td><a href="{{route('prestador.delete', $p->id)}}" class="confirmation danger"> <i class="glyphicon glyphicon-trash
-                                    "></i></a></td>
-
-          </tr>
-        @endforeach
-      </tbody>
-    </table>
-
-  </div>
-
-
-
-
-@endsection
+@section('title', 'Listagem de prestadores')
 
 @section('css')
+<style>
+	.table-container {
+		background: #fff;
+		border-radius: 8px;
+		padding: 20px;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+		border: 1px solid #ebf0f5;
+		margin-bottom: 25px;
+	}
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+	.btn-action {
+		width: 32px;
+		height: 32px;
+		line-height: 32px;
+		padding: 0;
+		text-align: center;
+		border-radius: 6px;
+		margin: 0 2px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.2s;
+		border: 1px solid #ddd;
+		background: #fff;
+	}
 
-    .checked {
-      color: orange;
-    }
+	.btn-action:hover {
+		transform: scale(1.1);
+		box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+		text-decoration: none;
+	}
 
-    @charset "UTF-8";
+	.content-header .breadcrumb { display: none !important; }
 
     :root {
       --star-size: 20px;
-      --star-color: #fff;
+      --star-color: #ddd;
       --star-background: #fc0;
     }
 
     .Stars {
       --percent: calc(var(--rating) / 5 * 100%);
-
       font-size: var(--star-size);
-
       line-height: 1;
+      display: inline-block;
     }
 
     .Stars::before {
@@ -101,135 +57,71 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+</style>
+@stop
 
-    .container {
+@section('content_header')
+<div class="row" style="margin-bottom: 15px;">
+	<div class="col-sm-6">
+		<h1 style="margin: 0; font-weight: 700; color: #333;">Listagem de Prestadores</h1>
+	</div>
+	<div class="col-sm-6 text-right">
+		<a class="btn btn-primary" href="{{route('prestador.create')}}" style="border-radius: 50px; padding: 8px 20px; font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+			<i class="fa fa-plus"></i> Cadastrar
+		</a>
+	</div>
+</div>
+@stop
 
-      width: auto;
-      align-items: center;
-      justify-content: center;
-      padding: 0 20px;
-    }
-
-    .rating {
-      display: flex;
-      width: 100%;
-      justify-content: center;
-      overflow: hidden;
-      flex-direction: row-reverse;
-      height: 150px;
-      position: relative;
-    }
-
-    .rating-0 {
-      filter: grayscale(100%);
-    }
-
-    .rating>input {
-      display: none;
-    }
-
-    .rating>label {
-      cursor: pointer;
-      width: 40px;
-      height: 40px;
-      margin-top: auto;
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='126.729' height='126.73'%3e%3cpath fill='%23e3e3e3' d='M121.215 44.212l-34.899-3.3c-2.2-.2-4.101-1.6-5-3.7l-12.5-30.3c-2-5-9.101-5-11.101 0l-12.4 30.3c-.8 2.1-2.8 3.5-5 3.7l-34.9 3.3c-5.2.5-7.3 7-3.4 10.5l26.3 23.1c1.7 1.5 2.4 3.7 1.9 5.9l-7.9 32.399c-1.2 5.101 4.3 9.3 8.9 6.601l29.1-17.101c1.9-1.1 4.2-1.1 6.1 0l29.101 17.101c4.6 2.699 10.1-1.4 8.899-6.601l-7.8-32.399c-.5-2.2.2-4.4 1.9-5.9l26.3-23.1c3.8-3.5 1.6-10-3.6-10.5z'/%3e%3c/svg%3e");
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: 76%;
-      transition: .3s;
-    }
-
-    .rating>input:checked~label,
-    .rating>input:checked~label~label {
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='126.729' height='126.73'%3e%3cpath fill='%23fcd93a' d='M121.215 44.212l-34.899-3.3c-2.2-.2-4.101-1.6-5-3.7l-12.5-30.3c-2-5-9.101-5-11.101 0l-12.4 30.3c-.8 2.1-2.8 3.5-5 3.7l-34.9 3.3c-5.2.5-7.3 7-3.4 10.5l26.3 23.1c1.7 1.5 2.4 3.7 1.9 5.9l-7.9 32.399c-1.2 5.101 4.3 9.3 8.9 6.601l29.1-17.101c1.9-1.1 4.2-1.1 6.1 0l29.101 17.101c4.6 2.699 10.1-1.4 8.899-6.601l-7.8-32.399c-.5-2.2.2-4.4 1.9-5.9l26.3-23.1c3.8-3.5 1.6-10-3.6-10.5z'/%3e%3c/svg%3e");
-    }
-
-
-    .rating>input:not(:checked)~label:hover,
-    .rating>input:not(:checked)~label:hover~label {
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='126.729' height='126.73'%3e%3cpath fill='%23d8b11e' d='M121.215 44.212l-34.899-3.3c-2.2-.2-4.101-1.6-5-3.7l-12.5-30.3c-2-5-9.101-5-11.101 0l-12.4 30.3c-.8 2.1-2.8 3.5-5 3.7l-34.9 3.3c-5.2.5-7.3 7-3.4 10.5l26.3 23.1c1.7 1.5 2.4 3.7 1.9 5.9l-7.9 32.399c-1.2 5.101 4.3 9.3 8.9 6.601l29.1-17.101c1.9-1.1 4.2-1.1 6.1 0l29.101 17.101c4.6 2.699 10.1-1.4 8.899-6.601l-7.8-32.399c-.5-2.2.2-4.4 1.9-5.9l26.3-23.1c3.8-3.5 1.6-10-3.6-10.5z'/%3e%3c/svg%3e");
-    }
-
-    .emoji-wrapper {
-      width: 100%;
-      text-align: center;
-      height: 100px;
-      overflow: hidden;
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
-
-    .emoji-wrapper:before,
-    .emoji-wrapper:after {
-      content: "";
-      height: 15px;
-      width: 100%;
-      position: absolute;
-      left: 0;
-      z-index: 1;
-    }
-
-    .emoji-wrapper:before {
-      top: 0;
-      background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 35%, rgba(255, 255, 255, 0) 100%);
-    }
-
-    .emoji-wrapper:after {
-      bottom: 0;
-      background: linear-gradient(to top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 35%, rgba(255, 255, 255, 0) 100%);
-    }
-
-    .emoji {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      transition: .3s;
-    }
-
-    .emoji>svg {
-      margin: 15px 0;
-      width: 70px;
-      height: 70px;
-      flex-shrink: 0;
-    }
-
-    #rating-1:checked~.emoji-wrapper>.emoji {
-      transform: translateY(-100px);
-    }
-
-    #rating-2:checked~.emoji-wrapper>.emoji {
-      transform: translateY(-200px);
-    }
-
-    #rating-3:checked~.emoji-wrapper>.emoji {
-      transform: translateY(-300px);
-    }
-
-    #rating-4:checked~.emoji-wrapper>.emoji {
-      transform: translateY(-400px);
-    }
-
-    #rating-5:checked~.emoji-wrapper>.emoji {
-      transform: translateY(-500px);
-    }
-
-    .feedback {
-
-      background-color: #fff;
-      width: 100%;
-      padding: 30px;
-      border-radius: 8px;
-      display: flex;
-      flex-direction: column;
-      flex-wrap: wrap;
-      align-items: center;
-      box-shadow: 0 4px 30px rgba(0, 0, 0, .05);
-    }
-  </style>
-
+@section('content')
+<div class="table-container">
+	<table id="lista-prestadores" class="table table-hover" style="width: 100%;">
+		<thead>
+			<tr style="background: #fcfcfc;">
+				<th>Nome</th>
+				<th>Telefone</th>
+				<th>Email</th>
+				<th>Qualificação</th>
+				<th>UF</th>
+				<th>Cidade(s)</th>
+				<th>Avaliações</th>
+				<th width="120" class="text-center">Ações</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach($prestadores as $p)
+				<tr>
+					<td><a href="{{route('prestador.edit', $p->id)}}" style="font-weight: 600; color: #3c8dbc;">{{$p->nome}}</a></td>
+					<td>{{$p->telefone}}</td>
+					<td>{{$p->email}}</td>
+					<td>{{$p->qualificacao}}</td>
+					<td>{{strtoupper($p->ufAtuacao)}}</td>
+					<td>
+						@foreach(json_decode($p->cidadeAtuacao) ?? [] as $c)
+							<span class="btn btn-default btn-xs" style="margin: 1px; border-radius: 4px;">{{$c}}</span>
+						@endforeach
+					</td>
+					<td>
+						@if(optional($p->rating)->count())
+							<span class="pull-right" style="margin-left: 5px;">({{$p->rating->median('rating')}})</span>
+							<div class="Stars" style="--rating: {{$p->rating->median('rating')}};"></div>
+						@endif
+					</td>
+					<td class="text-center" style="white-space: nowrap;">
+						<a href="{{route('prestador.edit', $p->id)}}" class="btn btn-default btn-action" title="Editar">
+							<i class="fa fa-edit text-warning"></i>
+						</a>
+						<a href="{{route('prestador.delete', $p->id)}}" class="btn btn-default btn-action confirmation" title="Excluir">
+							<i class="fa fa-trash text-danger"></i>
+						</a>
+					</td>
+				</tr>
+			@endforeach
+		</tbody>
+	</table>
+</div>
 @endsection
+
 @section('js')
 
 

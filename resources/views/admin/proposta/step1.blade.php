@@ -1,27 +1,75 @@
 @extends('adminlte::page')
 
-@section('content_header')
-    <h1>Gerar nova Proposta</h1>
+@section('title', 'Gerar nova Proposta')
+
+@section('css')
+<style>
+	.form-container {
+		background: #fff;
+		border-radius: 8px;
+		padding: 25px;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+		border: 1px solid #ebf0f5;
+		margin-bottom: 25px;
+	}
+
+	.btn-pill {
+		border-radius: 50px;
+		padding: 6px 20px;
+		font-weight: 600;
+		transition: all 0.2s;
+	}
+
+	.btn-pill:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+	}
+
+	/* Scope controls inside form container */
+	.form-container .form-control {
+		border-radius: 6px;
+		border: 1px solid #d2d6de;
+		box-shadow: none;
+		transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+	}
+
+	.form-container .form-control:focus {
+		border-color: #3c8dbc;
+		box-shadow: none;
+	}
+
+	.form-container label {
+		font-weight: 600;
+		color: #555;
+		font-size: 0.95em;
+		margin-bottom: 6px;
+	}
+
+	.form-container .box-body {
+		padding: 0;
+	}
+
+	.content-header .breadcrumb { display: none !important; }
+</style>
 @stop
 
-
+@section('content_header')
+<div class="row" style="margin-bottom: 15px;">
+	<div class="col-sm-12">
+		<h1 style="margin: 0; font-weight: 700; color: #333;">Gerar Nova Proposta</h1>
+	</div>
+</div>
+@stop
 
 @section('content')
-
-<div class="box box-primary">
-
-    <div class="box-header with-border">
-        <h3 class="box-title">Proposta</h3>
-    </div>
+<div class="form-container">
     @if($errors->any())
-    {!! implode('', $errors->all('<div class="alert alert-danger alert-dismissible">:message</div>')) !!}
+    {!! implode('', $errors->all('<div class="alert alert-danger alert-dismissible" style="border-radius: 6px;">:message</div>')) !!}
     @endif
 
     {!! Form::open(['route'=>'proposta.store','id'=>'cadastroProposta','method'=>'post']) !!}
 
-    
-
-    <div class="box-body">
+    <div class="box-body row">
 
         <div class="col-md-6">
             <div class="form-group">
@@ -42,35 +90,28 @@
 
         </div>
 
-       
-
-
 		<div class="col-md-12">
 			<div class="form-group">
 				{!! Form::label('servicos', 'Servicos:', array('class'=>'control-label')) !!}
 				<br>
-				{!! Form::select('servico_id', [], null, ['class'=>'form-control servicosLpu','style'=>'width:70%;']) !!}
-				<button class="btn btn-success adicionar" type="button"><i class="glyphicon glyphicon-plus"></i> Adicionar</button>
-                <button class="btn btn-info btn-xs adicionarSub" type="button"><i class="glyphicon glyphicon-plus"></i> SubServiço</button>  
-				
+				{!! Form::select('servico_id', [], null, ['class'=>'form-control servicosLpu','style'=>'width:70%; display: inline-block; vertical-align: middle; margin-right: 10px;']) !!}
+				<button class="btn btn-success adicionar btn-pill" type="button" style="padding: 6px 15px;"><i class="fa fa-plus"></i> Adicionar</button>
+                <button class="btn btn-info btn-xs adicionarSub btn-pill" type="button" style="padding: 6px 15px; margin-left: 5px;"><i class="fa fa-plus"></i> SubServiço</button>  
 			</div>
 		</div>
 
-		<div class="col-md-12 servicos" style="display:none">
-            <table class="table table-striped table-bordered " id="datatable">
+		<div class="col-md-12 servicos" style="display:none; margin-top: 15px; margin-bottom: 15px;">
+            <table class="table table-hover" id="datatable" style="width: 100%;">
                 <thead>
-                <tr>
+                <tr style="background: #fcfcfc;">
                         <th>#</th>
                         <th>Serviço</th> 
                         <th>Escopo</th>
                         <th width="20%">Responsável</th>
                         <th>Valor Unitário</th>
                         <th></th>  
-                                            
                     </tr>
                 </thead>
-                   
-
                     <tbody>
 
                     </tbody>
@@ -118,24 +159,15 @@
 
         </div>
 
-
-
-
-</div>
-
-    <div class="box-footer">
-        <a href="javascript: history.go(-1)" class="btn btn-default">Voltar</a>
-        <button type="submit" class="btn btn-info">Próximo Passo</button>
     </div>
 
-
+	<div style="border-top: 1px solid #f4f4f4; padding-top: 20px; margin-top: 20px; display: flex; gap: 10px;">
+		<a href="javascript: history.go(-1)" class="btn btn-default btn-pill">Voltar</a>
+		<button type="submit" class="btn btn-info btn-pill">Próximo Passo</button>
+	</div>
 
     {!! Form::close() !!}
-
-
-
-
-
+</div>
 @endsection
 
 
