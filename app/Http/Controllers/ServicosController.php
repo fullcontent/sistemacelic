@@ -1224,6 +1224,7 @@ class ServicosController extends Controller
                     if (!ServicoFinalizado::where('servico_id', $servico->id)->first()) {
                         $this->finalizarServico($servico->id);
                         $this->removerVinculo($servico->vinculos);
+                        $this->notificarClientesFinalizacao($servico);
                     }
 
                 }
@@ -1644,9 +1645,61 @@ class ServicosController extends Controller
 
         // Save the updated service
         $servico->save();
+        $this->notificarClientesProtocolo($servico);
 
         // Redirect to the service show page
         return redirect()->route('servicos.show', $servico->id);
+    }
+
+    protected function notificarClientesFinalizacao($servico)
+    {
+        try {
+            $webhookService = new \App\Services\WebhookService();
+            $webhookService->sendStatusChangeEmail($servico, 'em_andamento', 'finalizado', 'Serviço finalizado com sucesso.');
+
+            $empresaId = $servico->empresa_id ?: ($servico->unidade ? $servico->unidade->empresa_id : null);
+            if ($empresaId) {
+                $clientUserIds = UserAccess::where('empresa_id', $empresaId)->pluck('user_id');
+                $clientUsers = User::whereIn('id', $clientUserIds)->where('active', 1)->where('privileges', 'cliente')->get();
+
+                $resumo = "O serviço '{$servico->nome}' (OS: {$servico->os}) foi finalizado com sucesso.";
+                foreach ($clientUsers as $clientUser) {
+                    try {
+                        $clientUser->notify(new UserMentioned($servico, 'cliente.servico.show', $resumo));
+                    } catch (\Exception $e) {
+                        \Log::error("Erro ao notificar cliente {$clientUser->name} sobre finalização: " . $e->getMessage());
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error("Erro no envio de notificações de finalização: " . $e->getMessage());
+        }
+    }
+
+    protected function notificarClientesProtocolo($servico)
+    {
+        try {
+            $protocoloUrl = !empty($servico->protocolo_anexo) ? url("public/uploads/{$servico->protocolo_anexo}") : '';
+            $webhookService = new \App\Services\WebhookService();
+            $webhookService->sendProtocoloEmail($servico, $servico->protocolo_numero, $servico->protocolo_emissao, $protocoloUrl);
+
+            $empresaId = $servico->empresa_id ?: ($servico->unidade ? $servico->unidade->empresa_id : null);
+            if ($empresaId) {
+                $clientUserIds = UserAccess::where('empresa_id', $empresaId)->pluck('user_id');
+                $clientUsers = User::whereIn('id', $clientUserIds)->where('active', 1)->where('privileges', 'cliente')->get();
+
+                $resumo = "Novo protocolo ({$servico->protocolo_numero}) anexado ao serviço '{$servico->nome}'.";
+                foreach ($clientUsers as $clientUser) {
+                    try {
+                        $clientUser->notify(new UserMentioned($servico, 'cliente.servico.show', $resumo));
+                    } catch (\Exception $e) {
+                        \Log::error("Erro ao notificar cliente {$clientUser->name} sobre protocolo: " . $e->getMessage());
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error("Erro no envio de notificações de protocolo: " . $e->getMessage());
+        }
     }
 
     public function timelineView($id)
@@ -1849,10 +1902,9 @@ class ServicosController extends Controller
         $servico->save();
 
         try {
-            $webhookService = new \App\Services\WebhookService();
-            $webhookService->sendStatusChangeEmail($servico, $previousStatus, 'finalizado', 'Ciclo de análise aprovado e serviço finalizado');
+            $this->notificarClientesFinalizacao($servico);
         } catch (\Exception $e) {
-            \Log::error('Erro ao disparar WebhookService em finalizarCicloAnalise: ' . $e->getMessage());
+            \Log::error('Erro ao disparar notificações de cliente em finalizarCicloAnalise: ' . $e->getMessage());
         }
 
         // Registra histórico

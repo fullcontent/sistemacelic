@@ -189,4 +189,52 @@ class WebhookService
             return false;
         }
     }
+
+    public function sendProtocoloEmail($servico, $protocoloNumero, $protocoloEmissao, $anexoUrl = '')
+    {
+        if (!$this->statusWebhookUrl) {
+            Log::warning('WebhookService: URL do webhook de status não configurada (WEBHOOK_STATUS_URL / WEBHOOK_EMAIL_URL).');
+            return false;
+        }
+
+        try {
+            if (!$servico->relationLoaded('unidade')) {
+                $servico->load('unidade.empresa');
+            }
+
+            $payload = [
+                'event' => 'protocolo_anexado',
+                'servico' => [
+                    'id' => $servico->id,
+                    'os' => $servico->os,
+                    'nome' => $servico->nome,
+                    'situacao' => $servico->situacao,
+                    'tipo' => $servico->tipo,
+                    'unidade' => $servico->unidade ? $servico->unidade->nomeFantasia : 'N/A',
+                    'cliente' => $servico->unidade && $servico->unidade->empresa ? $servico->unidade->empresa->nomeFantasia : 'N/A',
+                    'link' => route('cliente.servico.show', $servico->id)
+                ],
+                'protocolo' => [
+                    'numero' => $protocoloNumero,
+                    'emissao' => $protocoloEmissao,
+                    'anexo_url' => $anexoUrl
+                ],
+                'system_context' => [
+                    'app_name' => config('app.name'),
+                    'app_url' => config('app.url'),
+                    'user' => auth()->check() ? auth()->user()->name : 'Sistema',
+                    'timestamp' => now()->toDateTimeString()
+                ]
+            ];
+
+            $response = $this->client->post($this->statusWebhookUrl, [
+                'json' => $payload
+            ]);
+
+            return $response->getStatusCode() === 200 || $response->getStatusCode() === 201;
+        } catch (\Exception $e) {
+            Log::error('WebhookService: Erro ao disparar webhook de protocolo: ' . $e->getMessage());
+            return false;
+        }
+    }
 }
